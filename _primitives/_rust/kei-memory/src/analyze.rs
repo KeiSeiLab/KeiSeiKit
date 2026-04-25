@@ -1,5 +1,5 @@
 //! Session retrospective — duration, tool counts, files, errors, time-wasters.
-//!
+
 //! Constructor Pattern: one cube, one read-only responsibility.
 //! Output is plain-text (stdout). Callers can `--summary` for a one-liner
 //! suitable for appending to audit-backlog.md, or full report for review.

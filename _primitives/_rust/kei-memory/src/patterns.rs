@@ -1,5 +1,5 @@
 //! Pattern detector — recurring event-classes.
-//!
+
 //! Constructor Pattern: one cube, one read/write responsibility.
 //! A "pattern" is an event_class that occurred ≥2 times in ONE session
 //! (in-session recurrence) or ≥2 times across DIFFERENT sessions

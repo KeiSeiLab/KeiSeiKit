@@ -122,6 +122,8 @@ fi
 setup_target_dirs
 scaffold_memory_index
 install_blocks
+install_roles
+install_capabilities
 run_primitives_phase
 install_bridges
 install_manifests

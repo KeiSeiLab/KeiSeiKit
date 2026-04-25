@@ -1,5 +1,5 @@
 //! SQL schema for the kei-memory offline analyzer.
-//!
+
 //! Constructor Pattern: schema + migration runner, no business logic.
 //! DB default path: `~/.claude/memory/kei-memory.sqlite`.
 //! Any structural change MUST append a new migration; never edit history.

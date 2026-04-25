@@ -1,5 +1,5 @@
 //! CLI glue for the `classify` subcommand.
-//!
+
 //! Constructor Pattern: main.rs stays dispatch-only; this cube owns the
 //! print-a-ranking layer. Pure function of (dir, message, min_len,
 //! threshold). Splits load + classify + print into three tiny helpers.

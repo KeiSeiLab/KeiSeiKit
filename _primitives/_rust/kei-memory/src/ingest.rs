@@ -1,5 +1,5 @@
 //! Ingest — read JSONL trace → insert events into DB.
-//!
+
 //! Constructor Pattern: one cube, single responsibility.
 //! Trace line shape (subset we care about):
 //!   {"ts": 1700000000, "kind": "tool_use", "tool": "Bash",

@@ -1,17 +1,17 @@
 //! Metric math — pure functions over two parallel label vectors.
-//!
+
 //! No IO, no predictors, no disk. Every function takes `&[&str]` + returns
 //! numbers or HashMaps. Follows sklearn convention:
-//!
+
 //!   * precision_c  = TP_c / (TP_c + FP_c)       (0 if denominator 0)
 //!   * recall_c     = TP_c / (TP_c + FN_c)       (0 if denominator 0)
 //!   * f1_c         = 2 · P · R / (P + R)        (0 if denominator 0)
 //!   * support_c    = number of gold rows with true=c
 //!   * accuracy     = correct / total            (0 if total=0)
-//!
+
 //! Macro-F1 is computed in `eval_report`; it is the arithmetic mean of
 //! per-category f1 scores over categories WITH support > 0.
-//!
+
 //! Zero-support categories: we still emit a row (precision=recall=f1=0),
 //! so the report can show them — matches the spec test
 //! `per_category_metrics_handle_zero_support`.

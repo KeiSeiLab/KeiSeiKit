@@ -1,9 +1,9 @@
 //! Integration tests for the likelihood-ratio classifier.
-//!
+
 //! Uses `#[path]` to pull the modules under test directly from src/,
 //! matching the pattern used in `tests/integration.rs` (no library
 //! crate surface).
-//!
+
 //! Test fixtures are built via `Firmware::train_from_text` (Z1's
 //! in-memory trainer) so we don't need disk I/O for most cases. The
 //! two `load_from_dir*` tests DO hit disk via `tempfile`.

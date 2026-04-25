@@ -1,9 +1,9 @@
 //! Category predictors — trait + two real implementations.
-//!
+
 //! The `CategoryPredictor` trait isolates the eval loop from concrete
 //! classifier internals so tests can inject lightweight mocks (see
 //! `tests/eval.rs`). Two real impls live here:
-//!
+
 //!   * `RegexPredictor`     — v1: walk compiled category table, first
 //!                             matching regex wins, else "uncategorized".
 //!   * `FirmwarePredictor`  — v2: delegate to `Classifier::classify`
@@ -11,7 +11,7 @@
 //!                             settings mandated by the spec (we want the
 //!                             top category even for very short inputs so
 //!                             the eval never returns None for length).
-//!
+
 //! Constructor Pattern: one file, one responsibility (turn text → label).
 //! All stateless functions except for the two thin predictor structs,
 //! which hold their pre-compiled categories / loaded classifier.

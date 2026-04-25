@@ -1,9 +1,9 @@
 //! Report — read scan output, aggregate, print plaintext table.
-//!
+
 //! Constructor Pattern: one responsibility = turn rows into a ranking.
 //! Two group-by modes: `category` (default) and `session` (chatlog file).
 //! Sort key = weighted score (count * weight), desc.
-//!
+
 //! Output is plaintext with fixed-width columns so the user can grep it.
 
 use crate::row::{parse_csv, Row};

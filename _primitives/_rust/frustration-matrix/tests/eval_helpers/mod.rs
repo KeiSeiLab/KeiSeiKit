@@ -1,13 +1,13 @@
 //! Shared fixtures for `tests/eval.rs`.
-//!
+
 //! Lives in a subdirectory so Cargo doesn't compile it as its own test
 //! binary. The parent test (`tests/eval.rs`) declares this with:
-//!
+
 //! ```ignore
 //! #[path = "eval_helpers/mod.rs"]
 //! mod eval_helpers;
 //! ```
-//!
+
 //! The `#[path]` form is used because `super::*` from here needs to resolve
 //! to the eval-types already wired up in the test root via `#[path]`
 //! includes — keeping the wire-up chain confined to the test root.

@@ -1,5 +1,5 @@
 //! Classifier-driven row emission for the scan loop.
-//!
+
 //! Constructor Pattern: one function, one responsibility — given one
 //! extracted user-line `Hit` and a loaded `Classifier`, emit exactly one
 //! `Row` (the top-scoring category, or `"uncategorized"` if the classifier

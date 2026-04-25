@@ -1,5 +1,5 @@
 //! Co-access tracking — files touched within a 5-minute window.
-//!
+
 //! Constructor Pattern: one cube, single responsibility.
 //! Derived from an in-house implementation, algorithmic spec documented in coaccess.md.
 //! Key difference: session-id isn't part of the coaccess PK — we aggregate

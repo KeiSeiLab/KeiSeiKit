@@ -1,6 +1,6 @@
 //! frustration-matrix — longitudinal user-pushback scanner + firmware trainer
 //! + likelihood-ratio classifier.
-//!
+
 //! Constructor Pattern: main.rs only dispatches. Work is in cubes:
 //! categories / markdown / jsonl / since / row / scan / report / firmware /
 //! firmware_corpus / firmware_ngram / classifier. CLI shape stable; extend
@@ -92,11 +92,12 @@ enum Cmd {
         by: By,
     },
     /// Train a byte-level n-gram firmware from a corpus directory.
-    /// Output is gzipped JSON, typically 10-50 KB per language class.
+    /// Output
+    /// is gzipped JSON, typically 10-50 KB per language class.
     Train {
         #[arg(long)]
         root: PathBuf,
-        /// Context depth. Internal calibration knee is 4 on 10-25 MB.
+        /// Context depth. internal calibration knee is 4 on 10-25 MB.
         #[arg(long, default_value_t = firmware::DEFAULT_MAX_DEPTH)]
         depth: usize,
         #[arg(long)]

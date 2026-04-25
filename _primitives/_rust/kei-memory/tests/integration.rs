@@ -1,5 +1,5 @@
 //! Integration tests for kei-memory.
-//!
+
 //! Constructor Pattern: each test = one scenario, one assertion target.
 //! Uses tempfile for per-test isolated sqlite file. Loads source modules
 //! via `#[path]` so we don't need to expose a library crate surface.

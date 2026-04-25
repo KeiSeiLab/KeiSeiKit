@@ -1,9 +1,9 @@
 //! Normalised per-file parse product.
-//!
+
 //! Both markdown and jsonl parsers emit their own line types. The scan
 //! loop only needs a common shape: `{file, line_no, text, timestamp?}`.
 //! This cube is the only place that knows how to unify the two.
-//!
+
 //! `timestamp` is `Some` only for jsonl entries (runtime writes an
 //! ISO 8601 `.timestamp` field). Markdown falls back to file mtime,
 //! applied by the scan loop — keep this struct dumb.

@@ -1,20 +1,20 @@
 //! Eval — compare regex-based (v1) vs firmware-based (v2) classification on
 //! a hand-labelled gold set. Reports per-category precision / recall / f1,
 //! overall accuracy and macro-f1, plus two confusion matrices.
-//!
+
 //! This module consumes APIs from firmware.rs (Z1) and classifier.rs (Z2).
 //! If those modules have different method names at orchestrator-merge time,
 //! update the call sites here — the eval LOGIC is independent of the
 //! internal firmware representation.
-//!
+
 //! Constructor Pattern: this file holds only the public types + the
 //! `evaluate` orchestrator. Helpers live in sibling cubes:
-//!
+
 //!   * `eval_gold`    — parse labelled JSONL, filter quality=gold
 //!   * `eval_predict` — `CategoryPredictor` trait + regex / firmware impls
 //!   * `eval_metrics` — pure precision / recall / f1 math
 //!   * `eval_report`  — CSV write + stdout summary
-//!
+
 //! Purity: every mathematical step in eval_metrics is a pure function of
 //! two integer vectors (true + predicted). Predictors are behind a trait
 //! so tests can inject `MockClassifier` without Z1/Z2 on disk.

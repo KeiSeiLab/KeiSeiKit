@@ -1,5 +1,5 @@
 //! Command handlers — one function per CLI subcommand.
-//!
+
 //! Constructor Pattern: each handler <30 LOC, single responsibility.
 //! Pulled out of main.rs to keep the dispatcher under the 200 LOC limit.
 

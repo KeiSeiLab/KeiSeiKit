@@ -1,8 +1,8 @@
 //! Output row — one hit per (category, chatlog file, line_no).
-//!
+
 //! Constructor Pattern: one struct, two serializers. CSV is emitted by hand
 //! (no `csv` crate in the dependency list); JSONL uses `serde_json`.
-//!
+
 //! Fields are public and stable — this is the wire format the `report`
 //! sub-command reads back from disk.
 

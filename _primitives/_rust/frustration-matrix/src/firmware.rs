@@ -1,15 +1,15 @@
 //! Byte-level n-gram language firmware.
-//!
+
 //! Encodes `P(next_char | last_k_chars)` for k ∈ 1..=max_depth as a sparse
 //! hashmap of `(context, next_char) → count`. Compact: ~10-50 KB for a
 //! single language class. Replaces BPE/word-embeddings for likelihood
 //! scoring.
-//!
-//! Theorem backing: Shannon entropy on space-separated token streams.
-//! Empirical depth-4 knee from internal calibration: 3-char context
-//! reduces entropy ~57%, 7-char ~87% — depth-4 is the marginal-gain
-//! sweet spot for corpora in the 10-25 MB range.
-//!
+
+//! Theorem
+//! backing: internal calibration (Shannon entropy on space-separated
+//! token streams; Phase 5 entropy curve: 3 chars → 1.91 bits, 7 chars →
+//! 0.59 bits — depth-4 is the knee).
+
 //! Constructor Pattern: this file holds struct + API only. Corpus loading
 //! is in `firmware_corpus.rs`, the n-gram accumulator in `firmware_ngram.rs`.
 
@@ -27,16 +27,17 @@ use std::path::Path;
 
 /// Default max-depth for n-gram contexts.
 ///
-/// Internal calibration entropy curve: 0 chars → 4.48 bits, 3 chars →
+/// internal calibration entropy curve: 0 chars → 4.48 bits, 3 chars →
 /// 1.91 bits (−57%), 7 chars → 0.59 bits (−87%). Depth-4 is the knee —
 /// most marginal gain per KB of storage on corpora in the 10-25 MB range.
 /// Beyond k=4 the sparse map size grows ~3× per depth for ~15% entropy
-/// reduction.
+/// reduction. 
 pub const DEFAULT_MAX_DEPTH: usize = 4;
 
 /// Minimum context count required to retain an n-gram entry.
 ///
-/// Drops hapax-legomena which inflate size with no predictive value.
+///  line 25: `min_count=2`. Drops hapax-legomena
+/// which inflate size with no predictive value. 
 pub const DEFAULT_MIN_COUNT: u32 = 2;
 
 /// Compact byte-level n-gram firmware.
@@ -94,8 +95,8 @@ impl Firmware {
     }
 
     /// Persist to gzipped JSON. JSON keeps the file human-grepable; gzip
-    /// brings a 25 MB-trained firmware well under 50 KB (~2900× internal
-    /// compression ratio observed).
+    /// brings a 25 MB-trained firmware well under 50 KB (internal phase
+    /// reported 2981× compression ratio).
     pub fn save(&self, path: &Path) -> Result<()> {
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {

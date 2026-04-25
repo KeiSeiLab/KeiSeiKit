@@ -1,22 +1,22 @@
 //! Firmware-based likelihood-ratio classifier.
-//!
+
 //! One cube, one responsibility: given per-category firmwares + a neutral
 //! baseline, assign a message to the category with the highest
 //! length-normalized log-likelihood ratio
 //! `log P(msg|cat) − log P(msg|neutral)` / chars(msg).
-//!
+
 //! ASSUMPTION: `firmware.rs` is supplied by a parallel Z1 agent (RULE 0.13).
 //! Expected API: `Firmware::{train_from_dir, train_from_text,
 //! log_likelihood, save, load}`. We adapt call sites here; never edit Z1.
-//!
+
 //! Ratio removes base-rate language entropy (~1 bit/char). Length-normalize
 //! so long messages don't trivially outscore short ones.
-//!
-//! Defaults (see constants below): MIN_LEN = 20 — derived from internal
-//! n-gram entropy calibration ("7-9 chars of context = almost full
-//! predictability"; max_depth = 8 → 2 full prediction windows = 16 → 20
-//! with safety margin). THRESHOLD = 0.0 — any net-positive ratio counts;
-//! permissive default for tuning later.
+
+//! Defaults (see constants below): MIN_LEN = 20 — DERIVED from internal
+//! n-gram entropy (internal calibration:
+//! "7-9 chars of context = almost full predictability"; max_depth = 8 → 2
+//! full prediction windows = 16 → 20 with safety margin). THRESHOLD = 0.0
+//! — any net-positive ratio counts; permissive default for tuning later.
 
 use crate::firmware::Firmware;
 use anyhow::{anyhow, Context, Result};

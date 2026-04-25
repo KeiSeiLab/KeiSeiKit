@@ -1,6 +1,6 @@
 //! Firmware tests — cover training, save/load, multilingual alphabet,
 //! unigram fallback, and size budget (≤50 KB at depth 4 on 1 MB corpus).
-//!
+
 //! Like `tests/integration.rs`, we link source modules via `#[path]` so
 //! the binary crate doesn't need to export a library surface.
 
@@ -97,7 +97,7 @@ fn unseen_context_falls_back_to_unigram() {
 // ---------------------------------------------------------------
 // 5. depth_4_on_small_corpus_stays_under_50kb — size budget sanity.
 //    Generates a 1 MB corpus of predictable prose; saves; asserts
-//    file size < 50 KB — the internal compression-ratio target.
+//    file size < 50 KB. This is the internal compression-ratio target.
 // ---------------------------------------------------------------
 #[test]
 fn depth_4_on_small_corpus_stays_under_50kb() {

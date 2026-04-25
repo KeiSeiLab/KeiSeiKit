@@ -58,33 +58,73 @@ cd "$DST"
 echo "==> rsync $SRC → $DST (tracked files only)"
 TMP_LIST="$(mktemp)"
 trap "rm -f $TMP_LIST" EXIT
-( cd "$SRC" && git ls-files ) > "$TMP_LIST"
 
-rsync -a --delete --files-from="$TMP_LIST" \
-    --exclude='_primitives/_rust/frustration-matrix/data/corpus/' \
-    --exclude='_primitives/_rust/frustration-matrix/data/labeled-training-set.jsonl' \
-    --exclude='_primitives/_rust/frustration-matrix/data/firmwares/' \
-    --exclude='.claude/worktrees/' \
-    --exclude='_forks/' \
-    "$SRC/" "$DST/"
+# Filter the git-ls-files list with grep BEFORE handing to rsync.
+# rsync's `--exclude` is ignored when `--files-from` is used (its glob
+# matcher only fires for directory traversal, not for explicit-file mode).
+# So we pre-strip every path that would leak Genesis-laden data.
+EXCLUDED_PATTERNS='^(_primitives/_rust/frustration-matrix/data/corpus/|_primitives/_rust/frustration-matrix/data/labeled-training-set\.jsonl|_primitives/_rust/frustration-matrix/data/firmwares/|\.claude/worktrees/|_forks/)'
+( cd "$SRC" && git ls-files ) | grep -vE "$EXCLUDED_PATTERNS" > "$TMP_LIST"
+
+rsync -a --files-from="$TMP_LIST" "$SRC/" "$DST/"
+
+# Drop public-side files that no longer exist (or are now excluded) on src.
+# We can't use `rsync --delete` with `--files-from` reliably (it limits to
+# the listed paths); do it explicitly via diff against the destination tree.
+DST_LIST="$(mktemp)"
+DELETIONS="$(mktemp)"
+trap "rm -f $TMP_LIST $DST_LIST $DELETIONS" EXIT
+( cd "$DST" && git ls-files ) > "$DST_LIST"
+# Files in DST that are not in the new (filtered) source list AND are not
+# locally-managed public-only artefacts (sync script, mirror docs, sync
+# meta) get deleted.
+LOCAL_ONLY='^(tools/sync-public\.sh|PUBLIC-MIRROR\.md|_primitives/_rust/frustration-matrix/data/README\.md)$'
+{ comm -23 <(sort "$DST_LIST") <(sort "$TMP_LIST") || true; } \
+    | { grep -vE "$LOCAL_ONLY" || true; } > "$DELETIONS"
+if [ -s "$DELETIONS" ]; then
+    while IFS= read -r f; do
+        [ -n "$f" ] && rm -f "$DST/$f"
+    done < "$DELETIONS"
+fi
 
 # ---- 2. sed substitutions ----
 echo "==> applying scrub rules"
+# Rules are run in order — order matters. Each rule is a `sed -E` script.
+# More-specific rules first; the catch-all "Genesis " (with trailing space)
+# rule at the bottom must NOT run before the structured ones.
 SUBSTITUTIONS=(
-    's|Port of Genesis `[a-z_.0-9]\+\.py` + `[a-z_.0-9]\+\.py`\. Theorem|Theorem|g'
-    's|Genesis HISTORY\.md §[0-9-]\+|internal calibration|g'
-    's|`~/Projects/KeiLab/Genesis/firmware/HISTORY\.md`|internal calibration|g'
-    's|DERIVED from Genesis|DERIVED from internal|g'
-    's|`Genesis-clean: no [^`]*`|implementation note removed|g'
-    's|Genesis-clean: no normalize.*$||g'
-    's|Genesis dissolves those|as ill-posed|g'
-    's|Genesis Phase 3 compression ratio|internal compression-ratio target|g'
-    's|Genesis Phase 5|internal phase|g'
-    's|\[E2 VERIFIED: Genesis [^]]*\]||g'
-    's|\[E1 VERIFIED: source\]||g'
-    's|for KeiLab / bio work|for any pre-registered experiment work|g'
-    's|`~/Projects/KeiLab/Genesis/`||g'
-    's|Genesis HISTORY\.md|internal calibration notes|g'
+    # Multi-token leak: "Port of Genesis `compute_firmware_v2.py` + `deep_firmware.py`. Theorem"
+    's#Port of Genesis `[a-z_.0-9]+\.py`( \+ `[a-z_.0-9]+\.py`)?\. Theorem#Theorem#g'
+    # "Ports Genesis `<file>.py` / `<file>.py`. Output is..." (CLI subcommand docstring form)
+    's#Ports Genesis `[a-z_.0-9]+\.py`( / `[a-z_.0-9]+\.py`)?\. ##g'
+    # Bare reference: "Genesis `<file>.py` /  `<file>.py`" with no trailing period
+    's#Genesis `[a-z_.0-9]+\.py`( / `[a-z_.0-9]+\.py`)?##g'
+    # Genesis `<file>.py` line N reference
+    's#Genesis `[a-z_.0-9]+\.py` line [0-9]+:?##g'
+    # E-grade citations referencing Genesis or source
+    's#\[E[0-9] VERIFIED: Genesis [^]]*\]##g'
+    's#\[E[0-9] VERIFIED: source\]##g'
+    # Genesis HISTORY.md section/line refs (most specific first)
+    's#`~/Projects/KeiLab/Genesis/firmware/HISTORY\.md` §[0-9]+ l\.[0-9]+#internal calibration#g'
+    's#`~/Projects/KeiLab/Genesis/firmware/HISTORY\.md`#internal calibration#g'
+    's#~/Projects/KeiLab/Genesis/firmware/HISTORY\.md##g'
+    's#Genesis HISTORY\.md §[0-9-]+#internal calibration#g'
+    's#Genesis HISTORY\.md#internal calibration notes#g'
+    's#`~/Projects/KeiLab/Genesis/`##g'
+    's#~/Projects/KeiLab/Genesis/##g'
+    # Phase-N labels that imply Genesis project structure
+    's#Genesis Phase 3 compression ratio#internal compression-ratio target#g'
+    's#Genesis Phase [0-9]+ entropy curve#internal entropy-curve calibration#g'
+    's#Genesis Phase [0-9]+#internal phase#g'
+    # Catch-all attribution rewrites
+    's#DERIVED from Genesis#DERIVED from internal#g'
+    's#Genesis dissolves those#as ill-posed#g'
+    's#Genesis-clean: no normalize\(S\), no Frobenius, no rank-r decomposition\.##g'
+    's#Genesis-clean: no [a-zA-Z_(),.0-9 -]+\.##g'
+    's#for KeiLab / bio work#for any pre-registered experiment work#g'
+    # Trailing whitespace artefacts left by stripping
+    's#  +$##g'
+    's#^(//!|//|/\*\*?)\s*$##g'
 )
 
 # Targets: only files we control, not data dir
@@ -101,15 +141,21 @@ done
 
 # ---- 3. validate: no residual Genesis/KeiLab content leaks ----
 echo "==> validating clean"
-RESIDUAL=$(grep -rniE "Genesis (HISTORY|Phase|firmware|paradigm|paths|compute_firmware|deep_firmware)" \
+# Match any Genesis/KeiLab/HISTORY.md reference that is NOT legitimate
+# author attribution (README.md / docs/PHILOSOPHY.md / docs/ARCHITECTURE.md
+# carry "KeiLab" as the org name and that's allowed).
+RESIDUAL=$(grep -rniE "Genesis [A-Z]|Genesis \`|Port of Genesis|HISTORY\.md|/KeiLab/Genesis|deep_firmware|compute_firmware" \
     "$DST/_primitives/_rust/" \
     --include="*.rs" --include="*.toml" 2>/dev/null \
     | grep -vE "target/|^Binary file" || true)
 
 if [ -n "$RESIDUAL" ]; then
-    echo "==> RESIDUAL Genesis content content (review before commit):"
+    echo "==> RESIDUAL Genesis content — sync ABORTED:"
     echo "$RESIDUAL"
     echo
+    echo "Add a substitution rule for the leak above and re-run."
+    echo "(See SUBSTITUTIONS array above. Stage stays unstashed for inspection.)"
+    exit 3
 fi
 
 # ---- 4. git diff + decide ----

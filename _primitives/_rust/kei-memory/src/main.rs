@@ -1,5 +1,5 @@
 //! kei-memory — offline session analyzer + recurring-pattern detector.
-//!
+
 //! Constructor Pattern: main.rs only dispatches; work lives in cubes.
 //! Storage: `~/.claude/memory/kei-memory.sqlite` (or $KEI_MEMORY_DB).
 //! RULE 0.14 — session self-audit, silent-first until 10 sessions ingested.

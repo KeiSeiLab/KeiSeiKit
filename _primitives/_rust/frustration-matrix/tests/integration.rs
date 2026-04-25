@@ -1,5 +1,5 @@
 //! Integration tests for frustration-matrix.
-//!
+
 //! Constructor Pattern: each test = one scenario, one assertion target.
 //! We load source modules via `#[path]` so we don't need to expose a
 //! library crate surface (matches the pattern used in kei-memory).

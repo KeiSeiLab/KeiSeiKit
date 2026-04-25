@@ -43,6 +43,33 @@ install_blocks() {
   cp -f "$KIT_DIR/_blocks/"*.md "$AGENTS_DIR/_blocks/"
 }
 
+# Refresh _roles/*.toml — SSoT is the kit, always overwritten after backup.
+# Manifests reference these via tool_role/agent_role keys; without them the
+# assembler fails with "read role .../<name>.toml: No such file".
+install_roles() {
+  if ! compgen -G "$KIT_DIR/_roles/"*.toml > /dev/null; then
+    return 0
+  fi
+  say "copying agent roles -> $AGENTS_DIR/_roles/"
+  mkdir -p "$AGENTS_DIR/_roles"
+  backup_dir "$AGENTS_DIR/_roles"
+  cp -f "$KIT_DIR/_roles/"*.toml "$AGENTS_DIR/_roles/"
+}
+
+# Refresh _capabilities/<bucket>/<name>/text.md — capability snippets
+# referenced by manifests' capabilities[] list. SSoT is the kit; full tree
+# copy after backup. Without this the assembler fails with "read capability
+# X::Y at .../_capabilities/X/Y/text.md: No such file".
+install_capabilities() {
+  if [ ! -d "$KIT_DIR/_capabilities" ]; then
+    return 0
+  fi
+  say "copying capability snippets -> $AGENTS_DIR/_capabilities/"
+  mkdir -p "$AGENTS_DIR/_capabilities"
+  backup_dir "$AGENTS_DIR/_capabilities"
+  cp -Rf "$KIT_DIR/_capabilities/"* "$AGENTS_DIR/_capabilities/"
+}
+
 # Copy the Rust assembler source (Cargo.toml + src/*.rs + .gitignore if any).
 # Caller should run build_assembler afterwards.
 copy_assembler_source() {

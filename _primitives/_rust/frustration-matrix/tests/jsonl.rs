@@ -1,5 +1,5 @@
 //! Integration tests for `jsonl` cube.
-//!
+
 //! Constructor Pattern: one scenario per test. We mount `jsonl.rs` via
 //! `#[path]` (same pattern as `integration.rs`) so no library crate
 //! surface is required. Fixtures are written to `tempfile::TempDir` —
