@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>app.keisei.cortex</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>@@KEI_CORTEX_BIN@@</string>
+    <string>serve</string>
+    <string>--token-path</string>
+    <string>@@KEI_TOKEN_PATH@@</string>
+    <string>--ledger-path</string>
+    <string>@@KEI_LEDGER_PATH@@</string>
+    <string>--pet-root</string>
+    <string>@@KEI_PET_ROOT@@</string>
+    <string>--memory-db</string>
+    <string>@@KEI_MEMORY_DB@@</string>
+    <string>--cors-origin</string>
+    <string>@@KEI_CORS_ORIGIN@@</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>@@HOME@@</string>
+    <key>KEI_TOKEN_PATH</key>
+    <string>@@KEI_TOKEN_PATH@@</string>
+    <key>KEI_PET_ROOT</key>
+    <string>@@KEI_PET_ROOT@@</string>
+    <key>KEI_LEDGER_PATH</key>
+    <string>@@KEI_LEDGER_PATH@@</string>
+    <key>KEI_MEMORY_DB</key>
+    <string>@@KEI_MEMORY_DB@@</string>
+    <key>KEI_CORS_ORIGIN</key>
+    <string>@@KEI_CORS_ORIGIN@@</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>ProcessType</key>
+  <string>Interactive</string>
+
+  <key>StandardOutPath</key>
+  <string>@@HOME@@/Library/Logs/keisei-cortex.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>@@HOME@@/Library/Logs/keisei-cortex.log</string>
+
+  <key>WorkingDirectory</key>
+  <string>@@HOME@@</string>
+</dict>
+</plist>

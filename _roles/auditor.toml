@@ -1,0 +1,28 @@
+[role]
+name = "auditor"
+display-name = "Fork review auditor (read-only)"
+description = "Reviews a writer's fork diff. Emits PASS/FAIL/INCONCLUSIVE verdict with findings. No mutations."
+spawnable = true
+claude-subagent-type = "critic"
+
+[capabilities]
+required = ["policy::no-git-ops","scope::read-only","verify::fork-audit","output::verdict"]
+
+[tools]
+allowed = ["Read","Glob","Grep","Bash"]
+bash-patterns-allowed = ['^cargo( |$)','^git diff','^git log','^git show']
+
+[escalation]
+policy = "ask-via-return"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "audit"
+domain = "agent"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "toml"
+
+[pipeline]
+handoff = ["merger"]

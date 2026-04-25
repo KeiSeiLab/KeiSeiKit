@@ -1,0 +1,107 @@
+{
+  "name": "@keisei/vscode-cortex",
+  "displayName": "KeiSei Cortex",
+  "description": "Local AI pet companion + chat — backed by kei-cortex daemon",
+  "version": "0.1.0",
+  "publisher": "keisei",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "./dist/extension.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "keywords": [
+    "ai",
+    "chat",
+    "live2d",
+    "cortex",
+    "keisei"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "keisei-cortex.openChat",
+        "title": "KeiSei: Open Cortex Chat",
+        "category": "KeiSei"
+      },
+      {
+        "command": "keisei-cortex.chatAboutSelection",
+        "title": "KeiSei: Ask About Selection",
+        "category": "KeiSei"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "keisei-cortex",
+          "title": "KeiSei Cortex",
+          "icon": "$(hubot)"
+        }
+      ]
+    },
+    "views": {
+      "keisei-cortex": [
+        {
+          "type": "webview",
+          "id": "keisei-cortex.chatView",
+          "name": "Cortex",
+          "contextualTitle": "KeiSei Cortex"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "keisei-cortex.openChat",
+        "key": "ctrl+shift+k",
+        "mac": "cmd+shift+k"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "keisei-cortex.chatAboutSelection",
+          "group": "1_keisei"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "KeiSei Cortex",
+      "properties": {
+        "keisei-cortex.daemonUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:9797",
+          "description": "URL of the local kei-cortex daemon."
+        },
+        "keisei-cortex.tokenPath": {
+          "type": "string",
+          "default": "~/.keisei/cortex.token",
+          "description": "Path to the file containing the bearer token used to authenticate to the daemon."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
+    "package": "vsce package --no-dependencies",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.93.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

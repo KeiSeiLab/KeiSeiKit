@@ -1,0 +1,22 @@
+[Unit]
+Description=KeiSei Cortex daemon (kei-cortex)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=@@KEI_CORTEX_BIN@@ serve --token-path @@KEI_TOKEN_PATH@@ --ledger-path @@KEI_LEDGER_PATH@@ --pet-root @@KEI_PET_ROOT@@ --memory-db @@KEI_MEMORY_DB@@ --cors-origin @@KEI_CORS_ORIGIN@@
+WorkingDirectory=@@HOME@@
+Environment=HOME=@@HOME@@
+Environment=KEI_TOKEN_PATH=@@KEI_TOKEN_PATH@@
+Environment=KEI_PET_ROOT=@@KEI_PET_ROOT@@
+Environment=KEI_LEDGER_PATH=@@KEI_LEDGER_PATH@@
+Environment=KEI_MEMORY_DB=@@KEI_MEMORY_DB@@
+Environment=KEI_CORS_ORIGIN=@@KEI_CORS_ORIGIN@@
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

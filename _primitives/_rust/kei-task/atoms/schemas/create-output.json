@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/create-output.json",
+  "title": "kei-task::create output",
+  "description": "Uses the shared `entity-base` fragment — every kei-entity-store create verb returns `{id, created_at}`.",
+  "allOf": [
+    { "$ref": "../../../../../_schemas/fragments/entity-base.json" }
+  ],
+  "examples": [
+    { "id": 42, "created_at": 1714000000 }
+  ]
+}

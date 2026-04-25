@@ -1,0 +1,17 @@
+[Unit]
+Description=KeiSei Cortex UI (static http.server wrapper for cortex-ui dist)
+After=network-online.target keisei-cortex.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 -m http.server --bind 127.0.0.1 @@KEI_UI_PORT@@
+WorkingDirectory=@@KEI_UI_DIST@@
+Environment=HOME=@@HOME@@
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

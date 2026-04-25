@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>app.keisei.cortex.ui</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>python3</string>
+    <string>-m</string>
+    <string>http.server</string>
+    <string>--bind</string>
+    <string>127.0.0.1</string>
+    <string>@@KEI_UI_PORT@@</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>@@HOME@@</string>
+  </dict>
+
+  <key>WorkingDirectory</key>
+  <string>@@KEI_UI_DIST@@</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>StandardOutPath</key>
+  <string>@@HOME@@/Library/Logs/keisei-cortex-ui.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>@@HOME@@/Library/Logs/keisei-cortex-ui.log</string>
+</dict>
+</plist>

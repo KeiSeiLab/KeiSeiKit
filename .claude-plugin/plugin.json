@@ -1,0 +1,22 @@
+{
+  "name": "keisei",
+  "version": "0.16.0",
+  "description": "Constructor-Pattern agent kit for Claude Code: composable behavioral blocks, 23 Rust primitives, 39 portable skills, 9 pre-wired hooks, typed artifact handoff, sleep-sync cloud consolidation, MCP server layer.",
+  "author": {
+    "name": "KeiSei",
+    "url": "https://github.com/KeiSei84"
+  },
+  "homepage": "https://github.com/KeiSei84/KeiSeiKit",
+  "repository": "https://github.com/KeiSei84/KeiSeiKit",
+  "license": "MIT",
+  "keywords": [
+    "constructor-pattern",
+    "agents",
+    "skills",
+    "hooks",
+    "mcp",
+    "rust",
+    "claude-code",
+    "sleep-sync"
+  ]
+}

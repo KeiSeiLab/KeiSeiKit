@@ -1,0 +1,16 @@
+# {{PROJECT_NAME}} — Copilot Instructions
+
+## Architecture
+Read DECISIONS.md before making architectural choices. Document new decisions there.
+
+## Code Style
+- Constructor Pattern: 1 file = 1 class = 1 responsibility
+- File <200 lines, function <30 lines
+- Types/interfaces BEFORE implementation
+- Tests WITH code, never "later"
+
+## Forbidden
+- Mixins, abstract factories, DI containers
+- Rewriting working code without reason
+- Committing .env, credentials, API keys
+- Adding abstractions for one-time operations

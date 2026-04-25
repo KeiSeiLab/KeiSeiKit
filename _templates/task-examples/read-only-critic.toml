@@ -1,0 +1,44 @@
+# Example task.toml — read-only role for kei-critic.
+# Read-only tasks only parameterise scope paths (for reference) and the
+# required output fields. No cargo-check/test crates because read-only
+# role lacks the tools::cargo-only-bash capability.
+
+[task]
+role = "read-only"
+agent-id = "read-only-critic-EXAMPLE"
+parent-agent = ""
+
+[scope]
+# Whitelist reads — substrate gate still denies Edit/Write globally, but
+# the agent uses these globs to focus its inspection.
+files-whitelist = [
+  "**/*.rs",
+]
+files-denylist = [
+  "**/target/**",
+  "**/generated/**",
+]
+
+[verification]
+# Read-only pass — no cargo crates to verify. Left empty on purpose.
+cargo-check-crates = []
+cargo-test-crates = []
+
+[output]
+# Parameterises output::report-format + output::severity-grade.
+report-fields-required = [
+  "findings-count",
+  "per-finding",
+  "severity-sort",
+  "categories",
+]
+
+[body]
+text = """
+Sweep the Rust workspace for anti-patterns, god objects, circular
+imports, and Constructor-Pattern violations (files > 200 LOC,
+functions > 30 LOC). Every finding must carry a [HIGH|MEDIUM|LOW]
+severity grade (output::severity-grade) and a file:line citation.
+No fixes — report only; the orchestrator will route edits to
+kei-code-implementer.
+"""

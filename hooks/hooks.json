@@ -1,0 +1,107 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/assemble-agents.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/site-wysiwyd-check.sh",
+            "statusMessage": "site-wysiwyd drift check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/milestone-commit-hook.sh",
+            "statusMessage": "milestone self-audit check (RULE 0.14)..."
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/error-spike-detector.sh",
+            "statusMessage": "error-spike rolling window (RULE 0.14)..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/assemble-validate.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/agent-capability-check.sh",
+            "statusMessage": "agent-capability-check (Agent Substrate v1, phase 4)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/no-hand-edit-agents.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/agent-capability-check.sh",
+            "statusMessage": "agent-capability-check (Agent Substrate v1, phase 4)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tomd-preread.sh",
+            "statusMessage": "tomd pre-read auto-convert check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/agent-fork-logger.sh",
+            "statusMessage": "agent-fork-logger (RULE 0.12)..."
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/orchestrator-dirty-check.sh",
+            "statusMessage": "orchestrator-dirty-check (RULE 0.13)..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-end-dump.sh",
+            "statusMessage": "session-end trace dump (RULE 0.14)..."
+          }
+        ]
+      }
+    ]
+  }
+}

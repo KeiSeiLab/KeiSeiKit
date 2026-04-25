@@ -1,0 +1,24 @@
+# AGENTS.md
+
+> Read by Codex CLI (OpenAI spec), Copilot, Aider (when referenced), Windsurf, Warp, Zed, Antigravity (since v1.20.3, 2026-03-05), JetBrains Junie. See also: CLAUDE.md / .cursor/rules/ / GEMINI.md / .junie/guidelines.md / replit.md.
+
+## {{PROJECT_NAME}}
+
+{{PROJECT_DESCRIPTION}}
+
+## Before You Start
+1. Read `DECISIONS.md` — architectural choices already made
+2. Read `TODO.md` (if exists) — current priorities
+3. Read `CLAUDE.md` (if exists) — project-specific rules
+
+## Rules
+- **Constructor Pattern**: 1 file = 1 class. File <200 lines. Function <30 lines.
+- **Root cause**: fix causes, not symptoms
+- **SSOT**: types, routes, enums defined in ONE place
+- **Tests**: write WITH code, never defer
+
+## Do NOT
+- Rewrite working code without reason
+- Add abstractions for one-time operations
+- Skip reading DECISIONS.md before architectural changes
+- Commit .env, credentials, API keys

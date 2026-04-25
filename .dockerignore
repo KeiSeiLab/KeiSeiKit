@@ -1,0 +1,46 @@
+# .dockerignore — trim the Docker build context.
+# Without this, `docker build` tries to copy the full working tree into the
+# daemon, including target/ (2.6 GB after v0.21 aws-sdk-s3), agent worktrees
+# (6+ GB), and node_modules. That caused an I/O error on 2026-04-22 when the
+# battle-test image tried to pack everything.
+#
+# Keep this list aligned with tests/battle/Dockerfile.install-test — anything
+# the Dockerfile actually needs (scripts/, install/, hooks/, skills/, etc.)
+# must NOT be listed here.
+
+# Rust build artefacts
+**/target/
+**/*.rlib
+**/*.rmeta
+
+# TypeScript / node
+**/node_modules/
+**/dist/
+**/.turbo/
+
+# Agent worktrees (several GB — never relevant inside a container build)
+.claude/worktrees/
+
+# Git internal (we don't need history inside the image)
+.git/
+
+# IDE + OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Editor backups
+*~
+*.bak
+*.bak-*
+
+# Secrets (defence in depth — RULE 0.8 + project .gitignore)
+**/.env
+**/secrets/*.env
+*.pem
+*.key
+
+# Logs
+*.log
+/tmp/

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "_schemas/fragments/entity-base.json",
+  "title": "Entity base fields",
+  "description": "Common output fields emitted by every kei-entity-store verb. Referenced by `create-output`, `get-output` etc across kei-*-store crates.",
+  "type": "object",
+  "required": ["id", "created_at"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "SQLite rowid assigned at INSERT"
+    },
+    "created_at": {
+      "type": "integer",
+      "description": "Unix timestamp (seconds since epoch) at row creation"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+# Example task.toml — read-only role for kei-security-auditor.
+# Security sweep scoped to HIGH-risk surfaces (auth / crypto / network
+# / deserialisation / FFI).
+
+[task]
+role = "read-only"
+agent-id = "read-only-security-EXAMPLE"
+parent-agent = ""
+
+[scope]
+files-whitelist = [
+  "_primitives/_rust/**/src/**/*.rs",
+  "hooks/**",
+  "install/**",
+]
+files-denylist = [
+  "**/target/**",
+  "**/tests/**",
+]
+
+[verification]
+cargo-check-crates = []
+cargo-test-crates = []
+
+[output]
+# Parameterises output::report-format + output::severity-grade.
+report-fields-required = [
+  "risk-classification",
+  "mode",
+  "files-reviewed",
+  "new-dependencies",
+  "per-finding",
+  "supply-chain-verdict",
+  "9-point-coverage",
+]
+
+[body]
+text = """
+Security audit of the agent-substrate Rust workspace: classify each
+touched crate HIGH / MEDIUM / LOW, run the 9-point differential
+checklist on HIGH surfaces, perform variant analysis (exact → structural
+→ semantic grep), and supply-chain-check every new dep via
+OSV.dev / GitHub Advisories. Every finding gets [HIGH|MEDIUM|LOW] plus
+a concrete reproduction path. No 'might' / 'probably' — prove or drop.
+"""

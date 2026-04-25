@@ -1,0 +1,344 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # v0.22.3 fix: aarch64-linux moved from ubuntu-latest + cross-linker
+        # install (apt gcc-aarch64-linux-gnu consistently failed in CI) to
+        # ubuntu-24.04-arm NATIVE ARM runner. No cross-compile, rustc builds
+        # the target host-native. `experimental: false` — native path is
+        # reliable.
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            experimental: false
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            experimental: false
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            experimental: false
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            experimental: false
+    steps:
+      # v0.19.1 supply-chain hardening (H5): all actions pinned by full
+      # commit SHA; a floating tag like @v4 can be re-pointed by a
+      # compromised maintainer (CVE-2025-30066 class). Version comment next
+      # to each SHA is for human readability only — the SHA is load-bearing.
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin: named-branch convention (validator V-2026-04-22)
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+        with:
+          workspaces: _primitives/_rust
+
+      # v0.22.3: cross-linker step removed — aarch64-linux now builds
+      # natively on ubuntu-24.04-arm. No cross-compile, no gcc-aarch64-linux-gnu.
+
+      - name: Build workspace (release)
+        working-directory: _primitives/_rust
+        run: cargo build --workspace --release --target ${{ matrix.target }}
+
+      - name: Package binaries
+        id: package
+        working-directory: _primitives/_rust/target/${{ matrix.target }}/release
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Collect every Cargo-built executable (Linux + macOS: no ext, mode +x).
+          # Portable across GNU + BSD find: iterate, test executability in shell.
+          BINS=()
+          for f in *; do
+            [ -f "$f" ] || continue
+            case "$f" in
+              *.d|*.rlib|*.rmeta|*.so|*.dylib|*.dSYM) continue ;;
+            esac
+            if [ -x "$f" ]; then
+              BINS+=("$f")
+            fi
+          done
+          if [ "${#BINS[@]}" -eq 0 ]; then
+            echo "::error::no release binaries produced for ${{ matrix.target }}"
+            exit 1
+          fi
+          echo "Binaries found: ${BINS[*]}"
+          ARCHIVE="keisei-${{ matrix.target }}.tar.gz"
+          tar czf "$GITHUB_WORKSPACE/$ARCHIVE" "${BINS[@]}"
+          cd "$GITHUB_WORKSPACE"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$ARCHIVE" > "$ARCHIVE.sha256"
+          else
+            shasum -a 256 "$ARCHIVE" > "$ARCHIVE.sha256"
+          fi
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: binaries-${{ matrix.target }}
+          path: |
+            keisei-${{ matrix.target }}.tar.gz
+            keisei-${{ matrix.target }}.tar.gz.sha256
+          if-no-files-found: error
+
+  # v0.18 Phase 1 (exobrain): compile @keisei/mcp-server to a single static
+  # binary for 5 platforms via `bun build --compile`. Runs in parallel with
+  # build-release; the release job below `needs:` both. Linux arm64 is kept
+  # `continue-on-error` because the ubuntu arm runner pool is newer and
+  # occasionally flaky — a missing linux-arm64 asset must NOT block release.
+  build-mcp-binary:
+    # v0.22.2 fix: `macos-13` Intel runners were deprecated by GitHub and the
+    # pool is dry — `darwin-x64` jobs sit in queued for hours and block the
+    # final `release` job (needs: build-mcp-binary). bun supports
+    # cross-compile to every target from any host, so we consolidate every
+    # bun build onto ubuntu-latest. Faster, no macOS quota cost, no runner
+    # starvation. Binaries are still native per-target (bun produces the
+    # correct Mach-O / ELF / PE format via --target).
+    name: Build mcp-server ${{ matrix.target.platform }}-${{ matrix.target.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - { platform: linux,   arch: x64,   bun_target: bun-linux-x64,    ext: '' }
+          - { platform: linux,   arch: arm64, bun_target: bun-linux-arm64,  ext: '' }
+          - { platform: darwin,  arch: x64,   bun_target: bun-darwin-x64,   ext: '' }
+          - { platform: darwin,  arch: arm64, bun_target: bun-darwin-arm64, ext: '' }
+          - { platform: windows, arch: x64,   bun_target: bun-windows-x64,  ext: '.exe' }
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
+        with:
+          bun-version: latest
+
+      # v0.19.1 supply-chain hardening (H4): lockfile is REQUIRED — the
+      # `|| bun install` fallback was removed so a missing bun.lock fails
+      # the build instead of resolving deps fresh against the live npm
+      # registry (tainted-binary window). bun.lock lives at workspace
+      # root (_ts_packages/bun.lock) — bun is a monorepo tool and tracks
+      # all packages/* from one lockfile. See BUILD.md §Lockfile.
+      - name: Install mcp-server deps
+        shell: bash
+        working-directory: _ts_packages
+        run: bun install --frozen-lockfile
+
+      - name: Compile single-binary
+        shell: bash
+        env:
+          BIN_NAME: kei-mcp-server-${{ matrix.target.platform }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          bun build \
+            --compile \
+            --target=${{ matrix.target.bun_target }} \
+            _ts_packages/packages/mcp-server/src/index.ts \
+            --outfile "dist/${BIN_NAME}"
+          ls -la "dist/${BIN_NAME}"
+
+      - name: Compute sha256
+        shell: bash
+        env:
+          BIN_NAME: kei-mcp-server-${{ matrix.target.platform }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
+        run: |
+          set -euo pipefail
+          cd dist
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${BIN_NAME}" > "${BIN_NAME}.sha256"
+          else
+            shasum -a 256 "${BIN_NAME}" > "${BIN_NAME}.sha256"
+          fi
+          cat "${BIN_NAME}.sha256"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: kei-mcp-server-${{ matrix.target.platform }}-${{ matrix.target.arch }}
+          path: |
+            dist/kei-mcp-server-${{ matrix.target.platform }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
+            dist/kei-mcp-server-${{ matrix.target.platform }}-${{ matrix.target.arch }}${{ matrix.target.ext }}.sha256
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: [build-release, build-mcp-binary]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin: named-branch convention (validator V-2026-04-22)
+
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+        with:
+          workspaces: _primitives/_rust
+
+      - name: Build kei-changelog
+        working-directory: _primitives/_rust
+        run: cargo build --release -p kei-changelog
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          path: dist/
+
+      - name: Flatten artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          # Rust tarballs + sha256 sums from build-release matrix.
+          # MCP-server bare binaries (+ .exe on windows) + sha256 sums from
+          # build-mcp-binary matrix. Bare binaries need a stable name to stay
+          # USB-drive-droppable, so no archive — we ship them raw alongside
+          # the tarballs.
+          find dist -type f \( \
+               -name '*.tar.gz' \
+            -o -name '*.sha256' \
+            -o -name 'kei-mcp-server-*' \
+            \) -exec mv {} release-assets/ \;
+          ls -la release-assets
+
+      - name: Generate release notes (kei-changelog)
+        id: notes
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          PREV="$(git tag --sort=-creatordate | grep -v "^${TAG}$" | head -n1 || true)"
+          echo "Current tag: ${TAG}"
+          echo "Previous tag: ${PREV:-<none>}"
+          if [ -n "${PREV}" ]; then
+            NOTES="$(./_primitives/_rust/target/release/kei-changelog \
+              --from "${PREV}" --to "${TAG}" --version "${TAG}")"
+          else
+            NOTES="$(./_primitives/_rust/target/release/kei-changelog \
+              --to "${TAG}" --version "${TAG}")"
+          fi
+          if [ -z "${NOTES}" ]; then
+            NOTES="Release ${TAG}. No conventional-commit entries found in range."
+          fi
+          {
+            echo 'notes<<KEISEI_NOTES_EOF'
+            echo "${NOTES}"
+            echo 'KEISEI_NOTES_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # v0.22.3 fix: softprops/action-gh-release v2.6.2 exited with failure
+      # on v0.22.2 due to a metadata-update race (asset uploaded to blob
+      # store but Releases metadata API returned 404 on the subsequent
+      # PATCH — eventual-consistency window). All 15 assets WERE uploaded,
+      # but the action exited 1 and left the Release in Draft state.
+      #
+      # Replaced with `gh release create` (bundled on all GitHub runners).
+      # CLI is idempotent: if the release already exists it updates it; if
+      # assets already exist `--clobber` replaces them. No metadata-PATCH
+      # race. Retry loop on transient upload failures.
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          NOTES: ${{ steps.notes.outputs.notes }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Create the release if missing; `|| true` absorbs "already exists"
+          # on workflow re-run.
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TAG" \
+              --notes "$NOTES"
+          # Upload all assets with --clobber so re-runs replace cleanly.
+          # Retry each asset up to 3 times on transient network errors.
+          shopt -s nullglob
+          for f in release-assets/*.tar.gz release-assets/*.sha256 release-assets/kei-mcp-server-*; do
+            [ -f "$f" ] || continue
+            for try in 1 2 3; do
+              if gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber "$f"; then
+                break
+              elif [ "$try" -eq 3 ]; then
+                echo "::error::failed to upload $f after 3 tries" >&2
+                exit 1
+              else
+                echo "upload of $f failed (attempt $try/3), retrying in 5s..." >&2
+                sleep 5
+              fi
+            done
+          done
+          echo "✓ Release $TAG published with all assets"
+
+  npm-publish:
+    name: Publish npm packages (optional)
+    needs: release
+    runs-on: ubuntu-latest
+    # Graceful skip: if NPM_TOKEN secret is not configured, the first step
+    # reports "skipped" and exits 0 — Rust-binary release above still succeeds.
+    steps:
+      - name: Check NPM_TOKEN presence
+        id: have_token
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "present=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=0" >> "$GITHUB_OUTPUT"
+            echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
+          fi
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        if: steps.have_token.outputs.present == '1'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        if: steps.have_token.outputs.present == '1'
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install deps
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        run: npm ci
+
+      - name: Build workspaces
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        run: npm run build --workspaces --if-present
+
+      - name: Publish each package
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          for pkg in packages/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "::group::publish $pkg"
+              ( cd "$pkg" && npm publish --access public ) \
+                || echo "::warning::publish failed for $pkg (continuing)"
+              echo "::endgroup::"
+            fi
+          done

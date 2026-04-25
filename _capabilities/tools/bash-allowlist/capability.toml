@@ -1,0 +1,42 @@
+[capability]
+name = "tools::bash-allowlist"
+category = "tools"
+version = "1.0"
+description = "Allowlist patterns for Bash — deny every command not matching one of the configured regex patterns (default set covers cargo, rustc, rustup, mkdir, ls, pwd, and /tmp cleanup)."
+rationale = "Bash is the highest-blast-radius tool. An explicit allowlist keeps agents on safe loops and prevents accidental `curl | sh`, `npm install`, or `sudo` escalation. Renamed from `tools::cargo-only-bash` (v0.17) — 'bash-allowlist' describes the mechanism (allowlist regex match over argv), while 'cargo-only' was a specific instance of the default pattern set."
+
+[restricts]
+tool-patterns = [
+  '^cargo( |$)',
+  '^rustc( |$)',
+  '^rustup( |$)',
+  '^mkdir( |$)',
+  '^ls( |$)',
+  '^pwd( |$)',
+  '^rm -rf /tmp/',
+]
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::tools_bash_allowlist"
+event = "PreToolUse:Bash"
+severity = "block"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "tools"
+layer = "agent-substrate"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

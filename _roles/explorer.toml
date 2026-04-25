@@ -1,0 +1,31 @@
+[role]
+name = "explorer"
+display-name = "explorer + cargo-check (read-only analyst with build probe)"
+description = "Read-only analyst that may run cargo-family commands for build/test introspection. No edits, no git, no non-cargo shell."
+spawnable = true
+claude-subagent-type = "Explore"
+
+[capabilities]
+# Layer E — inherits read-only capability set, adds bash-allowlist for cargo probing.
+extends = "read-only"
+required = ["tools::bash-allowlist"]
+
+[tools]
+allowed = ["Read", "Glob", "Grep", "WebFetch", "Bash"]
+bash-patterns-allowed = ['^cargo( |$)']
+
+[escalation]
+policy = "ask-via-return"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

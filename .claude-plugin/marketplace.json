@@ -1,0 +1,21 @@
+{
+  "name": "keisei-marketplace",
+  "owner": {
+    "name": "KeiSei84",
+    "url": "https://github.com/KeiSei84"
+  },
+  "metadata": {
+    "description": "KeiSei Constructor-Pattern kits and primitives for Claude Code",
+    "version": "0.16.0"
+  },
+  "plugins": [
+    {
+      "name": "keisei",
+      "source": {
+        "source": "github",
+        "repo": "KeiSei84/KeiSeiKit"
+      },
+      "description": "Full KeiSeiKit — 12-agent fleet, 39 skills, 9 hooks, 23 Rust primitives, sleep-sync cloud consolidation, MCP server layer"
+    }
+  ]
+}

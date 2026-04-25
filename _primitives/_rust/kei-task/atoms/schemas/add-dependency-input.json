@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/add-dependency-input.json",
+  "title": "kei-task::add-dependency input",
+  "description": "Writes one edge into the task DAG. Uses the shared `edge` fragment; restricts `edge_type` (`dep_type` here) to the task-specific enum and renames to `dep_type` for backwards compatibility.",
+  "type": "object",
+  "required": ["from", "to"],
+  "properties": {
+    "from": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Source task id (the task that has the dependency)"
+    },
+    "to": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Target task id (the task being depended on)"
+    },
+    "dep_type": {
+      "type": "string",
+      "enum": [
+        "blocks",
+        "feeds_into",
+        "subtask_of",
+        "milestone_of",
+        "assigned_to",
+        "depends_on"
+      ],
+      "default": "blocks",
+      "description": "Task-specific refinement of the generic `edge.edge_type`"
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    { "from": 42, "to": 17, "dep_type": "blocks" },
+    { "from": 3, "to": 1 }
+  ]
+}
