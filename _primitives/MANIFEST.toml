@@ -22,7 +22,7 @@ frontend = ["mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-
 ops     = ["kei-ledger", "ssh-check", "firewall-diff", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-provision"]
 dev     = ["kei-migrate", "kei-changelog", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-artifact", "kei-agent-runtime", "kei-capability", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay"]
 mcp     = ["kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth"]
-cortex  = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer"]
+cortex  = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery"]
 full    = ["tomd", "kei-doctor", "kei-ledger", "kei-migrate", "kei-changelog", "ssh-check", "firewall-diff", "mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-preview", "figma-tokens", "frontend-inspect", "screenshot-decode", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth", "kei-artifact", "keisei", "kei-agent-runtime", "kei-capability", "kei-provision", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay", "kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "frustration-matrix", "kei-skill-importer"]
 
 # --- shell primitives (13) -------------------------------------------------
@@ -362,3 +362,21 @@ kind = "rust"
 crate = "kei-skill-importer"
 deps = ["kei-atom-discovery (path dep)"]
 desc = "Universal parser/canonicalizer/emitter for external AI-coding-tool skills (OpenClaw / Cline / Cursor / Claude Code / Kimi) → atom / recipe / proposed-primitive"
+
+# --- Transitive workspace deps — required by cortex-profile crates ---------
+# kei-pet → kei-dna-index, kei-skill-importer → kei-atom-discovery.
+# Listed as primitives so the install-time profile resolver pulls them in
+# alongside their parent crates and the generated workspace Cargo.toml has
+# every path-dep present on disk.
+
+[primitive.kei-dna-index]
+kind = "rust"
+crate = "kei-dna-index"
+deps = ["kei-shared (path dep)"]
+desc = "Read-only adjacency/cluster/precedent index over kei-ledger DNAs (transitive dep of kei-pet)"
+
+[primitive.kei-atom-discovery]
+kind = "rust"
+crate = "kei-atom-discovery"
+deps = []
+desc = "Atom-graph discovery + canonicalization (transitive dep of kei-skill-importer)"
