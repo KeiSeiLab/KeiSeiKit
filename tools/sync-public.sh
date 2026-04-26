@@ -125,6 +125,9 @@ SUBSTITUTIONS=(
     # Trailing whitespace artefacts left by stripping
     's#  +$##g'
     's#^(//!|//|/\*\*?)\s*$##g'
+    # API-key prefix scrub — even truncated `sk-ant-api03-XXXXX...` can ID a key
+    's#`sk-ant-api[0-9]+-[A-Za-z0-9_-]+\.\.\.`#an Anthropic API key (now redacted)#g'
+    's#sk-ant-api[0-9]+-[A-Za-z0-9_-]{4,}#sk-ant-REDACTED#g'
 )
 
 # Targets: only files we control, not data dir

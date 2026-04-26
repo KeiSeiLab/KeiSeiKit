@@ -79,7 +79,7 @@ cd _primitives/_rust && cargo test --workspace 2>&1 | tail -5
 
 ## Security note
 
-⚠️ **API key leak detected mid-session.** User pasted `sk-ant-api03-ilFs04...` in plain text. User must revoke at https://console.anthropic.com/settings/keys and store replacement in `~/.claude/secrets/.env` per RULE 0.8 before resuming HttpDriver work.
+⚠️ **API key leak detected mid-session.** User pasted an Anthropic API key in plain text (now redacted). User must revoke at https://console.anthropic.com/settings/keys and store replacement in `~/.claude/secrets/.env` per RULE 0.8 before resuming HttpDriver work.
 
 ---
 
