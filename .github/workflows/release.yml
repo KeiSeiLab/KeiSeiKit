@@ -39,7 +39,7 @@ jobs:
       # commit SHA; a floating tag like @v4 can be re-pointed by a
       # compromised maintainer (CVE-2025-30066 class). Version comment next
       # to each SHA is for human readability only — the SHA is load-bearing.
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0
 
@@ -126,7 +126,7 @@ jobs:
           - { platform: darwin,  arch: arm64, bun_target: bun-darwin-arm64, ext: '' }
           - { platform: windows, arch: x64,   bun_target: bun-windows-x64,  ext: '.exe' }
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Install bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
@@ -186,7 +186,7 @@ jobs:
     needs: [build-release, build-mcp-binary]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
           fetch-depth: 0
 
@@ -308,7 +308,7 @@ jobs:
             echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
           fi
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         if: steps.have_token.outputs.present == '1'
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
