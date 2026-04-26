@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.keisei.forgejo-runner</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>${BREW}/bin/act_runner</string>
+        <string>daemon</string>
+        <string>--config</string>
+        <string>${DATA}/config.yaml</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>${DATA}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>${HOME}</string>
+        <key>USER</key>
+        <string>${USER}</string>
+        <key>PATH</key>
+        <string>${BREW}/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>${LOGS}/runner.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>${LOGS}/runner.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>8192</integer>
+    </dict>
+</dict>
+</plist>

@@ -85,6 +85,9 @@ members = [
     "kei-tty",
     # Wave 36 — Model Context Protocol stdio JSON-RPC server (atom registry + skills as resources)
     "kei-mcp",
+    # Wave 45 — dev-hub bundle (project dashboard data sources)
+    "kei-projects-index",
+    "kei-projects-watcher",
 ]
 
 [workspace.package]

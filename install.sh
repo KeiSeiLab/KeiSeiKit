@@ -93,9 +93,9 @@ run_menu_if_needed || exit 1
 # --- resolve profile (default=minimal) -----------------------------------
 PROFILE="${PROFILE:-minimal}"
 case "$PROFILE" in
-  minimal|core|frontend|ops|dev|mcp|cortex|full|custom) ;;
+  minimal|core|frontend|ops|dev|mcp|cortex|full|custom|local-mirror|dashboard|full-hub) ;;
   *)
-    err "unknown profile: $PROFILE. Valid: minimal | core | frontend | ops | dev | mcp | cortex | full"
+    err "unknown profile: $PROFILE. Valid: minimal | core | frontend | ops | dev | mcp | cortex | local-mirror | dashboard | full-hub | full"
     exit 1
     ;;
 esac

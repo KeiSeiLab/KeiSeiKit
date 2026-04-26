@@ -120,7 +120,7 @@ remove_node_primitive() {
 # --- install / remove orchestrators --------------------------------------
 # Install primitives from a name list (newline-separated on stdin).
 install_primitives() {
-  local names existing combined kind p any_rust=0
+  local names existing combined kind p any_rust=0 any_external=0
   names="$(cat)"
   existing="$(read_installed)"
   combined="$(printf '%s\n%s\n' "$existing" "$names" | grep -v '^$' || true)"
@@ -128,16 +128,40 @@ install_primitives() {
     [ -z "$p" ] && continue
     kind="$(primitive_field "$p" kind)"
     case "$kind" in
-      shell) copy_shell_primitive "$p" ;;
-      rust)  copy_rust_primitive "$p"; any_rust=1 ;;
-      node)  copy_node_primitive  "$p" ;;
-      *)     warn "unknown primitive: $p (skipping)"; continue ;;
+      shell)    copy_shell_primitive "$p" ;;
+      rust)     copy_rust_primitive "$p"; any_rust=1 ;;
+      node)     copy_node_primitive  "$p" ;;
+      external) install_external_primitive "$p"; any_external=1 ;;
+      *)        warn "unknown primitive: $p (skipping)"; continue ;;
     esac
   done <<< "$names"
   printf '%s\n' "$combined" | write_installed
   if [ "$any_rust" = "1" ]; then
     regenerate_rust_workspace
   fi
+}
+
+# kind=external — primitive is a brew/pipx/cargo-installable third-party tool
+# wrapped by an `install/lib-dev-hub-<name>.sh` helper. Source the helper
+# (shellcheck disable for dynamic source) and call its `install_<slug>`
+# entry point. The helper handles brew install + plist render + bootstrap.
+install_external_primitive() {
+  local name="$1" file slug
+  file="$(primitive_field "$name" file)"
+  if [ -z "$file" ] || [ ! -f "$KIT_DIR/$file" ]; then
+    warn "external primitive $name has no installer at $file (skipping)"
+    return 0
+  fi
+  # shellcheck disable=SC1090,SC1091
+  source "$KIT_DIR/$file"
+  # Convert "dev-hub-forgejo" → "install_dev_hub_forgejo".
+  slug="install_$(printf '%s' "$name" | tr '-' '_')"
+  if ! command -v "$slug" >/dev/null 2>&1; then
+    err "external primitive $name: entry point $slug not found in $file"
+    return 1
+  fi
+  say "  + external: $name (via $file)"
+  "$slug" || warn "$name install failed — re-run after fixing prereqs"
 }
 
 # Remove a single primitive by name.

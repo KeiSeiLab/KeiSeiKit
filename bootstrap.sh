@@ -27,7 +27,7 @@
 set -euo pipefail
 
 # --- defaults ------------------------------------------------------------
-PROFILE="${KEISEIKIT_PROFILE:-cortex}"
+PROFILE="${KEISEIKIT_PROFILE:-}"   # empty → wizard prompts on TTY (Wave 45)
 YES_FLAG=""
 EXTRA_FLAGS=()
 SKIP_PREREQS=0
@@ -43,9 +43,64 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# --- wizard (Wave 45) ----------------------------------------------------
+# If no --profile given AND we're on a TTY, ask. Non-TTY (CI / pipe) →
+# fallback to cortex for compat with v0.16 default behaviour.
+prompt_profile() {
+    if [ -n "$PROFILE" ]; then return 0; fi
+    if [ ! -t 0 ] || [ ! -t 1 ]; then PROFILE="cortex"; return 0; fi
+    cat <<'WIZARD'
+
+╔═══════════════════════════════════════════════════════════════════╗
+║  KeiSeiKit Installation Wizard                                    ║
+╠═══════════════════════════════════════════════════════════════════╣
+║                                                                   ║
+║   [1] minimal       — agents+hooks+skills only                    ║
+║                       50 MB · 5 sec install                       ║
+║                                                                   ║
+║   [2] cortex        — + kei-cortex daemon + UI + 8 Rust crates    ║
+║                       540 MB · 5 min install                      ║
+║                                                                   ║
+║   [3] local-mirror  — cortex + Local Forgejo + Forgejo Runner CI  ║
+║                       800 MB · 10 min · push without VPN          ║
+║                                                                   ║
+║   [4] dashboard     — local-mirror + Project Dashboard + DBs UI   ║
+║                       1 GB · 15 min · single pane of glass        ║
+║                                                                   ║
+║   [5] full-hub      — dashboard + Search + Docs + Backup          ║
+║                       1.3 GB · 25 min · everything                ║
+║                                                                   ║
+║   [6] full          — every primitive in MANIFEST (53 tools)      ║
+║                       1.5 GB · 15 min · power user                ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+WIZARD
+    local choice=""
+    while true; do
+        read -r -p "Pick a profile [1-6, default=2]: " choice
+        choice="${choice:-2}"
+        case "$choice" in
+            1) PROFILE="minimal";      break ;;
+            2) PROFILE="cortex";       break ;;
+            3) PROFILE="local-mirror"; break ;;
+            4) PROFILE="dashboard";    break ;;
+            5) PROFILE="full-hub";     break ;;
+            6) PROFILE="full";         break ;;
+            *) echo "invalid — pick 1, 2, 3, 4, 5, or 6" ;;
+        esac
+    done
+    echo "[bootstrap] profile selected: $PROFILE"
+    echo
+}
+
+prompt_profile
+
 case "$PROFILE" in
-    minimal|core|frontend|ops|dev|mcp|cortex|full) ;;
-    *) echo "[bootstrap] unknown profile: $PROFILE (valid: minimal core frontend ops dev mcp cortex full)" >&2; exit 2 ;;
+    minimal|core|frontend|ops|dev|mcp|cortex|full|local-mirror|dashboard|full-hub) ;;
+    *) echo "[bootstrap] unknown profile: $PROFILE" >&2
+       echo "   valid: minimal cortex local-mirror dashboard full-hub full (also core/frontend/ops/dev/mcp)" >&2
+       exit 2 ;;
 esac
 
 # --- helpers -------------------------------------------------------------
