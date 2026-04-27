@@ -31,7 +31,7 @@ tokio-stream = "0.1"
 futures = "0.3"
 uuid = { version = "1", features = ["v4"] }
 async-stream = "0.3"
-toml = "0.8"
+toml = "1.1"
 bytes = "1"
 tempfile = "3"
 dashmap = "5"

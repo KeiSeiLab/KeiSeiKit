@@ -110,7 +110,7 @@ chrono = { version = "0.4", default-features = false, features = ["clock"] }
 anyhow = "1"
 thiserror = "1"
 tempfile = "3"
-toml = "0.8"
+toml = "1.1"
 flate2 = "1"
 walkdir = "2"
 pretty_assertions = "1"

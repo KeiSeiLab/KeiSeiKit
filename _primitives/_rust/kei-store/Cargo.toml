@@ -24,7 +24,7 @@ clap = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = "1"
-toml = "0.8"
+toml = "1.1"
 git2 = { version = "0.19", default-features = false }
 
 # v0.21 — optional cloud stack behind `s3` feature.
