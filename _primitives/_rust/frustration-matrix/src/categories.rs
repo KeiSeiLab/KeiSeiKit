@@ -1,18 +1,18 @@
 //! Category seed table — one file, one responsibility (the "model").
-
+//!
 //! Extend by editing ONLY this file. Each `Category` is a flat struct of
 //! static metadata + uncompiled regex sources. `compile_all()` is the sole
 //! factory: it walks the seed table once and returns compiled regexes
 //! paired with the metadata. Callers never touch raw strings — they get a
 //! `Vec<CompiledCategory>` and match against it.
-
+//!
 //! Design:
 //! * uncompiled `triggers` live as `&'static str` so they can be verified
 //!   at test time without any allocator;
 //! * compiled regexes use `(?i)` prefix so all matching is case-insensitive,
 //!   which matters because user pushback appears in both Russian and English;
 //! * every regex is compiled once at startup — never per-line.
-
+//!
 //! Seed rationale (from the 22k-token Explore audit that motivated this CLI):
 //! 1. `conservative-framing` and `paradigm-slippage` were the two recurring
 //!    classes the audit found.

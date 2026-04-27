@@ -1,6 +1,6 @@
 //! Firmware tests — cover training, save/load, multilingual alphabet,
 //! unigram fallback, and size budget (≤50 KB at depth 4 on 1 MB corpus).
-
+//!
 //! Like `tests/integration.rs`, we link source modules via `#[path]` so
 //! the binary crate doesn't need to export a library surface.
 

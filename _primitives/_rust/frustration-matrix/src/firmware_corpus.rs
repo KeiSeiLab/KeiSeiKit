@@ -1,15 +1,15 @@
 //! Corpus loader — walks a directory, concatenates training text.
-
+//!
 //! Dispatch by extension:
 //!   * `.md`         — full body minus `### Assistant` blocks
 //!   * `.txt`        — raw body
 //!   * `.jsonl`      — user turns only (via existing `jsonl::parse_user_lines`)
-
+//!
 //! Files separated by `\n` in the resulting buffer so n-grams don't bleed
 //! across file boundaries (single-char gap is enough — the alphabet builder
 //! collects `\n` like any other char, and its unigram drops below min_count
 //! only if the corpus has no newlines at all).
-
+//!
 //! Constructor Pattern: this cube only wires `fs` + existing parsers.
 
 use crate::jsonl::parse_user_lines;

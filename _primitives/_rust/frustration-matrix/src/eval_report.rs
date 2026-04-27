@@ -1,11 +1,11 @@
 //! Eval report — CSV writer + human-readable stdout summary.
-
+//!
 //! Constructor Pattern: IO-only. All math is already done in
 //! `eval_metrics`; this cube just serializes.
-
+//!
 //! CSV schema (one row per model per category):
 //!   `model,category,precision,recall,f1,support`
-
+//!
 //! Stdout format matches the layout in the task spec — fixed-width
 //! columns so `grep` / `awk` still work on the summary.
 

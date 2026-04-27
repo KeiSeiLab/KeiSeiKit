@@ -88,6 +88,233 @@ mistake reappears twice, `/escalate-recurrence` offers to codify it
 as rule + wiki entry + hook. Code: `hooks/*.sh`, `skills/self-audit/`,
 `skills/escalate-recurrence/`.
 
+## Drive→Forgejo Import Pipeline (Wave 46–47)
+
+End-to-end pipeline that takes one or more Google Drive folders and lands
+them as private repos on the local Forgejo dev-hub (Wave 45). Zero manual
+auth/Keychain/.env work — installer auto-bootstraps; user only does the
+one-time rclone OAuth click. Each function below has file:line proof.
+
+### `kei-gdrive-import classify` — single-folder verdict
+
+Walks the marker table against a folder, returns a JSON `Classification`
+with verdict (PROJECT / AMBIGUOUS / NOT-A-PROJECT / ALREADY-REPO), score,
+primary language, and matched markers. Local FS path by default; remote
+rclone path with `--remote`.
+
+**Code proof** (`_primitives/_rust/kei-gdrive-import/src/classify.rs:120`):
+```rust
+pub fn classify(path: &Path) -> Classification {
+    let names: Vec<String> = MARKERS
+        .iter()
+        .filter(|m| path.join(m.file).exists())
+        .map(|m| m.file.to_string())
+        .collect();
+    verdict_from_names(path.display().to_string(), names)
+}
+```
+
+**Try it**: `kei-gdrive-import classify ~/Projects/KeiSeiKit`
+
+### `classify_remote` — verdict via `rclone lsf`, no download
+
+For Drive folders. Shells to `rclone lsf <path> --max-depth 1`, applies
+the same scoring as local. Zero bytes downloaded — only filename
+listing.
+
+**Code proof** (`_primitives/_rust/kei-gdrive-import/src/classify.rs:98`):
+```rust
+pub fn classify_remote(remote_path: &str) -> anyhow::Result<Classification> {
+    use std::process::Command;
+    let output = Command::new("rclone")
+        .args(["lsf", remote_path, "--max-depth", "1"])
+        .output()
+```
+
+**Try it**: `kei-gdrive-import classify --remote "gdrive:projects/MyApp"`
+
+### `scan-tree` — walk one level under a root
+
+Lists immediate subfolders + classifies each. Local (`std::fs::read_dir`)
+or remote (`rclone lsjson`).
+
+**Code proof** (`_primitives/_rust/kei-gdrive-import/src/scan.rs:19`):
+```rust
+pub fn scan_tree(root: &Path) -> Result<Vec<Classification>> {
+    let mut out: Vec<Classification> = Vec::new();
+    let entries = std::fs::read_dir(root)
+        .with_context(|| format!("read_dir {}", root.display()))?;
+```
+
+**Try it**: `kei-gdrive-import scan-tree --remote "gdrive:projects/" | jq '.[].verdict'`
+
+### 8-marker scoring table — single SSoT
+
+The const array that drives every verdict. Add a row → entire pipeline
+recognises a new build system. No second copy anywhere.
+
+**Code proof** (`_primitives/_rust/kei-gdrive-import/src/scoring.rs:26`):
+```rust
+pub const MARKERS: &[Marker] = &[
+    Marker { file: "Cargo.toml",      weight: 10, kind: MarkerKind::BuildManifest, primary_lang: Some("rust")    },
+    Marker { file: "package.json",    weight: 10, kind: MarkerKind::BuildManifest, primary_lang: Some("node")    },
+    Marker { file: "pyproject.toml",  weight: 10, kind: MarkerKind::BuildManifest, primary_lang: Some("python")  },
+```
+
+### `kei-drive-import` wizard — explicit-paths mode (default)
+
+Bash orchestrator. Default mode: pass paths directly (no scan ceremony,
+"obvious path optimised" per Wave 47). `--scan` for auto-discover. `--paths-from FILE` for batch.
+
+**Code proof** (`_templates/drive-import-wizard.sh.tmpl:539`):
+```bash
+main_paths() {
+    local paths=()
+    if [ -n "$PATHS_FILE" ]; then
+        while IFS= read -r line; do
+            line="${line%%#*}"   # strip comments
+            line="$(printf '%s' "$line" | awk '{$1=$1};1')"  # trim
+            [ -n "$line" ] && paths+=("$line")
+        done < "$PATHS_FILE"
+    fi
+```
+
+**Try it**: `kei-drive-import "gdrive:projects/A" "gdrive:Work/clientB"`
+
+### Allowlist guard derived from `$FORGEJO_URL` (Wave 46 audit HIGH-3 fix)
+
+The remote-allowlist check used to hardcode `^http://127.0.0.1:3001/`,
+silently breaking any user who overrode `KEI_FORGEJO_URL`. Now derived
+from the same env var that builds the repo URL.
+
+**Code proof** (`_templates/drive-import-wizard.sh.tmpl:420`):
+```bash
+case "$origin_url" in
+    "${FORGEJO_URL}/"*) ;;
+    *)
+        printf 'kei-drive-import: ERROR: REJECTED: remote not allowlisted (expected %s/...): %s\n' \
+            "$FORGEJO_URL" "$origin_url" >&2
+        exit 1
+        ;;
+esac
+```
+
+### `_dhf_bootstrap_admin_user` — Forgejo admin + token + Keychain auto-create
+
+On first install, detects empty Forgejo, creates admin `$USER` with random
+24-char password + 40-hex access token, stashes both in macOS Keychain
+(`forgejo-admin-password` + `forgejo-api-token`), stamps `.env` with
+`KEI_FORGEJO_USER` + `KEI_FORGEJO_URL`. Idempotent — re-runs are no-op.
+
+**Code proof** (`install/lib-dev-hub-forgejo.sh:95`):
+```bash
+_dhf_bootstrap_admin_user() {
+  local config username user_count password output token kc env_file
+  local kc_token_svc kc_pass_svc
+  config="$(_dhf_app_ini)"
+  username="${KEI_FORGEJO_ADMIN_USER:-${USER:-denis}}"
+```
+
+**Try it**: included in `./install.sh --profile=full-hub --yes`. Retrieve later: `security find-generic-password -s 'forgejo-admin-password' -w`.
+
+### `install_primitives` clean-stamp guard (audit HIGH-1 fix)
+
+Pre-fix: `.installed` file recorded ALL primitives regardless of whether
+their `install_*()` function succeeded. Re-runs skipped silently-broken
+installs. Now: per-primitive exit-code tracking, only clean installs stamp.
+
+**Code proof** (`install/lib-primitives.sh:122`):
+```bash
+install_primitives() {
+  local names existing combined kind p any_rust=0 any_external=0
+  local installed_clean install_ok
+  names="$(cat)"
+  existing="$(read_installed)"
+  installed_clean=""
+```
+
+### `tools/sync-public.sh` — public-mirror pipeline
+
+4-phase: rsync (with IP-aware excludes) → sed substitutions → leak-grep
+(hard banlist + soft warnlist) → diff stat. Push is NEVER automatic
+(RULE 0.1) — script prints exact manual command at the end.
+
+**Code proof** (`tools/sync-public.sh:190`):
+```bash
+main() {
+    say "MODE: $MODE"
+    say "private: $PRIVATE_ROOT"
+    say "public:  $PUBLIC_ROOT (remote $PUBLIC_REMOTE/$PUBLIC_BRANCH)"
+    echo
+    phase_rsync
+```
+
+**Try it**: `./tools/sync-public.sh --dry-run` (preview), then `--confirm` (apply).
+
+### MCP exposure (Wave 47)
+
+One line in the registry exposes `kei-gdrive-import` to every MCP-aware
+client (Cursor, Continue, Zed, Cline, Kimi, OpenClaw) the moment they
+mount `kei-mcp-server`. No per-client glue.
+
+**Code proof** (`_ts_packages/packages/mcp-server/src/tool-registry.ts:31`):
+```typescript
+{ binary: "kei-gdrive-import", desc: "Classify a Google Drive folder as PROJECT/AMBIGUOUS/NOT-A-PROJECT/ALREADY-REPO via 8-marker scoring (Cargo.toml, package.json, pyproject.toml, go.mod, pom.xml, build.gradle, Gemfile, composer.json). Subcommands: classify <path> [--remote], scan-tree <root> [--remote]. Remote mode shells to rclone lsf — no download." },
+```
+
+### `/drive-import` skill (Wave 47, Claude Code)
+
+Claude Code slash-command bridging the wizard. Pre-flight checklist,
+pipeline diagram (10 steps), failure-mode triage table.
+
+**Code proof** (`skills/drive-import/SKILL.md:1`):
+```yaml
+---
+name: drive-import
+description: Import one or more Google Drive folders as private repos into the local Forgejo dev-hub. Wraps the kei-drive-import bash wizard. Click-only path-picker, optional --scan auto-discover. Requires rclone OAuth (one-time) + Wave 45 dev-hub Forgejo running.
+argument-hint: (optional) "drive:path/to/folder"
+---
+```
+
+**Try it**: `/drive-import` in Claude Code.
+
+### Bridge documentation — generic AGENTS.md (Wave 47)
+
+The `_bridges/agents-md.tmpl` is the convention read by Codex CLI / Copilot
+/ Aider / Windsurf / Warp / Zed / Antigravity / Junie. Tool catalogue
+appears here once, not per-IDE.
+
+**Code proof** (`_bridges/agents-md.tmpl:27`):
+```markdown
+## Available KeiSeiKit Tools (MCP-exposed)
+
+When the kit's MCP server is mounted (`keisei attach` or `keisei mount`), these
+Rust primitives are callable from any MCP-aware client (Cursor, Continue,
+Zed, Cline, Kimi, OpenClaw):
+```
+
+### Integration tests — 7/8 PASS (i4)
+
+8 assertions over mocked rclone + mocked Forgejo + real `kei-gdrive-import`
+binary. Test 8 gracefully skips when port 3001 is held by real Forgejo
+(can't fake auth against unknown live daemon).
+
+**Code proof** (`tests/gdrive_import_integration.sh:181`):
+```bash
+main() {
+    setup
+    test1_classify_rust_app
+    test2_classify_already_imported
+    test3_classify_photo_folder
+    test4_scan_tree
+    test5_classify_remote
+    test6_wizard_secret_block
+    test7_wizard_remote_allowlist
+    test8_wizard_ledger_ok
+```
+
+**Try it**: `bash tests/gdrive_import_integration.sh`
+
 ## Deployment modes
 
 | Where | How | When you want it |
@@ -273,6 +500,30 @@ The kit itself is MIT-licensed (this repo). Sister projects in the
 KeiTech portfolio that touch ML weights, guidance laws, kernel-level
 code, or offensive security are governed by `~/.claude/rules/security.md`
 and never deploy publicly without double-confirmation.
+
+## Origin and an honest note to whoever reads this
+
+I'm not a developer. I picked up Claude Code in January 2026 and had
+never written a line of code before that. This project is a seven-day
+run that started from wanting to beat [Andrej Karpathy's CLAUDE.md](https://github.com/karpathy)
+on methods for working with AI agents — huge thanks to him; that file
+showed what was possible. The kit went a bit further than a rules
+sheet, and now it's too big for one person to hold.
+
+If you're an engineer reading this — be kind. Constructive criticism
+is welcome. Any architectural decision that genuinely optimises
+something is welcome. I will learn from the diff.
+
+**On the bus factor.** Bus factor is a real concept — but it doesn't
+apply the same way in our generation. Everyone has AI tools that can
+read, develop, and support a codebase like this. There is no single
+human dependency here: you, your Claude, your Cursor, your Aider can
+pick up this code and continue it. Anyone can contribute something —
+human or agent. The substrate is designed to be readable that way.
+
+If your contribution lands and the work feels worth it to you — I
+have another version of this, more mathematical and more neural-
+identical, that I'd be glad to share access to.
 
 ## Author
 

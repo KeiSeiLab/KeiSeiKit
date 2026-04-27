@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# mock-git — PATH-shim that no-ops `git push` and delegates everything else
+# to the real git binary. Used by test 8 to let the wizard's full migration
+# flow succeed without needing a real Forgejo git smart-HTTP backend.
+
+set -u
+
+REAL_GIT="${MOCK_REAL_GIT:-/usr/bin/git}"
+[ -x "$REAL_GIT" ] || REAL_GIT="$(command -v git 2>/dev/null || true)"
+# Re-resolve to skip ourselves.
+if [ -z "$REAL_GIT" ] || [ "$REAL_GIT" = "$0" ]; then
+    # Walk PATH to find the next git after our directory.
+    OUR_DIR="$(cd "$(dirname "$0")" && pwd)"
+    OLDIFS="$IFS"; IFS=':'
+    for d in $PATH; do
+        [ "$d" = "$OUR_DIR" ] && continue
+        if [ -x "$d/git" ]; then REAL_GIT="$d/git"; break; fi
+    done
+    IFS="$OLDIFS"
+fi
+[ -n "$REAL_GIT" ] && [ -x "$REAL_GIT" ] || { echo "mock-git: real git not found" >&2; exit 127; }
+
+# Walk arguments looking for the first non-flag, non-key=val word —
+# that's the subcommand. If it's "push", no-op success.
+for a in "$@"; do
+    case "$a" in
+        -c) continue ;;
+        -*=*|*=*) continue ;;
+        -*) continue ;;
+        push) exit 0 ;;
+        *) break ;;
+    esac
+done
+exec "$REAL_GIT" "$@"

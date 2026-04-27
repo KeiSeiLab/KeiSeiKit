@@ -1,5 +1,5 @@
 //! Cosine similarity over sparse term-weight maps.
-
+//!
 //! Constructor Pattern: one cube, one pure-math responsibility.
 //! Classical numerator = Σ a·b over shared keys;
 //! classical denominator = ‖a‖₂ · ‖b‖₂. No normalize-to-Frobenius, no rank

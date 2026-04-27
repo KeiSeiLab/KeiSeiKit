@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# mock-rclone — PATH-override stub for kei-gdrive-import integration tests.
+# Maps a synthetic remote spec ("mockdrive:sub/path") onto $MOCK_RCLONE_FIXTURE_ROOT.
+# Implements: listremotes, about, lsf, lsjson, copy. Other verbs → silent ok.
+
+set -u
+
+ROOT="${MOCK_RCLONE_FIXTURE_ROOT:-/tmp/mock-rclone-empty}"
+
+# Drop a leading "--config <file>" pair if present.
+if [ "${1:-}" = "--config" ]; then
+    shift; shift 2>/dev/null || true
+fi
+
+cmd="${1:-}"
+shift 2>/dev/null || true
+
+# remote_to_local SPEC — print local FS path under ROOT for "remote:sub" specs.
+remote_to_local() {
+    case "${1:-}" in
+        '')   printf '' ;;
+        *:*)  printf '%s/%s' "$ROOT" "${1#*:}" ;;
+        *)    printf '%s' "$1" ;;
+    esac
+}
+
+# parse_spec FLAG_VAR ARGS... — collect first non-flag arg into $SPEC; sets
+# DIRS_ONLY, INCLUDE as side effects (declared by caller).
+parse_lsf_args() {
+    SPEC=""; DIRS_ONLY=0; INCLUDE=""
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --dirs-only)  DIRS_ONLY=1; shift ;;
+            --include)    INCLUDE="${2:-}"; shift 2 ;;
+            --max-depth)  shift 2 ;;
+            -R|--recursive) shift ;;
+            --*)          shift ;;
+            *)            [ -z "$SPEC" ] && SPEC="$1"; shift ;;
+        esac
+    done
+}
+
+emit_lsf_entry() {
+    local base="$1" is_dir="$2"
+    if [ "$is_dir" = "1" ]; then
+        if [ -n "$INCLUDE" ]; then
+            [ "$INCLUDE" = ".git/" ] && [ "$base" = ".git" ] && printf '%s/\n' "$base"
+            return 0
+        fi
+        printf '%s/\n' "$base"
+    else
+        [ "$DIRS_ONLY" = "1" ] && return 0
+        if [ -n "$INCLUDE" ]; then
+            case "$base" in $INCLUDE) printf '%s\n' "$base" ;; esac
+            return 0
+        fi
+        printf '%s\n' "$base"
+    fi
+}
+
+run_lsf() {
+    parse_lsf_args "$@"
+    local lp; lp="$(remote_to_local "$SPEC")"
+    [ -d "$lp" ] || return 0
+    local entry base
+    for entry in "$lp"/* "$lp"/.[!.]*; do
+        [ -e "$entry" ] || continue
+        base="$(basename "$entry")"
+        if [ -d "$entry" ]; then emit_lsf_entry "$base" 1
+        else emit_lsf_entry "$base" 0; fi
+    done
+}
+
+run_lsjson() {
+    parse_lsf_args "$@"
+    local lp; lp="$(remote_to_local "$SPEC")"
+    printf '['
+    [ -d "$lp" ] && {
+        local first=1 entry base isd
+        for entry in "$lp"/*; do
+            [ -e "$entry" ] || continue
+            base="$(basename "$entry")"
+            if [ -d "$entry" ]; then isd=true; else isd=false; fi
+            [ "$DIRS_ONLY" = "1" ] && [ "$isd" = "false" ] && continue
+            [ "$first" = "1" ] || printf ','
+            printf '{"Name":"%s","IsDir":%s}' "$base" "$isd"
+            first=0
+        done
+    }
+    printf ']\n'
+}
+
+# run_copy SRC DST — recursive copy from a remote-spec to local DST.
+run_copy() {
+    local src="${1:-}" dst="${2:-}"
+    if [ -z "$src" ] || [ -z "$dst" ]; then return 0; fi
+    local sl; sl="$(remote_to_local "$src")"
+    [ -d "$sl" ] || return 0
+    mkdir -p "$dst"
+    # cp -R "$sl"/. "$dst" — POSIX-portable: copies hidden + visible.
+    if [ -n "$(ls -A "$sl" 2>/dev/null)" ]; then
+        cp -R "$sl"/. "$dst" 2>/dev/null || true
+    fi
+}
+
+case "$cmd" in
+    listremotes)
+        printf 'mockdrive:\n' ;;
+    about)
+        printf 'Total: 100G\nUsed: 1G\nFree: 99G\n' ;;
+    lsf)
+        run_lsf "$@" ;;
+    lsjson)
+        run_lsjson "$@" ;;
+    copy)
+        run_copy "$@" ;;
+    *)
+        : ;;
+esac
+exit 0

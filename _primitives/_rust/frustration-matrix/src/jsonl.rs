@@ -1,15 +1,15 @@
 //! JSONL session transcript parser — extract USER messages only.
-
+//!
 //! Raw Claude Code session files (`~/.claude/projects/*/sessions/*.jsonl`)
 //! are newline-delimited JSON. One message per line. Shapes vary across
 //! Claude Code versions — see `extract_user_text` for the five known
 //! variants we normalise.
-
+//!
 //! Constructor Pattern: one file, one public entry (`parse_user_lines`).
 //! Helpers are small and private. No full-file `read_to_string` — we
 //! stream via `BufReader::lines()` so a 1.4 GB corpus never materialises
 //! in memory all at once.
-
+//!
 //! System echoes (`<local-command-*>`, `<command-*>`, `<system-reminder>`,
 //! `<task-notification>`, `<command-stderr>`) are injected by the CLI
 //! runtime, not typed by the user — we drop them here, not in the

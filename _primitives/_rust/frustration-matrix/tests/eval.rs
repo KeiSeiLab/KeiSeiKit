@@ -1,9 +1,9 @@
 //! Integration tests for the `eval` subcommand.
-
+//!
 //! Constructor Pattern: each test = one scenario, ≤ 30 LOC body. Shared
 //! fixtures + helpers live in `tests/eval_helpers/mod.rs` — subdirectory
 //! so Cargo does not compile them as a separate test binary.
-
+//!
 //! We load source modules via `#[path = "../src/X.rs"]` (matches existing
 //! `tests/integration.rs`). The `CategoryPredictor` trait lets each test
 //! wire a `MockPredictor` — Z1/Z2 need not be complete.

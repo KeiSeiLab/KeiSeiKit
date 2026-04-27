@@ -1,10 +1,10 @@
 //! TF-IDF over session documents — fresh reimplementation.
-
+//!
 //! Constructor Pattern: one cube, one responsibility.
-//! 
+//! Genesis-clean: no normalize(S), no Frobenius, no rank-r decomposition.
 //! Pure classical text-retrieval: tokens, term-frequency, inverse-doc-freq,
 //! cosine similarity between (session_id, prompt) document vectors.
-
+//!
 //! Document identity = session_id. Corpus = all ingested sessions.
 
 use crate::similarity::cosine_tfidf;

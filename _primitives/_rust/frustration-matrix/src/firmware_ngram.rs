@@ -1,10 +1,10 @@
 //! N-gram statistics accumulator — a pure cube.
-
+//!
 //! Single-pass scan over a UTF-8 string: for every position `i`, observe
 //! contexts of every length `k ∈ 1..=max_depth` ending at `i-1` paired
 //! with the char at `i`. Final step filters hapax-legomena (`min_count`)
 //! and builds the alphabet + unigram vector on alphabet indices.
-
+//!
 //! Constructor Pattern: no IO, no dependencies on `Firmware`. Produces
 //! owned `HashMap`s that `Firmware::finalize` moves into the struct.
 

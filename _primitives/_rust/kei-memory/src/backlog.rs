@@ -1,5 +1,5 @@
 //! Backlog — silent-first audit item CRUD.
-
+//!
 //! Constructor Pattern: one cube, one CLI subcommand's worth of logic.
 
 use chrono::Utc;

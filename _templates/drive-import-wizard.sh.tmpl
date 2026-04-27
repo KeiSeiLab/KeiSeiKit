@@ -1,0 +1,597 @@
+#!/usr/bin/env bash
+# kei-drive-import — interactive Google Drive → local Forgejo importer.
+# Generated from _templates/drive-import-wizard.sh.tmpl by install/lib-dev-hub-gdrive-import.sh.
+# Frozen flag block + 5-step pre-push checklist per tasks/kei-gdrive-import/PLAN.md (Wave 2 R1/R3).
+
+set -u
+set -o pipefail
+IFS=$'\n\t'
+
+KIT_DIR="${KIT_DIR:-${HOME}/Projects/KeiSeiKit}"
+SECRETS_FILE="${HOME}/.claude/secrets/.env"
+# Source secrets EARLY so KEI_FORGEJO_USER + KEI_FORGEJO_URL flow into the
+# defaults below. Step 0 re-validates and re-sources defensively.
+if [ -f "$SECRETS_FILE" ]; then
+    set -a; . "$SECRETS_FILE"; set +a
+fi
+FORGEJO_URL="${KEI_FORGEJO_URL:-http://127.0.0.1:3001}"
+FORGEJO_URL="${FORGEJO_URL%/}"   # MEDIUM-fix: strip trailing slash so
+                                 # ${FORGEJO_URL}/path doesn't double-slash
+FORGEJO_USER="${KEI_FORGEJO_USER:-${USER}}"
+# Keychain service names — single source. Override per-host via env.
+KC_TOKEN_SERVICE="${KEI_FORGEJO_KC_TOKEN_SERVICE:-forgejo-api-token}"
+KC_PASS_SERVICE="${KEI_FORGEJO_KC_PASS_SERVICE:-forgejo-admin-password}"
+GITIGNORE_SHA="576334520435382d6522f349b9d270eda1e79a25"
+GITIGNORE_BASE="https://raw.githubusercontent.com/github/gitignore/${GITIGNORE_SHA}"
+GITIGNORE_CACHE="/tmp/kei-gdrive-gitignore-cache"
+STAGING_ROOT="/tmp/kei-gdrive-import"
+LEDGER_FILE="${KIT_DIR}/var/kei-drive-import-ledger.csv"
+GITIGNORE_MAP="${KIT_DIR}/_templates/drive-import-gitignore-map.txt"
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+
+err() { printf 'kei-drive-import: ERROR: %s\n' "$*" >&2; }
+info() { printf '%s\n' "$*"; }
+die() { err "$*"; exit 1; }
+ask_yn() {
+    local reply=""
+    printf '%s [y/N] ' "$1" >&2
+    read -r reply || reply=""
+    case "$reply" in y|Y|yes|YES) return 0 ;; *) return 1 ;; esac
+}
+
+step0_preflight() {
+    info "==> Step 0: Preflight"
+    [ -f "$SECRETS_FILE" ] || die "secrets file not found: $SECRETS_FILE (RULE 0.8)"
+    # shellcheck disable=SC1090
+    set -a; . "$SECRETS_FILE"; set +a
+    [ -n "${RCLONE_CONFIG:-}" ]   || die "RCLONE_CONFIG not set in $SECRETS_FILE (PLAN.md Wave 2 R2)"
+    [ -n "${KEI_DRIVE_REMOTE:-}" ] || die "KEI_DRIVE_REMOTE not set (e.g. KEI_DRIVE_REMOTE=gdrive)"
+    [ -f "$RCLONE_CONFIG" ] || die "rclone config missing at $RCLONE_CONFIG — run: rclone --config $RCLONE_CONFIG config"
+    local missing=""
+    for bin in rclone jq gitleaks kei-gdrive-import curl git; do
+        command -v "$bin" >/dev/null 2>&1 || missing="$missing $bin"
+    done
+    if [ -n "$missing" ]; then
+        err "missing binaries:$missing"
+        die "run install/lib-dev-hub-gdrive-import.sh first"
+    fi
+    [ -f "$GITIGNORE_MAP" ] || die "gitignore map not found: $GITIGNORE_MAP"
+    curl -sf -o /dev/null --max-time 5 "${FORGEJO_URL}/api/v1/version" \
+        || die "Forgejo not reachable at ${FORGEJO_URL} — start dev-hub first"
+    mkdir -p "$STAGING_ROOT" "$GITIGNORE_CACHE" "$(dirname "$LEDGER_FILE")"
+    info "    secrets sourced, binaries present, Forgejo reachable."
+}
+
+step1_remote_check() {
+    info "==> Step 1: rclone remote check"
+    if ! rclone --config "$RCLONE_CONFIG" listremotes 2>/dev/null | grep -q "^${KEI_DRIVE_REMOTE}:$"; then
+        err "remote '${KEI_DRIVE_REMOTE}:' not found in $RCLONE_CONFIG"
+        info "  add via: rclone --config $RCLONE_CONFIG config"
+        info "  name=${KEI_DRIVE_REMOTE}  storage=drive  scope=drive.readonly  (auto-config opens browser)"
+        die "remote not configured"
+    fi
+    local about_out
+    about_out=$(rclone --config "$RCLONE_CONFIG" about "${KEI_DRIVE_REMOTE}:" 2>&1 || true)
+    if printf '%s\n' "$about_out" | grep -qiE 'oauth2|401|token'; then
+        err "rclone token appears expired (oauth2/401/token in 'rclone about')"
+        info "  re-auth: rclone --config $RCLONE_CONFIG config reconnect ${KEI_DRIVE_REMOTE}:"
+        die "token expired"
+    fi
+    info "    remote '${KEI_DRIVE_REMOTE}:' OK."
+}
+
+PROJECT_LIST=""
+AMBIGUOUS_LIST=""
+NOTPROJECT_COUNT=0
+ALREADYREPO_COUNT=0
+SCAN_ROOT=""
+
+step2_scan() {
+    info "==> Step 2: scan"
+    SCAN_ROOT="${1:-${KEI_DRIVE_REMOTE}:Projects/}"
+    info "    root: $SCAN_ROOT"
+    local folders
+    folders=$(rclone --config "$RCLONE_CONFIG" lsf --dirs-only "$SCAN_ROOT" 2>/dev/null || true)
+    [ -n "$folders" ] || die "no folders under $SCAN_ROOT (or rclone lsf failed)"
+
+    local gdoc_count
+    gdoc_count=$(rclone --config "$RCLONE_CONFIG" lsf "$SCAN_ROOT" \
+        --include "*.gdoc" --include "*.gsheet" --include "*.gslides" -R 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${gdoc_count:-0}" -gt 0 ]; then
+        info "    pre-flight: $gdoc_count Google-native files (.gdoc/.gsheet/.gslides) — SKIPPED by --drive-skip-gdocs."
+        if ask_yn "    export gdocs as md? (unverified for current API)"; then
+            info "    (gdoc-export not implemented in this build; skipping anyway.)"
+        fi
+    fi
+
+    info "    classifying..."
+    local count=0 p_count=0 a_count=0 s_count=0 r_count=0 folder verdict
+    OLDIFS="$IFS"
+    IFS='
+'
+    set -f
+    # shellcheck disable=SC2086
+    set -- $folders
+    set +f
+    IFS="$OLDIFS"
+    for raw in "$@"; do
+        folder="${raw%/}"
+        [ -z "$folder" ] && continue
+        count=$((count + 1))
+        verdict=$(kei-gdrive-import classify --remote "${SCAN_ROOT%/}/$folder" 2>/dev/null \
+                  | jq -r '.verdict' 2>/dev/null || echo "ERROR")
+        case "$verdict" in
+            PROJECT)
+                p_count=$((p_count + 1))
+                PROJECT_LIST="${PROJECT_LIST}${folder}
+" ;;
+            AMBIGUOUS)
+                a_count=$((a_count + 1))
+                AMBIGUOUS_LIST="${AMBIGUOUS_LIST}${folder}
+" ;;
+            "NOT-A-PROJECT"|NOT_A_PROJECT) s_count=$((s_count + 1)) ;;
+            ALREADY-REPO|ALREADY_REPO|AlreadyRepo) r_count=$((r_count + 1)) ;;
+            *)
+                err "unknown verdict for '$folder': $verdict (treated as NOT-A-PROJECT)"
+                s_count=$((s_count + 1)) ;;
+        esac
+    done
+    NOTPROJECT_COUNT="$s_count"
+    ALREADYREPO_COUNT="$r_count"
+    info "    total: $count   PROJECT=$p_count  AMBIGUOUS=$a_count  NOT-A-PROJECT=$s_count  AlreadyRepo=$r_count (skipped)"
+}
+
+SELECTED_LIST=""
+step3_select() {
+    info "==> Step 3: select"
+    local p_count a_count
+    p_count=$(printf '%s' "$PROJECT_LIST" | grep -c .)
+    a_count=$(printf '%s' "$AMBIGUOUS_LIST" | grep -c .)
+    [ "$p_count" -eq 0 ] && [ "$a_count" -eq 0 ] && die "no PROJECT or AMBIGUOUS folders to import"
+
+    info ""
+    info "  PROJECT folders ($p_count):"
+    local i=1 f
+    OLDIFS="$IFS"
+    IFS='
+'
+    for f in $PROJECT_LIST; do
+        [ -z "$f" ] && continue
+        printf '    [%d] %s\n' "$i" "$f"
+        i=$((i + 1))
+    done
+    if [ "$a_count" -gt 0 ]; then
+        info ""
+        info "  AMBIGUOUS folders ($a_count) — review carefully:"
+        for f in $AMBIGUOUS_LIST; do
+            [ -z "$f" ] && continue
+            printf '    [%d] %s\n' "$i" "$f"
+            i=$((i + 1))
+        done
+    fi
+    IFS="$OLDIFS"
+
+    info ""
+    info "  Selection: 'all' / 'projects' (P only) / comma-list (e.g. 1,3,5) / 'none'"
+    local reply=""
+    printf '  > ' >&2
+    read -r reply || reply=""
+    case "$reply" in
+        none|NONE|"") die "user selected none — aborting" ;;
+        all|ALL) SELECTED_LIST="${PROJECT_LIST}${AMBIGUOUS_LIST}" ;;
+        projects|PROJECTS|p|P) SELECTED_LIST="$PROJECT_LIST" ;;
+        *)
+            SELECTED_LIST=""
+            local combined="${PROJECT_LIST}${AMBIGUOUS_LIST}"
+            local total idx_raw idx picked
+            total=$(printf '%s' "$combined" | grep -c .)
+            OLDIFS="$IFS"
+            IFS=','
+            set -f
+            # shellcheck disable=SC2086
+            set -- $reply
+            set +f
+            IFS="$OLDIFS"
+            for idx_raw in "$@"; do
+                idx=$(printf '%s' "$idx_raw" | tr -d ' ')
+                case "$idx" in ''|*[!0-9]*) err "invalid index: '$idx_raw'"; continue ;; esac
+                if [ "$idx" -lt 1 ] || [ "$idx" -gt "$total" ]; then
+                    err "index out of range: $idx (1..$total)"; continue
+                fi
+                picked=$(printf '%s' "$combined" | sed -n "${idx}p")
+                [ -n "$picked" ] && SELECTED_LIST="${SELECTED_LIST}${picked}
+"
+            done ;;
+    esac
+
+    local sel_count
+    sel_count=$(printf '%s' "$SELECTED_LIST" | grep -c .)
+    [ "$sel_count" -eq 0 ] && die "selection resolved to zero folders"
+    info ""
+    info "  Will import $sel_count project(s) to $FORGEJO_URL as user '$FORGEJO_USER'."
+    ask_yn "  Continue?" || die "user declined"
+}
+
+ledger_append() {
+    # ledger_append <project> <status> <forgejo_url> <staging_path>
+    local ts
+    ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    [ -f "$LEDGER_FILE" ] || printf 'timestamp,project_name,status,forgejo_url,staging_path\n' >> "$LEDGER_FILE"
+    printf '%s,%s,%s,%s,%s\n' "$ts" "$1" "$2" "$3" "$4" >> "$LEDGER_FILE"
+}
+
+resolve_gitignore_template() {
+    local staging="$1" marker template
+    while IFS=$'\t' read -r marker template; do
+        [ -z "$marker" ] && continue
+        case "$marker" in '#'*) continue ;; esac
+        if [ -f "$staging/$marker" ]; then
+            printf '%s' "$template"; return 0
+        fi
+    done < "$GITIGNORE_MAP"
+    printf ''
+}
+
+fetch_gitignore_template() {
+    local template="$1" dest="$2" cached="${GITIGNORE_CACHE}/$1"
+    if [ ! -f "$cached" ]; then
+        curl -fsSL "${GITIGNORE_BASE}/${template}" -o "$cached" || return 1
+    fi
+    cp "$cached" "$dest"
+}
+
+forgejo_token() {
+    local tok=""
+    tok=$(security find-generic-password -s "$KC_TOKEN_SERVICE" -w 2>/dev/null || true)
+    if [ -n "$tok" ]; then printf '%s' "$tok"; return 0; fi
+    if [ -n "${KEI_FORGEJO_TOKEN:-}" ]; then printf '%s' "$KEI_FORGEJO_TOKEN"; return 0; fi
+    printf 'Forgejo API token not found in Keychain or $KEI_FORGEJO_TOKEN.\nPaste token (input hidden): ' >&2
+    stty -echo 2>/dev/null || true
+    read -r tok || tok=""
+    stty echo 2>/dev/null || true
+    printf '\n' >&2
+    [ -z "$tok" ] && return 1
+    if ask_yn "Store this token in macOS Keychain (service=$KC_TOKEN_SERVICE)?"; then
+        if security add-generic-password -s "$KC_TOKEN_SERVICE" -a "$FORGEJO_USER" -w "$tok" -U 2>/dev/null; then
+            printf 'Token stored in Keychain.\n' >&2
+        else
+            err "failed to store token in Keychain (continuing in-memory)"
+        fi
+    fi
+    printf '%s' "$tok"
+}
+
+size_ext_check() {
+    # returns 0=ok, 1=user-aborted
+    local staging="$1" total pdf media pct_pdf pct_media
+    total=$(find "$staging" -type f -not -path '*/.git/*' -exec stat -f%z {} \; 2>/dev/null \
+            | awk 'BEGIN{s=0}{s+=$1}END{print s+0}')
+    [ "${total:-0}" -eq 0 ] && return 0
+    pdf=$(find "$staging" -type f -name '*.pdf' -exec stat -f%z {} \; 2>/dev/null \
+          | awk 'BEGIN{s=0}{s+=$1}END{print s+0}')
+    media=$(find "$staging" -type f \
+            \( -name '*.mp4' -o -name '*.mov' -o -name '*.mkv' -o -name '*.iso' -o -name '*.zip' \) \
+            -exec stat -f%z {} \; 2>/dev/null | awk 'BEGIN{s=0}{s+=$1}END{print s+0}')
+    pct_pdf=$(( pdf * 100 / total ))
+    pct_media=$(( media * 100 / total ))
+    info "    size: $total bytes; pdf=${pct_pdf}%, media=${pct_media}%"
+    if [ "$pct_pdf" -gt 50 ] || [ "$pct_media" -gt 30 ]; then
+        ask_yn "    looks like third-party content (pdf>50% or media>30%); continue?" || return 1
+    fi
+    return 0
+}
+
+migrate_one() {
+    local proj="$1"
+    # Optional 2nd arg = full remote path (paths-mode passes it explicitly).
+    # Scan-mode legacy: derive from SCAN_ROOT + proj (relative folder name).
+    local src="${2:-${SCAN_ROOT%/}/${proj}}"
+    local staging="${STAGING_ROOT}/${proj}_${TIMESTAMP}"
+    local repo_url="${FORGEJO_URL}/${FORGEJO_USER}/${proj}.git"
+    info ""
+    info "  --- $proj ---"
+    mkdir -p "$staging"
+
+    # 4.3 (.git existing-repo guard via remote first)
+    local has_git_remote
+    has_git_remote=$(rclone --config "$RCLONE_CONFIG" lsf --dirs-only --include ".git/" "$src" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${has_git_remote:-0}" -gt 0 ]; then
+        info "    SKIP: source already contains .git/ — refusing to overwrite live repo"
+        ledger_append "$proj" "SKIPPED-ALREADY-REPO" "" "$staging"
+        return 0
+    fi
+
+    # 4.2 rclone copy (FROZEN flag block per PLAN.md R1)
+    info "    rclone copy $src -> $staging"
+    if ! rclone --config "$RCLONE_CONFIG" copy "$src" "$staging" \
+        --drive-skip-gdocs \
+        --drive-skip-shortcuts \
+        --drive-skip-dangling-shortcuts \
+        --drive-acknowledge-abuse \
+        --exclude "**/.DS_Store" --exclude "**/._*" \
+        --exclude "**/Thumbs.db" --exclude "**/desktop.ini" \
+        --exclude "**/.Spotlight-V100/**" --exclude "**/.Trashes/**" --exclude "**/.fseventsd/**" \
+        --transfers 4 --checkers 8 --tpslimit 10 \
+        --retries 5 --low-level-retries 10 \
+        --checksum --create-empty-src-dirs \
+        --stats 5s --log-file "$staging/.rclone-import.log"
+    then
+        err "rclone copy failed for $proj"
+        ledger_append "$proj" "FAILED-RCLONE" "" "$staging"
+        return 1
+    fi
+
+    # 4.3 fallback: HEAD file present after copy
+    if [ -f "$staging/.git/HEAD" ]; then
+        info "    SKIP: .git/HEAD found in staging (fallback) — refusing to re-init"
+        ledger_append "$proj" "SKIPPED-ALREADY-REPO" "" "$staging"
+        return 0
+    fi
+
+    # 4.4 size + ext histogram
+    if ! size_ext_check "$staging"; then
+        info "    user aborted on size/ext warning"
+        ledger_append "$proj" "SKIPPED-USER" "" "$staging"
+        return 0
+    fi
+
+    # 4.5 secret scan
+    info "    gitleaks scan..."
+    if ! gitleaks dir --no-banner --redact "$staging" >/dev/null 2>&1; then
+        err "gitleaks found secrets in $proj"
+        info "    options: [s]kip this project / [a]bort all"
+        local reply=""
+        printf '    > ' >&2
+        read -r reply || reply=""
+        case "$reply" in
+            a|A|abort|ABORT)
+                ledger_append "$proj" "BLOCKED-SECRETS" "" "$staging"
+                die "user aborted batch on secret-scan failure" ;;
+            *)
+                ledger_append "$proj" "BLOCKED-SECRETS" "" "$staging"
+                return 1 ;;
+        esac
+    fi
+
+    # 4.6 apply gitignore
+    local template
+    template=$(resolve_gitignore_template "$staging")
+    if [ -n "$template" ]; then
+        info "    applying $template"
+        fetch_gitignore_template "$template" "$staging/.gitignore" \
+            || err "failed to fetch $template; continuing without .gitignore"
+    else
+        info "    no marker matched; no language .gitignore applied"
+    fi
+
+    # 4.7 git init + commit (inside staging — separate repo, allowed at runtime)
+    (
+        cd "$staging" || exit 1
+        git init -b main >/dev/null 2>&1 || git init >/dev/null 2>&1
+        git symbolic-ref HEAD refs/heads/main 2>/dev/null || true
+        git add . >/dev/null 2>&1 || true
+        git -c user.name="kei-drive-import" -c user.email="import@local" \
+            commit -m "Import from Drive: $proj" >/dev/null 2>&1 || true
+    ) || {
+        err "git init/commit failed for $proj"
+        ledger_append "$proj" "FAILED-GIT" "" "$staging"
+        return 1
+    }
+
+    # 4.8 forgejo create
+    local token
+    token=$(forgejo_token)
+    if [ -z "$token" ]; then
+        err "no Forgejo token available"
+        ledger_append "$proj" "BLOCKED-FORGEJO" "" "$staging"
+        return 1
+    fi
+    info "    creating Forgejo repo..."
+    local http_code body_file
+    body_file=$(mktemp)
+    http_code=$(curl -sS -o "$body_file" -w '%{http_code}' \
+        -u "${FORGEJO_USER}:${token}" \
+        -H "Content-Type: application/json" \
+        -d "{\"name\":\"$proj\",\"auto_init\":false,\"private\":true}" \
+        "${FORGEJO_URL}/api/v1/user/repos" 2>/dev/null || echo "000")
+    case "$http_code" in
+        2*) info "    repo created." ;;
+        409)
+            info "    repo already exists on Forgejo (409); will push to existing."
+            ledger_append "$proj" "REPO-EXISTS" "$repo_url" "$staging" ;;
+        *)
+            err "Forgejo create failed: HTTP $http_code"
+            sed -n '1,3p' "$body_file" >&2 2>/dev/null || true
+            rm -f "$body_file"
+            ledger_append "$proj" "BLOCKED-FORGEJO" "" "$staging"
+            return 1 ;;
+    esac
+    rm -f "$body_file"
+
+    # 4.9 + 4.10 push (with remote-allowlist guard derived from FORGEJO_URL —
+    # case statement avoids regex-escaping URL meta chars; works in bash 3.2)
+    (
+        cd "$staging" || exit 1
+        git remote remove origin 2>/dev/null || true
+        git remote add origin "$repo_url"
+        local origin_url
+        origin_url=$(git remote get-url origin 2>/dev/null || echo "")
+        case "$origin_url" in
+            "${FORGEJO_URL}/"*) ;;
+            *)
+                printf 'kei-drive-import: ERROR: REJECTED: remote not allowlisted (expected %s/...): %s\n' \
+                    "$FORGEJO_URL" "$origin_url" >&2
+                exit 1
+                ;;
+        esac
+        # Auth via http.extraHeader keeps the token off argv + git config + reflog.
+        # base64-encode "user:token" once; pass as ephemeral -c for this push only.
+        local basic_auth
+        basic_auth="$(printf '%s:%s' "$FORGEJO_USER" "$token" | base64 | tr -d '\n')"
+        git -c "http.extraHeader=Authorization: Basic ${basic_auth}" \
+            push -u origin main >/dev/null 2>&1 || exit 1
+    ) || {
+        err "git push failed for $proj"
+        ledger_append "$proj" "FAILED-PUSH" "$repo_url" "$staging"
+        return 1
+    }
+
+    info "    OK: pushed to $repo_url"
+    ledger_append "$proj" "OK" "$repo_url" "$staging"
+    return 0
+}
+
+OK_COUNT=0
+SKIP_COUNT=0
+BLOCK_COUNT=0
+FAIL_COUNT=0
+
+bucket_last() {
+    local last
+    last=$(tail -n 1 "$LEDGER_FILE" 2>/dev/null | awk -F',' '{print $3}')
+    case "$last" in
+        OK) OK_COUNT=$((OK_COUNT + 1)) ;;
+        SKIPPED-*|REPO-EXISTS) SKIP_COUNT=$((SKIP_COUNT + 1)) ;;
+        BLOCKED-*) BLOCK_COUNT=$((BLOCK_COUNT + 1)) ;;
+        FAILED-*) FAIL_COUNT=$((FAIL_COUNT + 1)) ;;
+        *) FAIL_COUNT=$((FAIL_COUNT + 1)) ;;
+    esac
+}
+
+step4_migrate() {
+    info "==> Step 4: migrate"
+    OLDIFS="$IFS"
+    IFS='
+'
+    for proj in $SELECTED_LIST; do
+        [ -z "$proj" ] && continue
+        migrate_one "$proj" || true
+        bucket_last
+    done
+    IFS="$OLDIFS"
+}
+
+step5_report() {
+    info ""
+    info "==> Step 5: report"
+    info "    OK      : $OK_COUNT"
+    info "    SKIPPED : $SKIP_COUNT"
+    info "    BLOCKED : $BLOCK_COUNT"
+    info "    FAILED  : $FAIL_COUNT"
+    info "    ledger  : $LEDGER_FILE"
+    if [ "$BLOCK_COUNT" -gt 0 ] || [ "$FAIL_COUNT" -gt 0 ]; then
+        return 1
+    fi
+    return 0
+}
+
+usage() {
+    cat <<USAGE
+kei-drive-import — import folders from Google Drive into local Forgejo.
+
+USAGE:
+  kei-drive-import [PATH...]                  # explicit paths (recommended)
+  kei-drive-import --paths-from FILE          # paths from file (one per line)
+  kei-drive-import --scan [ROOT]              # scan + classify mode
+  kei-drive-import --help
+
+EXAMPLES:
+  # Import three explicit folders. No scan, no classify, just go.
+  kei-drive-import "gdrive:projects/MyApp" "gdrive:Work/clientA" "gdrive:foo/bar"
+
+  # Batch from file (# comments OK, blank lines OK)
+  kei-drive-import --paths-from ~/import-list.txt
+
+  # Discover mode: walk a root and ask which to import (legacy default)
+  kei-drive-import --scan "gdrive:projects/"
+
+ENV:
+  KEI_DRIVE_REMOTE   default rclone remote name (default: gdrive)
+  KEI_FORGEJO_USER   forgejo owner (default: \$USER)
+  KEI_FORGEJO_URL    forgejo URL (default: http://127.0.0.1:3001)
+  RCLONE_CONFIG      rclone config path (required, set in .env)
+USAGE
+}
+
+# Parse args. Modes: explicit-paths (default) / scan / paths-from / help.
+MODE="paths"
+SCAN_ARG=""
+PATHS_FILE=""
+EXPLICIT_PATHS=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        --scan)    MODE="scan"; SCAN_ARG="${2:-}"; [ -n "$SCAN_ARG" ] && shift; shift ;;
+        --paths-from)
+            MODE="paths"; PATHS_FILE="${2:-}"
+            [ -z "$PATHS_FILE" ] && die "--paths-from requires a file argument"
+            [ -f "$PATHS_FILE" ] || die "paths file not found: $PATHS_FILE"
+            shift 2 ;;
+        --) shift; while [ $# -gt 0 ]; do EXPLICIT_PATHS+=("$1"); shift; done ;;
+        -*) die "unknown flag: $1 (try --help)" ;;
+        *)  EXPLICIT_PATHS+=("$1"); shift ;;
+    esac
+done
+
+# Path-list mode: skip scan/classify, go straight to migrate. Each path is
+# a literal rclone remote spec (e.g. "gdrive:projects/MyApp"). Repo name =
+# last path component.
+main_paths() {
+    local paths=()
+    if [ -n "$PATHS_FILE" ]; then
+        while IFS= read -r line; do
+            line="${line%%#*}"   # strip comments
+            line="$(printf '%s' "$line" | awk '{$1=$1};1')"  # trim
+            [ -n "$line" ] && paths+=("$line")
+        done < "$PATHS_FILE"
+    fi
+    if [ ${#EXPLICIT_PATHS[@]} -gt 0 ]; then
+        paths+=("${EXPLICIT_PATHS[@]}")
+    fi
+    if [ ${#paths[@]} -eq 0 ]; then
+        usage; die "no paths given (positional args or --paths-from FILE required)"
+    fi
+    step0_preflight
+    step1_remote_check
+    info "==> Step 2: paths-mode (${#paths[@]} explicit, scan/classify skipped)"
+    # Validate each remote path exists before any work
+    local p name
+    SELECTED_PROJECTS=()
+    for p in "${paths[@]}"; do
+        if ! rclone --config "$RCLONE_CONFIG" lsf --max-depth 1 "$p" >/dev/null 2>&1; then
+            die "path not found in remote: $p"
+        fi
+        name="$(basename "$p")"
+        info "    + $p → repo '$name'"
+        SELECTED_PROJECTS+=("$p|$name")
+    done
+    step4_migrate_paths
+    step5_report && exit 0 || exit 1
+}
+
+# Migrate from SELECTED_PROJECTS (path|name pairs from main_paths).
+step4_migrate_paths() {
+    info "==> Step 4: migrate (${#SELECTED_PROJECTS[@]} folder(s))"
+    local entry src name
+    for entry in "${SELECTED_PROJECTS[@]}"; do
+        src="${entry%%|*}"
+        name="${entry##*|}"
+        migrate_one "$name" "$src" || true
+        bucket_last
+    done
+}
+
+main() {
+    if [ "$MODE" = "scan" ]; then
+        step0_preflight
+        step1_remote_check
+        step2_scan "$SCAN_ARG"
+        step3_select
+        step4_migrate
+        step5_report && exit 0 || exit 1
+    else
+        main_paths
+    fi
+}
+
+main "$@"

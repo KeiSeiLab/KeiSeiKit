@@ -121,20 +121,31 @@ remove_node_primitive() {
 # Install primitives from a name list (newline-separated on stdin).
 install_primitives() {
   local names existing combined kind p any_rust=0 any_external=0
+  local installed_clean install_ok
   names="$(cat)"
   existing="$(read_installed)"
-  combined="$(printf '%s\n%s\n' "$existing" "$names" | grep -v '^$' || true)"
+  installed_clean=""
   while IFS= read -r p; do
     [ -z "$p" ] && continue
     kind="$(primitive_field "$p" kind)"
+    install_ok=1
     case "$kind" in
-      shell)    copy_shell_primitive "$p" ;;
+      shell)    copy_shell_primitive "$p" || install_ok=0 ;;
       rust)     copy_rust_primitive "$p"; any_rust=1 ;;
-      node)     copy_node_primitive  "$p" ;;
-      external) install_external_primitive "$p"; any_external=1 ;;
+      node)     copy_node_primitive  "$p" || install_ok=0 ;;
+      external) install_external_primitive "$p" || install_ok=0; any_external=1 ;;
       *)        warn "unknown primitive: $p (skipping)"; continue ;;
     esac
+    # Stamp .installed only on clean install. Failed installs must NOT be
+    # recorded — otherwise re-runs skip them and silent-broken state persists
+    # (Wave 46 audit HIGH-1 finding).
+    if [ "$install_ok" = "1" ]; then
+      installed_clean="$(printf '%s\n%s\n' "$installed_clean" "$p" | grep -v '^$' || true)"
+    else
+      warn "primitive $p had install errors — NOT stamping .installed"
+    fi
   done <<< "$names"
+  combined="$(printf '%s\n%s\n' "$existing" "$installed_clean" | grep -v '^$' | sort -u || true)"
   printf '%s\n' "$combined" | write_installed
   if [ "$any_rust" = "1" ]; then
     regenerate_rust_workspace

@@ -86,14 +86,89 @@ _dhf_print_banner() {
   say ""
 }
 
+# Idempotent admin user + API token bootstrap. Detects "no users yet" via
+# `forgejo admin user list`; on empty DB, creates one admin with random
+# password + access token, stashes both in macOS Keychain (services
+# `forgejo-admin-password` + `forgejo-api-token`), and stamps
+# `~/.claude/secrets/.env` with KEI_FORGEJO_USER + KEI_FORGEJO_URL.
+# Re-runs are no-ops. Returns 0 even if Keychain stash skipped (Linux).
+_dhf_bootstrap_admin_user() {
+  local config username user_count password output token kc env_file
+  local kc_token_svc kc_pass_svc
+  config="$(_dhf_app_ini)"
+  username="${KEI_FORGEJO_ADMIN_USER:-${USER:-denis}}"
+  # Single-source Keychain service names (override per-host via env).
+  # Wizard MUST read identical names — see drive-import-wizard.sh.tmpl.
+  kc_token_svc="${KEI_FORGEJO_KC_TOKEN_SERVICE:-forgejo-api-token}"
+  kc_pass_svc="${KEI_FORGEJO_KC_PASS_SERVICE:-forgejo-admin-password}"
+  # Detection: any rows beyond header in `admin user list`?
+  user_count="$(forgejo --config "$config" admin user list 2>/dev/null \
+    | tail -n +2 | grep -cv '^$' || echo 0)"
+  if [ "$user_count" -gt 0 ]; then
+    say "  → forgejo already has $user_count user(s), skipping admin bootstrap"
+    return 0
+  fi
+  say "  → bootstrapping admin user '$username' (random password + access token)"
+  password="$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)"
+  output="$(forgejo admin user create \
+    --config "$config" \
+    --username "$username" \
+    --password "$password" \
+    --email "${username}@kei-drive-import.local" \
+    --must-change-password=false \
+    --admin \
+    --access-token \
+    --access-token-name "kei-drive-import" \
+    --access-token-scopes "write:repository,write:user" 2>&1)"
+  token="$(printf '%s' "$output" | grep -oE '[a-f0-9]{40}' | head -1)"
+  if [ -z "$token" ]; then
+    err "  → admin user create failed or token not extractable; output:"
+    err "$output"
+    return 1
+  fi
+  # Keychain (macOS only — `security` not on Linux). Soft-fail elsewhere.
+  if command -v security >/dev/null 2>&1; then
+    security add-generic-password -U -s "$kc_token_svc" \
+      -a "$username" -w "$token" 2>/dev/null && \
+      say "  → token stashed: security find-generic-password -s $kc_token_svc -w"
+    security add-generic-password -U -s "$kc_pass_svc" \
+      -a "$username" -w "$password" 2>/dev/null && \
+      say "  → password stashed: security find-generic-password -s $kc_pass_svc -w"
+  else
+    warn "  → 'security' (macOS Keychain) not found — credentials only on screen below:"
+    warn "      USER:  $username"
+    warn "      PASS:  $password"
+    warn "      TOKEN: $token"
+    warn "    Save manually before this output scrolls off."
+  fi
+  # Stamp .env with KEI_FORGEJO_USER + URL (live, not example — wizard reads .env).
+  env_file="$HOME_DIR/.claude/secrets/.env"
+  [ -d "$(dirname "$env_file")" ] || mkdir -p "$(dirname "$env_file")"
+  [ -f "$env_file" ] || { touch "$env_file"; chmod 600 "$env_file"; }
+  if ! grep -q "^KEI_FORGEJO_USER=" "$env_file" 2>/dev/null; then
+    {
+      echo ""
+      echo "# dev-hub-forgejo bootstrap (auto-added)"
+      echo "KEI_FORGEJO_USER=$username"
+      echo "KEI_FORGEJO_URL=http://127.0.0.1:3001"
+    } >> "$env_file"
+    chmod 600 "$env_file"
+    say "  → .env stamped with KEI_FORGEJO_USER + KEI_FORGEJO_URL"
+  fi
+}
+
 # Public — install entry point. Called from install.sh primitives phase.
 install_dev_hub_forgejo() {
   say "[dev-hub-forgejo] install starting"
-  _dhf_check_brew         || return 1
-  _dhf_brew_install       || return 1
-  _dhf_ensure_data_dir    || return 1
-  _dhf_bootstrap_app_ini  || return 1
-  install_service forgejo || return 1
+  _dhf_check_brew              || return 1
+  _dhf_brew_install            || return 1
+  _dhf_ensure_data_dir         || return 1
+  _dhf_bootstrap_app_ini       || return 1
+  install_service forgejo      || return 1
+  # Daemon needs a moment to bind 3001 before we hit the admin CLI (which
+  # is offline anyway — uses --config, not API — but DB locks contend).
+  sleep 2
+  _dhf_bootstrap_admin_user    || warn "  admin bootstrap failed; daemon up but no user — re-run install lib"
   _dhf_print_banner
   say "[dev-hub-forgejo] install complete"
 }

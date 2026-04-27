@@ -88,6 +88,8 @@ members = [
     # Wave 45 — dev-hub bundle (project dashboard data sources)
     "kei-projects-index",
     "kei-projects-watcher",
+    # Wave 46 — Google Drive → Forgejo one-shot importer (folder classifier)
+    "kei-gdrive-import",
 ]
 
 [workspace.package]

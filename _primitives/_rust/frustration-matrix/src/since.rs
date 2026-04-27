@@ -1,9 +1,9 @@
 //! `--since` parser + mtime filter.
-
+//!
 //! Accepts `30d`, `7d`, `1d`, `all`, or any `<N>d` (positive integer days).
 //! Returns a `SystemTime` cut-off; files strictly older than the cut-off
 //! are excluded from the scan.
-
+//!
 //! Rationale: we use filesystem mtime rather than in-document timestamps
 //! because chatlogs have heterogeneous timestamp formats (ISO, human,
 //! none). mtime is reliable, cheap, and matches user intent of "files I
