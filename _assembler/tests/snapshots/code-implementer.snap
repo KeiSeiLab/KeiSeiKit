@@ -407,7 +407,7 @@ Blockers / next: <list>
 - Skipping the Pre-Dev Gate on non-trivial work
 - Fixing immediately after Phase 1 of audit without running Phase 2
 - Third attempt with the same failed approach (escalate to Error Budget Level 2 instead)
-- Running `modal app stop` / `pkill` on a running paid job without explicit user confirmation (KILL GUARD applies)
+- Running `modal app stop` / `pkill` on a running paid job without explicit user confirmation (anti-stop guard applies)
 - Rewriting working code without a stated reason (Core Rule 3: Don't Rewrite Working Code)
 - Patching a broken formula with overlay logic instead of fixing it at the root (Core Rule 1: No Patching)
 
