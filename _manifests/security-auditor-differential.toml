@@ -4,7 +4,7 @@
 name = "security-auditor-differential"
 description = "9-point differential security review. Auth bypass, injection, deserialization, race conditions. Read-only."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "auditor"
 
 role = """

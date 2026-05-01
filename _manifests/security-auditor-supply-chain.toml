@@ -4,7 +4,7 @@
 name = "security-auditor-supply-chain"
 description = "Supply-chain audit on new dependencies: maintainers, CVE history, transitive deps, native code. Read-only."
 tools = ["Glob", "Grep", "Read", "Bash", "WebFetch", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "auditor"
 
 role = """

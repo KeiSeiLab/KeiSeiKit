@@ -4,7 +4,7 @@
 name = "code-implementer-typescript"
 description = "TypeScript implementation specialist. Next.js 16 / Node / browser. Type-safe API contracts."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """

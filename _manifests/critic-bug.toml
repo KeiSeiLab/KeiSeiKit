@@ -4,7 +4,7 @@
 name = "critic-bug"
 description = "Detects bug patterns: off-by-one, error-swallowing, unchecked Result/Option, race conditions in shared state. Read-only."
 tools = ["Glob", "Grep", "Read"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """

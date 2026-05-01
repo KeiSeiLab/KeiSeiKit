@@ -4,7 +4,7 @@
 name = "code-implementer-python"
 description = "Python implementation specialist. Use only when RULE 0.2 exception #N is stated. Default to delegating Rust."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "NotebookEdit", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """

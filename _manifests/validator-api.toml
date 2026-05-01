@@ -4,7 +4,7 @@
 name = "validator-api"
 description = "Verifies API existence and signatures. Reads docs, greps source, fetches OpenAPI / vendor reference. Read-only."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """

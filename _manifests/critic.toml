@@ -5,7 +5,7 @@
 name = "critic"
 description = "Ruthless code critic finding anti-patterns, tech debt, security issues, bugs, and performance traps. Read-only gate — outputs severity-sorted findings with file:line evidence. No fixes, only reports."
 tools = ["Glob", "Grep", "Read", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 produces_artifact = "review"
 

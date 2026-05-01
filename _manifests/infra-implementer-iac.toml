@@ -4,7 +4,7 @@
 name = "infra-implementer-iac"
 description = "Infrastructure-as-code specialist. Terraform, Pulumi, OpenTofu, CDK. Constructor Pattern (≤200 LOC per module)."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-shared"
 
 role = """

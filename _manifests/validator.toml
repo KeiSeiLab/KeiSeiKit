@@ -5,7 +5,7 @@
 name = "validator"
 description = "RULE 0.4 enforcement gate — fact-checker and hallucination detector. Verifies API existence, version compatibility, documentation claims, code reality, and external benchmarks. Read-only — emits VERIFIED / UNVERIFIED / FALSE / PARTIALLY TRUE per claim."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 produces_artifact = "review"
 

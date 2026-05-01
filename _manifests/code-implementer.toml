@@ -5,7 +5,7 @@
 name = "code-implementer"
 description = "Generic implementation specialist for Rust/Swift/Python/Go/Flutter/TypeScript. Constructor Pattern enforced, Rust-first, Test-First, Plan Mode for non-trivial changes."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "NotebookEdit", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 produces_artifact = "patch"
 

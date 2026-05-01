@@ -4,7 +4,7 @@
 name = "infra-implementer-container"
 description = "Containerization specialist. Dockerfile, OCI images, multi-stage builds, distroless."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-shared"
 
 role = """

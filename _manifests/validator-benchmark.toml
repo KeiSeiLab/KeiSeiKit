@@ -4,7 +4,7 @@
 name = "validator-benchmark"
 description = "Verifies external benchmark claims (p50/p95/throughput). Read-only."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """

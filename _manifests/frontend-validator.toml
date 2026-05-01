@@ -4,7 +4,7 @@
 name = "frontend-validator"
 description = "Frontend continuous validator. Runs tsc --noEmit, eslint, kei-db-contract, optional visual snapshot. Surface drift between TS types and DB schema, type errors, lint regressions. Advisory by default."
 tools = ["Glob", "Grep", "Read", "Bash"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """

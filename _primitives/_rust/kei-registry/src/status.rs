@@ -48,6 +48,11 @@ pub struct BranchRow {
     pub ahead: u32,
     pub behind: u32,
     pub last_commit: String,
+    /// Deterministic DNA-style identifier for the branch. Format
+    /// `branch::git::<sha8(branch_name)>::<sha8(commit_sha)>`. Computed
+    /// on-the-fly from `(name, last_commit)` so it survives without DB
+    /// persistence — the underlying truth lives in `.git/refs/heads/<name>`.
+    pub dna: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -127,6 +132,26 @@ fn path_atom_rows(conn: &Connection) -> Result<Vec<PathAtomRow>> {
     Ok(rows)
 }
 
+/// Compute a deterministic DNA-style identifier for a git branch. Mirrors
+/// the kei-shared wire format `<role>::<caps>::<scope_sha8>::<body_sha8>`:
+/// role is fixed `branch`, caps is fixed `git`, scope_sha is the first 8
+/// hex chars of `sha256(branch_name)`, body_sha is the first 8 chars of
+/// the commit SHA (which is itself a SHA-1 prefix). The pair is unique
+/// per (name, head_commit) so the DNA changes on every commit, mirroring
+/// the immutable-content invariant atoms have.
+fn compute_branch_dna(name: &str, commit_sha: &str) -> String {
+    use sha2::{Digest, Sha256};
+    let mut h = Sha256::new();
+    h.update(name.as_bytes());
+    let name_sha = format!("{:x}", h.finalize());
+    let scope8 = &name_sha[..8];
+    let body8 = commit_sha
+        .get(..8)
+        .unwrap_or(commit_sha)
+        .to_ascii_lowercase();
+    format!("branch::git::{scope8}::{body8}")
+}
+
 /// Take the first three segments of a `<role>::<caps>::<scope_sha8>::...`
 /// DNA so the displayed prefix is readable but identifying.
 fn dna_prefix(dna: &str) -> String {
@@ -161,13 +186,16 @@ fn git_branches(repo: &Path) -> Result<Vec<BranchRow>> {
             Some(parts[1].to_string())
         };
         let (ahead, behind) = parse_track(parts[2]);
+        let last_commit = parts[3].to_string();
+        let dna = compute_branch_dna(&name, &last_commit);
         rows.push(BranchRow {
             current: current_branch.as_deref() == Some(&name),
             name,
             upstream,
             ahead,
             behind,
-            last_commit: parts[3].to_string(),
+            last_commit,
+            dna,
         });
     }
     Ok(rows)
@@ -261,8 +289,8 @@ pub fn render_ascii(s: &Status) -> String {
         };
         let upstream = b.upstream.as_deref().unwrap_or("(none)");
         out.push_str(&format!(
-            "  {} {:<40} → {:<25} {} @ {}\n",
-            marker, b.name, upstream, track, b.last_commit
+            "  {} {:<40} → {:<25} {} @ {}  {}\n",
+            marker, b.name, upstream, track, b.last_commit, dna_prefix(&b.dna)
         ));
     }
     out.push('\n');
@@ -325,6 +353,35 @@ mod tests {
     fn dna_prefix_three_segments() {
         let dna = "atom::md::1a771d51::b8f9e85f-abc12345";
         assert_eq!(dna_prefix(dna), "atom::md::1a771d51::…");
+    }
+
+    #[test]
+    fn branch_dna_is_deterministic_and_well_formed() {
+        let dna = compute_branch_dna("feat/foo-bar", "3422bdca12d4567");
+        assert!(dna.starts_with("branch::git::"));
+        let parts: Vec<&str> = dna.split("::").collect();
+        assert_eq!(parts.len(), 4);
+        assert_eq!(parts[0], "branch");
+        assert_eq!(parts[1], "git");
+        assert_eq!(parts[2].len(), 8); // sha8 of branch name
+        assert_eq!(parts[3], "3422bdca"); // first 8 of commit
+        // determinism: same input → same DNA
+        let dna2 = compute_branch_dna("feat/foo-bar", "3422bdca12d4567");
+        assert_eq!(dna, dna2);
+    }
+
+    #[test]
+    fn branch_dna_changes_on_commit() {
+        let a = compute_branch_dna("main", "aaaaaaaa1111");
+        let b = compute_branch_dna("main", "bbbbbbbb2222");
+        assert_ne!(a, b, "DNA should change when commit changes");
+    }
+
+    #[test]
+    fn branch_dna_changes_on_rename() {
+        let a = compute_branch_dna("main", "deadbeef");
+        let b = compute_branch_dna("trunk", "deadbeef");
+        assert_ne!(a, b, "DNA should change when name changes");
     }
 
     #[test]

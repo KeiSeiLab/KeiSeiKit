@@ -4,7 +4,7 @@
 name = "code-implementer-rust"
 description = "Rust implementation specialist (Cargo, traits, async/tokio, rusqlite, tests). RULE 0.2 default language. Constructor Pattern enforced. Hands off other languages to siblings."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """

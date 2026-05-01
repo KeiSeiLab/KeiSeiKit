@@ -4,7 +4,7 @@
 name = "validator-code-reality"
 description = "Verifies behavioural claims against running code. Reads tests, traces, recent runs. Read-only."
 tools = ["Glob", "Grep", "Read", "Bash"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """

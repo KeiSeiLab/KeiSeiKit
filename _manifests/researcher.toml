@@ -5,7 +5,7 @@
 name = "researcher"
 description = "Generic web + codebase research with 3 modes (web / code / hybrid). Returns Evidence-Graded findings. Read-only. Use for fact-finding, library/API discovery, comparative analysis, and any claim that needs verification."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """

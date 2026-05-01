@@ -5,7 +5,7 @@
 name = "modal-runner"
 description = "Modal compute orchestrator. Pre-launch cost estimation, GPU compatibility check, single-variant verify, observability-first, and a hard anti-stop guard against stopping running training. Use for any Modal app launch, batch spawn, or job inspection."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """

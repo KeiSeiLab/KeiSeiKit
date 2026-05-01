@@ -4,7 +4,7 @@
 name = "validator-doc"
 description = "Verifies documentation claims against code reality. Read-only."
 tools = ["Glob", "Grep", "Read", "WebFetch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """
