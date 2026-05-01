@@ -23,7 +23,10 @@ Your steps in order, each emitting a section of the final report:
 
 4. **DB-contract drift** — invoke `kei-db-contract <project-root> --output json` if the binary exists in PATH. Parse JSON. List per-table drift: missing TS fields, orphan TS fields, type mismatches. Severity: ENFORCE if drift_count > 0 and project has DB; else N/A.
 
-5. **Visual regression (optional)** — if `playwright.config.*` exists AND a baseline snapshot dir is set, invoke `npx playwright test --reporter=json` for visual tests. Severity: WARN if any pixel diff exceeds threshold.
+5. **Visual regression** — if `package.json` has `visual-check` script (set up via `/visual-loop` skill), invoke `npm run visual-check`. Else if `playwright.config.*` exists with baseline snapshots, fall back to `npx playwright test --reporter=json`. Else skip with N/A.
+   Severity: WARN if pixel diff > 0.01 ratio. FAIL only on `--strict` invocation.
+
+6. **A11y quick** — if `package.json` has `a11y-check` script, invoke. Else skip. Severity: WARN.
 
 6. **Verdict block** — summary table: each check, status (PASS / WARN / FAIL), brief evidence pointer.
 
