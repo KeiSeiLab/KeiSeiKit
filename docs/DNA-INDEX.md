@@ -1,19 +1,19 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T15:21:20Z.
-> Total blocks: 509. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T16:06:16Z.
+> Total blocks: 512. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 121 |
 | hook | 40 |
-| primitive | 106 |
+| primitive | 109 |
 | rule | 174 |
 | skill | 68 |
 
 ---
 
-## Primitive (106)
+## Primitive (109)
 
 Sorted alphabetically by name.
 
@@ -81,8 +81,8 @@ Sorted alphabetically by name.
 | kei-memory-sled | primitive::md,networ… | _primitives/_rust/kei-memory-sled/Cargo.toml | 6fdae904 |
 | kei-memory-sqlite | primitive::md,networ… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | 93761682 |
 | kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | fd996e76 |
-| kei-model | primitive::cli,md,re… | _primitives/_rust/kei-model/Cargo.toml | 1a4038fd |
 | kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | b67e44b9 |
+| kei-model::kei-model | primitive::_::6a479a… | _primitives/_rust/kei-model/Cargo.toml | 3f74b167 |
 | kei-net-ipsec | primitive::md,networ… | _primitives/_rust/kei-net-ipsec/Cargo.toml | edb79478 |
 | kei-net-openvpn | primitive::md,networ… | _primitives/_rust/kei-net-openvpn/Cargo.toml | a209e645 |
 | kei-net-wireguard | primitive::md,networ… | _primitives/_rust/kei-net-wireguard/Cargo.toml | 05a75c60 |
@@ -98,9 +98,12 @@ Sorted alphabetically by name.
 | kei-provision | primitive::cli,md::1… | _primitives/_rust/kei-provision/Cargo.toml | cfa53bb3 |
 | kei-prune | primitive::cli,md,sq… | _primitives/_rust/kei-prune/Cargo.toml | 4454513b |
 | kei-refactor-engine | primitive::cli,md::c… | _primitives/_rust/kei-refactor-engine/Cargo.toml | 92e83ce0 |
-| kei-registry | primitive::cli,fs,ha… | _primitives/_rust/kei-registry/Cargo.toml | 5a2e79d8 |
 | kei-registry::foo | primitive::_::12366c… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
+| kei-registry::foo | primitive::_::3937fa… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
+| kei-registry::kei-registry | primitive::_::30e60a… | _primitives/_rust/kei-registry/Cargo.toml | d5146bbd |
+| kei-registry::kei-registry | primitive::_::4744f0… | _primitives/_rust/kei-registry/Cargo.toml | 4e595599 |
 | kei-registry::mini-prim | primitive::_::57f8eb… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
+| kei-registry::mini-prim | primitive::_::bb2052… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-replay | primitive::cli,hash,… | _primitives/_rust/kei-replay/Cargo.toml | 74f2fcc4 |
 | kei-router | primitive::cli,md,ne… | _primitives/_rust/kei-router/Cargo.toml | 2cfaa362 |
 | kei-runtime | primitive::cli,fs,md… | _primitives/_rust/kei-runtime/Cargo.toml | c19f68cf |
@@ -1093,6 +1096,7 @@ Sorted alphabetically by name.
 - `kei-migrate` — 2 versions: db2e7bd0 → fd996e76
 - `kei-model` — 2 versions: 0a6ce8bc → 1a4038fd
 - `kei-model-router` — 2 versions: 1280a1dd → b67e44b9
+- `kei-model::kei-model` — 2 versions: 0948fb4f → 3f74b167
 - `kei-net-ipsec` — 2 versions: 600684a8 → edb79478
 - `kei-net-openvpn` — 2 versions: d4c94d69 → a209e645
 - `kei-net-wireguard` — 2 versions: e2c8fab8 → 05a75c60
@@ -1109,7 +1113,9 @@ Sorted alphabetically by name.
 - `kei-prune` — 2 versions: 7c0a0c11 → 4454513b
 - `kei-refactor-engine` — 2 versions: 90048888 → 92e83ce0
 - `kei-registry` — 3 versions: 7d9570ad → 5a2e79d8 → 5a2e79d8
-- `kei-registry::kei-registry` — 21 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf
+- `kei-registry::foo` — 2 versions: 403bc4b0 → 403bc4b0
+- `kei-registry::kei-registry` — 36 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf → 713f693b → 5faa1d45 → 84b3d3aa → f0fd45d4 → a50c01c9 → a4b4526d → b6f981f1 → 93eeffff → d3feb512 → f21fe020 → cbe1a45d → d5146bbd → a33bb21f → a3f03a74 → 4e595599
+- `kei-registry::mini-prim` — 2 versions: 9fa2b304 → 9fa2b304
 - `kei-replay` — 2 versions: 420ceb46 → 74f2fcc4
 - `kei-router` — 2 versions: fc8c6820 → 2cfaa362
 - `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd

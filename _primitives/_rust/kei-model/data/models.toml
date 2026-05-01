@@ -253,3 +253,219 @@ output_per_mtok_micro = 0
 status = "verified"
 source_url = "https://ollama.com/library/llama3"
 verified_at = "2026-04-28"
+
+# ============================================================
+# Google Gemini image-gen (nano-banana CLI) — verified 2026-05-01
+# Source: https://fal.ai/models/fal-ai/flux-2-pro (fal.ai catalog)
+#         https://fal.ai/pricing
+# SCHEMA NOTE: provider="local" is a placeholder — the Provider
+# enum does not yet include "google". Follow-up: add Provider::Google
+# and Provider::Fal and Provider::Elevenlabs to model.rs + enum parse().
+# capabilities=[] because Capability enum has no image-gen / video-gen
+# variants yet. Follow-up: extend Capability enum with generation caps.
+# Per-image cost stored in output_per_mtok_micro (1 image = 1 unit).
+# Unit semantics noted in the notes field (loader does not yet parse "unit").
+# ============================================================
+
+[[models]]
+id = "gemini-3-1-flash-image"
+provider = "local"
+display_name = "Gemini 3.1 Flash Image (Nano Banana 2)"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image"]
+status = "active"
+role_tags = ["image-cheap", "image-gen"]
+fallback = ""
+notes = "Google Gemini Flash image-gen consumed via nano-banana CLI. Real provider: google. Per-image cost; 1 unit = 1 image. output_per_mtok_micro stores per-image micro-cents. Pricing unverified on public page — nanobanana aggregator lists $0.0398/image via fal.ai."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 3980000
+status = "needs-verification"
+source_url = "https://fal.ai/pricing"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "gemini-3-pro-image"
+provider = "local"
+display_name = "Gemini 3 Pro Image (Nano Banana Pro)"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image", "image-edit"]
+status = "active"
+role_tags = ["image-flagship", "image-gen"]
+fallback = "gemini-3-1-flash-image"
+notes = "Google Gemini Pro image-gen consumed via nano-banana CLI. Real provider: google. Per-image cost; 1 unit = 1 image. output_per_mtok_micro stores per-image micro-cents. Pricing not on public page — marked needs-verification."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 0
+status = "needs-verification"
+source_url = "https://fal.ai/pricing"
+verified_at = "2026-05-01"
+
+# ============================================================
+# fal.ai generation models (image + video) — verified 2026-05-01
+# Source: https://fal.ai/models/fal-ai/flux-2-pro
+#         https://fal.ai/models/fal-ai/flux-pro/v1.1
+#         https://fal.ai/models/fal-ai/kling-video/o3/4k/text-to-video
+#         https://fal.ai/models/fal-ai/kling-video/o3/standard/image-to-video
+#         https://fal.ai/models/fal-ai/veo3
+#         https://fal.ai/models/fal-ai/ideogram/v3
+#         https://fal.ai/models/fal-ai/recraft-v3
+# SCHEMA NOTE: provider="local" placeholder (real provider: fal).
+# capabilities=[] placeholder (enum lacks image-gen/video-gen/etc).
+# Image pricing: output_per_mtok_micro = per-image micro-cents (1 unit = 1 image).
+# Video pricing: output_per_mtok_micro = per-second micro-cents (1 unit = 1 second).
+# ============================================================
+
+[[models]]
+id = "flux-2-pro"
+provider = "local"
+display_name = "FLUX.2 [pro] Text to Image"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image"]
+status = "active"
+role_tags = ["image-flagship", "image-gen"]
+fallback = "flux-pro-1-1"
+notes = "fal.ai FLUX.2 [pro]. ZERO-CONFIG: no guidance_scale parameter (model handles internally). Per-megapixel billing: $0.03 first MP + $0.015 per extra MP. 1024x1024 = $0.03, 1920x1080 = $0.045. output_per_mtok_micro = 3000000 (base 1MP price). Real provider: fal."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 3000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/flux-2-pro"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "flux-pro-1-1"
+provider = "local"
+display_name = "FLUX.1 [pro] v1.1 Text to Image"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image"]
+status = "active"
+role_tags = ["image-flagship", "image-gen"]
+fallback = ""
+notes = "fal.ai FLUX Pro 1.1. Per-megapixel billing: $0.04/MP rounded up. Fallback for flux-2-pro. output_per_mtok_micro = 4000000 (1MP base). Real provider: fal."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 4000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/flux-pro/v1.1"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "kling-o3"
+provider = "local"
+display_name = "Kling O3 4K Text/Image to Video"
+context_tokens = 0
+capabilities = ["video-gen", "text-to-video", "image-to-video"]
+status = "active"
+role_tags = ["video-gen"]
+fallback = ""
+notes = "fal.ai Kling O3. 4K video generation. Per-second cost: $0.42/s (audio off). Durations 3-15s; default 5s (=$2.10). 2500-char prompt limit (O3 hard limit). Supports elements + voice_ids simultaneously. output_per_mtok_micro = 42000000 (per-second micro-cents). Real provider: fal."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 42000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/kling-video/o3/4k/text-to-video"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "veo-3"
+provider = "local"
+display_name = "Google Veo 3 (via fal.ai)"
+context_tokens = 0
+capabilities = ["video-gen", "text-to-video"]
+status = "active"
+role_tags = ["video-gen"]
+fallback = "kling-o3"
+notes = "fal.ai Google Veo 3 partner model. Per-second cost: $0.50/s (audio off) or $0.75/s (audio on). Fast tier: $0.25/s (audio off) or $0.40/s (audio on). output_per_mtok_micro = 50000000 (standard audio-off). Real provider: fal/google."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 50000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/veo3"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "ideogram-v3"
+provider = "local"
+display_name = "Ideogram V3 Text to Image"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image", "image-edit"]
+status = "active"
+role_tags = ["image-flagship", "image-gen"]
+fallback = ""
+notes = "fal.ai Ideogram V3. Per-image tiered: $0.03 TURBO / $0.06 BALANCED / $0.09 QUALITY. Exceptional text/typography rendering. output_per_mtok_micro = 6000000 (BALANCED tier). Real provider: fal."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 6000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/ideogram/v3"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "recraft-v3"
+provider = "local"
+display_name = "Recraft V3 Text to Image / Vector"
+context_tokens = 0
+capabilities = ["image-gen", "text-to-image", "image-edit"]
+status = "active"
+role_tags = ["image-cheap", "image-gen"]
+fallback = ""
+notes = "fal.ai Recraft V3. Per-image: $0.04 (raster) or $0.08 (vector_illustration style). Styles: realistic_image, digital_illustration, vector_illustration. Strong text rendering. output_per_mtok_micro = 4000000 (raster base). Real provider: fal."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 4000000
+status = "verified"
+source_url = "https://fal.ai/models/fal-ai/recraft-v3"
+verified_at = "2026-05-01"
+
+# ============================================================
+# ElevenLabs voice generation — verified 2026-05-01
+# Source: https://elevenlabs.io/pricing/api
+# SCHEMA NOTE: provider="local" placeholder (real provider: elevenlabs).
+# Voice pricing: output_per_mtok_micro = per-1k-char micro-cents
+# (1 unit = 1000 characters). input_per_mtok_micro = 0.
+# ============================================================
+
+[[models]]
+id = "elevenlabs-v3"
+provider = "local"
+display_name = "ElevenLabs Turbo v3 (Flash)"
+context_tokens = 0
+capabilities = ["voice-gen", "text-to-speech", "voice-clone"]
+status = "active"
+role_tags = ["voice-gen"]
+fallback = "elevenlabs-multilingual-v2"
+notes = "ElevenLabs high-quality voice model. Per-1k-chars: $0.10. Low latency ~250-300ms. Supports 32 languages. 40k char limit per request. output_per_mtok_micro = 10000000 (per-1k-chars micro-cents). Real provider: elevenlabs. ElevenLabs 3-step pattern: designVoice -> createVoice -> TTS."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 10000000
+status = "verified"
+source_url = "https://elevenlabs.io/pricing/api"
+verified_at = "2026-05-01"
+
+[[models]]
+id = "elevenlabs-multilingual-v2"
+provider = "local"
+display_name = "ElevenLabs Multilingual v2"
+context_tokens = 0
+capabilities = ["voice-gen", "text-to-speech", "voice-clone"]
+status = "active"
+role_tags = ["voice-gen"]
+fallback = ""
+notes = "ElevenLabs multilingual voice model (fallback for v3). Per-1k-chars: $0.10. Same pricing tier as v3. Supports 32 languages. output_per_mtok_micro = 10000000. Real provider: elevenlabs."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 10000000
+status = "verified"
+source_url = "https://elevenlabs.io/pricing/api"
+verified_at = "2026-05-01"

@@ -74,6 +74,11 @@ pub fn dispatch(cmd: Command) -> Result<Outcome> {
             ledger_db,
             format,
         } => handle_status(db, git_repo, ledger_db, format),
+        Command::Secrets {
+            env_files,
+            scan_root,
+            format,
+        } => crate::secrets_handler::handle_secrets(env_files, scan_root, format),
     }
 }
 

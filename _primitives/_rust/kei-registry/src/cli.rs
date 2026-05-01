@@ -168,4 +168,20 @@ pub enum Command {
         #[arg(long, default_value = "ascii")]
         format: String,
     },
+
+    /// Audit secret/env-var references across the kit. Reads env-var NAMES
+    /// from .env files (never values), greps the kit tree for usages,
+    /// reports orphans (defined but unreferenced).
+    Secrets {
+        /// Env-file paths to scan (default: `~/.claude/secrets/.env` if
+        /// exists, plus any `<scan-root>/secrets/*.env`).
+        #[arg(long = "env-file")]
+        env_files: Vec<PathBuf>,
+        /// Root to scan for usages (default: current directory).
+        #[arg(long, default_value = ".")]
+        scan_root: PathBuf,
+        /// Output format: `ascii` (default) or `json`.
+        #[arg(long, default_value = "ascii")]
+        format: String,
+    },
 }
