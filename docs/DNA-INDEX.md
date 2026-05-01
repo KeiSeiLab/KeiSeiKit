@@ -884,92 +884,92 @@ Sorted alphabetically by name.
 
 | Name | DNA prefix | Path | Body sha8 |
 |---|---|---|---|
-| API — Anthropic (Claude) | atom::_::ae4ffd4e::4… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-anthropic.md | 4cba1946 |
-| API — Apify (web scraping platform) | atom::_::6288776c::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-apify.md | f7c27f78 |
-| API — ElevenLabs (voice) | atom::_::3eb2bd5e::4… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-elevenlabs.md | 458d19af |
-| API — GraphQL (schema-first, DataLoader, subscriptions, persisted queries) | atom::_::fca3c2ac::e… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-graphql.md | e6ec4781 |
-| API — OpenAPI-First (3.1 as single source of truth) | atom::_::0bed12e3::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-openapi-first.md | 9c6e9280 |
-| API — REST Conventions (verbs, status codes, resources, idempotency, ETag) | atom::_::0af36def::0… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-rest-conventions.md | 05cf52c6 |
-| API — Versioning, Pagination, Rate Limiting | atom::_::564a0920::a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-versioning-pagination-ratelimit.md | a501b835 |
-| API — fal.ai (image / video / 3D) | atom::_::0813c280::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/api-fal-ai.md | 3b53b955 |
-| AUTH — Authorization (RBAC / ABAC / ReBAC) | atom::_::6070b84e::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/auth-authorization.md | 8961656b |
-| AUTH — OAuth2 + OIDC (Authorization Code + PKCE) | atom::_::8be642de::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/auth-oauth2-oidc.md | 98debce0 |
-| AUTH — Passkeys (WebAuthn / FIDO2) | atom::_::94c5d302::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/auth-passkeys.md | 97eefc78 |
-| AUTH — Sessions & Cookies (+JWT tradeoff) | atom::_::a11a36d9::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/auth-sessions.md | f3359b91 |
-| BASELINE — inherit from Main Claude (never violate) | atom::_::477f2902::4… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/baseline.md | 44fc4025 |
-| CI — Forgejo Actions (self-hosted, Tailscale-only admin) | atom::_::225f3100::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/ci-forgejo-actions.md | f2ac5ad0 |
-| CI — GitHub Actions (OIDC, matrix, cache, reusable workflows) | atom::_::032b667b::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/ci-github-actions.md | ba80d3df |
-| CI — Release automation (SemVer, changelog, tagging) | atom::_::c42ae6cf::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/ci-release-automation.md | 99ad09c3 |
-| CI — Security gate (secrets, SCA, SBOM, semgrep, licenses) | atom::_::351de96c::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/ci-security-gate.md | b869dc10 |
-| DB — Drizzle ORM (TypeScript) patterns | atom::_::78f6d553::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/db-drizzle.md | 89da5438 |
-| DB — Migration hygiene (universal) | atom::_::21bd9035::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/db-migration-hygiene.md | 8efdbbd2 |
-| DB — PostgreSQL (current major — 17 as of 2026-04) patterns | atom::_::3160a646::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/db-postgres.md | 52f2cf0b |
-| DB — SQLite (prod-suitable) patterns | atom::_::3dd8ae89::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/db-sqlite.md | 659190f9 |
-| DB — SQLx (Rust) patterns | atom::_::661ee0b4::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/db-sqlx.md | 3f4984d6 |
-| DEPLOY — AWS EC2 (Instance Connect + Elastic IP) | atom::_::d39a1e45::7… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-aws-ec2.md | 7114479f |
-| DEPLOY — Cloudflare (Workers / Pages / R2 / KV) | atom::_::b356507b::a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-cloudflare.md | a8f9852a |
-| DEPLOY — Docker | atom::_::5e61c11f::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-docker.md | 8c1616cf |
-| DEPLOY — Generic VPS (provider-agnostic cloud-init + ssh-first-contact) | atom::_::1e1a442e::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-vps-generic.md | c278455b |
-| DEPLOY — Hetzner Cloud (CX22 / CAX11 + TF + Cloud Firewall) | atom::_::3760e45f::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-hetzner-cloud.md | b6340db6 |
-| DEPLOY — LOCAL ONLY (sensitive / pre-disclosure project) | atom::_::67c56d06::0… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-local-only.md | 0ed597d2 |
-| DEPLOY — Modal (GPU compute) | atom::_::a3e3aa06::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/deploy-modal.md | 9598fb12 |
-| DOCS — Architecture diagrams (Mermaid) | atom::_::e87474f7::7… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/docs-architecture-diagrams.md | 7ae83b02 |
-| DOCS — Operational runbook template | atom::_::c130bd64::d… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/docs-runbook.md | d28961e0 |
-| DOCS — Public `README.md` scaffold | atom::_::c616c9c0::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/docs-readme-template.md | 9f54ac42 |
-| DOCS — `CLAUDE.md` (project bootstrap template) | atom::_::ca7554c2::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/docs-claude-md.md | f220bcb5 |
-| DOCS — `DECISIONS.md` / ADR template (MADR 4.0) | atom::_::dec0fc64::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/docs-decisions-adr.md | 688b6062 |
-| DOMAIN — ML Training | atom::_::93128033::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/domain-ml-training.md | 502dc4d1 |
-| DOMAIN — Paid APIs (Anthropic / OpenAI / fal.ai / Apify / Modal / AWS / GCP / ElevenLabs) | atom::_::0fbbc015::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/domain-paid-apis.md | 3ec83d8b |
-| DOMAIN — Scraper unified output invariant | atom::_::5f806192::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/scraper-unified-output.md | c3127262 |
-| DOMAIN — Scrapers Tier 1 (free APIs + open-source) | atom::_::f3829bb7::7… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/scraper-free-tier.md | 76720261 |
-| DOMAIN — Scrapers Tier 3 (Apify / Bright Data paid) | atom::_::ae824713::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/scraper-paid-tier.md | 947e828f |
-| DOMAIN — Secrets handling | atom::_::8acd76d2::0… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/domain-has-secrets.md | 0c6ca668 |
-| DOUBLE AUDIT PROTOCOL (mandatory when 3+ files touched) | atom::_::2feb9f19::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-double-audit.md | 6777758c |
-| ERROR BUDGET — 3-Level Escalation | atom::_::c54befb7::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-error-budget.md | 9f287ccb |
-| EVIDENCE GRADING | atom::_::a96dc5e7::1… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/evidence-grading.md | 1f53dd20 |
-| MATH FIRST (mandatory for ML / physics / theory work) | atom::_::85d26d3e::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-math-first.md | c4be5d41 |
-| MEMORY PROTOCOL | atom::_::c3633f9a::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/memory-protocol.md | 51fe1c55 |
-| MODE — Agent × Cognitive-Mode Matrix | atom::_::b66bab8c::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-matrix.md | 51067491 |
-| MODE — Devil's Advocate | atom::_::2dbb2590::4… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-devils-advocate.md | 4592adea |
-| MODE — First Principles | atom::_::78f84026::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-first-principles.md | 5a96e03c |
-| MODE — Maximalist | atom::_::704957b8::1… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-maximalist.md | 1e62f540 |
-| MODE — Minimalist | atom::_::27e5df03::2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-minimalist.md | 2d19f9cb |
-| MODE — Skeptic | atom::_::625363a9::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/mode-skeptic.md | cdb387ee |
-| OBSERVABILITY — Distributed traces (OpenTelemetry + W3C traceparent) | atom::_::7d4e9694::a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/obs-traces.md | a242193a |
-| OBSERVABILITY — Metrics (Prometheus + OTel + RED/USE) | atom::_::1c976699::2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/obs-metrics.md | 2b6b71a1 |
-| OBSERVABILITY — Structured logs (JSON-lines) | atom::_::b1b45276::e… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/obs-structured-logs.md | ea984fbd |
-| PRE-DEV GATE — three checks before any new code | atom::_::e8916aec::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-pre-dev-gate.md | 336ff4cc |
-| Pipeline 5-Phase Wizard Template (shared preamble) | atom::_::54564af1::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/pipeline-5phase-template.md | 8eca71b8 |
-| Pure-Click Contract | atom::_::d09a171f::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-pure-click-contract.md | 9fdb2d9a |
-| SECURITY — Audit Logging (auditd + journald forwarding) | atom::_::f617b24b::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/security-audit-logging.md | 3bafc6f8 |
-| SECURITY — Firewall (ufw default-deny + rate limiting + nftables alt) | atom::_::f404cc5f::5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/security-firewall-ufw.md | 5452a32e |
-| SECURITY — Patching (unattended-upgrades + needrestart + reboot window) | atom::_::22e056fe::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/security-patching.md | 6736cb45 |
-| SECURITY — SSH Hardening (sshd_config.d/99-kei.conf) | atom::_::221ea663::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/security-ssh-hardening.md | f64872fa |
-| SECURITY — TLS via Caddy (automatic ACME, HTTP-01 / DNS-01) | atom::_::d990d943::2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/security-tls-caddy.md | 2c5e8fde |
-| STACK — Astro 6 (Content + Marketing + Islands) | atom::_::f4a34753::2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-astro.md | 245630f0 |
-| STACK — Embedded Rust STM32 (embassy / cortex-m) | atom::_::ebf68a21::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-embedded-stm32.md | 6fc3b55a |
-| STACK — FastAPI + async SQLAlchemy 2.0 + PostgreSQL | atom::_::8d6a0bc1::1… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-fastapi-postgres.md | 100bdd1f |
-| STACK — Flutter + Riverpod + Clean Architecture | atom::_::44208b34::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-flutter.md | b66a5b3a |
-| STACK — Go server | atom::_::cd4d99db::d… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-go-server.md | dd9dd97c |
-| STACK — Next.js 15/16 (App Router + TS + Server Components) | atom::_::f1e362c9::a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-nextjs.md | ab3b00c8 |
-| STACK — Python ML (PyTorch / JAX) | atom::_::ffd80d3c::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-python-ml.md | ceb1fc98 |
-| STACK — Rust CLI / tooling | atom::_::dfcc02e8::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-rust-cli.md | f9b3d3e1 |
-| STACK — Rust HTTP server (axum + tokio + sqlx) | atom::_::3ff89b59::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-rust-axum.md | ffce850f |
-| STACK — SvelteKit (Svelte 5 Runes + TS) | atom::_::e310ae03::7… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-sveltekit.md | 7739c3ad |
-| STACK — Swift SPM executable (macOS) | atom::_::c88b667b::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-swift-spm.md | cc1bc234 |
-| STACK — Swift iOS (UIKit / SwiftUI hybrid) | atom::_::6009a698::c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-swift-ios.md | ce4bea9b |
-| STACK — Tailwind CSS 4 (compositional add-on) | atom::_::2451c900::6… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-tailwind.md | 61a5d59a |
-| STACK — Vite + React 19 + TypeScript (SPA) | atom::_::2d4ba30b::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/stack-react-vite.md | 9c443f61 |
-| TEST — End-to-end (Playwright browser automation) | atom::_::af3c25ff::e… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/test-e2e.md | eb42d2d7 |
-| TEST — Fuzzing (input-space exploration) | atom::_::e15b2f03::f… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/test-fuzz.md | f861626c |
-| TEST — Load / performance testing (baseline → profile → fix) | atom::_::ab9ea8b9::4… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/test-load.md | 456e2277 |
-| TEST — Property-based testing (invariants + shrinking) | atom::_::d2c8bd9e::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/test-property.md | 329287ab |
-| TEST-FIRST | atom::_::2158b933::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/rule-test-first.md | b65a0c3a |
-| `_blocks/` — Composable Agent Content | atom::_::c8144990::b… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_blocks/README.md | bd6e19ee |
-| auditor | atom::_::b46e86db::7… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/auditor.toml | 7eb6ab3a |
-| edit-local | atom::_::b7724e4f::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/edit-local.toml | 35ca9971 |
-| edit-shared | atom::_::db022330::3… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/edit-shared.toml | 332b1a8b |
-| explorer | atom::_::892af912::d… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/explorer.toml | d61c4f89 |
+| API — Anthropic (Claude) | atom::_::ae4ffd4e::4… | _blocks/api-anthropic.md | 4cba1946 |
+| API — Apify (web scraping platform) | atom::_::6288776c::f… | _blocks/api-apify.md | f7c27f78 |
+| API — ElevenLabs (voice) | atom::_::3eb2bd5e::4… | _blocks/api-elevenlabs.md | 458d19af |
+| API — GraphQL (schema-first, DataLoader, subscriptions, persisted queries) | atom::_::fca3c2ac::e… | _blocks/api-graphql.md | e6ec4781 |
+| API — OpenAPI-First (3.1 as single source of truth) | atom::_::0bed12e3::9… | _blocks/api-openapi-first.md | 9c6e9280 |
+| API — REST Conventions (verbs, status codes, resources, idempotency, ETag) | atom::_::0af36def::0… | _blocks/api-rest-conventions.md | 05cf52c6 |
+| API — Versioning, Pagination, Rate Limiting | atom::_::564a0920::a… | _blocks/api-versioning-pagination-ratelimit.md | a501b835 |
+| API — fal.ai (image / video / 3D) | atom::_::0813c280::3… | _blocks/api-fal-ai.md | 3b53b955 |
+| AUTH — Authorization (RBAC / ABAC / ReBAC) | atom::_::6070b84e::8… | _blocks/auth-authorization.md | 8961656b |
+| AUTH — OAuth2 + OIDC (Authorization Code + PKCE) | atom::_::8be642de::9… | _blocks/auth-oauth2-oidc.md | 98debce0 |
+| AUTH — Passkeys (WebAuthn / FIDO2) | atom::_::94c5d302::9… | _blocks/auth-passkeys.md | 97eefc78 |
+| AUTH — Sessions & Cookies (+JWT tradeoff) | atom::_::a11a36d9::f… | _blocks/auth-sessions.md | f3359b91 |
+| BASELINE — inherit from Main Claude (never violate) | atom::_::477f2902::4… | _blocks/baseline.md | 44fc4025 |
+| CI — Forgejo Actions (self-hosted, Tailscale-only admin) | atom::_::225f3100::f… | _blocks/ci-forgejo-actions.md | f2ac5ad0 |
+| CI — GitHub Actions (OIDC, matrix, cache, reusable workflows) | atom::_::032b667b::b… | _blocks/ci-github-actions.md | ba80d3df |
+| CI — Release automation (SemVer, changelog, tagging) | atom::_::c42ae6cf::9… | _blocks/ci-release-automation.md | 99ad09c3 |
+| CI — Security gate (secrets, SCA, SBOM, semgrep, licenses) | atom::_::351de96c::b… | _blocks/ci-security-gate.md | b869dc10 |
+| DB — Drizzle ORM (TypeScript) patterns | atom::_::78f6d553::8… | _blocks/db-drizzle.md | 89da5438 |
+| DB — Migration hygiene (universal) | atom::_::21bd9035::8… | _blocks/db-migration-hygiene.md | 8efdbbd2 |
+| DB — PostgreSQL (current major — 17 as of 2026-04) patterns | atom::_::3160a646::5… | _blocks/db-postgres.md | 52f2cf0b |
+| DB — SQLite (prod-suitable) patterns | atom::_::3dd8ae89::6… | _blocks/db-sqlite.md | 659190f9 |
+| DB — SQLx (Rust) patterns | atom::_::661ee0b4::3… | _blocks/db-sqlx.md | 3f4984d6 |
+| DEPLOY — AWS EC2 (Instance Connect + Elastic IP) | atom::_::d39a1e45::7… | _blocks/deploy-aws-ec2.md | 7114479f |
+| DEPLOY — Cloudflare (Workers / Pages / R2 / KV) | atom::_::b356507b::a… | _blocks/deploy-cloudflare.md | a8f9852a |
+| DEPLOY — Docker | atom::_::5e61c11f::8… | _blocks/deploy-docker.md | 8c1616cf |
+| DEPLOY — Generic VPS (provider-agnostic cloud-init + ssh-first-contact) | atom::_::1e1a442e::c… | _blocks/deploy-vps-generic.md | c278455b |
+| DEPLOY — Hetzner Cloud (CX22 / CAX11 + TF + Cloud Firewall) | atom::_::3760e45f::b… | _blocks/deploy-hetzner-cloud.md | b6340db6 |
+| DEPLOY — LOCAL ONLY (sensitive / pre-disclosure project) | atom::_::67c56d06::0… | _blocks/deploy-local-only.md | 0ed597d2 |
+| DEPLOY — Modal (GPU compute) | atom::_::a3e3aa06::9… | _blocks/deploy-modal.md | 9598fb12 |
+| DOCS — Architecture diagrams (Mermaid) | atom::_::e87474f7::7… | _blocks/docs-architecture-diagrams.md | 7ae83b02 |
+| DOCS — Operational runbook template | atom::_::c130bd64::d… | _blocks/docs-runbook.md | d28961e0 |
+| DOCS — Public `README.md` scaffold | atom::_::c616c9c0::9… | _blocks/docs-readme-template.md | 9f54ac42 |
+| DOCS — `CLAUDE.md` (project bootstrap template) | atom::_::ca7554c2::f… | _blocks/docs-claude-md.md | f220bcb5 |
+| DOCS — `DECISIONS.md` / ADR template (MADR 4.0) | atom::_::dec0fc64::6… | _blocks/docs-decisions-adr.md | 688b6062 |
+| DOMAIN — ML Training | atom::_::93128033::5… | _blocks/domain-ml-training.md | 502dc4d1 |
+| DOMAIN — Paid APIs (Anthropic / OpenAI / fal.ai / Apify / Modal / AWS / GCP / ElevenLabs) | atom::_::0fbbc015::3… | _blocks/domain-paid-apis.md | 3ec83d8b |
+| DOMAIN — Scraper unified output invariant | atom::_::5f806192::c… | _blocks/scraper-unified-output.md | c3127262 |
+| DOMAIN — Scrapers Tier 1 (free APIs + open-source) | atom::_::f3829bb7::7… | _blocks/scraper-free-tier.md | 76720261 |
+| DOMAIN — Scrapers Tier 3 (Apify / Bright Data paid) | atom::_::ae824713::9… | _blocks/scraper-paid-tier.md | 947e828f |
+| DOMAIN — Secrets handling | atom::_::8acd76d2::0… | _blocks/domain-has-secrets.md | 0c6ca668 |
+| DOUBLE AUDIT PROTOCOL (mandatory when 3+ files touched) | atom::_::2feb9f19::6… | _blocks/rule-double-audit.md | 6777758c |
+| ERROR BUDGET — 3-Level Escalation | atom::_::c54befb7::9… | _blocks/rule-error-budget.md | 9f287ccb |
+| EVIDENCE GRADING | atom::_::a96dc5e7::1… | _blocks/evidence-grading.md | 1f53dd20 |
+| MATH FIRST (mandatory for ML / physics / theory work) | atom::_::85d26d3e::c… | _blocks/rule-math-first.md | c4be5d41 |
+| MEMORY PROTOCOL | atom::_::c3633f9a::5… | _blocks/memory-protocol.md | 51fe1c55 |
+| MODE — Agent × Cognitive-Mode Matrix | atom::_::b66bab8c::5… | _blocks/mode-matrix.md | 51067491 |
+| MODE — Devil's Advocate | atom::_::2dbb2590::4… | _blocks/mode-devils-advocate.md | 4592adea |
+| MODE — First Principles | atom::_::78f84026::5… | _blocks/mode-first-principles.md | 5a96e03c |
+| MODE — Maximalist | atom::_::704957b8::1… | _blocks/mode-maximalist.md | 1e62f540 |
+| MODE — Minimalist | atom::_::27e5df03::2… | _blocks/mode-minimalist.md | 2d19f9cb |
+| MODE — Skeptic | atom::_::625363a9::c… | _blocks/mode-skeptic.md | cdb387ee |
+| OBSERVABILITY — Distributed traces (OpenTelemetry + W3C traceparent) | atom::_::7d4e9694::a… | _blocks/obs-traces.md | a242193a |
+| OBSERVABILITY — Metrics (Prometheus + OTel + RED/USE) | atom::_::1c976699::2… | _blocks/obs-metrics.md | 2b6b71a1 |
+| OBSERVABILITY — Structured logs (JSON-lines) | atom::_::b1b45276::e… | _blocks/obs-structured-logs.md | ea984fbd |
+| PRE-DEV GATE — three checks before any new code | atom::_::e8916aec::3… | _blocks/rule-pre-dev-gate.md | 336ff4cc |
+| Pipeline 5-Phase Wizard Template (shared preamble) | atom::_::54564af1::8… | _blocks/pipeline-5phase-template.md | 8eca71b8 |
+| Pure-Click Contract | atom::_::d09a171f::9… | _blocks/rule-pure-click-contract.md | 9fdb2d9a |
+| SECURITY — Audit Logging (auditd + journald forwarding) | atom::_::f617b24b::3… | _blocks/security-audit-logging.md | 3bafc6f8 |
+| SECURITY — Firewall (ufw default-deny + rate limiting + nftables alt) | atom::_::f404cc5f::5… | _blocks/security-firewall-ufw.md | 5452a32e |
+| SECURITY — Patching (unattended-upgrades + needrestart + reboot window) | atom::_::22e056fe::6… | _blocks/security-patching.md | 6736cb45 |
+| SECURITY — SSH Hardening (sshd_config.d/99-kei.conf) | atom::_::221ea663::f… | _blocks/security-ssh-hardening.md | f64872fa |
+| SECURITY — TLS via Caddy (automatic ACME, HTTP-01 / DNS-01) | atom::_::d990d943::2… | _blocks/security-tls-caddy.md | 2c5e8fde |
+| STACK — Astro 6 (Content + Marketing + Islands) | atom::_::f4a34753::2… | _blocks/stack-astro.md | 245630f0 |
+| STACK — Embedded Rust STM32 (embassy / cortex-m) | atom::_::ebf68a21::6… | _blocks/stack-embedded-stm32.md | 6fc3b55a |
+| STACK — FastAPI + async SQLAlchemy 2.0 + PostgreSQL | atom::_::8d6a0bc1::1… | _blocks/stack-fastapi-postgres.md | 100bdd1f |
+| STACK — Flutter + Riverpod + Clean Architecture | atom::_::44208b34::b… | _blocks/stack-flutter.md | b66a5b3a |
+| STACK — Go server | atom::_::cd4d99db::d… | _blocks/stack-go-server.md | dd9dd97c |
+| STACK — Next.js 15/16 (App Router + TS + Server Components) | atom::_::f1e362c9::a… | _blocks/stack-nextjs.md | ab3b00c8 |
+| STACK — Python ML (PyTorch / JAX) | atom::_::ffd80d3c::c… | _blocks/stack-python-ml.md | ceb1fc98 |
+| STACK — Rust CLI / tooling | atom::_::dfcc02e8::f… | _blocks/stack-rust-cli.md | f9b3d3e1 |
+| STACK — Rust HTTP server (axum + tokio + sqlx) | atom::_::3ff89b59::f… | _blocks/stack-rust-axum.md | ffce850f |
+| STACK — SvelteKit (Svelte 5 Runes + TS) | atom::_::e310ae03::7… | _blocks/stack-sveltekit.md | 7739c3ad |
+| STACK — Swift SPM executable (macOS) | atom::_::c88b667b::c… | _blocks/stack-swift-spm.md | cc1bc234 |
+| STACK — Swift iOS (UIKit / SwiftUI hybrid) | atom::_::6009a698::c… | _blocks/stack-swift-ios.md | ce4bea9b |
+| STACK — Tailwind CSS 4 (compositional add-on) | atom::_::2451c900::6… | _blocks/stack-tailwind.md | 61a5d59a |
+| STACK — Vite + React 19 + TypeScript (SPA) | atom::_::2d4ba30b::9… | _blocks/stack-react-vite.md | 9c443f61 |
+| TEST — End-to-end (Playwright browser automation) | atom::_::af3c25ff::e… | _blocks/test-e2e.md | eb42d2d7 |
+| TEST — Fuzzing (input-space exploration) | atom::_::e15b2f03::f… | _blocks/test-fuzz.md | f861626c |
+| TEST — Load / performance testing (baseline → profile → fix) | atom::_::ab9ea8b9::4… | _blocks/test-load.md | 456e2277 |
+| TEST — Property-based testing (invariants + shrinking) | atom::_::d2c8bd9e::3… | _blocks/test-property.md | 329287ab |
+| TEST-FIRST | atom::_::2158b933::b… | _blocks/rule-test-first.md | b65a0c3a |
+| `_blocks/` — Composable Agent Content | atom::_::c8144990::b… | _blocks/README.md | bd6e19ee |
+| auditor | atom::_::b46e86db::7… | _roles/auditor.toml | 7eb6ab3a |
+| edit-local | atom::_::b7724e4f::3… | _roles/edit-local.toml | 35ca9971 |
+| edit-shared | atom::_::db022330::3… | _roles/edit-shared.toml | 332b1a8b |
+| explorer | atom::_::892af912::d… | _roles/explorer.toml | d61c4f89 |
 | foo | atom::md::36904b21::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::71c0f62c::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::b61b8509::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
@@ -980,27 +980,27 @@ Sorted alphabetically by name.
 | foo | atom::md::63a73aa1::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::0f507ef3::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::40c9240c::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
-| git-ops | atom::_::6da713d3::d… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/git-ops.toml | da80a8e7 |
-| merger | atom::_::183b6add::a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/merger.toml | af2bf880 |
-| output::merge-result | atom::output::d58ef5… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/output/merge-result/capability.toml | 91cb9245 |
-| output::report-format | atom::output::ad3888… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/output/report-format/capability.toml | 2051e906 |
-| output::severity-grade | atom::output::cad67a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/output/severity-grade/capability.toml | ed37a6c0 |
-| output::verdict | atom::output::33808e… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/output/verdict/capability.toml | b7b8f09e |
-| policy::git-ops-scope | atom::policy::223791… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/policy/git-ops-scope/capability.toml | 4d43202c |
-| policy::no-git-ops | atom::policy::62703a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/policy/no-git-ops/capability.toml | eed5a2d2 |
-| quality::cargo-check-green | atom::quality::4ee65… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/quality/cargo-check-green/capability.toml | 58fde9c4 |
-| quality::constructor-pattern | atom::quality::9f509… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/quality/constructor-pattern/capability.toml | a9c646b2 |
-| quality::tests-green | atom::quality::4502c… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/quality/tests-green/capability.toml | aa3903f9 |
-| read-only | atom::_::ebbf642d::8… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_roles/read-only.toml | 87b7cee9 |
-| safety::no-dep-bump | atom::safety::ec5c73… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/safety/no-dep-bump/capability.toml | 52f17bcf |
-| scope::files-denylist | atom::scope::2062ed2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/scope/files-denylist/capability.toml | 7a3eb264 |
-| scope::files-whitelist | atom::scope::dff44fd… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/scope/files-whitelist/capability.toml | 5a2b126c |
-| scope::read-only | atom::scope::9a26ff2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/scope/read-only/capability.toml | eeffc63a |
-| tools::bash-allowlist | atom::tools::b154595… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/tools/bash-allowlist/capability.toml | f18330d4 |
-| tools::cargo-only-bash | atom::_::692833ce::9… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/tools/cargo-only-bash/capability.toml | 98e70f68 |
-| tools::deny-tools | atom::tools::d64414a… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/tools/deny-tools/capability.toml | 8f342dd8 |
-| tools::read-only | atom::_::eded5636::2… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/tools/read-only/capability.toml | 22bba452 |
-| verify::fork-audit | atom::verify::81e519… | /Users/denisparfionovich/Projects/KeiSeiKit-public/_capabilities/verify/fork-audit/capability.toml | 3fb8694d |
+| git-ops | atom::_::6da713d3::d… | _roles/git-ops.toml | da80a8e7 |
+| merger | atom::_::183b6add::a… | _roles/merger.toml | af2bf880 |
+| output::merge-result | atom::output::d58ef5… | _capabilities/output/merge-result/capability.toml | 91cb9245 |
+| output::report-format | atom::output::ad3888… | _capabilities/output/report-format/capability.toml | 2051e906 |
+| output::severity-grade | atom::output::cad67a… | _capabilities/output/severity-grade/capability.toml | ed37a6c0 |
+| output::verdict | atom::output::33808e… | _capabilities/output/verdict/capability.toml | b7b8f09e |
+| policy::git-ops-scope | atom::policy::223791… | _capabilities/policy/git-ops-scope/capability.toml | 4d43202c |
+| policy::no-git-ops | atom::policy::62703a… | _capabilities/policy/no-git-ops/capability.toml | eed5a2d2 |
+| quality::cargo-check-green | atom::quality::4ee65… | _capabilities/quality/cargo-check-green/capability.toml | 58fde9c4 |
+| quality::constructor-pattern | atom::quality::9f509… | _capabilities/quality/constructor-pattern/capability.toml | a9c646b2 |
+| quality::tests-green | atom::quality::4502c… | _capabilities/quality/tests-green/capability.toml | aa3903f9 |
+| read-only | atom::_::ebbf642d::8… | _roles/read-only.toml | 87b7cee9 |
+| safety::no-dep-bump | atom::safety::ec5c73… | _capabilities/safety/no-dep-bump/capability.toml | 52f17bcf |
+| scope::files-denylist | atom::scope::2062ed2… | _capabilities/scope/files-denylist/capability.toml | 7a3eb264 |
+| scope::files-whitelist | atom::scope::dff44fd… | _capabilities/scope/files-whitelist/capability.toml | 5a2b126c |
+| scope::read-only | atom::scope::9a26ff2… | _capabilities/scope/read-only/capability.toml | eeffc63a |
+| tools::bash-allowlist | atom::tools::b154595… | _capabilities/tools/bash-allowlist/capability.toml | f18330d4 |
+| tools::cargo-only-bash | atom::_::692833ce::9… | _capabilities/tools/cargo-only-bash/capability.toml | 98e70f68 |
+| tools::deny-tools | atom::tools::d64414a… | _capabilities/tools/deny-tools/capability.toml | 8f342dd8 |
+| tools::read-only | atom::_::eded5636::2… | _capabilities/tools/read-only/capability.toml | 22bba452 |
+| verify::fork-audit | atom::verify::81e519… | _capabilities/verify/fork-audit/capability.toml | 3fb8694d |
 
 ---
 

@@ -396,5 +396,5 @@ Blockers / next: <list>
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
 - `~/.claude/rules/api-cost-guard.md`
 - `~/.claude/rules/ml-protocol.md`
-- `~/.claude/projects/-Users-denisparfionovich/memory/MEMORY.md  (Compute Cost Incident 2026-02-26)`
+- `~/.claude/memory/MEMORY.md  (Compute Cost Incident 2026-02-26)`
 - `https://modal.com/pricing  (live pricing — WebFetch or user browser)`

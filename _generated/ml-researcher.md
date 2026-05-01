@@ -271,4 +271,4 @@ Blockers / next: <list>
 - `~/.claude/rules/observable-classification.md`
 - `~/.claude/rules/api-cost-guard.md`
 - `~/.claude/rules/no-downgrade-constructive.md`
-- `~/.claude/projects/-Users-denisparfionovich/memory/wrong-paths-specialized-ml.md`
+- `~/.claude/memory/wrong-paths-specialized-ml.md`
