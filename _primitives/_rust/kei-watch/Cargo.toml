@@ -1,0 +1,24 @@
+[package]
+name = "kei-watch"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "Filesystem watcher primitive — thin canonical wrapper around notify"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-watch"
+path = "src/main.rs"
+
+[lib]
+name = "kei_watch"
+path = "src/lib.rs"
+
+[dependencies]
+notify = "8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"

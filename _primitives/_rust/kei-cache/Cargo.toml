@@ -1,0 +1,28 @@
+[package]
+name = "kei-cache"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Atom result cache — deterministic wrapping of pure (query/transform) atom invocations"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-cache"
+path = "src/main.rs"
+
+[lib]
+name = "kei_cache"
+path = "src/lib.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+anyhow = "1"
+thiserror = "1"
+kei-atom-discovery = { path = "../kei-atom-discovery" }
+
+[dev-dependencies]
+tempfile = "3"

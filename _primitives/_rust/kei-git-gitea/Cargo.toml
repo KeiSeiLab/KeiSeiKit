@@ -1,0 +1,32 @@
+[package]
+name = "kei-git-gitea"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "GitBackend impl for Gitea (gitea.com / self-hosted) over /api/v1. Wave 5 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_git_gitea"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+kei-shared = { path = "../kei-shared" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+wiremock = { workspace = true }
+
+[package.metadata.keisei]
+backend = "gitea"
+trait = "GitBackend"
+description = "Gitea HTTP API client + GitBackend impl (mirror, ensure_repo, clone, push)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

@@ -1,0 +1,28 @@
+//! __CRATE__::__VERB__ atom implementation.
+//!
+//! See `atoms/__VERB__.md` for the human-facing spec and frontmatter.
+//! See `atoms/schemas/__VERB__-{input,output}.json` for the wire shape.
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize)]
+pub struct Input {
+    // TODO: fields matching schemas/__VERB__-input.json
+}
+
+#[derive(Debug, Serialize)]
+pub struct Output {
+    // TODO: fields matching schemas/__VERB__-output.json
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    // TODO: error codes matching frontmatter `errors:` list
+    #[error("not implemented")]
+    NotImplemented,
+}
+
+/// Entry point — called by `src/main.rs` CLI dispatcher and by `kei-runtime invoke`.
+pub fn run(_input: Input) -> Result<Output, Error> {
+    Err(Error::NotImplemented)
+}

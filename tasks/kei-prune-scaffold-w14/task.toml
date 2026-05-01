@@ -1,0 +1,66 @@
+[task]
+role = "edit-local"
+agent-id = "kei-prune-scaffold-w14"
+
+[scope]
+files-whitelist = ["_primitives/_rust/kei-prune/**"]
+files-denylist = ["_primitives/_rust/Cargo.toml"]
+
+[verification]
+cargo-check-crates = ["kei-prune"]
+cargo-test-crates = ["kei-prune"]
+test-count-min = 8
+
+[output]
+report-fields-required = [
+    "files-touched",
+    "cargo-check",
+    "cargo-test",
+]
+
+[body]
+text = """
+Create new primitive `kei-prune` — retire unused agents / primitives based on
+kei-ledger usage stats. Mirrors biological pruning: mozg забывает то что не
+активировалось достаточно долго.
+
+## Design
+
+1. Engine-native via kei-entity-store. No new schema (just queries over
+   existing ledger `agents` table).
+
+2. Public API:
+   ```rust
+   pub struct PruneCandidate { id: i64, dna: String, last_used_ts: i64, age_days: i64 }
+   pub fn candidates(conn: &Connection, now: i64, min_idle_days: u32) -> Result<Vec<PruneCandidate>, Error>;
+   pub fn mark_retired(conn: &Connection, id: i64, now: i64) -> Result<(), Error>;
+   ```
+
+3. CLI:
+   - `kei-prune list --idle-days 90` — JSON array of candidates
+   - `kei-prune mark --id 5` — mark retired (sets status='retired', no delete)
+   - `kei-prune stats` — summary: active / idle / retired counts
+
+4. Pure metadata primitive — DOES NOT delete anything. Marks ledger row
+   status='retired'. Downstream tooling (archive/compact) can act on marker.
+
+## Tests (≥8)
+
+- candidates_returns_empty_on_fresh_db
+- candidates_excludes_active_rows
+- candidates_returns_idle_over_threshold
+- candidates_respects_min_idle_days
+- mark_retired_updates_status
+- mark_retired_idempotent
+- stats_counts_buckets
+- retired_rows_excluded_from_candidates
+
+## Constructor Pattern
+Every file ≤200 LOC, every fn ≤30 LOC. Deps: kei-entity-store path,
+rusqlite workspace, clap workspace, serde workspace, thiserror workspace.
+
+## IMPORTANT — standalone [workspace] escape hatch
+Add empty [workspace] table to crate's Cargo.toml (inside your whitelist)
+so cargo check/test work before orchestrator registers in workspace.
+Orchestrator will remove on merge.
+"""

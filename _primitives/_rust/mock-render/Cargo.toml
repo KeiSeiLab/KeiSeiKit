@@ -1,0 +1,18 @@
+[package]
+name = "mock-render"
+version = "0.1.0"
+edition.workspace = true
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+rust-version.workspace = true
+
+[[bin]]
+name = "mock-render"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"

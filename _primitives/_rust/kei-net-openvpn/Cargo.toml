@@ -1,0 +1,29 @@
+[package]
+name = "kei-net-openvpn"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "NetworkMode impl for OpenVPN — systemctl start/stop openvpn-server@<name> + management interface UNIX socket status parser. Wave 9 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_net_openvpn"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[package.metadata.keisei]
+backend = "openvpn"
+trait = "NetworkMode"
+description = "OpenVPN NetworkMode (systemctl-managed openvpn-server@ unit + management UNIX socket peers)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

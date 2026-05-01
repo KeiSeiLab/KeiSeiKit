@@ -1,0 +1,29 @@
+[package]
+name = "kei-memory-sled"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "MemoryBackend impl over sled (embedded key-value store) for kei-runtime-core"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_memory_sled"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+sled = "0.34"
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+backend = "sled"
+description = "Embedded sled-backed MemoryBackend; offline-first, single-process"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

@@ -1,0 +1,34 @@
+[package]
+name = "kei-memory-redis"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "MemoryBackend trait-impl backed by Redis 7+ (async). Wave 6 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_memory_redis"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = "0.1"
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+redis = { version = "0.27", default-features = false, features = ["aio", "tokio-comp"] }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[features]
+# Tests in `tests/redis_smoke.rs` are gated behind `live` and only run when
+# a real Redis 7+ is reachable on REDIS_URL (default redis://127.0.0.1:6379).
+# Default builds compile but skip live network.
+default = []
+live = []
+
+[package.metadata.keisei]
+backend = "redis"
+trait = "MemoryBackend"
+description = "Redis 7+ MemoryBackend (async, aio+tokio-comp). Hosted Sleep Wave 6."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

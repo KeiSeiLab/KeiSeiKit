@@ -1,0 +1,453 @@
+# KeiSeiKit Primitives Manifest
+# Declarative SSoT for install.sh profile resolution.
+#
+# Profiles compose primitive sets; install.sh --profile=<name> resolves the
+# member list, copies/builds only those, and records the result in
+# ~/.claude/agents/_primitives/.installed.
+#
+# Individual primitives can be added/removed on top of any profile via
+# --add=<name>[,<name>] / --remove=<name>.
+#
+# Schema (per primitive):
+#   kind  = "shell" | "rust"
+#   file  = "<name>.sh"       (shell only — lives at _primitives/<file>)
+#   crate = "<name>"          (rust only — lives at _primitives/_rust/<crate>)
+#   deps  = ["<dep description>", ...]    # runtime/host deps, human-readable
+#   desc  = "<one-line description>"
+
+[profile]
+minimal = []
+core    = ["tomd", "kei-doctor"]
+frontend = ["mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-preview", "figma-tokens", "frontend-inspect", "screenshot-decode"]
+ops     = ["kei-ledger", "ssh-check", "firewall-diff", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-provision"]
+dev     = ["kei-migrate", "kei-changelog", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-artifact", "kei-agent-runtime", "kei-capability", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay"]
+mcp     = ["kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth"]
+cortex  = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery"]
+# --- dev-hub bundle profiles (Wave 45) ------------------------------------
+# Adds local-first git server (Forgejo), CI runner, project dashboard,
+# search, doc hub, and backups. Each level is a strict superset of the
+# previous one — `dashboard` extends `local-mirror`, `full-hub` extends
+# `dashboard`. Native macOS arm64 (brew + launchd plists). See
+# `install/lib-dev-hub-*.sh` for the install logic per component.
+local-mirror = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner"]
+dashboard    = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette"]
+full-hub     = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
+full    = ["tomd", "kei-doctor", "kei-ledger", "kei-migrate", "kei-changelog", "ssh-check", "firewall-diff", "mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-preview", "figma-tokens", "frontend-inspect", "screenshot-decode", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth", "kei-artifact", "keisei", "kei-agent-runtime", "kei-capability", "kei-provision", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay", "kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "frustration-matrix", "kei-skill-importer", "kei-projects-index", "kei-projects-watcher", "dev-hub-forgejo", "dev-hub-forgejo-runner", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
+
+# --- shell primitives (13) -------------------------------------------------
+
+[primitive.tomd]
+kind = "shell"
+file = "tomd.sh"
+deps = ["jq", "pandoc (optional — needed for .docx/.pptx/.html)"]
+desc = "Universal non-native format → markdown (PDF, DOCX, XLSX, PPTX, CSV, images, code)"
+
+[primitive.kei-doctor]
+kind = "shell"
+file = "kei-doctor.sh"
+deps = []
+desc = "Substrate health check + PATH diagnostic; --fix attempts repair"
+
+[primitive.design-scrape]
+kind = "shell"
+file = "design-scrape.sh"
+deps = ["jq", "npx (Node)", "playwright (`npx playwright install chromium`)"]
+desc = "Live URL → design tokens + screenshots JSON via Playwright"
+
+[primitive.live-preview]
+kind = "shell"
+file = "live-preview.sh"
+deps = ["npm"]
+desc = "start/stop/status wrapper for a project's dev server (.keisei/dev-server.pid)"
+
+[primitive.figma-tokens]
+kind = "shell"
+file = "figma-tokens.sh"
+deps = ["curl", "jq", "FIGMA_TOKEN env var"]
+desc = "Figma API → design tokens JSON (consumed by tokens-sync)"
+
+[primitive.frontend-inspect]
+kind = "shell"
+file = "frontend-inspect.sh"
+deps = ["jq"]
+desc = "Scan project dir → report framework, styling, UI count, lockfile"
+
+[primitive.screenshot-decode]
+kind = "shell"
+file = "screenshot-decode.sh"
+deps = ["curl", "jq", "base64", "ANTHROPIC_API_KEY env var"]
+desc = "Screenshot → structured design description via Claude vision API"
+
+[primitive.harden-base]
+kind = "shell"
+file = "harden-base.sh"
+deps = ["bash", "apt (runs on target Debian/Ubuntu VPS)"]
+desc = "Idempotent Debian/Ubuntu baseline hardening (fail2ban, ufw, unattended-upgrades)"
+
+[primitive.provision-hetzner]
+kind = "shell"
+file = "provision-hetzner.sh"
+deps = ["hcloud CLI", "HCLOUD_TOKEN env var"]
+desc = "Hetzner Cloud server provisioner — create/status/destroy/list"
+
+[primitive.provision-vultr]
+kind = "shell"
+file = "provision-vultr.sh"
+deps = ["vultr-cli v3", "VULTR_API_KEY env var"]
+desc = "Vultr VPS provisioner — create/status/destroy/list"
+
+[primitive.metrics-scrape]
+kind = "shell"
+file = "metrics-scrape.sh"
+deps = ["curl", "awk", "jq (optional — needed for --format json)"]
+desc = "Prometheus /metrics scrape + normalize + diff against baseline"
+
+[primitive.log-ship]
+kind = "shell"
+file = "log-ship.sh"
+deps = ["curl", "awk", "jq (optional — needed for --validate)"]
+desc = "Tail structured logs → forward to Loki / Datadog / HTTP with rate limits"
+
+[primitive.kei-ci-lint]
+kind = "shell"
+file = "kei-ci-lint.sh"
+deps = ["yq v4+ (mikefarah/yq Go impl)"]
+desc = "Validate GitHub/Forgejo Actions workflow YAML (pinning, OIDC, cache, permissions)"
+
+[primitive.kei-docs-scaffold]
+kind = "shell"
+file = "kei-docs-scaffold.sh"
+deps = []
+desc = "Detect project type → generate missing CLAUDE.md/DECISIONS.md/RUNBOOK.md/README.md"
+
+# --- rust primitives (8) ---------------------------------------------------
+
+[primitive.kei-ledger]
+kind = "rust"
+crate = "kei-ledger"
+deps = ["rusqlite bundled (no system sqlite required)"]
+desc = "Agent-fork lifecycle SQLite ledger (fork/done/fail) — SSoT for RULE 0.12"
+
+[primitive.kei-migrate]
+kind = "rust"
+crate = "kei-migrate"
+deps = ["sqlx (postgres/sqlite/mysql)", "tokio", "DATABASE_URL env var"]
+desc = "Universal SQL migration runner — Postgres/SQLite/MySQL autodetect"
+
+[primitive.kei-changelog]
+kind = "rust"
+crate = "kei-changelog"
+deps = ["git2 (vendored libgit2)"]
+desc = "Git-cliff-style CHANGELOG.md generator from Conventional Commits"
+
+[primitive.ssh-check]
+kind = "rust"
+crate = "ssh-check"
+deps = []
+desc = "sshd_config linter — flags weak ciphers, PermitRootLogin yes, password auth"
+
+[primitive.firewall-diff]
+kind = "rust"
+crate = "firewall-diff"
+deps = ["ufw (target-side; binary parses `ufw status` output)"]
+desc = "ufw intended-vs-running diff — catches drift between declared and live rules"
+
+[primitive.mock-render]
+kind = "rust"
+crate = "mock-render"
+deps = ["Chrome/Chromium (runtime)", "playwright (optional for parity driver)"]
+desc = "Playwright wrapper with SHA-locked PNG (WYSIWYD: What You See Is What You Deploy)"
+
+[primitive.visual-diff]
+kind = "rust"
+crate = "visual-diff"
+deps = []
+desc = "Pixel diff with tolerance — used in /site-create screenshot-regression loop"
+
+[primitive.tokens-sync]
+kind = "rust"
+crate = "tokens-sync"
+deps = []
+desc = "Design tokens JSON → Tailwind config extend + CSS variables under :root"
+
+[primitive.kei-memory]
+kind = "rust"
+crate = "kei-memory"
+deps = ["rusqlite bundled (no system sqlite required)"]
+desc = "Session retrospective + recurring pattern detector (offline-first, RULE 0.14)"
+
+[primitive.kei-conflict-scan]
+kind = "rust"
+crate = "kei-conflict-scan"
+deps = []
+desc = "Deep-sleep (NREM) conflict scanner — rules/hooks/blocks/orphans/CP violations across ~/.claude"
+
+[primitive.kei-refactor-engine]
+kind = "rust"
+crate = "kei-refactor-engine"
+deps = []
+desc = "Deep-sleep refactor-plan generator; consumes kei-conflict-scan JSON; zero-conflict guarantee on patches"
+
+[primitive.kei-graph-check]
+kind = "rust"
+crate = "kei-graph-check"
+deps = []
+desc = "Post-refactor graph-integrity gate — wikilinks + handoffs + block refs resolve after patch"
+
+[primitive.kei-store]
+kind = "rust"
+crate = "kei-store"
+deps = ["git2 (vendored libgit2)", "aws-sdk-s3 + tokio + rustls (optional, behind `s3` feature)"]
+desc = "Memory-repo backend abstraction — GitHub / Forgejo / Gitea / Filesystem / S3 (real S3/R2/MinIO via aws-sdk-s3 when built with `--features s3`; local-manifest stub otherwise)"
+
+# --- v0.14 LBM port (10) ---------------------------------------------------
+
+[primitive.kei-router]
+kind = "rust"
+crate = "kei-router"
+deps = ["regex"]
+desc = "Natural-language query → tool-call router (LBM pkg/keirouter port, no ML)"
+
+[primitive.kei-sage]
+kind = "rust"
+crate = "kei-sage"
+deps = ["rusqlite bundled (FTS5 enabled)"]
+desc = "Obsidian-style knowledge graph with FTS5, BFS, PageRank (LBM internal/sage port)"
+
+[primitive.kei-task]
+kind = "rust"
+crate = "kei-task"
+deps = ["rusqlite bundled (FTS5 enabled)"]
+desc = "Task DAG + deps + milestones (LBM internal/task port)"
+
+[primitive.kei-chat-store]
+kind = "rust"
+crate = "kei-chat-store"
+deps = ["rusqlite bundled (FTS5 enabled)"]
+desc = "Session persistence for Claude chats (LBM internal/chat port)"
+
+[primitive.kei-crossdomain]
+kind = "rust"
+crate = "kei-crossdomain"
+deps = ["rusqlite bundled"]
+desc = "Cross-domain typed-edge store + BFS + auto-link (LBM internal/crossdomain port)"
+
+[primitive.kei-search-core]
+kind = "rust"
+crate = "kei-search-core"
+deps = ["rusqlite bundled"]
+desc = "3-wave research engine with budget cap; fetch interface frozen (LBM internal/search port)"
+
+[primitive.kei-content-store]
+kind = "rust"
+crate = "kei-content-store"
+deps = ["rusqlite bundled", "sha2"]
+desc = "Asset + prompt + campaign registry (LBM internal/content port)"
+
+[primitive.kei-social-store]
+kind = "rust"
+crate = "kei-social-store"
+deps = ["rusqlite bundled (FTS5 enabled)"]
+desc = "People + interaction CRM lite (LBM internal/social port)"
+
+[primitive.kei-curator]
+kind = "rust"
+crate = "kei-curator"
+deps = ["rusqlite bundled"]
+desc = "Edge decay + orphan prune for cross-domain graphs (LBM internal/curator port)"
+
+[primitive.kei-auth]
+kind = "rust"
+crate = "kei-auth"
+deps = ["rusqlite bundled", "hmac", "sha2"]
+desc = "Multi-tenant session tokens with scopes + HMAC-signed expiry (rewrite, not port)"
+
+[primitive.kei-pet]
+kind = "rust"
+crate = "kei-pet"
+desc = "Pet persona manifest — Ed25519 identity + voice/edge/forbidden schema"
+deps = []
+
+[primitive.kei-shared]
+kind = "rust"
+crate = "kei-shared"
+desc = "Shared DNA format + substrate types used by kei-cortex, kei-agent-runtime"
+deps = []
+
+# --- v0.15 artifact handoff pipeline (1) -----------------------------------
+
+[primitive.kei-artifact]
+kind = "rust"
+crate = "kei-artifact"
+deps = ["rusqlite bundled"]
+desc = "Typed artifact handoff pipeline — schema-validated content pass-between agents (BMAD-style)"
+
+# --- v0.18 exobrain CLI (1) ------------------------------------------------
+
+[primitive.keisei]
+kind = "rust"
+crate = "keisei"
+deps = ["regex", "tempfile (runtime)"]
+desc = "Exobrain attach/status CLI — mounts a portable brain into an AI client (MVP: Claude Code)"
+
+# --- v0.22/v1 agent substrate + atom pipeline (8) --------------------------
+
+[primitive.kei-agent-runtime]
+kind = "rust"
+crate = "kei-agent-runtime"
+deps = []
+desc = "Agent substrate v1 runtime — Capability trait + registry + compose/spawn/verify + DNA"
+
+[primitive.kei-capability]
+kind = "rust"
+crate = "kei-capability"
+deps = ["kei-agent-runtime"]
+desc = "Hook-protocol CLI adapter — routes PreToolUse check + on-return verify to kei-agent-runtime"
+
+[primitive.kei-provision]
+kind = "rust"
+crate = "kei-provision"
+deps = ["hcloud CLI (for Hetzner backend)", "vultr-cli v3 (for Vultr backend)", "HCLOUD_TOKEN / VULTR_API_KEY env var"]
+desc = "Unified VPS provisioner — dispatches Hetzner / Vultr (supersedes provision-{hetzner,vultr}.sh)"
+
+[primitive.kei-entity-store]
+kind = "rust"
+crate = "kei-entity-store"
+deps = ["rusqlite bundled (no system sqlite required)"]
+desc = "Convergence-Layer-A engine — shared schema-driven SQLite CRUD + graph verbs (library-only)"
+
+[primitive.kei-pipe]
+kind = "rust"
+crate = "kei-pipe"
+deps = []
+desc = "Atom DAG pipe runtime — topo-sorts steps, pipes JSON between atoms"
+
+[primitive.kei-cache]
+kind = "rust"
+crate = "kei-cache"
+deps = ["rusqlite bundled", "kei-atom-discovery (path dep)"]
+desc = "Deterministic result cache for pure (query/transform) atom invocations"
+
+[primitive.kei-spawn]
+kind = "rust"
+crate = "kei-spawn"
+deps = ["kei-agent-runtime"]
+desc = "Agent substrate v1 — automation envelope: prepare + ledger fork + verify"
+
+[primitive.kei-replay]
+kind = "rust"
+crate = "kei-replay"
+deps = ["kei-agent-runtime", "rusqlite bundled"]
+desc = "Reconstruct agent spawn from DNA — replay / verify / diff"
+
+# --- v0.24 cortex daemon + UI (2) ------------------------------------------
+# Cortex daemon registration (Wave 24 PR1). The full setup wizard
+# (/cortex-setup) lands in PR2: wizard provisions tokens, pip installs
+# whisper deps, pre-downloads model, builds cortex-ui bundle, registers
+# launchd/systemd unit. See _primitives/_rust/kei-cortex/INSTALL.md.
+
+[primitive.kei-cortex]
+kind = "rust"
+crate = "kei-cortex"
+deps = ["python3 (>=3.9, for whisper_worker.py subprocess)", "pip install -r scripts/requirements.txt", "ffmpeg (on PATH, faster-whisper audio demux)"]
+desc = "Local HTTP daemon exposing chat/TTS/STT/portrait endpoints — backs cortex-ui browser app"
+
+[primitive.cortex-ui]
+kind = "node"
+path = "_ts_packages/packages/cortex-ui"
+deps = ["node>=18", "pnpm"]
+desc = "Svelte 5 + Vite 5 web UI for kei-cortex daemon (chat panel, Live2D pet renderer, portrait uploader)"
+
+[primitive.frustration-matrix]
+kind = "rust"
+crate = "frustration-matrix"
+deps = []
+desc = "Longitudinal user-frustration scanner — regex categories + byte n-gram likelihood classifier; reads chatlogs/JSONL, emits CSV/JSONL"
+
+# --- Wave 26.5 external skill-format importer (1) --------------------------
+
+[primitive.kei-skill-importer]
+kind = "rust"
+crate = "kei-skill-importer"
+deps = ["kei-atom-discovery (path dep)"]
+desc = "Universal parser/canonicalizer/emitter for external AI-coding-tool skills (OpenClaw / Cline / Cursor / Claude Code / Kimi) → atom / recipe / proposed-primitive"
+
+# --- Transitive workspace deps — required by cortex-profile crates ---------
+# kei-pet → kei-dna-index, kei-skill-importer → kei-atom-discovery.
+# Listed as primitives so the install-time profile resolver pulls them in
+# alongside their parent crates and the generated workspace Cargo.toml has
+# every path-dep present on disk.
+
+[primitive.kei-dna-index]
+kind = "rust"
+crate = "kei-dna-index"
+deps = ["kei-shared (path dep)"]
+desc = "Read-only adjacency/cluster/precedent index over kei-ledger DNAs (transitive dep of kei-pet)"
+
+[primitive.kei-atom-discovery]
+kind = "rust"
+crate = "kei-atom-discovery"
+deps = []
+desc = "Atom-graph discovery + canonicalization (transitive dep of kei-skill-importer)"
+
+# --- Wave 45 dev-hub bundle (8 components) --------------------------------
+# Each `dev-hub-*` primitive ships an `install/lib-dev-hub-<name>.sh` script
+# (kind=external) that uses the host's package manager (brew / pipx / cargo)
+# to install a third-party binary, render a launchd plist from
+# `install/launchd-templates/<name>.plist.tmpl`, and start the service via
+# `brew services` or `launchctl load`. Two `kei-projects-*` primitives
+# (kind=rust) are built locally — they walk `~/Projects/` for the dashboard.
+
+[primitive.kei-projects-index]
+kind = "rust"
+crate = "kei-projects-index"
+deps = ["git2 (vendored libgit2)", "rusqlite bundled"]
+desc = "Walk ~/Projects/, build SQLite index of git state + CLAUDE.md head + ledger refs (universal scanner for the dashboard view)"
+
+[primitive.kei-projects-watcher]
+kind = "rust"
+crate = "kei-projects-watcher"
+deps = ["notify (FSEvents on macOS)", "rusqlite bundled"]
+desc = "fsevents daemon — watch ~/Projects/ for git/file changes, push delta into kei-projects-index SQLite"
+
+[primitive.dev-hub-forgejo]
+kind = "external"
+file = "install/lib-dev-hub-forgejo.sh"
+deps = ["brew", "darwin-arm64"]
+desc = "Local Forgejo git server (brew install forgejo + launchd plist + push-mirror config to remote-Forgejo / GitHub)"
+
+[primitive.dev-hub-forgejo-runner]
+kind = "external"
+file = "install/lib-dev-hub-forgejo-runner.sh"
+deps = ["brew", "act_runner formula", "dev-hub-forgejo (must be installed first for token registration)"]
+desc = "Forgejo Actions CI runner (act_runner brew formula + launchd plist + outbound polling to local Forgejo)"
+
+[primitive.dev-hub-datasette]
+kind = "external"
+file = "install/lib-dev-hub-datasette.sh"
+deps = ["pipx", "Python 3.11+"]
+desc = "Datasette SQLite browser (pipx install datasette + launchd plist serving ~/.claude/agents/*.sqlite + ~/Projects/*/*.sqlite read-only)"
+
+[primitive.dev-hub-zoekt]
+kind = "external"
+file = "install/lib-dev-hub-zoekt.sh"
+deps = ["brew", "go runtime"]
+desc = "Zoekt code-search across all repos (brew install zoekt + launchd plists for zoekt-webserver + zoekt-indexserver indexing ~/Projects/)"
+
+[primitive.dev-hub-mdbook]
+kind = "external"
+file = "install/lib-dev-hub-mdbook.sh"
+deps = ["cargo (rustup default stable)"]
+desc = "mdBook doc hub auto-rendering CLAUDE.md / DECISIONS.md / RUNBOOK.md across all repos (cargo install mdbook + cron rebuild on git push)"
+
+[primitive.dev-hub-restic]
+kind = "external"
+file = "install/lib-dev-hub-restic.sh"
+deps = ["brew", "S3-compatible target (R2 / B2 / S3) — credentials in ~/.claude/secrets/.env"]
+desc = "Encrypted off-site backups (brew install restic + launchd timer daily backup of ~/Projects/, ~/.claude/, ~/Library/Application Support/keisei/)"
+
+[primitive.dev-hub-gdrive-import]
+kind = "external"
+file = "install/lib-dev-hub-gdrive-import.sh"
+deps = ["brew", "cargo (rustup default stable)", "dev-hub-forgejo (target for imported repos)", "rclone OAuth conf at ~/.config/rclone/rclone.conf"]
+desc = "Wave 46 one-shot wizard: classify Google Drive subfolders via 8-marker scoring (Cargo.toml/package.json/pyproject.toml/go.mod/pom.xml/build.gradle/Gemfile/composer.json) and import each detected project into the local Forgejo dev-hub as a fresh repo. Brew installs rclone+jq+gitleaks, cargo-builds kei-gdrive-import, renders dev-hub/drive-import-wizard.sh from _templates/. Live token in ~/.config/rclone/rclone.conf (RULE 0.8 — never in .env)."

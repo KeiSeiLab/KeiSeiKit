@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/create-input.json",
+  "title": "kei-task::create input",
+  "description": "Create a new task row. Extends shared `titled-content` fragment with task-specific `priority` enum and optional `milestone_id`.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "../../../../../_schemas/fragments/titled-content.json" }
+  ],
+  "properties": {
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "default": "medium"
+    },
+    "milestone_id": { "type": "integer", "minimum": 1 }
+  },
+  "examples": [
+    { "title": "Fix auth bug", "priority": "high" },
+    { "title": "Refactor router", "description": "Split monolith", "priority": "medium" }
+  ]
+}

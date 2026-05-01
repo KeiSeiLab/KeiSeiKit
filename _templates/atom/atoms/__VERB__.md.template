@@ -1,0 +1,42 @@
+---
+atom: __CRATE__::__VERB__
+kind: __KIND__
+version: "0.1.0"
+
+input:
+  schema: schemas/__VERB__-input.json
+  required: []
+  example: {}
+
+output:
+  schema: schemas/__VERB__-output.json
+  example: {}
+
+errors: []
+
+side_effects: []
+idempotent: true
+timeout_ms: 5000
+
+deprecated: null
+stability: experimental
+
+keywords: []
+related: []
+---
+
+# __CRATE__::__VERB__
+
+__DESCRIPTION__
+
+## Example
+
+    __CRATE__ __VERB__ [args...]
+
+## Gotchas
+
+_TODO: document non-obvious behaviour_
+
+## Related
+
+_TODO: add [[atom-id]] wikilinks to related atoms_

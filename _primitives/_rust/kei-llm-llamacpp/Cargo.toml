@@ -1,0 +1,31 @@
+[package]
+name = "kei-llm-llamacpp"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Wave 58 — adapter to llama.cpp via shell-out (llama-cli / llama-server). NO FFI, NO daemon."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-llm-llamacpp"
+path = "src/main.rs"
+
+[lib]
+name = "kei_llm_llamacpp"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+backend = "none"
+description = "Local-LLM adapter — shells out to llama-cli/llama-server, parses stdout. Probe/models/generate/server/version subcommands. Runner trait for testability. Default --host 127.0.0.1 for security."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

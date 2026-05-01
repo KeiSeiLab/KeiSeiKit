@@ -1,0 +1,27 @@
+[package]
+name = "frustration-matrix"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Longitudinal user-frustration matrix — regex-based chatlog scan (no ML)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "frustration_matrix"
+path = "src/lib.rs"
+
+[[bin]]
+name = "frustration-matrix"
+path = "src/main.rs"
+
+[dependencies]
+regex = { workspace = true }
+walkdir = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+flate2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

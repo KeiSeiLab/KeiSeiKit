@@ -1,0 +1,27 @@
+[package]
+name = "kei-frustration-loop"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Per-user frustration learning loop — feedback ingestion + auto-retrain trigger + nightly Phase-0 cron hook"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_frustration_loop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-frustration-loop"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+flate2 = { workspace = true }
+walkdir = { workspace = true }
+frustration-matrix = { path = "../frustration-matrix" }
+
+[dev-dependencies]
+tempfile = { workspace = true }

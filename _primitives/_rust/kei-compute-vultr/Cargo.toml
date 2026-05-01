@@ -1,0 +1,36 @@
+[package]
+name = "kei-compute-vultr"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Vultr Cloud (v2 API) implementation of the kei-runtime-core ComputeProvider trait"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_compute_vultr"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-compute-vultr"
+path = "src/main.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+clap = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+kei-shared = { path = "../kei-shared" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+
+[package.metadata.keisei]
+backend = "vultr-cloud-v2"
+trait = "ComputeProvider"
+description = "Vultr Cloud Compute v2 API impl of ComputeProvider — instance create/destroy/halt/start/resize, base64 cloud-init, vc2/vhf tier validation"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

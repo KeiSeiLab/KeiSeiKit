@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "_schemas/fragments/edge.json",
+  "title": "Edge input",
+  "description": "Input mixin — one directed edge in a graph entity. Consumed by `link` / `rank` verbs in kei-entity-store.",
+  "type": "object",
+  "required": ["from", "to"],
+  "properties": {
+    "from": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Source entity id"
+    },
+    "to": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Target entity id"
+    },
+    "edge_type": {
+      "type": "string",
+      "default": "links",
+      "description": "Semantic label for the edge (e.g. 'blocks', 'depends_on', 'links')"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Optional edge weight (defaults to 1.0 if absent)"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+# Example task.toml — edit-local role, scoped to kei-forge.
+# The orchestrator writes one of these per spawn to parameterise the
+# substrate gates + verifies. Consumed by `kei-agent-runtime compose`
+# (build prompt) and `kei-capability check/verify` (enforcement).
+
+[task]
+role = "edit-local"
+agent-id = "edit-local-forge-EXAMPLE"
+parent-agent = ""
+
+[scope]
+# Parameterises scope::files-whitelist and scope::files-denylist.
+files-whitelist = [
+  "_primitives/_rust/kei-forge/**",
+]
+files-denylist = [
+  "_primitives/_rust/Cargo.toml",
+  "_primitives/_rust/Cargo.lock",
+  ".github/**",
+]
+
+[verification]
+# Parameterises quality::cargo-check-green and quality::tests-green.
+cargo-check-crates = ["kei-forge"]
+cargo-test-crates = ["kei-forge"]
+test-count-min = 44
+
+[output]
+# Parameterises output::report-format. Fields the verifier looks for.
+report-fields-required = [
+  "files-touched",
+  "cargo-check",
+  "cargo-test",
+  "loc-delta",
+]
+
+[body]
+text = """
+Replace the shell-out templating path in kei-forge with a pure-Rust
+implementation. Constructor Pattern caps apply (file < 200 LOC,
+function < 30 LOC). Keep existing public API stable.
+"""

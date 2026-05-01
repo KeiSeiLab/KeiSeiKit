@@ -1,0 +1,25 @@
+{
+  "name": "@keisei/ts-packages",
+  "private": true,
+  "version": "0.14.0",
+  "description": "KeiSeiKit TypeScript layer — MCP server and external-API adapters",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "rm -rf packages/*/dist packages/*/*.tsbuildinfo"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "tsx": "^4.16.0"
+  },
+  "author": "Denis Parfionovich <info@greendragon.info>"
+}

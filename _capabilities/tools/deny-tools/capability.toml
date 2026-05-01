@@ -1,0 +1,34 @@
+[capability]
+name = "tools::deny-tools"
+category = "tools"
+version = "1.0"
+description = "Add a list of tools (Edit, Write, MultiEdit, NotebookEdit) to the PreToolUse deny-list — agent may read but not mutate the filesystem."
+rationale = "Read-only agents (research, critic, explorer) must never alter source. A denial at the tool level is simpler and more robust than per-path scope checks. Renamed from `tools::read-only` (v0.17) — 'deny-tools' explicitly names the mechanism (add tools to deny-list) rather than using the metaphorical 'read-only' label."
+
+[restricts]
+tool-patterns = []
+tools-denied = ["Edit", "Write", "MultiEdit", "NotebookEdit"]
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::tools_deny_tools"
+event = "PreToolUse:Edit|Write"
+severity = "block"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "tools"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

@@ -1,0 +1,39 @@
+[capability]
+name = "scope::files-denylist"
+category = "scope"
+version = "1.0"
+description = "Block Edit/Write to paths matching a per-task denylist, even if otherwise whitelisted."
+rationale = "Protects SSoT files (Cargo.toml / Cargo.lock / rules / settings.json / CI configs) that are easy to touch accidentally and hard to recover once committed. Denylist overrides whitelist."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = ["files-denylist"]
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::scope_files_denylist"
+event = "PreToolUse:Edit|Write"
+severity = "block"
+
+[verify]
+rust-module = "verifies::scope_files_denylist"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "scope"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

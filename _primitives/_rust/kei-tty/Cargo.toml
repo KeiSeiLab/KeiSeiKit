@@ -1,0 +1,29 @@
+[package]
+name = "kei-tty"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Ratatui-based terminal UI client for the kei-cortex daemon"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-tty"
+path = "src/main.rs"
+
+[lib]
+name = "kei_tty"
+path = "src/lib.rs"
+
+[dependencies]
+ratatui = "0.28"
+crossterm = { version = "0.28", features = ["event-stream"] }
+tokio = { workspace = true }
+futures = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = "1"

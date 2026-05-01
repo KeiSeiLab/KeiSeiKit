@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/search-input.json",
+  "title": "kei-task::search input",
+  "type": "object",
+  "required": ["query"],
+  "properties": {
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "description": "FTS5 query syntax over task title + description"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000,
+      "default": 20
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    { "query": "refactor", "limit": 20 },
+    { "query": "auth OR token" }
+  ]
+}

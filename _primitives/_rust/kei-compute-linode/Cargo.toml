@@ -1,0 +1,39 @@
+[package]
+name = "kei-compute-linode"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "ComputeProvider impl for Linode (Akamai Cloud) v4 API. Wave 2 atomar — sibling of kei-compute-hetzner. Honors LINODE_TOKEN env ref per RULE 0.8."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-compute-linode"
+path = "src/main.rs"
+
+[lib]
+name = "kei_compute_linode"
+path = "src/lib.rs"
+
+[dependencies]
+kei-runtime-core = { path = "../kei-runtime-core" }
+kei-shared = { path = "../kei-shared" }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+clap = { workspace = true }
+base64 = "0.22"
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+backend = "linode-api-v4"
+trait = "ComputeProvider"
+description = "Linode (Akamai Cloud) v4 REST API. Bearer LINODE_TOKEN. Tier slugs: g6-nanode-1 / g6-standard-{1,2,4} / g6-dedicated-{2,4}."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

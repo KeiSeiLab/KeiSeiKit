@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kei-artifact://spec",
+  "title": "Agent Specification",
+  "description": "Architect output — what to build and under which constraints.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["goal", "constraints", "invariants"],
+  "properties": {
+    "goal": {
+      "type": "string",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "invariants": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "tradeoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["choice", "rejected", "because"],
+        "properties": {
+          "choice": {"type": "string", "minLength": 1},
+          "rejected": {"type": "string", "minLength": 1},
+          "because": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "evidence_grade": {
+      "type": "string",
+      "enum": ["E1", "E2", "E3", "E4", "E5", "E6"]
+    }
+  }
+}

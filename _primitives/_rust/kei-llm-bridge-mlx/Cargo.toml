@@ -1,0 +1,30 @@
+[package]
+name = "kei-llm-bridge-mlx"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "LlmBackend trait-bridge wrapping kei-llm-mlx (Wave 59, Apple Silicon only). Wave 4 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_llm_bridge_mlx"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = "0.1"
+thiserror = { workspace = true }
+tokio = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+kei-llm-mlx = { path = "../kei-llm-mlx" }
+kei-shared = { path = "../kei-shared" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+anyhow = { workspace = true }
+
+[package.metadata.keisei]
+backend = "mlx-bridge"
+trait = "LlmBackend"
+description = "Bridges kei-llm-mlx (Wave 59 Apple Silicon shell-out) to LlmBackend trait"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

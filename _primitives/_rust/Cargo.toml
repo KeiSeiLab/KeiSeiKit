@@ -1,0 +1,226 @@
+[workspace]
+resolver = "2"
+members = [
+    "kei-ledger",
+    "kei-migrate",
+    "kei-changelog",
+    "ssh-check",
+    "firewall-diff",
+    "mock-render",
+    "visual-diff",
+    "tokens-sync",
+    "kei-memory",
+    "kei-conflict-scan",
+    "kei-refactor-engine",
+    "kei-graph-check",
+    "kei-store",
+    # v0.14 LBM port — 10 new MCP-core primitives
+    "kei-router",
+    "kei-sage",
+    "kei-task",
+    "kei-chat-store",
+    "kei-crossdomain",
+    "kei-search-core",
+    "kei-content-store",
+    "kei-social-store",
+    "kei-curator",
+    "kei-auth",
+    # v0.15 artifact handoff pipeline
+    "kei-artifact",
+    # v0.18 exobrain CLI
+    "keisei",
+    # v1 substrate — local web wizard for scaffolding atoms (Stream A)
+    "kei-forge",
+    # v1 substrate — atom invocation runtime + schema linter (Stream D)
+    "kei-runtime",
+    # Hosted Sleep substrate — 12 traits + DNA + plugin registry (impls in sibling crates)
+    "kei-runtime-core",
+    # Hosted Sleep Wave 2 — bare-metal SSH ComputeProvider impl
+    "kei-compute-baremetal",
+    # v1 substrate — shared atom discovery + frontmatter + safe path (Stream E)
+    "kei-atom-discovery",
+    # agent substrate v1 — phase 3 runtime (Capability trait + registry + compose/spawn/verify)
+    "kei-agent-runtime",
+    # agent substrate v1 — phase 3 hook-protocol CLI adapter
+    "kei-capability",
+    # v0.24 unification — unified VPS provisioner (supersedes provision-{hetzner,vultr}.sh)
+    "kei-provision",
+    # Convergence Layer A — schema-driven verb-template engine for SQLite-CRUD stores
+    "kei-entity-store",
+    # v1 substrate — atom DAG pipe runtime (topo-sort + JSON piping between atoms)
+    "kei-pipe",
+    # v1 substrate — deterministic result cache for pure (query/transform) atoms
+    "kei-cache",
+    # agent substrate v1 — automation envelope: prepare + ledger fork + verify
+    "kei-spawn",
+    # agent substrate v1 — reconstruct spawn from DNA (ledger row + task.toml + recompose)
+    "kei-replay",
+    # v0.29 Wave 13 — structural JSON diff primitive (RFC 6902 subset add/remove/replace)
+    "kei-diff",
+    # v0.29 Wave 13 — durable task scheduler (cron / at / interval) metadata primitive
+    "kei-scheduler",
+    # v0.29 Wave 13 — filesystem watcher primitive (thin notify wrapper, sync API)
+    "kei-watch",
+    # v0.30 Wave 14 — bio-inspired pruning (retire idle agents)
+    "kei-prune",
+    # v0.30 Wave 14 — federated marketplace discovery stub
+    "kei-discover",
+    # v0.30 Wave 14 — taxonomy graph + lineage stdout visualizer
+    "kei-brain-view",
+    # v0.30 Wave 14 — whole-brain tar.zst export/import
+    "kei-hibernate",
+    # v0.30 Wave 14 — ed25519 creator attestation
+    "kei-ledger-sign",
+    # v0.31 Wave 15 — managed git worktree + ledger lifecycle (fork/collect/gc/rescue)
+    "kei-fork",
+    # v0.34 Wave 17 — SSoT for DNA format + shared substrate types
+    "kei-shared",
+    # v0.32 Wave 15 — read-only DNA adjacency/cluster/precedent over kei-ledger
+    "kei-dna-index",
+    # Pet UI v1 — persona manifest parse/validate + Ed25519 identity + overlay renderer
+    "kei-pet",
+    # v0.37 Wave 20 — local HTTP daemon (axum) exposing cortex state for web UI at keisei.app
+    # v0.39 Wave 25 — longitudinal user-frustration matrix (regex + byte n-gram firmware classifier)
+    "frustration-matrix",
+    # Wave 54 — per-user online learning loop on top of frustration-matrix (sleep Phase 0 + install bootstrap)
+    "kei-frustration-loop",
+    # Wave 26.5 — universal external skill-format importer (OpenClaw/Cline/Cursor/Claude/Kimi)
+    "kei-skill-importer",
+    # Wave 45 — dev-hub bundle (project dashboard data sources)
+    "kei-projects-index",
+    "kei-projects-watcher",
+    # Wave 46 — Google Drive → Forgejo one-shot importer (folder classifier)
+    "kei-gdrive-import",
+    # Wave 48 — content protection SSoT (regex matrix scanner / substituter)
+    "kei-leak-matrix",
+    # Wave 51 — research output → action pipeline (parses MASTER-REPORT.md, emits kei-spawn task.toml)
+    "kei-decision",
+    # Wave 52 — UNIVERSAL decomposition layer: 5 MD-format parsers (research/audit/sleep/architecture/new-project)
+    "kei-decompose",
+    # A1.1 — foreign project ingestion runtime (clone → walk → identify modules → stage for downstream atomars)
+    "kei-import-project",
+    # Wave 53 — UNIVERSAL block identity registry (primitive/skill/rule/hook/atom DNA in SQLite)
+    "kei-registry",
+    # Wave 55 — UNIVERSAL model registry + selector (verified pricing 2026-04-28)
+    "kei-model",
+    # P1.2 daytona
+    "kei-backend-daytona",
+    # P0.2 trajectory export
+    "kei-export-trajectories",
+    # Phase 3.1 — Hermes/agentskills.io SKILL.md format primitives
+    "kei-skills",
+    # P4.1 gateway — multi-platform messaging unified (Telegram/Discord/Slack/CLI/WhatsApp/Signal/Generic)
+    "kei-gateway",
+    # P4.2 scheduler — Hermes-equivalent cron/at/interval with JSON persistence
+    # NOTE: distinct from existing `kei-scheduler` (SQLite metadata DB). See
+    # `kei-cron-scheduler/Cargo.toml` for the rationale on coexistence.
+    "kei-cron-scheduler",
+    # Wave 56 — Mac hardware/OS/tooling detector (foundation for local LLM stack: ollama/llamacpp/mlx)
+    "kei-machine-probe",
+    # Wave 57 — Ollama HTTP adapter (localhost:11434, streaming, 5 subcommands)
+    "kei-llm-ollama",
+    # Wave 58 — llama.cpp shell-out adapter (no FFI, llama-cli/llama-server, 5 subcommands)
+    "kei-llm-llamacpp",
+    # Wave 59 — Apple MLX adapter (mlx_lm shell-out, macOS Apple Silicon only, hard platform gate)
+    "kei-llm-mlx",
+    # Hosted Sleep Wave 4 — MLX LlmBackend bridge (Apple Silicon only)
+    "kei-llm-bridge-mlx",
+    # Hosted Sleep Wave 2 — Vultr ComputeProvider impl
+    "kei-compute-vultr",
+    # Hosted Sleep Wave 2 — Linode ComputeProvider impl
+    "kei-compute-linode",
+    # Wave 60 — UNIVERSAL local-LLM backend selector (glues W55+W56+W57+W58+W59 → picks Mlx/LlamaCpp/Ollama)
+    "kei-llm-router",
+    # Hosted Sleep Wave 1 — systemd ServiceManager impl
+    "kei-svc-systemd",
+    # RULE 0.17 — atomar time-logger (Wave 10)
+    "kei-tlog",
+    # Per-LLM-call token + cost observability store (cortex token tracker, Phase D sleep-report)
+    "kei-token-tracker",
+    # Cross-window agent heartbeat (auto: redis | sqlite)
+    "kei-ping",
+    # Hosted Sleep Wave 2 — DigitalOcean ComputeProvider impl (Wave 5 redo)
+    "kei-compute-digitalocean",
+    # Hosted Sleep Wave 5 — git providers (Gitea/Forgejo/GitLab/Bitbucket)
+    "kei-git-gitea",
+    "kei-git-forgejo",
+    "kei-git-gitlab",
+    "kei-git-bitbucket",
+    # Hosted Sleep Wave 6 — memory backends (sled/redis/postgres/sqlite)
+    "kei-memory-sled",
+    "kei-memory-redis",
+    "kei-memory-postgres",
+    "kei-memory-sqlite",
+    # Wave 7 — Google OAuth 2.0 + OIDC AuthProvider
+    "kei-auth-google",
+    # Wave 7 — Apple Sign-In AuthProvider
+    "kei-auth-apple",
+    # Wave 7 — Magic-Link email AuthProvider (HMAC-signed token, stateless)
+    "kei-auth-magiclink",
+    # Wave 7 — WebAuthn passkey AuthProvider
+    "kei-auth-webauthn",
+    # Wave 8 — Telegram Bot API NotifyChannel (sendMessage with HTML parse_mode + severity emoji)
+    "kei-notify-telegram",
+    # Wave 8 — Discord webhook NotifyChannel
+    "kei-notify-discord",
+    # Wave 8 — Slack incoming-webhook NotifyChannel
+    "kei-notify-slack",
+    # Wave 8 — SMS via Twilio Programmable Messaging
+    "kei-notify-sms",
+    # Wave 9 — VPN/network backends
+    "kei-net-wireguard",
+    "kei-net-openvpn",
+    "kei-net-ipsec",
+    # Cortex stack — local AI runtime (daemon + TUI + MCP server)
+    "kei-cortex",
+    "kei-tty",
+    "kei-mcp",
+]
+
+[workspace.package]
+edition = "2021"
+rust-version = "1.77"
+
+[workspace.dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+serde_yaml_ng = "0.10"
+sha2 = "0.10"
+image = { version = "0.25", default-features = false, features = ["png"] }
+regex = "1.10"
+rusqlite = { version = "0.31", features = ["bundled"] }
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+anyhow = "1"
+thiserror = "1"
+tempfile = "3"
+toml = "0.8"
+flate2 = "1"
+walkdir = "2"
+pretty_assertions = "1"
+# Shared async + HTTP deps (Waves 31/32/33/35/36 etc — kei-tty / kei-router / etc)
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "sync"] }
+tokio-stream = "0.1"
+futures = "0.3"
+reqwest = { version = "0.12", features = ["json", "stream", "multipart", "rustls-tls"], default-features = false }
+bytes = "1"
+async-trait = "0.1"
+wiremock = "0.6"
+# Wave 38a — daemon integration deps (PTY for /term WS endpoint, tungstenite for axum WS)
+portable-pty = "0.8"
+tokio-tungstenite = "0.29"
+# Wave 44a — tool-sandbox hardening (shell tokenization, URL parsing, bounded LRU)
+shell-words = "1"
+url = "2"
+lru = "0.12"
+# Wave 44b — atomic O_NOFOLLOW openat for symlink-safe writes (tool_apply.rs)
+nix = { version = "0.29", default-features = false, features = ["fs"] }
+# A2.1 — kei-import-project trait pattern matcher (syn AST parsing)
+syn = { version = "2", features = ["full"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1

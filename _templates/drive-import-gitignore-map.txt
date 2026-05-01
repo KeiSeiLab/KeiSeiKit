@@ -1,0 +1,8 @@
+Cargo.toml	Rust.gitignore
+package.json	Node.gitignore
+pyproject.toml	Python.gitignore
+go.mod	Go.gitignore
+pom.xml	Maven.gitignore
+build.gradle	Gradle.gitignore
+Gemfile	Ruby.gitignore
+composer.json	Composer.gitignore

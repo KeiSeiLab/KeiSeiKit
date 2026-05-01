@@ -1,0 +1,57 @@
+# tests/battle/Dockerfile.install-test
+# Battle-test: run KeiSeiKit install.sh on a clean Ubuntu 24.04 container.
+# Validates: install succeeds, block/skill/hook counts match README, hook
+# test-gate passes, settings.json (if any) is valid JSON.
+#
+# Build from repo root:
+#   docker build -t keisei-battle:latest -f tests/battle/Dockerfile.install-test .
+#
+# Run (default: minimal profile):
+#   docker run --rm keisei-battle:latest
+#
+# Override profile:
+#   docker run --rm -e PROFILE=dev  keisei-battle:latest
+#   docker run --rm -e PROFILE=full keisei-battle:latest
+#
+# Env:
+#   PROFILE              one of minimal|core|dev|full (default: minimal)
+#   KEI_SKIP_RUST_BUILD  1 = skip cargo build for primitives (assembler
+#                            still builds; install.sh always builds it)
+
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    CARGO_HOME=/root/.cargo \
+    RUSTUP_HOME=/root/.rustup \
+    PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Baseline deps that a "fresh" user machine would have after apt install.
+# build-essential: cc/ld for cargo. jq: install.sh HARD prereq. pandoc:
+# soft prereq for tomd. git, curl, ca-certificates: kit + rustup download.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        git curl ca-certificates build-essential jq pandoc \
+ && rm -rf /var/lib/apt/lists/*
+
+# Rust toolchain — Ubuntu 24.04 ships rustc 1.75; _assembler/Cargo.toml uses
+# edition = "2024" which needs >= 1.85. Use rustup to get stable.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path \
+ && rustc --version && cargo --version
+
+# Copy the kit. .dockerignore excludes target/ so the image stays slim.
+WORKDIR /opt/keiseikit
+COPY . /opt/keiseikit/
+
+# Install verify + entry scripts (path is hardcoded so they remain runnable
+# whatever CWD the user sets via -w).
+COPY tests/battle/verify.sh       /usr/local/bin/verify.sh
+COPY tests/battle/battle-entry.sh /usr/local/bin/battle-entry.sh
+RUN chmod +x /usr/local/bin/verify.sh \
+             /usr/local/bin/battle-entry.sh \
+             /opt/keiseikit/install.sh
+
+ENV PROFILE=minimal
+ENTRYPOINT ["/usr/local/bin/battle-entry.sh"]

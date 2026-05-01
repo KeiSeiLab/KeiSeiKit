@@ -1,0 +1,25 @@
+[package]
+name = "kei-machine-probe"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Wave 56 — Mac hardware/OS/tooling capability detector. Foundation for the local-LLM stack (Waves 57-60: ollama / llamacpp / mlx / router)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-machine-probe"
+path = "src/main.rs"
+
+[lib]
+name = "kei_machine_probe"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

@@ -1,0 +1,35 @@
+{
+  "name": "@keisei/youtube-adapter",
+  "version": "0.14.0",
+  "description": "YouTube Data API v3 adapter for the KeiSei MCP server",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "youtube-transcript": "^1.2.1",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "Denis Parfionovich <info@greendragon.info>"
+}

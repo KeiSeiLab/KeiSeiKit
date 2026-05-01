@@ -1,0 +1,35 @@
+[capability]
+name = "policy::git-ops-scope"
+category = "policy"
+version = "1.0"
+description = "Allow ONLY the merger's required git and kei-fork / kei-ledger shell patterns. Every other shell command is denied."
+rationale = "The merger role needs real git state-changing access (git merge, git push, git tag) that RULE 0.13 forbids from every other role. policy::git-ops-scope is the narrow exception: allow precisely the git/kei-fork/kei-ledger subcommands the merger needs, deny everything else. Less than unrestricted, more than read-only."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::policy_git_ops_scope"
+event = "PreToolUse:Bash"
+severity = "enforce"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "policy"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

@@ -1,0 +1,27 @@
+[package]
+name = "kei-artifact"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Typed artifact handoff pipeline — BMAD-style document pass-between agents with JSON Schema validation"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-artifact"
+path = "src/main.rs"
+
+[lib]
+name = "kei_artifact"
+path = "src/lib.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[dev-dependencies]
+tempfile = "3"

@@ -1,0 +1,25 @@
+[package]
+name = "kei-conflict-scan"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Deep-sleep conflict scanner — rules/hooks/blocks/orphans/CP violations (v0.13.0)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-conflict-scan"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+regex = "1"
+walkdir = "2"
+anyhow = "1"
+
+[dev-dependencies]
+tempfile = "3"

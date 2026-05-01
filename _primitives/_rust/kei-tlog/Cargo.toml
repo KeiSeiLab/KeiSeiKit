@@ -1,0 +1,20 @@
+[package]
+name = "kei-tlog"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "RULE 0.17 — atomar time-logger for agents and pipelines. Emits JSONL lines to ~/.claude/memory/time-metrics/tasks.jsonl."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-tlog"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { workspace = true }
+
+[package.metadata.keisei]
+trait = "TimeLogger"
+description = "Wall-clock + JSONL journal for any pipeline. Constructor Pattern: 1 binary, 1 responsibility."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

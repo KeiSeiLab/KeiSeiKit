@@ -1,0 +1,25 @@
+[package]
+name = "kei-net-wireguard"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "Wave 9 — WireGuard NetworkMode adapter via wg-quick + wg shell-out (private mesh, is_public=false). Sibling of kei-net-tailscale; glued by kei-runtime-core::traits::network."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_net_wireguard"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[package.metadata.keisei]
+backend = "wireguard"
+description = "WireGuard NetworkMode (wg-quick up/down, wg show dump) — private mesh adapter"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

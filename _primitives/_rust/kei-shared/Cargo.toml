@@ -1,0 +1,15 @@
+[package]
+name = "kei-shared"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Shared substrate types — single source of truth for DNA format + small utility types"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_shared"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+thiserror = "1"

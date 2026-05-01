@@ -1,0 +1,29 @@
+---
+name: {{PROJECT_NAME}}
+alwaysApply: true
+---
+
+# {{PROJECT_NAME}} — Continue.dev Rules
+
+{{PROJECT_DESCRIPTION}}
+
+## Constructor Pattern
+1 file = 1 class = 1 responsibility. Function >30 lines = split. File >200 lines = decompose.
+
+## Core Rules
+- No patching — fix root cause, not symptoms
+- Don't rewrite working code without reason
+- Single Source of Truth — types, routes, enums in ONE place
+- Types/interfaces BEFORE implementation
+- Tests WITH code, never "later"
+
+## Project Context
+- Architecture decisions: see `DECISIONS.md`
+- Project rules: see `CLAUDE.md`
+- Current priorities: see `TODO.md`
+
+## Forbidden
+- Mixins, abstract factories, DI containers
+- Rewriting working code without reason
+- Committing .env, credentials, API keys
+- Adding abstractions for one-time operations

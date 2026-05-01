@@ -1,0 +1,30 @@
+[package]
+name = "kei-runtime-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Hosted Sleep runtime substrate — 12 traits + DNA + plugin registry. No impls; impls live in sibling kei-{compute,llm,git,...}-* crates."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_runtime_core"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tokio = { version = "1", features = ["macros", "rt", "sync"] }
+sha2 = { workspace = true }
+rand = "0.8"
+kei-shared = { path = "../kei-shared" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[package.metadata.keisei]
+backend = "none"
+description = "Hosted Sleep runtime traits + DNA registry; impls in sibling crates"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

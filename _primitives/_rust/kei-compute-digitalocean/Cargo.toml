@@ -1,0 +1,25 @@
+[package]
+name = "kei-compute-digitalocean"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "DigitalOcean ComputeProvider impl for kei-runtime-core (Wave 2 redo). REST v2 + bearer-token auth, mocked tests via wiremock."
+license = "Apache-2.0"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_compute_digitalocean"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }

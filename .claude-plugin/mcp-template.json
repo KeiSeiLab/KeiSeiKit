@@ -1,0 +1,9 @@
+{
+  "_comment": "Template for .mcp.json. Copy to repo root as .mcp.json to register the KeiSei MCP server. Requires @keisei/mcp-server published to npm (status: not yet published — see PLUGIN.md).",
+  "mcpServers": {
+    "keisei": {
+      "command": "npx",
+      "args": ["-y", "@keisei/mcp-server", "--stdio"]
+    }
+  }
+}

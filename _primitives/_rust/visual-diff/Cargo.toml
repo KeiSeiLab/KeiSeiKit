@@ -1,0 +1,16 @@
+[package]
+name = "visual-diff"
+version = "0.1.0"
+edition.workspace = true
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+rust-version.workspace = true
+
+[[bin]]
+name = "visual-diff"
+path = "src/main.rs"
+
+[dependencies]
+image = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"

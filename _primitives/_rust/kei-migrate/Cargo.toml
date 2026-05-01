@@ -1,0 +1,29 @@
+[package]
+name = "kei-migrate"
+version = "0.1.0"
+edition = "2021"
+description = "Universal SQL migration runner — Postgres/SQLite/MySQL autodetect from DATABASE_URL"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-migrate"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+clap = { version = "4", features = ["derive", "env"] }
+sha2 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = [
+    "runtime-tokio",
+    "tls-rustls",
+    "any",
+    "postgres",
+    "sqlite",
+    "mysql",
+] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs"] }
+
+[dev-dependencies]
+tempfile = "3"

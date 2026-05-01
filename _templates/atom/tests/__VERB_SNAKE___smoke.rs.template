@@ -1,0 +1,13 @@
+//! Smoke test for __CRATE__::__VERB__.
+//!
+//! Minimal happy-path + one error-path. Schema compliance is enforced by
+//! `kei-schema-lint` separately; these tests verify actual function behaviour.
+
+// TODO: replace path once crate is wired
+// use __CRATE_SNAKE__::atoms::__VERB_SNAKE__::{run, Input};
+
+#[test]
+fn smoke_placeholder() {
+    // TODO: real test once `run` is implemented
+    assert!(true, "replace with real assertions before shipping");
+}

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Phase 0 of nightly sleep — runs BEFORE Phase A (incubation) and Phase B
+# (REM consolidation). Scans new chatlogs since the last scan, classifies
+# every user line via the per-user firmware regex SSoT, and appends every
+# hit to the shared queue at `~/.claude/frustration/queue.jsonl` for
+# morning review.
+#
+# Wire into the nightly cron BEFORE the sleep-trigger prompt is rendered.
+# Idempotent: if `kei-frustration-loop` is missing or no per-user firmware
+# exists, the script logs the reason and exits 0 (never blocks Phase A/B).
+#
+# Env overrides:
+#   KEI_FRUSTRATION_USER  — user slug (default: $(whoami))
+#   KEI_FRUSTRATION_HOME  — home dir (default: $HOME)
+set -euo pipefail
+
+USER_ID="${KEI_FRUSTRATION_USER:-$(whoami)}"
+HOME_DIR="${KEI_FRUSTRATION_HOME:-${HOME:?HOME not set}}"
+
+if ! command -v kei-frustration-loop >/dev/null 2>&1; then
+    printf 'sleep-phase-0: kei-frustration-loop not on PATH, skipping\n' >&2
+    exit 0
+fi
+
+SINCE_FILE="$HOME_DIR/.claude/frustration/$USER_ID.last-scan.ts"
+SINCE=$(cat "$SINCE_FILE" 2>/dev/null || echo 0)
+
+# nightly-scan reads the per-user firmware, walks ~/.claude/memory/traces,
+# and appends to ~/.claude/frustration/queue.jsonl. Output is a single
+# line of JSON ScanReport on stdout — captured by the orchestrator.
+kei-frustration-loop nightly-scan \
+    --user "$USER_ID" \
+    --since "$SINCE" \
+    --home "$HOME_DIR"

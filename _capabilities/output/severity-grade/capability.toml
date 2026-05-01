@@ -1,0 +1,34 @@
+[capability]
+name = "output::severity-grade"
+category = "output"
+version = "1.0"
+description = "Require critic-role agents to tag every finding with a [HIGH|MEDIUM|LOW] severity grade."
+rationale = "~/.claude/rules/debugging.md Security Review phase 2 output format. Lets the orchestrator triage fixes by priority; ungraded findings become unactionable backlog."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::output_severity_grade"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "output"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

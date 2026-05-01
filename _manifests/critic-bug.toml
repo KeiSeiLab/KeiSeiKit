@@ -1,0 +1,44 @@
+# Atomar agent — auto-generated 2026-04-29 (RULE ZERO decomposition).
+# 1 cube = 1 responsibility. Edit this manifest, not the .md.
+
+name = "critic-bug"
+description = "Detects bug patterns: off-by-one, error-swallowing, unchecked Result/Option, race conditions in shared state. Read-only."
+tools = ["Glob", "Grep", "Read"]
+model = "opus"
+substrate_role = "read-only"
+
+role = """
+You scan for known bug shapes — error-swallowing (catch + ignore), unchecked Result/Option (.unwrap on user input), off-by-one in loops, mutable static / shared state without lock, TOCTOU. Severity-sorted with reproduction hint.
+"""
+
+blocks = [
+    "baseline",
+    "evidence-grading",
+    "memory-protocol",
+]
+
+domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
+forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
+output_extra_fields = ["Largest file LOC", "Tests pass count"]
+
+[[handoff]]
+target = "validator"
+trigger = "general fact-check fallback"
+[references]
+extra = [
+    "~/.claude/rules/code-style.md",
+    "~/.claude/rules/karpathy-behavioral.md",
+]
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-29"

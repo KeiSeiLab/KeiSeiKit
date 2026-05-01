@@ -1,0 +1,255 @@
+# SSoT model catalog. Pricing verified 2026-04-28 against official provider
+# pages. Per RULE 0.4: source_url + verified_at on every "verified" row.
+# Conversion: $1.00/Mtok = 100_000_000 micro-cents/Mtok.
+#
+# Schema: see _primitives/_rust/kei-model/src/model.rs
+# Loader: see _primitives/_rust/kei-model/src/registry.rs
+
+# ============================================================
+# Anthropic — verified 2026-04-28
+# Source: claude.com/pricing + benchlm.ai April 2026 confirmation
+# ============================================================
+
+[[models]]
+id = "claude-opus-4-7"
+provider = "anthropic"
+display_name = "Claude Opus 4.7"
+context_tokens = 200000
+capabilities = ["code", "vision", "streaming", "function-call", "long-context-200k", "system-prompt"]
+status = "active"
+role_tags = ["expensive-code", "complex-reasoning", "code-implementer", "edit-shared", "kei-architect"]
+fallback = "claude-sonnet-4-6"
+notes = "Anthropic flagship 2026-04. NOTE: new tokenizer can produce 35% more tokens for same input vs prior versions."
+
+[models.pricing]
+input_per_mtok_micro = 500000000
+output_per_mtok_micro = 2500000000
+status = "verified"
+source_url = "https://claude.com/pricing"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "claude-sonnet-4-6"
+provider = "anthropic"
+display_name = "Claude Sonnet 4.6"
+context_tokens = 200000
+capabilities = ["code", "vision", "streaming", "function-call", "long-context-200k", "system-prompt"]
+status = "active"
+role_tags = ["mid", "edit-local", "kei-researcher"]
+fallback = "claude-haiku-4-5"
+notes = "Anthropic mid-tier"
+
+[models.pricing]
+input_per_mtok_micro = 300000000
+output_per_mtok_micro = 1500000000
+status = "verified"
+source_url = "https://claude.com/pricing"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "claude-haiku-4-5"
+provider = "anthropic"
+display_name = "Claude Haiku 4.5"
+context_tokens = 200000
+capabilities = ["code", "streaming", "function-call", "long-context-200k", "system-prompt"]
+status = "active"
+role_tags = ["cheap-classifier", "kei-critic", "kei-classifier"]
+fallback = "gpt-4o-mini"
+notes = "Anthropic cheap-tier (current kei-cortex default)"
+
+[models.pricing]
+input_per_mtok_micro = 100000000
+output_per_mtok_micro = 500000000
+status = "verified"
+source_url = "https://claude.com/pricing"
+verified_at = "2026-04-28"
+
+# ============================================================
+# OpenAI — verified 2026-04-28
+# Source: openai.com/api/pricing
+# ============================================================
+
+[[models]]
+id = "gpt-4o"
+provider = "openai"
+display_name = "GPT-4o"
+context_tokens = 128000
+capabilities = ["code", "vision", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["mid"]
+fallback = "gpt-4o-mini"
+notes = "OpenAI mid-tier multimodal"
+
+[models.pricing]
+input_per_mtok_micro = 250000000
+output_per_mtok_micro = 1000000000
+status = "verified"
+source_url = "https://openai.com/api/pricing/"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "gpt-4o-mini"
+provider = "openai"
+display_name = "GPT-4o Mini"
+context_tokens = 128000
+capabilities = ["code", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["cheap"]
+fallback = "deepseek-chat"
+notes = "OpenAI cheap-tier (current kei-router openai default). 16x cheaper than GPT-4o."
+
+[models.pricing]
+input_per_mtok_micro = 15000000
+output_per_mtok_micro = 60000000
+status = "verified"
+source_url = "https://openai.com/api/pricing/"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "o1"
+provider = "openai"
+display_name = "OpenAI o1"
+context_tokens = 200000
+capabilities = ["code", "function-call", "long-context-200k", "system-prompt"]
+status = "active"
+role_tags = ["complex-reasoning"]
+fallback = "gpt-4o"
+notes = "OpenAI reasoning-tier. NOTE: internal 'thinking tokens' inflate actual cost beyond listed rate. o3 has replaced o1 as primary; consider migration."
+
+[models.pricing]
+input_per_mtok_micro = 1500000000
+output_per_mtok_micro = 6000000000
+status = "verified"
+source_url = "https://openai.com/api/pricing/"
+verified_at = "2026-04-28"
+
+# ============================================================
+# Kimi — verified 2026-04-28
+# Source: openrouter.ai (Moonshot K2 Thinking listing)
+# ============================================================
+
+[[models]]
+id = "kimi-k2-thinking"
+provider = "kimi"
+display_name = "Kimi K2 Thinking"
+context_tokens = 256000
+capabilities = ["code", "streaming", "function-call", "long-context-200k", "system-prompt"]
+status = "active"
+role_tags = ["complex-reasoning", "mid"]
+fallback = "deepseek-chat"
+notes = "Moonshot Kimi reasoning-tier (current kei-router kimi default). Trillion-param MoE, 32B active. Cached input: 75% off."
+
+[models.pricing]
+input_per_mtok_micro = 60000000
+output_per_mtok_micro = 250000000
+status = "verified"
+source_url = "https://openrouter.ai/moonshotai/kimi-k2-thinking"
+verified_at = "2026-04-28"
+
+# ============================================================
+# Mistral — verified 2026-04-28
+# Source: mistral.ai/pricing
+# ============================================================
+
+[[models]]
+id = "mistral-large"
+provider = "mistral"
+display_name = "Mistral Large 3"
+context_tokens = 128000
+capabilities = ["code", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["mid"]
+fallback = "mistral-small"
+notes = "Mistral flagship (Large 3 generation)"
+
+[models.pricing]
+input_per_mtok_micro = 200000000
+output_per_mtok_micro = 600000000
+status = "verified"
+source_url = "https://mistral.ai/pricing"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "mistral-small"
+provider = "mistral"
+display_name = "Mistral Small 3"
+context_tokens = 128000
+capabilities = ["code", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["cheap"]
+fallback = "deepseek-chat"
+notes = "Mistral cheap-tier (Small 3 generation)"
+
+[models.pricing]
+input_per_mtok_micro = 10000000
+output_per_mtok_micro = 30000000
+status = "verified"
+source_url = "https://mistral.ai/pricing"
+verified_at = "2026-04-28"
+
+# ============================================================
+# DeepSeek — verified 2026-04-28
+# Source: api-docs.deepseek.com
+# NOTE: deepseek-chat / deepseek-reasoner are deprecated names;
+# they map to deepseek-v4-flash non-thinking / thinking modes
+# respectively. Pricing here reflects v4-flash rates which apply
+# to both legacy names.
+# ============================================================
+
+[[models]]
+id = "deepseek-chat"
+provider = "deepseek"
+display_name = "DeepSeek Chat (v4-flash compat)"
+context_tokens = 128000
+capabilities = ["code", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["cheap"]
+fallback = "llama-3-70b-local"
+notes = "DeepSeek conversational tier. Legacy name maps to v4-flash non-thinking mode. Migrate to deepseek-v4-flash before deprecation deadline."
+
+[models.pricing]
+input_per_mtok_micro = 14000000
+output_per_mtok_micro = 28000000
+status = "verified"
+source_url = "https://api-docs.deepseek.com/quick_start/pricing"
+verified_at = "2026-04-28"
+
+[[models]]
+id = "deepseek-reasoner"
+provider = "deepseek"
+display_name = "DeepSeek Reasoner (v4-flash thinking compat)"
+context_tokens = 128000
+capabilities = ["code", "streaming", "function-call", "system-prompt"]
+status = "active"
+role_tags = ["complex-reasoning", "mid"]
+fallback = "deepseek-chat"
+notes = "DeepSeek reasoning tier. Legacy name maps to v4-flash thinking mode (75% discount applied per docs). Effective rates after discount."
+
+[models.pricing]
+input_per_mtok_micro = 43500000
+output_per_mtok_micro = 87000000
+status = "verified"
+source_url = "https://api-docs.deepseek.com/quick_start/pricing"
+verified_at = "2026-04-28"
+
+# ============================================================
+# Local (Ollama / llama.cpp / MLX) — free, marked verified-zero
+# ============================================================
+
+[[models]]
+id = "llama-3-70b-local"
+provider = "local"
+display_name = "Llama 3 70B (local inference)"
+context_tokens = 8192
+capabilities = ["code", "streaming", "system-prompt"]
+status = "active"
+role_tags = ["free", "cheap"]
+fallback = ""
+notes = "Local inference (Ollama / llama.cpp / MLX). Zero per-token cost; energy + hardware-amortization tracked separately."
+
+[models.pricing]
+input_per_mtok_micro = 0
+output_per_mtok_micro = 0
+status = "verified"
+source_url = "https://ollama.com/library/llama3"
+verified_at = "2026-04-28"

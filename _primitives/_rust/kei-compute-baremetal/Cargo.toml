@@ -1,0 +1,35 @@
+[package]
+name = "kei-compute-baremetal"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "ComputeProvider impl for user-owned bare-metal boxes — registers SSH connection, runs cloud-init equivalent, status-pings via SSH. No cloud API. Wave 2 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_compute_baremetal"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-compute-baremetal"
+path = "src/main.rs"
+
+[dependencies]
+async-trait = "0.1"
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+kei-shared = { path = "../kei-shared" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[package.metadata.keisei]
+backend = "ssh-baremetal"
+trait = "ComputeProvider"
+description = "Register-only ComputeProvider for user-owned hardware: SSH ping + remote shell exec + cloud-init dispatch; no provision/destroy of hardware"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

@@ -1,0 +1,75 @@
+# Agent manifest — Constructor Pattern SSoT for {{NAME}}.
+# The .md file is GENERATED from this manifest + _blocks/*.md by _assembler (Rust).
+# Edit THIS file, not the generated .md.
+#
+# Template placeholders (filled by ~/.claude/skills/new-agent):
+#   {{NAME}}             — agent slug, e.g. "myproject-specialist" (lowercase, [a-z0-9-])
+#   {{DESCRIPTION}}      — one-line summary shown to the orchestrator
+#   {{TOOLS}}            — comma-separated Rust-array of tool names, e.g. "Glob", "Grep", "Read"
+#   {{MODEL}}            — usually "opus"; "sonnet" for cheaper bulk work
+#   {{MEMORY_PROJECT}}   — memory file name, e.g. "myproject-project.md" (lives under
+#                          your Claude Code memory directory, typically
+#                          ~/.claude/memory/)
+#   {{PROJECT_CLAUDEMD}} — absolute-ish path to the project's CLAUDE.md
+#   {{ROLE}}             — 2-3 sentence role description (triple-quoted string)
+#   {{BLOCKS}}           — computed list of blocks to compose, one per line, quoted,
+#                          with a trailing comma; see order rules below
+#   {{DOMAIN_IN}}        — multi-line list of what the agent DOES (quoted TOML strings)
+#   {{FORBIDDEN_DOMAIN}} — multi-line list of hard prohibitions
+#   {{OUTPUT_EXTRA}}     — extra output-report fields (appended to standard shape)
+#   {{HANDOFFS}}         — array-of-tables, one per downstream agent
+#   {{REFERENCES}}       — extra reference files beyond baseline/memory/project
+#
+# TOML scope rules enforced by the assembler:
+#   1. All top-level keys (name, description, tools, model, role, blocks,
+#      domain_in, forbidden_domain, output_extra_fields, memory_project,
+#      project_claudemd) MUST appear BEFORE any [[handoff]] table.
+#   2. [[handoff]] tables MUST appear BEFORE the final [references] table.
+#   3. Obligatory blocks (validator hard-fails without them):
+#        "baseline", "evidence-grading", "memory-protocol"
+#   4. At least one handoff is required.
+#   5. domain_in and forbidden_domain must each have >=1 entry.
+
+name = "{{NAME}}"
+description = "{{DESCRIPTION}}"
+tools = [{{TOOLS}}]
+model = "{{MODEL}}"
+memory_project = "{{MEMORY_PROJECT}}"
+project_claudemd = "{{PROJECT_CLAUDEMD}}"
+
+role = """
+{{ROLE}}
+"""
+
+# Order matters: baseline always first, then evidence-grading, memory-protocol,
+# then obligatory rule-blocks, then stack-specific, then deploy-specific, then
+# domain-specific. The assembler concatenates in the order given here.
+blocks = [
+{{BLOCKS}}
+]
+
+domain_in = [
+{{DOMAIN_IN}}
+]
+
+forbidden_domain = [
+{{FORBIDDEN_DOMAIN}}
+]
+
+# Agent-specific output fields (appended to the standard report shape defined
+# in the baseline block). Leave the list non-empty so reports stay auditable.
+output_extra_fields = [
+{{OUTPUT_EXTRA}}
+]
+
+# Handoffs MUST come after all top-level keys (TOML array-of-tables scope rule).
+# Each downstream agent = one [[handoff]] table.
+{{HANDOFFS}}
+
+# References (extra files beyond auto-included baseline/memory/project).
+# MUST be the LAST section in the file — any top-level key after it would be
+# parsed as belonging to [references].
+[references]
+extra = [
+{{REFERENCES}}
+]

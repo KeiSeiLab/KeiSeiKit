@@ -1,0 +1,27 @@
+# {{PROJECT_NAME}} — Replit Agent Instructions
+
+> Read by Replit Agent (does NOT read `AGENTS.md`).
+
+{{PROJECT_DESCRIPTION}}
+
+## Before You Start
+1. Read `DECISIONS.md` — architectural choices already made
+2. Read `TODO.md` (if exists) — current priorities
+3. Read `CLAUDE.md` (if exists) — project-specific rules
+
+## Constructor Pattern
+- 1 file = 1 class = 1 responsibility
+- File <200 lines, function <30 lines
+- Types/interfaces BEFORE implementation
+- Tests WITH code, never "later"
+
+## Core Rules
+- No patching — fix root cause, not symptoms
+- Don't rewrite working code without reason
+- Single Source of Truth — types, routes, enums in ONE place
+
+## Forbidden
+- Mixins, abstract factories, DI containers
+- Rewriting working code without reason
+- Committing .env, credentials, API keys
+- Adding abstractions for one-time operations

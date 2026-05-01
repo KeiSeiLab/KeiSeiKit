@@ -1,0 +1,33 @@
+[package]
+name = "kei-forge"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Local web wizard for scaffolding new atoms"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[package.metadata.keisei]
+backend = "none"
+description = "Local web wizard for scaffolding new atoms"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-forge"
+path = "src/main.rs"
+
+[lib]
+name = "kei_forge"
+path = "src/lib.rs"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tower = "0.5"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+tempfile = "3"

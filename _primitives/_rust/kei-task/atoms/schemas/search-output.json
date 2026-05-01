@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/search-output.json",
+  "title": "kei-task::search output",
+  "type": "object",
+  "required": ["results"],
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status", "priority"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string" },
+          "priority": { "type": "string" },
+          "task_type": { "type": "string" },
+          "parent_id": { "type": "integer" },
+          "assigned_to": { "type": "string" },
+          "due_date": { "type": "integer" },
+          "completed_at": { "type": "integer" },
+          "created_at": { "type": "integer" },
+          "updated_at": { "type": "integer" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "results": [
+        {
+          "id": 42,
+          "title": "refactor router",
+          "description": "split monolith",
+          "status": "pending",
+          "priority": "high",
+          "task_type": "",
+          "parent_id": 0,
+          "assigned_to": "",
+          "due_date": 0,
+          "completed_at": 0,
+          "created_at": 1714000000,
+          "updated_at": 1714000000
+        }
+      ]
+    }
+  ]
+}

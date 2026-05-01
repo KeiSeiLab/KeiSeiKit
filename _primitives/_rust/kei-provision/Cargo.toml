@@ -1,0 +1,31 @@
+[package]
+name = "kei-provision"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Unified VPS provisioner — one CLI for Hetzner / Vultr / (future) AWS / DO / Linode. Supersedes provision-hetzner.sh + provision-vultr.sh."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-provision"
+path = "src/main.rs"
+
+[lib]
+name = "kei_provision"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = "1"
+thiserror = "1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[package.metadata.keisei]
+backend = "external-cli"
+description = "Shells out to `hcloud` (Hetzner) or `vultr-cli` (Vultr). Parses JSON output. Honors HCLOUD_TOKEN / VULTR_API_KEY env refs per RULE 0.8."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+supersedes = ["provision-hetzner.sh", "provision-vultr.sh"]

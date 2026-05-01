@@ -1,0 +1,81 @@
+# Forgejo config — KeiSeiKit dev-hub bundle (Wave 45 local-mirror profile).
+# Sane defaults for solo macOS arm64 install. Bootstrapped by
+# install/lib-dev-hub-forgejo.sh on first install only (NEVER overwritten).
+# Placeholders ${HOME}/${USER}/${BREW}/${DATA}/${LOGS} are sed-substituted
+# at install time using the same convention as launchd plist templates.
+
+APP_NAME = KeiSei Forgejo (local)
+RUN_USER = ${USER}
+RUN_MODE = prod
+WORK_PATH = ${DATA}
+
+[server]
+PROTOCOL = http
+HTTP_ADDR = 127.0.0.1
+HTTP_PORT = 3001
+DOMAIN = localhost
+ROOT_URL = http://127.0.0.1:3001/
+DISABLE_SSH = false
+SSH_DOMAIN = localhost
+SSH_PORT = 2223
+SSH_LISTEN_HOST = 127.0.0.1
+SSH_LISTEN_PORT = 2223
+LFS_START_SERVER = true
+APP_DATA_PATH = ${DATA}/data
+ENABLE_PPROF = false
+
+[repository]
+ROOT = ${DATA}/repos
+DEFAULT_BRANCH = main
+DEFAULT_PRIVATE = private
+
+[database]
+DB_TYPE = sqlite3
+PATH = ${DATA}/forgejo.db
+SQLITE_TIMEOUT = 500
+LOG_SQL = false
+
+[log]
+ROOT_PATH = ${LOGS}
+MODE = console,file
+LEVEL = Info
+ROUTER = console
+
+[security]
+INSTALL_LOCK = true
+SECRET_KEY =
+INTERNAL_TOKEN =
+PASSWORD_HASH_ALGO = pbkdf2
+
+[service]
+DISABLE_REGISTRATION = true
+REQUIRE_SIGNIN_VIEW = false
+ENABLE_NOTIFY_MAIL = false
+DEFAULT_KEEP_EMAIL_PRIVATE = true
+DEFAULT_ALLOW_CREATE_ORGANIZATION = true
+DEFAULT_USER_VISIBILITY = private
+
+[session]
+PROVIDER = file
+PROVIDER_CONFIG = ${DATA}/sessions
+
+[picture]
+AVATAR_UPLOAD_PATH = ${DATA}/avatars
+REPOSITORY_AVATAR_UPLOAD_PATH = ${DATA}/repo-avatars
+
+[attachment]
+PATH = ${DATA}/attachments
+
+[lfs]
+PATH = ${DATA}/lfs
+
+[mailer]
+ENABLED = false
+
+[openid]
+ENABLE_OPENID_SIGNIN = false
+ENABLE_OPENID_SIGNUP = false
+
+[other]
+SHOW_FOOTER_VERSION = false
+SHOW_FOOTER_TEMPLATE_LOAD_TIME = false

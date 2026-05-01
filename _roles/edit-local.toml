@@ -1,0 +1,43 @@
+[role]
+name = "edit-local"
+display-name = "code-implementer (local edit scope)"
+description = "Write code within whitelisted files, run cargo check/test, emit structured report. No git, no workspace-level touches, no dep bumps."
+spawnable = true
+# Default Claude Code subagent_type to hand `prepare` output to.
+# Overridable per-task; see docs/AGENT-SUBSTRATE-SCHEMA.md §Orchestrator ergonomics.
+claude-subagent-type = "code-implementer"
+
+[capabilities]
+# Ordered list — text.md fragments concatenated in this order
+required = [
+  "policy::no-git-ops",
+  "scope::files-whitelist",
+  "scope::files-denylist",
+  "quality::constructor-pattern",
+  "quality::cargo-check-green",
+  "quality::tests-green",
+  "safety::no-dep-bump",
+  "output::report-format",
+]
+
+[tools]
+# Tool allowlist — anything not in this list is denied
+allowed = ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
+# Bash further restricted by tools::bash-allowlist-adjacent patterns
+bash-patterns-allowed = ['^cargo( |$)', '^mkdir( |$)', '^rm -rf /tmp/']
+
+[escalation]
+policy = "ask-via-return"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

@@ -1,0 +1,40 @@
+[role]
+name = "edit-shared"
+display-name = "code-implementer (shared-SSoT edit scope)"
+description = "Same baseline as edit-local, with one relaxed scope entry permitting edits to a task-specified SSoT path (e.g. workspace Cargo.toml, registry file). The relaxation is configured per task via `[scope].files-whitelist` in task.toml."
+spawnable = true
+claude-subagent-type = "code-implementer"
+
+[capabilities]
+# Layer E — inherits edit-local baseline. The SSoT relaxation rides on
+# scope::files-whitelist parameterization in task.toml. `relaxes` is
+# available for tasks that explicitly drop a parent capability; by default
+# we keep the full edit-local set.
+#
+# As of 2026-04-29 substrate.rs supports `extends` inheritance: parent's
+# `required` list is loaded recursively and merged (parent first, dedup,
+# then `relaxes` removed). See _assembler/src/substrate.rs::merge_extends.
+extends = "edit-local"
+required = []
+relaxes = []
+
+[tools]
+allowed = ["Read", "Write", "Edit", "Glob", "Grep", "Bash"]
+bash-patterns-allowed = ['^cargo( |$)', '^mkdir( |$)', '^rm -rf /tmp/']
+
+[escalation]
+# Tightened vs edit-local: SSoT edits notify orchestrator on any unclear case
+policy = "orchestrator-notify"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

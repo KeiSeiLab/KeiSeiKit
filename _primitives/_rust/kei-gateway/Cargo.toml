@@ -1,0 +1,56 @@
+[package]
+name = "kei-gateway"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "P4.1 — Unified messaging gateway: platform adapters, sessions, agent cache, delivery router."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+# Feature flags
+#   default      — pulls in the always-on CLI adapter
+#   telegram     — teloxide-based Telegram adapter (STUB scaffolded, full impl P4.1.b)
+#   discord      — serenity-based Discord adapter (STUB scaffolded, full impl P4.1.b)
+#   slack        — slack-morphism-based Slack adapter (STUB scaffolded, full impl P4.1.b)
+#   cli          — stdin/stdout adapter (only adapter actually wired in MVP)
+#   all-platforms — convenience to enable every adapter together
+#
+# MVP (this crate landing) ships ONLY `cli` working. tg/discord/slack are
+# feature-gated stubs with todo!() bodies. They compile under their feature
+# flag but panic at runtime — full implementations land in P4.1.b.
+
+[features]
+default = ["cli"]
+cli = []
+telegram = ["dep:teloxide", "dep:futures"]
+discord = ["dep:serenity", "dep:futures"]
+slack = ["dep:slack-morphism", "dep:futures", "dep:tokio-tungstenite"]
+all-platforms = ["telegram", "discord", "slack", "cli"]
+
+[lib]
+name = "kei_gateway"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { workspace = true, features = ["io-std"] }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+thiserror = { workspace = true }
+lru = { workspace = true }
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "sqlite", "macros", "chrono"] }
+blake3 = "1"
+dashmap = "6"
+# Optional — only pulled when the `telegram` feature is enabled.
+teloxide = { version = "0.13", default-features = false, features = ["rustls", "ctrlc_handler"], optional = true }
+futures = { workspace = true, optional = true }
+# Optional — only pulled when the `discord` feature is enabled.
+serenity = { version = "0.12", default-features = false, features = ["client", "gateway", "rustls_backend", "model"], optional = true }
+# Optional — only pulled when the `slack` feature is enabled.
+slack-morphism = { version = "2", default-features = false, features = ["hyper"], optional = true }
+tokio-tungstenite = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }

@@ -1,0 +1,39 @@
+[capability]
+name = "safety::no-dep-bump"
+category = "safety"
+version = "1.0"
+description = "Block dependency additions/upgrades: deny Edit to Cargo.toml dep sections; verify Cargo.lock is unchanged on return."
+rationale = "Supply-chain risk. A silent dep bump expands the attack surface and may trigger breaking-change cascades. Requires explicit task opt-in; orchestrator reviews Cargo.lock diff separately."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::safety_no_dep_bump"
+event = "PreToolUse:Edit|Write"
+severity = "block"
+
+[verify]
+rust-module = "verifies::safety_no_dep_bump"
+run-mode = "both"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "safety"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

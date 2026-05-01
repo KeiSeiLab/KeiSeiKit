@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# mock-gitleaks — PATH-override stub for kei-gdrive-import integration tests.
+# Mimics `gitleaks dir <path>`: exits 1 if any file under <path> matches the
+# AWS-shaped key pattern AKIA[A-Z0-9]{16}; exits 0 otherwise. Other args ignored.
+
+set -u
+
+DIR=""
+for arg in "$@"; do
+    case "$arg" in
+        dir) ;;
+        --no-banner|--redact|--*) ;;
+        *) [ -z "$DIR" ] && DIR="$arg" ;;
+    esac
+done
+
+if [ -z "$DIR" ] || [ ! -d "$DIR" ]; then
+    exit 0
+fi
+
+# AWS access-key shape: literal "AKIA" + 16 uppercase-alnum chars.
+if grep -REqI 'AKIA[A-Z0-9]{16}' "$DIR" 2>/dev/null; then
+    echo "mock-gitleaks: leak detected in $DIR" >&2
+    exit 1
+fi
+exit 0

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.keisei.datasette</string>
+
+    <!--
+      ProgramArguments invokes the wrapper script (NOT datasette directly).
+      The wrapper auto-discovers SQLite DBs at launch time so newly-added
+      databases are picked up on next `launchctl kickstart` without a
+      plist rewrite. See install/lib-dev-hub-datasette.sh::_datasette_write_wrapper.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>${KIT}/dev-hub/datasette-serve.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>${DATA}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>${HOME}</string>
+        <key>USER</key>
+        <string>${USER}</string>
+        <key>PATH</key>
+        <string>${HOME}/.local/bin:${BREW}/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>${LOGS}/datasette.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>${LOGS}/datasette.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>8192</integer>
+    </dict>
+</dict>
+</plist>

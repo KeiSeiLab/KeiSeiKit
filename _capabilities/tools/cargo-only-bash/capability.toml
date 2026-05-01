@@ -1,0 +1,16 @@
+# Deprecated alias — see `tools::bash-allowlist` for the real capability.
+#
+# Why this file exists: `tools::cargo-only-bash` was the original name
+# shipped in v0.16. v0.17 renamed it to `tools::bash-allowlist` because
+# "cargo-only" described only the default pattern set, not the actual
+# mechanism (an allowlist over the Bash argv).
+#
+# The registry in `kei-agent-runtime` resolves the old name to the new
+# implementation at lookup time and emits a stderr deprecation warning.
+# No `text.md` lives here — alias stubs never ship agent-visible text;
+# role files should reference `tools::bash-allowlist` directly.
+
+[capability]
+name = "tools::cargo-only-bash"
+alias = "tools::bash-allowlist"
+deprecated = "v0.17 — use tools::bash-allowlist; alias retained through v2"
