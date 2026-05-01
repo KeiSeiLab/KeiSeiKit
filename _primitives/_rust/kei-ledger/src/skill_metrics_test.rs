@@ -137,3 +137,38 @@ fn unused_skills_zero_days_lookback_lists_all() {
     let unused = super::unused_skills_at(&c, 0, NOW + 1).unwrap();
     assert!(unused.contains(&"skill_a".to_string()) || unused.contains(&"skill_c".to_string()));
 }
+
+/// End-to-end dispatch path: record_invocation via the same call the CLI
+/// `record-skill` arm uses, then verify the row fields land correctly.
+#[test]
+fn dispatch_path_inserts_correct_fields() {
+    let (_d, c) = open();
+    let ts = NOW + 1000;
+    let inv = SkillInvocation {
+        skill_name: "dev-guard".into(),
+        ts,
+        agent_id: Some("agent-dispatch-test".into()),
+        success: true,
+        trajectory_id: Some("traj-42".into()),
+        duration_ms: Some(4200),
+    };
+    let rows = record_invocation(&c, &inv).unwrap();
+    assert_eq!(rows, 1, "expected exactly one row inserted");
+
+    // Read back directly so the test is independent of every other helper.
+    let (name, got_ts, aid, ok, traj, ms): (String, i64, Option<String>, i64, Option<String>, Option<i64>) = c
+        .query_row(
+            "SELECT skill_name, ts, agent_id, success, trajectory_id, duration_ms
+             FROM skill_invocations
+             WHERE skill_name = 'dev-guard'",
+            [],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
+        )
+        .unwrap();
+    assert_eq!(name, "dev-guard");
+    assert_eq!(got_ts, ts);
+    assert_eq!(aid.as_deref(), Some("agent-dispatch-test"));
+    assert_eq!(ok, 1);
+    assert_eq!(traj.as_deref(), Some("traj-42"));
+    assert_eq!(ms, Some(4200));
+}
