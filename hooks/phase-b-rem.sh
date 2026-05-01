@@ -118,6 +118,89 @@ REPORT="reports/sleep-$TODAY.md"
   head -100 "$PATTERNS_OUT"
   echo '```'
   echo
+  # ----- Per-axis observability digests (added 2026-05-02) -----
+  # Cloud agents and morning human review get an actionable rollup of the
+  # tracking journals without having to parse multi-thousand-line JSONL.
+  if [ -d "ledger" ] || [ -d "time-metrics" ]; then
+    echo "## Tracking observability (last 7 days)"
+    echo
+  fi
+
+  if [ -f "ledger/agents.jsonl" ] && [ -s "ledger/agents.jsonl" ] \
+       && command -v jq >/dev/null 2>&1; then
+    echo "### Agent outcomes — ledger/agents.jsonl"
+    echo '```'
+    SEVEN_DAYS_AGO=$(( $(date +%s) - 7*86400 ))
+    jq -s --argjson cutoff "$SEVEN_DAYS_AGO" '
+      [.[] | select(.started_ts >= $cutoff)]
+      | group_by(.model) | map({
+          model: .[0].model,
+          n: length,
+          functional: ([.[] | select(.outcome=="functional")] | length),
+          partial: ([.[] | select(.outcome=="partial")] | length),
+          scaffolding: ([.[] | select(.outcome=="scaffolding")] | length),
+          fail: ([.[] | select(.outcome=="fail")] | length),
+          unknown: ([.[] | select(.outcome==null or .outcome=="")] | length),
+          total_cost_usd: (([.[] | .cost_micro_cents // 0] | add) / 100000000)
+        })' ledger/agents.jsonl 2>/dev/null | head -100
+    echo '```'
+    echo
+  fi
+
+  if [ -f "ledger/skill_invocations.jsonl" ] && [ -s "ledger/skill_invocations.jsonl" ] \
+       && command -v jq >/dev/null 2>&1; then
+    echo "### Skill success rates — ledger/skill_invocations.jsonl"
+    echo '```'
+    SEVEN_DAYS_AGO=$(( $(date +%s) - 7*86400 ))
+    jq -s --argjson cutoff "$SEVEN_DAYS_AGO" '
+      [.[] | select(.ts >= $cutoff)]
+      | group_by(.skill_name) | map({
+          skill: .[0].skill_name,
+          n: length,
+          successes: ([.[] | select(.success==1)] | length),
+          rate_pct: ((([.[] | select(.success==1)] | length) * 100) / length)
+        }) | sort_by(.n) | reverse' ledger/skill_invocations.jsonl 2>/dev/null | head -50
+    echo '```'
+    echo
+  fi
+
+  if [ -f "time-metrics/numeric-claims.jsonl" ] \
+       && [ -s "time-metrics/numeric-claims.jsonl" ] \
+       && command -v jq >/dev/null 2>&1; then
+    echo "### Numeric-claims tier breakdown — time-metrics/numeric-claims.jsonl"
+    echo '```'
+    jq -s 'group_by(.evidence_tier) | map({tier: .[0].evidence_tier, n: length})' \
+        time-metrics/numeric-claims.jsonl 2>/dev/null
+    echo '```'
+    echo "_RULE 0.18 health: high ESTIMATE-HTC ratio = orchestrator under-calibrated. Cloud agent should propose converting frequent ESTIMATE-HTC categories into FROM-JOURNAL via measured runs._"
+    echo
+  fi
+
+  if [ -f "time-metrics/agent-toolstats.jsonl" ] \
+       && [ -s "time-metrics/agent-toolstats.jsonl" ] \
+       && command -v jq >/dev/null 2>&1; then
+    echo "### Agent tool-call patterns — time-metrics/agent-toolstats.jsonl"
+    echo '```'
+    jq -s '
+      [.[] | select(.tool_stats != null)] as $rows
+      | ($rows | length) as $n
+      | {
+          n_with_stats: $n,
+          mean_tool_uses: (if $n == 0 then 0
+                          else (($rows | map(.tool_use_count // 0) | add) / $n) end),
+          mean_duration_ms: (if $n == 0 then 0
+                            else (($rows | map(.duration_ms // 0) | add) / $n) end),
+          tool_distribution: (
+            [$rows[] | .tool_stats // {} | to_entries[]]
+            | group_by(.key)
+            | map({tool: .[0].key, total_calls: ([.[] | .value] | add)})
+            | sort_by(.total_calls) | reverse
+          )
+        }' time-metrics/agent-toolstats.jsonl 2>/dev/null
+    echo '```'
+    echo
+  fi
+
   echo "## For human review"
   echo
   echo "- Anything in patterns above appearing >=3 times across sessions deserves a rule + hook"

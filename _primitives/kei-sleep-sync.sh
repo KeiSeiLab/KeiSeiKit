@@ -51,7 +51,55 @@ if [ -d "$TRACES_SRC" ]; then
     cp -n "$TRACES_SRC"/*.jsonl traces/ 2>/dev/null || true
 fi
 
-git add traces/ backlog.md 2>/dev/null || { log_err "git add failed"; exit 0; }
+# Mirror time-metrics journals (RULE 0.18 + post-2026-05-02 tracking).
+# Append-only JSONL, OK to overwrite remote with local since local is the
+# source-of-truth for this user's machine. Source files:
+#   sessions.jsonl        — RULE 0.18 session-duration journal
+#   tasks.jsonl           — task-timer.sh per-Agent durations
+#   numeric-claims.jsonl  — RULE 0.18 evidence-tagged claims
+#   agent-toolstats.jsonl — agent-outcome-backfill.sh sidecar
+TIME_METRICS_SRC="${HOME}/.claude/memory/time-metrics"
+if [ -d "$TIME_METRICS_SRC" ]; then
+    mkdir -p time-metrics 2>/dev/null || true
+    for f in sessions.jsonl tasks.jsonl numeric-claims.jsonl agent-toolstats.jsonl; do
+        if [ -f "$TIME_METRICS_SRC/$f" ]; then
+            cp "$TIME_METRICS_SRC/$f" "time-metrics/$f" 2>/dev/null || true
+        fi
+    done
+fi
+
+# Snapshot kei-ledger: agents + skill_invocations as JSONL (sqlite3 .dump
+# has too much noise + is binary-ordering-sensitive). Cloud agents can
+# stream-parse JSONL straight into pandas/duckdb for analysis.
+LEDGER_DB="${KEI_LEDGER_DB:-${HOME}/.claude/agents/ledger.sqlite}"
+if [ -f "$LEDGER_DB" ] && command -v sqlite3 >/dev/null 2>&1; then
+    mkdir -p ledger 2>/dev/null || true
+    # `-newline` mode + `-cmd .mode json` would be cleaner but isn't
+    # universally available; emit one-row-per-line JSON via select+json_object.
+    sqlite3 "$LEDGER_DB" \
+        "SELECT json_object(
+            'id', id, 'branch', branch, 'parent_branch', parent_branch,
+            'spec_sha', spec_sha, 'status', status,
+            'started_ts', started_ts, 'finished_ts', finished_ts,
+            'summary', summary, 'worktree_path', worktree_path,
+            'dna', dna, 'creator_id', creator_id, 'fork_parent_id', fork_parent_id,
+            'cost_micro_cents', cost_micro_cents, 'provider', provider,
+            'model', model, 'tokens_in', tokens_in, 'tokens_out', tokens_out,
+            'stubs_count', stubs_count, 'outcome', outcome,
+            'escalation_depth', escalation_depth, 'task_class_dna', task_class_dna
+         ) FROM agents ORDER BY started_ts" \
+        > ledger/agents.jsonl 2>/dev/null || true
+    sqlite3 "$LEDGER_DB" \
+        "SELECT json_object(
+            'id', id, 'skill_name', skill_name, 'ts', ts,
+            'agent_id', agent_id, 'success', success,
+            'trajectory_id', trajectory_id, 'duration_ms', duration_ms
+         ) FROM skill_invocations ORDER BY ts" \
+        > ledger/skill_invocations.jsonl 2>/dev/null || true
+fi
+
+git add traces/ backlog.md time-metrics/ ledger/ 2>/dev/null \
+    || { log_err "git add failed"; exit 0; }
 
 # Nothing staged — silent exit.
 if git diff --cached --quiet 2>/dev/null; then
