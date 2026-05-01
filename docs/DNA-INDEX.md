@@ -1,11 +1,11 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T14:25:35Z.
-> Total blocks: 507. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T15:21:20Z.
+> Total blocks: 509. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
-| atom | 119 |
+| atom | 121 |
 | hook | 40 |
 | primitive | 106 |
 | rule | 174 |
@@ -882,7 +882,7 @@ Sorted alphabetically by name.
 | task-timer | shell | hook::shell::dda5e94… | hooks/task-timer.sh |
 | tomd-preread | shell | hook::shell::8a95b76… | hooks/tomd-preread.sh |
 
-## Atom (119)
+## Atom (121)
 
 Sorted alphabetically by name.
 
@@ -984,6 +984,7 @@ Sorted alphabetically by name.
 | foo | atom::md::63a73aa1::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::0f507ef3::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::40c9240c::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::077f9361::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | git-ops | atom::_::6da713d3::d… | _roles/git-ops.toml | da80a8e7 |
 | merger | atom::_::183b6add::a… | _roles/merger.toml | af2bf880 |
 | output::merge-result | atom::output::d58ef5… | _capabilities/output/merge-result/capability.toml | 91cb9245 |
@@ -1004,6 +1005,7 @@ Sorted alphabetically by name.
 | tools::cargo-only-bash | atom::_::692833ce::9… | _capabilities/tools/cargo-only-bash/capability.toml | 98e70f68 |
 | tools::deny-tools | atom::tools::d64414a… | _capabilities/tools/deny-tools/capability.toml | 8f342dd8 |
 | tools::read-only | atom::_::eded5636::2… | _capabilities/tools/read-only/capability.toml | 22bba452 |
+| user-hooks | atom::md::331b9a34::… | _blocks/path-user-hooks.md | 023e5a08 |
 | user-memory | atom::md::1a771d51::… | _blocks/path-user-memory.md | b8f9e85f |
 | user-rules | atom::md::97292045::… | _blocks/path-user-rules.md | bc8e0acf |
 | verify::fork-audit | atom::verify::81e519… | _capabilities/verify/fork-audit/capability.toml | 3fb8694d |
@@ -1025,7 +1027,7 @@ Sorted alphabetically by name.
 - `alignment-check` — 2 versions: 4e7389b1 → b1e18549
 - `extract-task-durations` — 2 versions: e6854ef5 → 859873eb
 - `firewall-diff` — 2 versions: e42f1e32 → 8260ffc0
-- `foo` — 10 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
+- `foo` — 11 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
 - `frustration-matrix` — 2 versions: 0923b30a → d51e63c8
 - `kei-agent-runtime` — 2 versions: 708830d4 → 33b44d6c
 - `kei-artifact` — 2 versions: 2c55b84a → a33abf97
@@ -1106,8 +1108,8 @@ Sorted alphabetically by name.
 - `kei-provision` — 2 versions: 1d613e5d → cfa53bb3
 - `kei-prune` — 2 versions: 7c0a0c11 → 4454513b
 - `kei-refactor-engine` — 2 versions: 90048888 → 92e83ce0
-- `kei-registry` — 2 versions: 7d9570ad → 5a2e79d8
-- `kei-registry::kei-registry` — 12 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3
+- `kei-registry` — 3 versions: 7d9570ad → 5a2e79d8 → 5a2e79d8
+- `kei-registry::kei-registry` — 21 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf
 - `kei-replay` — 2 versions: 420ceb46 → 74f2fcc4
 - `kei-router` — 2 versions: fc8c6820 → 2cfaa362
 - `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd
