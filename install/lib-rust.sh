@@ -106,7 +106,8 @@ regenerate_rust_workspace() {
   members_nl="$(installed_rust_crates)"
   if [ -z "$members_nl" ]; then
     rm -f "$dst_root/Cargo.toml" "$dst_root/Cargo.lock"
-    copy_prebuilt_substrate_binaries
+    ensure_rust_binaries
+  copy_prebuilt_substrate_binaries
     return 0
   fi
   local n
@@ -119,6 +120,7 @@ regenerate_rust_workspace() {
     [ -n "$m" ] && [ -x "$dst_root/target/release/$m" ] && built=$((built+1))
   done <<< "$members_nl"
   say "  $built / $n Rust primitive binaries available"
+  ensure_rust_binaries
   copy_prebuilt_substrate_binaries
 }
 
