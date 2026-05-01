@@ -10,17 +10,11 @@
 //!   4. curl_with_secret    (10)
 //!   5. base64_blobs        (10)   ← restored as Block-tier
 //!
-//! Imports the guard via `#[path]` so the kei-memory binary crate stays
-//! binary-only (same approach as `tests/integration.rs`).
+//! Imports via the `kei_memory` lib (Wave B introduced `[lib]` target).
 //!
 //! Acceptance: at minimum 45 of 50 samples must reach `Block` severity.
 
-#[path = "../src/injection_patterns.rs"]
-mod injection_patterns;
-#[path = "../src/injection_guard.rs"]
-mod injection_guard;
-
-use injection_guard::scan;
+use kei_memory::injection_guard::scan;
 
 fn pem(label: &str) -> String {
     format!("{}BEGIN {}{}", "-".repeat(5), label, "-".repeat(5))
