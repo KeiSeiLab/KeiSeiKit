@@ -37,9 +37,15 @@ pub fn detect_in_session(conn: &Connection, session_id: &str) -> Result<Vec<Patt
         .collect::<Result<Vec<_>>>()?;
     let mut out = Vec::new();
     for (class, count, first, last) in rows {
+        // UPSERT: schema v3 added UNIQUE(event_class, COALESCE(session_id,'')).
+        // Re-ingest of the same session no longer duplicates rows; counts
+        // accumulate, last_seen_ts moves forward, first_seen_ts stays put.
         conn.execute(
             "INSERT INTO patterns (event_class, session_id, count, first_seen_ts, last_seen_ts)
-             VALUES (?1, ?2, ?3, ?4, ?5)",
+             VALUES (?1, ?2, ?3, ?4, ?5)
+             ON CONFLICT(event_class, COALESCE(session_id, '')) DO UPDATE SET
+                 count = patterns.count + excluded.count,
+                 last_seen_ts = MAX(patterns.last_seen_ts, excluded.last_seen_ts)",
             params![class, session_id, count, first, last],
         )?;
         out.push(PatternHit {

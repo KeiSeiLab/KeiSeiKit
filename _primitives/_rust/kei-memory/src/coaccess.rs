@@ -2,8 +2,13 @@
 //!
 //! Constructor Pattern: one cube, single responsibility.
 //! Derived from an in-house implementation, algorithmic spec documented in coaccess.md.
-//! Key difference: session-id isn't part of the coaccess PK — we aggregate
-//! across sessions so cross-session recurrences surface in `patterns`.
+//!
+//! Session_id IS used to scope the window query (avoiding cross-session
+//! false co-access — we never pair file_a from session X with file_b
+//! from session Y), but it isn't part of the coaccess row primary key
+//! (the PK is the canonical file pair). This means a file pair seen in
+//! 5 sessions has 1 row, not 5 — counts aggregate across sessions so
+//! cross-session recurrences surface in `patterns`.
 
 use rusqlite::{params, Connection, Result};
 
@@ -56,8 +61,7 @@ fn recent_files_in_window(
         .query_map(params![session_id, exclude, ts - WINDOW_SECS], |r| {
             r.get::<_, String>(0)
         })?
-        .filter_map(|r| r.ok())
-        .collect();
+        .collect::<Result<Vec<_>>>()?;
     Ok(rows)
 }
 

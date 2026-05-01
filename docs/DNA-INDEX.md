@@ -1,6 +1,6 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-04-30T19:19:40Z.
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T06:08:41Z.
 > Total blocks: 498. Per-type breakdown:
 
 | Type | Count |
@@ -41,7 +41,7 @@ Sorted alphabetically by name.
 | kei-compute-vultr | primitive::cli,md,ne… | _primitives/_rust/kei-compute-vultr/Cargo.toml | 4cb6c0b7 |
 | kei-conflict-scan | primitive::cli,fs,md… | _primitives/_rust/kei-conflict-scan/Cargo.toml | 381b80ad |
 | kei-content-store | primitive::cli,hash,… | _primitives/_rust/kei-content-store/Cargo.toml | 11ed9bd8 |
-| kei-cortex::kei-cortex | primitive::_::b9680d… | _primitives/_rust/kei-cortex/Cargo.toml | 44165ca9 |
+| kei-cortex::kei-cortex | primitive::_::b9680d… | _primitives/_rust/kei-cortex/Cargo.toml | 213f02fc |
 | kei-cron-scheduler | primitive::md,networ… | _primitives/_rust/kei-cron-scheduler/Cargo.toml | da2674f5 |
 | kei-crossdomain | primitive::cli,md,sq… | _primitives/_rust/kei-crossdomain/Cargo.toml | 7a263b47 |
 | kei-curator | primitive::cli,md,sq… | _primitives/_rust/kei-curator/Cargo.toml | dad1e6e3 |
@@ -74,11 +74,11 @@ Sorted alphabetically by name.
 | kei-llm-router | primitive::cli,md,ne… | _primitives/_rust/kei-llm-router/Cargo.toml | bd772802 |
 | kei-machine-probe | primitive::cli,md,re… | _primitives/_rust/kei-machine-probe/Cargo.toml | 634b2e86 |
 | kei-mcp | primitive::md,networ… | _primitives/_rust/kei-mcp/Cargo.toml | 3425ff56 |
-| kei-memory | primitive::cli,md,re… | _primitives/_rust/kei-memory/Cargo.toml | fd941920 |
 | kei-memory-postgres | primitive::md,networ… | _primitives/_rust/kei-memory-postgres/Cargo.toml | a9da92d3 |
 | kei-memory-redis | primitive::md,networ… | _primitives/_rust/kei-memory-redis/Cargo.toml | fd7a49a9 |
 | kei-memory-sled | primitive::md,networ… | _primitives/_rust/kei-memory-sled/Cargo.toml | 6bd5485f |
 | kei-memory-sqlite | primitive::md,networ… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | f64bbb1d |
+| kei-memory::kei-memory | primitive::_::e47cd8… | _primitives/_rust/kei-memory/Cargo.toml | 2f7698b2 |
 | kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | db2e7bd0 |
 | kei-model | primitive::cli,md,re… | _primitives/_rust/kei-model/Cargo.toml | 0a6ce8bc |
 | kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | 1280a1dd |
@@ -220,16 +220,16 @@ Sorted alphabetically by name.
 |---|---|---|
 | api-cost-guard::api-cost-guard | rule::_::6bcae557::0… | 00ce54e8 |
 
-### specialized-node-training
+### cfc-specialized
 
 | Section | DNA prefix | Body sha8 |
 |---|---|---|
-| specialized-node-training::math-first-checklist-run-in-order | rule::_::6dd96e77::7… | 73aa1785 |
-| specialized-node-training::mathematical-invariants-not-tuning-knobs-ok-to-use-without-ablation | rule::_::86555084::7… | 7742cc25 |
-| specialized-node-training::prohibited-patterns-all-cost-us-time-in-sister-projects | rule::_::5b56f0c6::a… | a8bfbeaa |
-| specialized-node-training::required-output-for-any-composed-multi-node-training-run | rule::_::a6630ec0::7… | 71b656a5 |
-| specialized-node-training::rule-0-benchmark-first-heuristic-second | rule::_::12823818::1… | 187e6ec8 |
-| specialized-node-training::session-checklist-before-starting-a-training-run | rule::_::5a7fb4a6::2… | 238cbe72 |
+| cfc-specialized-nodes::math-first-checklist-run-in-order | rule::_::6dd96e77::7… | 73aa1785 |
+| cfc-specialized-nodes::mathematical-invariants-not-tuning-knobs-ok-to-use-without-ablation | rule::_::86555084::7… | 7742cc25 |
+| cfc-specialized-nodes::prohibited-patterns-all-cost-us-time-in-sister-projects | rule::_::5b56f0c6::a… | a8bfbeaa |
+| cfc-specialized-nodes::required-output-for-any-composed-multi-node-training-run | rule::_::a6630ec0::7… | 71b656a5 |
+| cfc-specialized-nodes::rule-0-benchmark-first-heuristic-second | rule::_::12823818::1… | 187e6ec8 |
+| cfc-specialized-nodes::session-checklist-before-starting-a-training-run | rule::_::5a7fb4a6::2… | 238cbe72 |
 
 ### chat-numeric
 
@@ -509,17 +509,17 @@ Sorted alphabetically by name.
 | orchestrator-branch-first::verify-before-commit-rule-0-16-extension-2026-04-28 | rule::_::54da86b1::5… | 542ec80d |
 | orchestrator-branch-first::why | rule::_::c7ab64d8::e… | ed9bc7d8 |
 
-### observable-classification
+### paradigm-native
 
 | Section | DNA prefix | Body sha8 |
 |---|---|---|
-| observable-classification::applicability | rule::_::90e81a12::e… | e51ce6fe |
-| observable-classification::enforcement | rule::_::bf2f7abb::8… | 8214be9e |
-| observable-classification::escape-clause | rule::_::65752f5c::5… | 51e9c3c4 |
-| observable-classification::incident-2026-04-18 | rule::_::b44dadb8::c… | c9afa300 |
-| observable-classification::rule-lock | rule::_::08f708cb::2… | 2545665e |
-| observable-classification::the-rule | rule::_::daaf6443::6… | 65912d47 |
-| observable-classification::trap-patterns-all-real | rule::_::9c7f308c::1… | 12e64e93 |
+| paradigm-native-measurement::applicability | rule::_::90e81a12::e… | e51ce6fe |
+| paradigm-native-measurement::enforcement | rule::_::bf2f7abb::8… | 8214be9e |
+| paradigm-native-measurement::escape-clause | rule::_::65752f5c::5… | 51e9c3c4 |
+| paradigm-native-measurement::incident-2026-04-18 | rule::_::b44dadb8::c… | c9afa300 |
+| paradigm-native-measurement::rule-lock | rule::_::08f708cb::2… | 2545665e |
+| paradigm-native-measurement::the-rule | rule::_::daaf6443::6… | 65912d47 |
+| paradigm-native-measurement::trap-patterns-all-real | rule::_::9c7f308c::1… | 12e64e93 |
 
 ### patent-ssot
 
@@ -713,11 +713,11 @@ Sorted alphabetically by name.
 | secrets-single-source::rule-lock | rule::_::fc82b135::b… | b11aef22 |
 | secrets-single-source::the-rule | rule::_::fa12ec65::c… | c9b4f4f9 |
 
-### security::restricted-project
+### security::banned-project
 
 | Section | DNA prefix | Body sha8 |
 |---|---|---|
-| security::restricted-project-criteria | rule::_::59441dad::e… | e72b2356 |
+| security::banned-project-criteria | rule::_::59441dad::e… | e72b2356 |
 
 ### security::exception-double
 
@@ -729,7 +729,7 @@ Sorted alphabetically by name.
 
 | Section | DNA prefix | Body sha8 |
 |---|---|---|
-| security::forbidden-for-restricted-projects | rule::_::dff9b2a0::f… | f0286278 |
+| security::forbidden-for-banned-projects | rule::_::dff9b2a0::f… | f0286278 |
 
 ### security::related-rules
 
@@ -741,7 +741,7 @@ Sorted alphabetically by name.
 
 | Section | DNA prefix | Body sha8 |
 |---|---|---|
-| security::specific-restricted-project-list | rule::_::6f194ea9::e… | e7b00e8d |
+| security::specific-banned-project-list | rule::_::6f194ea9::e… | e7b00e8d |
 
 ### self-sufficiency::core
 
@@ -1005,7 +1005,8 @@ Sorted alphabetically by name.
 
 - `3D Scene Skill` — 2 versions: e31a87ca → ca06fcac
 - `foo` — 10 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
-- `kei-cortex::kei-cortex` — 49 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9
+- `kei-cortex::kei-cortex` — 50 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc
+- `kei-memory::kei-memory` — 32 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2
 - `kei-registry::kei-registry` — 3 versions: a9d4104f → 4110ba86 → 6e2dc3fd
 - `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd
 - `kei-token-tracker::kei-token-tracker` — 10 versions: 2e9d962a → 425b08f0 → 9a5196eb → 200eba01 → 2caec2d6 → 4538adbc → 0acb6793 → 1fa333e0 → dffb827c → 28bdb3b1
