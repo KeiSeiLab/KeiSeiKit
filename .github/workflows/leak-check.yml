@@ -26,7 +26,7 @@ jobs:
           hits=$(git ls-files | xargs grep -lE "$PATTERN" 2>/dev/null | grep -vE "$ALLOWLIST" || true)
           if [[ -n "$hits" ]]; then
             echo "::error::username-path leak detected"
-            echo "$hits" | sed 's/^/  /'
+            echo "$hits" | awk '{print "  " $0}'
             echo
             echo "Replace absolute home paths with placeholders:"
             echo "  ~/.claude/projects/-Users-<user>/memory/  ->  ~/.claude/memory/"
