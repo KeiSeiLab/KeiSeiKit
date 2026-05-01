@@ -358,11 +358,10 @@ We ship the feature their README claims. Honest delta in marketing.
 
 ---
 
-## Patent / IP considerations
+## Licensing
 
-- All Hermes code is MIT-licensed → free to copy with attribution.
-- The **Phase D auto-extraction with success-rate-driven re-improvement** is novel as far as our prior-art search shows. Worth a defensive provisional filing before public release of P3 (RULE 0.11 — patent SSoT git-model).
-- `keipatent-project-specialist` review recommended before P3.2 lands publicly.
+- All Hermes-derived code is MIT-licensed → free to copy with attribution.
+- Apache-2.0 patent grant covers original kit additions (see LICENSE).
 
 ---
 
