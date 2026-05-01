@@ -1,6 +1,6 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T07:41:26Z.
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T13:08:56Z.
 > Total blocks: 501. Per-type breakdown:
 
 | Type | Count |
@@ -99,7 +99,7 @@ Sorted alphabetically by name.
 | kei-prune | primitive::cli,md,sq… | _primitives/_rust/kei-prune/Cargo.toml | 7c0a0c11 |
 | kei-refactor-engine | primitive::cli,md::c… | _primitives/_rust/kei-refactor-engine/Cargo.toml | 90048888 |
 | kei-registry::foo | primitive::_::12366c… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
-| kei-registry::kei-registry | primitive::_::4744f0… | _primitives/_rust/kei-registry/Cargo.toml | 6e2dc3fd |
+| kei-registry::kei-registry | primitive::_::4744f0… | _primitives/_rust/kei-registry/Cargo.toml | 30e6dee3 |
 | kei-registry::mini-prim | primitive::_::57f8eb… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-replay | primitive::cli,hash,… | _primitives/_rust/kei-replay/Cargo.toml | 420ceb46 |
 | kei-router::kei-router | primitive::_::1e654e… | _primitives/_rust/kei-router/Cargo.toml | 98ab93cd |
@@ -1013,7 +1013,7 @@ Sorted alphabetically by name.
 - `kei-cortex::kei-cortex` — 50 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc
 - `kei-db-contract::kei-db-contract` — 17 versions: 2e9d962a → 07651211 → e4200114 → facc4312 → 20bb0441 → dcd5de23 → bbd7a9df → 2662f63e → e067292d → e39caba6 → 42411821 → ec449d79 → 48d6d10f → c06e17c1 → 82de90e6 → e4c729d2 → 2ef926dc
 - `kei-memory::kei-memory` — 33 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2 → 0dd1dfc8
-- `kei-registry::kei-registry` — 3 versions: a9d4104f → 4110ba86 → 6e2dc3fd
+- `kei-registry::kei-registry` — 12 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3
 - `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd
 - `kei-token-tracker::kei-token-tracker` — 10 versions: 2e9d962a → 425b08f0 → 9a5196eb → 200eba01 → 2caec2d6 → 4538adbc → 0acb6793 → 1fa333e0 → dffb827c → 28bdb3b1
 
