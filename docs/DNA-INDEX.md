@@ -1,12 +1,12 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T16:06:16Z.
-> Total blocks: 512. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T17:09:15Z.
+> Total blocks: 513. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 121 |
-| hook | 40 |
+| hook | 41 |
 | primitive | 109 |
 | rule | 174 |
 | skill | 68 |
@@ -81,8 +81,8 @@ Sorted alphabetically by name.
 | kei-memory-sled | primitive::md,networ… | _primitives/_rust/kei-memory-sled/Cargo.toml | 6fdae904 |
 | kei-memory-sqlite | primitive::md,networ… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | 93761682 |
 | kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | fd996e76 |
+| kei-model | primitive::cli,md,re… | _primitives/_rust/kei-model/Cargo.toml | 1a4038fd |
 | kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | b67e44b9 |
-| kei-model::kei-model | primitive::_::6a479a… | _primitives/_rust/kei-model/Cargo.toml | 3f74b167 |
 | kei-net-ipsec | primitive::md,networ… | _primitives/_rust/kei-net-ipsec/Cargo.toml | edb79478 |
 | kei-net-openvpn | primitive::md,networ… | _primitives/_rust/kei-net-openvpn/Cargo.toml | a209e645 |
 | kei-net-wireguard | primitive::md,networ… | _primitives/_rust/kei-net-wireguard/Cargo.toml | 05a75c60 |
@@ -98,10 +98,10 @@ Sorted alphabetically by name.
 | kei-provision | primitive::cli,md::1… | _primitives/_rust/kei-provision/Cargo.toml | cfa53bb3 |
 | kei-prune | primitive::cli,md,sq… | _primitives/_rust/kei-prune/Cargo.toml | 4454513b |
 | kei-refactor-engine | primitive::cli,md::c… | _primitives/_rust/kei-refactor-engine/Cargo.toml | 92e83ce0 |
+| kei-registry | primitive::cli,fs,ha… | _primitives/_rust/kei-registry/Cargo.toml | 5a2e79d8 |
 | kei-registry::foo | primitive::_::12366c… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
 | kei-registry::foo | primitive::_::3937fa… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
 | kei-registry::kei-registry | primitive::_::30e60a… | _primitives/_rust/kei-registry/Cargo.toml | d5146bbd |
-| kei-registry::kei-registry | primitive::_::4744f0… | _primitives/_rust/kei-registry/Cargo.toml | 4e595599 |
 | kei-registry::mini-prim | primitive::_::57f8eb… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-registry::mini-prim | primitive::_::bb2052… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-replay | primitive::cli,hash,… | _primitives/_rust/kei-replay/Cargo.toml | 74f2fcc4 |
@@ -838,7 +838,7 @@ Sorted alphabetically by name.
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
 
-## Hook (40)
+## Hook (41)
 
 Sorted alphabetically by name.
 
@@ -850,6 +850,7 @@ Sorted alphabetically by name.
 | agent-fork-done | shell | hook::shell::eeaa011… | hooks/agent-fork-done.sh |
 | agent-fork-logger | shell | hook::shell::1b43957… | hooks/agent-fork-logger.sh |
 | agent-heartbeat-tick | shell | hook::shell::29d6dbe… | hooks/agent-heartbeat-tick.sh |
+| agent-outcome-backfill | shell | hook::shell::c22f3e8… | hooks/agent-outcome-backfill.sh |
 | agent-stub-scan | shell | hook::shell::92df903… | hooks/agent-stub-scan.sh |
 | alignment-check | shell | hook::shell::01f8f21… | hooks/alignment-check.sh |
 | assemble-agents | shell | hook::shell::9cd98a7… | hooks/assemble-agents.sh |
@@ -1094,7 +1095,7 @@ Sorted alphabetically by name.
 - `kei-memory-sqlite` — 2 versions: f64bbb1d → 93761682
 - `kei-memory::kei-memory` — 33 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2 → 0dd1dfc8
 - `kei-migrate` — 2 versions: db2e7bd0 → fd996e76
-- `kei-model` — 2 versions: 0a6ce8bc → 1a4038fd
+- `kei-model` — 3 versions: 0a6ce8bc → 1a4038fd → 1a4038fd
 - `kei-model-router` — 2 versions: 1280a1dd → b67e44b9
 - `kei-model::kei-model` — 2 versions: 0948fb4f → 3f74b167
 - `kei-net-ipsec` — 2 versions: 600684a8 → edb79478
@@ -1112,7 +1113,7 @@ Sorted alphabetically by name.
 - `kei-provision` — 2 versions: 1d613e5d → cfa53bb3
 - `kei-prune` — 2 versions: 7c0a0c11 → 4454513b
 - `kei-refactor-engine` — 2 versions: 90048888 → 92e83ce0
-- `kei-registry` — 3 versions: 7d9570ad → 5a2e79d8 → 5a2e79d8
+- `kei-registry` — 4 versions: 7d9570ad → 5a2e79d8 → 5a2e79d8 → 5a2e79d8
 - `kei-registry::foo` — 2 versions: 403bc4b0 → 403bc4b0
 - `kei-registry::kei-registry` — 36 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf → 713f693b → 5faa1d45 → 84b3d3aa → f0fd45d4 → a50c01c9 → a4b4526d → b6f981f1 → 93eeffff → d3feb512 → f21fe020 → cbe1a45d → d5146bbd → a33bb21f → a3f03a74 → 4e595599
 - `kei-registry::mini-prim` — 2 versions: 9fa2b304 → 9fa2b304
