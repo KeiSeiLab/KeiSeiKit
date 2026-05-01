@@ -82,8 +82,8 @@ trigger = "findings suggest anti-pattern sweep or Constructor-Pattern violation 
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/debugging.md",
-    "~/.claude/rules/no-downgrade-constructive.md",
+    "path:user-rules/debugging.md",
+    "path:user-rules/no-downgrade-constructive.md",
     "~/.claude/agents/validator.md",
 ]
 

@@ -105,10 +105,10 @@ trigger = "anti-pattern sweep after batch — are prompts / generated assets con
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/api-cost-guard.md",
-    "~/.claude/rules/project-cartoon-studio.md",
-    "~/.claude/memory/fal-ai-models.md  (canonical model + price reference)",
-    "~/.claude/memory/website-creation-playbook.md  (end-to-end web asset recipe)",
+    "path:user-rules/api-cost-guard.md",
+    "path:user-rules/project-cartoon-studio.md",
+    "path:user-memory/fal-ai-models.md  (canonical model + price reference)",
+    "path:user-memory/website-creation-playbook.md  (end-to-end web asset recipe)",
     "https://fal.ai/pricing  (live pricing — WebFetch)",
 ]
 

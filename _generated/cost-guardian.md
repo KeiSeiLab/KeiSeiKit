@@ -238,9 +238,9 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/api-cost-guard.md`
-- `~/.claude/rules/ml-protocol.md`
-- `~/.claude/rules/debugging.md`
+- `{path::user-rules}/api-cost-guard.md`
+- `{path::user-rules}/ml-protocol.md`
+- `{path::user-rules}/debugging.md`
 - `https://modal.com/pricing`
 - `https://fal.ai/pricing`
 - `https://apify.com/pricing`

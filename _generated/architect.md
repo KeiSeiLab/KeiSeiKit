@@ -242,8 +242,8 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/code-style.md`
-- `~/.claude/rules/doc-conventions.md`
-- `~/.claude/rules/dev-workflow.md`
-- `~/.claude/rules/debugging.md`
-- `~/.claude/rules/no-downgrade-constructive.md`
+- `{path::user-rules}/code-style.md`
+- `{path::user-rules}/doc-conventions.md`
+- `{path::user-rules}/dev-workflow.md`
+- `{path::user-rules}/debugging.md`
+- `{path::user-rules}/no-downgrade-constructive.md`

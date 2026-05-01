@@ -230,8 +230,8 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/debugging.md`
-- `~/.claude/rules/security.md`
+- `{path::user-rules}/debugging.md`
+- `{path::user-rules}/security.md`
 - `https://owasp.org/Top10/`
 - `https://cwe.mitre.org/top25/`
 - `https://osv.dev/`

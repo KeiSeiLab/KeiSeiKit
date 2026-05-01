@@ -30,8 +30,8 @@ target = "validator"
 trigger = "general fact-check fallback"
 [references]
 extra = [
-    "~/.claude/rules/code-style.md",
-    "~/.claude/rules/karpathy-behavioral.md",
+    "path:user-rules/code-style.md",
+    "path:user-rules/karpathy-behavioral.md",
 ]
 
 [taxonomy]
