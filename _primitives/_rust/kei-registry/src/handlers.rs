@@ -68,7 +68,35 @@ pub fn dispatch(cmd: Command) -> Result<Outcome> {
         Command::IndexSubstrate { kit_root, db, dry_run } => {
             index_substrate::handle_index_substrate(Some(kit_root), db, dry_run)
         }
+        Command::Status {
+            db,
+            git_repo,
+            ledger_db,
+            format,
+        } => handle_status(db, git_repo, ledger_db, format),
     }
+}
+
+fn handle_status(
+    db: Option<PathBuf>,
+    git_repo: PathBuf,
+    ledger_db: Option<PathBuf>,
+    format: String,
+) -> Result<Outcome> {
+    let db_path = resolve_db(db);
+    let conn = open_db(&db_path)?;
+    let ledger = ledger_db.unwrap_or_else(crate::status::default_ledger_path);
+    let snap = crate::status::compute_status(&conn, Some(&git_repo), Some(&ledger))?;
+    match format.as_str() {
+        "json" => {
+            println!("{}", serde_json::to_string_pretty(&snap)?);
+        }
+        "ascii" | "" => {
+            print!("{}", crate::status::render_ascii(&snap));
+        }
+        other => anyhow::bail!("unknown --format '{other}' (use ascii or json)"),
+    }
+    Ok(Outcome::Ok)
 }
 
 fn handle_init(db: Option<PathBuf>) -> Result<Outcome> {
