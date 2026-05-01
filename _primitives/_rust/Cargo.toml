@@ -175,6 +175,8 @@ members = [
     "kei-cortex",
     "kei-tty",
     "kei-mcp",
+    # SQL ↔ TypeScript schema drift detector
+    "kei-db-contract",
 ]
 
 [workspace.package]

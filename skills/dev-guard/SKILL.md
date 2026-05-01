@@ -1,12 +1,12 @@
 ---
 name: dev-guard
-description: Continuous parallel quality gate during development — 3 agents check every significant code change for security holes, performance traps, and pattern violations in real-time. Run after writing code, before committing.
+description: Continuous parallel quality gate during development — 3 backend agents (security/perf/structure) plus optional 4th frontend-validator agent (TS types ↔ DB schema drift, lint, type-check, visual diff) check every significant code change in real-time. Run after writing code, before committing.
 ---
 
 # /dev-guard — Continuous Development Guard
 
 > wave-audit находит проблемы ПОСЛЕ. dev-guard ловит их ПОКА пишешь код.
-> 3 агента параллельно проверяют каждое значимое изменение.
+> 3 backend агента + опциональный frontend-validator проверяют каждое значимое изменение.
 
 ## Команды
 
@@ -113,6 +113,43 @@ Constructor Pattern Checks:
 Если всё чисто → `STRUCTURE: CLEAN (N checks passed, all files <200 LOC)`.
 ```
 
+### Agent: `frontend-validator` (опциональный 4-й)
+
+> Запускается если в diff есть `*.tsx | *.ts | *.svelte | *.vue | *.dart` ИЛИ затронут DB-layer
+> (`migrations/*.sql`, `src/db/**`, `src/types/**`, `prisma/schema.prisma`, `drizzle.config.*`).
+
+```
+Спавнить с subagent_type: "frontend-validator". Prompt:
+
+Frontend continuous-validation pass. Project root: [path], stack: [Next.js / Vite / Flutter / ...].
+Changed files: [список из git diff --name-only].
+
+Run in order, emit per-section status:
+
+1. Stack detect (package.json / pubspec.yaml / next.config.*).
+2. Type-check (npx tsc --noEmit OR dart analyze). List file:line errors.
+3. Lint (npx eslint . --ext .ts,.tsx OR dart analyze). List warnings.
+4. DB-contract drift — invoke `kei-db-contract <root> --output json` if binary in PATH AND project
+   has migrations/ OR src/db/. Parse drift_count + per-table fields.
+5. Visual regression — only if playwright.config.* exists. Skip otherwise.
+6. Verdict block: each check status (PASS / WARN / FAIL) + brief evidence.
+
+Output format:
+- TYPE_CHECK: <status> [<count> errors]
+- LINT: <status> [<count> warnings]
+- DB_CONTRACT: <status> [<drift_count> tables drifted]
+- VISUAL_DIFF: <status>
+- VERDICT: COMMIT_OK / FIX_FIRST / REVIEW_NEEDED
+
+Read-only on the codebase; do NOT autofix. Hand off TS errors to code-implementer-typescript.
+```
+
+Severity rules:
+- **TYPE_CHECK FAIL** → block commit (hard).
+- **DB_CONTRACT drift_count > 0** → block commit, suggest schema-or-types update.
+- **LINT warnings** → advisory.
+- **VISUAL_DIFF mismatch** → review needed (user approves new baseline OR fixes regression).
+
 ---
 
 ## Phase 2 — Quick Synthesis (lead, НЕ агент)
@@ -154,6 +191,8 @@ Verdict: COMMIT / FIX FIRST / REVIEW NEEDED
 | services/utils/config | performance + structure | ~1 min |
 | UI/styles/docs | structure only | ~30 sec |
 | 1 файл, <20 строк | lead проверяет сам (без агентов) | ~10 sec |
+| frontend (.tsx/.ts/.dart) | + frontend-validator | +30-60 sec |
+| DB layer (migrations/, src/db/, schema.prisma) | + frontend-validator (DB contract) | +20 sec |
 
 ---
 
