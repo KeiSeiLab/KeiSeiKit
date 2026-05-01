@@ -76,8 +76,8 @@ trigger = "vulnerability is architectural (auth boundary misplaced, SSoT violati
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/debugging.md",
-    "~/.claude/rules/security.md",
+    "path:user-rules/debugging.md",
+    "path:user-rules/security.md",
     "https://owasp.org/Top10/",
     "https://cwe.mitre.org/top25/",
     "https://osv.dev/",

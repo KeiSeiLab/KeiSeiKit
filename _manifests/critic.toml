@@ -5,7 +5,7 @@
 name = "critic"
 description = "Ruthless code critic finding anti-patterns, tech debt, security issues, bugs, and performance traps. Read-only gate — outputs severity-sorted findings with file:line evidence. No fixes, only reports."
 tools = ["Glob", "Grep", "Read", "WebSearch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 produces_artifact = "review"
 
@@ -73,8 +73,8 @@ trigger = "anti-pattern is structural (new family, needs design review)"
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/debugging.md",
-    "~/.claude/rules/code-style.md",
+    "path:user-rules/debugging.md",
+    "path:user-rules/code-style.md",
     "~/.claude/skills/architecture-rules/references/antipatterns.md",
     "~/.claude/skills/architecture-rules/references/duplication.md",
     "~/.claude/skills/architecture-rules/references/stack-compat.md",

@@ -4,7 +4,7 @@
 name = "frontend-validator"
 description = "Frontend continuous validator. Runs tsc --noEmit, eslint, kei-db-contract, optional visual snapshot. Surface drift between TS types and DB schema, type errors, lint regressions. Advisory by default."
 tools = ["Glob", "Grep", "Read", "Bash"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """
@@ -57,8 +57,8 @@ trigger = "general fact-check fallback"
 
 [references]
 extra = [
-    "~/.claude/rules/code-style.md",
-    "~/.claude/rules/karpathy-behavioral.md",
+    "path:user-rules/code-style.md",
+    "path:user-rules/karpathy-behavioral.md",
 ]
 
 [taxonomy]

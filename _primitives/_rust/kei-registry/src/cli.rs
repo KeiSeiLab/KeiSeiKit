@@ -147,4 +147,41 @@ pub enum Command {
         #[arg(long, default_value_t = false)]
         dry_run: bool,
     },
+
+    /// Cross-cutting status dashboard: blocks per type, registered path
+    /// atoms, local git branches with ahead/behind, and agent forks from
+    /// `kei-ledger` (if present).
+    Status {
+        /// Registry SQLite path (default: `$KEI_REGISTRY_DB` or
+        /// `~/.claude/registry.sqlite`).
+        #[arg(long)]
+        db: Option<PathBuf>,
+        /// Local git repo to scan for branches (default: current dir).
+        #[arg(long, default_value = ".")]
+        git_repo: PathBuf,
+        /// kei-ledger SQLite path (default: `$KEI_LEDGER_DB` or
+        /// `~/.claude/agents/ledger.sqlite`). Missing file → agent
+        /// section is skipped, never an error.
+        #[arg(long)]
+        ledger_db: Option<PathBuf>,
+        /// Output format: `ascii` (default) or `json`.
+        #[arg(long, default_value = "ascii")]
+        format: String,
+    },
+
+    /// Audit secret/env-var references across the kit. Reads env-var NAMES
+    /// from .env files (never values), greps the kit tree for usages,
+    /// reports orphans (defined but unreferenced).
+    Secrets {
+        /// Env-file paths to scan (default: `~/.claude/secrets/.env` if
+        /// exists, plus any `<scan-root>/secrets/*.env`).
+        #[arg(long = "env-file")]
+        env_files: Vec<PathBuf>,
+        /// Root to scan for usages (default: current directory).
+        #[arg(long, default_value = ".")]
+        scan_root: PathBuf,
+        /// Output format: `ascii` (default) or `json`.
+        #[arg(long, default_value = "ascii")]
+        format: String,
+    },
 }

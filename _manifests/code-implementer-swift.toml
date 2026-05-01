@@ -4,7 +4,7 @@
 name = "code-implementer-swift"
 description = "Swift / SwiftUI / SPM implementation specialist. macOS menubar / iOS apps. Constructor Pattern enforced."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """
@@ -30,8 +30,8 @@ target = "validator"
 trigger = "general fact-check fallback"
 [references]
 extra = [
-    "~/.claude/rules/code-style.md",
-    "~/.claude/rules/karpathy-behavioral.md",
+    "path:user-rules/code-style.md",
+    "path:user-rules/karpathy-behavioral.md",
 ]
 
 [taxonomy]

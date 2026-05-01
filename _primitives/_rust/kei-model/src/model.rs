@@ -59,6 +59,14 @@ pub enum Provider {
     Mistral,
     Deepseek,
     Local,
+    /// Google: Gemini text-LLM family + image generation (nano-banana CLI
+    /// consumes Gemini 3.1 Flash Image / Gemini 3 Pro Image).
+    Google,
+    /// fal.ai — image / video / 3D generation aggregator. Hosts Flux,
+    /// Kling O3, Veo 3, Ideogram, Recraft, etc.
+    Fal,
+    /// ElevenLabs — text-to-speech and voice cloning.
+    Elevenlabs,
 }
 
 impl Provider {
@@ -70,6 +78,9 @@ impl Provider {
             Provider::Mistral => "mistral",
             Provider::Deepseek => "deepseek",
             Provider::Local => "local",
+            Provider::Google => "google",
+            Provider::Fal => "fal",
+            Provider::Elevenlabs => "elevenlabs",
         }
     }
 
@@ -81,6 +92,9 @@ impl Provider {
             "mistral" => Some(Provider::Mistral),
             "deepseek" => Some(Provider::Deepseek),
             "local" => Some(Provider::Local),
+            "google" => Some(Provider::Google),
+            "fal" => Some(Provider::Fal),
+            "elevenlabs" => Some(Provider::Elevenlabs),
             _ => None,
         }
     }
@@ -102,6 +116,28 @@ pub enum Capability {
     LongContext1m,
     #[serde(rename = "system-prompt")]
     SystemPrompt,
+    // Generation capabilities (image / video / voice). Pricing for these
+    // is per-image / per-second / per-1k-chars rather than per-mtok; the
+    // existing Pricing struct stores the unit price in
+    // `output_per_mtok_micro` and the unit semantics live in `notes`.
+    #[serde(rename = "image-gen")]
+    ImageGen,
+    #[serde(rename = "text-to-image")]
+    TextToImage,
+    #[serde(rename = "image-edit")]
+    ImageEdit,
+    #[serde(rename = "video-gen")]
+    VideoGen,
+    #[serde(rename = "text-to-video")]
+    TextToVideo,
+    #[serde(rename = "image-to-video")]
+    ImageToVideo,
+    #[serde(rename = "voice-gen")]
+    VoiceGen,
+    #[serde(rename = "text-to-speech")]
+    TextToSpeech,
+    #[serde(rename = "voice-clone")]
+    VoiceClone,
 }
 
 impl Capability {
@@ -114,6 +150,15 @@ impl Capability {
             Capability::LongContext200k => "long-context-200k",
             Capability::LongContext1m => "long-context-1m",
             Capability::SystemPrompt => "system-prompt",
+            Capability::ImageGen => "image-gen",
+            Capability::TextToImage => "text-to-image",
+            Capability::ImageEdit => "image-edit",
+            Capability::VideoGen => "video-gen",
+            Capability::TextToVideo => "text-to-video",
+            Capability::ImageToVideo => "image-to-video",
+            Capability::VoiceGen => "voice-gen",
+            Capability::TextToSpeech => "text-to-speech",
+            Capability::VoiceClone => "voice-clone",
         }
     }
 
@@ -126,6 +171,15 @@ impl Capability {
             "long-context-200k" => Some(Capability::LongContext200k),
             "long-context-1m" => Some(Capability::LongContext1m),
             "system-prompt" => Some(Capability::SystemPrompt),
+            "image-gen" => Some(Capability::ImageGen),
+            "text-to-image" => Some(Capability::TextToImage),
+            "image-edit" => Some(Capability::ImageEdit),
+            "video-gen" => Some(Capability::VideoGen),
+            "text-to-video" => Some(Capability::TextToVideo),
+            "image-to-video" => Some(Capability::ImageToVideo),
+            "voice-gen" => Some(Capability::VoiceGen),
+            "text-to-speech" => Some(Capability::TextToSpeech),
+            "voice-clone" => Some(Capability::VoiceClone),
             _ => None,
         }
     }

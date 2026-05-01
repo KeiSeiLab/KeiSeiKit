@@ -5,7 +5,7 @@
 name = "fal-ai-runner"
 description = "fal.ai image, video, and 3D generation expert. Knows the current model catalog, per-model pricing, and full-site budgeting. Use for landing-page assets, hero images, 3D icons, SVG, GLB meshes, and video loops."
 tools = ["Glob", "Grep", "Read", "Edit", "Bash", "WebFetch", "Agent"]
-model = "opus"
+model = "sonnet"
 substrate_role = "edit-local"
 
 role = """
@@ -105,10 +105,10 @@ trigger = "anti-pattern sweep after batch — are prompts / generated assets con
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/api-cost-guard.md",
-    "~/.claude/rules/project-cartoon-studio.md",
-    "~/.claude/memory/fal-ai-models.md  (canonical model + price reference)",
-    "~/.claude/memory/website-creation-playbook.md  (end-to-end web asset recipe)",
+    "path:user-rules/api-cost-guard.md",
+    "path:user-rules/project-cartoon-studio.md",
+    "path:user-memory/fal-ai-models.md  (canonical model + price reference)",
+    "path:user-memory/website-creation-playbook.md  (end-to-end web asset recipe)",
     "https://fal.ai/pricing  (live pricing — WebFetch)",
 ]
 

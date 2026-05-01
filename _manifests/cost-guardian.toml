@@ -5,7 +5,7 @@
 name = "cost-guardian"
 description = "api-cost-guard.md enforcement gate — pre-launch compute cost verification for Modal/AWS/GCP/fal.ai/Apify/ElevenLabs. Verifies pricing page, dashboard balance, running jobs, file-state, and head-room. Read-only — emits GO/NO-GO recommendation BEFORE money is spent."
 tools = ["Glob", "Grep", "Read", "Bash", "WebFetch"]
-model = "opus"
+model = "sonnet"
 substrate_role = "read-only"
 
 role = """
@@ -85,9 +85,9 @@ trigger = "repeated NO-GO on same operation — pipeline redesign needed (cachin
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/api-cost-guard.md",
-    "~/.claude/rules/ml-protocol.md",
-    "~/.claude/rules/debugging.md",
+    "path:user-rules/api-cost-guard.md",
+    "path:user-rules/ml-protocol.md",
+    "path:user-rules/debugging.md",
     "https://modal.com/pricing",
     "https://fal.ai/pricing",
     "https://apify.com/pricing",
