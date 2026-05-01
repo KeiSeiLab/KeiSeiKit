@@ -20,7 +20,10 @@ jobs:
         run: |
           set -e
           PATTERN='denisparfionovich|/Users/[a-z]+/Projects/KeiSeiKit-public/'
-          hits=$(git ls-files | xargs grep -lE "$PATTERN" 2>/dev/null | grep -vE '^(NOTICE|README\.md)$' || true)
+          # Allowlist: byline files (intentional copyright) + this workflow
+          # itself (it contains the pattern as a literal detection rule).
+          ALLOWLIST='^(NOTICE|README\.md|\.github/workflows/leak-check\.yml)$'
+          hits=$(git ls-files | xargs grep -lE "$PATTERN" 2>/dev/null | grep -vE "$ALLOWLIST" || true)
           if [[ -n "$hits" ]]; then
             echo "::error::username-path leak detected"
             echo "$hits" | sed 's/^/  /'
