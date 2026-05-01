@@ -404,7 +404,7 @@ Blockers / next: <list>
 - `~/.claude/rules/api-cost-guard.md`
 - `~/.claude/rules/git-conventions.md`
 - `~/.claude/rules/dev-workflow.md`
-- `~/.claude/projects/-Users-denisparfionovich/memory/security-restricted-projects.md`
+- `~/.claude/memory/security-restricted-projects.md`
 - `MEMORY.md → Compute Cost Incident (2026-02-26): $98.78 Modal overrun — no dashboard check, unverified prices.`
 - `MEMORY.md → Recruiter shared-EC2 risk (<ec2-instance-id> shared with 3 projects, default SECRET_KEY, no CSRF).`
 - `MEMORY.md → CloudSync 146 GB bloat: two duplicate LaunchAgents both writing logs. Scan for duplicates before adding infra.`

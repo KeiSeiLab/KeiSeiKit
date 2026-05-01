@@ -208,7 +208,7 @@ Compute the diff lines to add:
 | <slug>.md | <one-line coverage> | Rules Index (added YYYY-MM-DD) | ~/.claude/hooks/<slug>-guard.sh |
 ```
 
-**`~/.claude/projects/-Users-denisparfionovich/memory/MEMORY.md`** (one-liner under `## Rules & Feedback`):
+**`~/.claude/memory/MEMORY.md`** (one-liner under `## Rules & Feedback`):
 ```
 - [[../../../../rules/<slug>]] — <one-line coverage>
 ```
@@ -294,7 +294,7 @@ Execute in order (each via its right tool — do NOT shell out when a tool exist
 1. `Write` → `~/.claude/rules/<slug>.md`
 2. If hook: `Write` → `~/.claude/hooks/<slug>-guard.sh`, then `Bash` → `chmod +x ~/.claude/hooks/<slug>-guard.sh`
 3. `Edit` → `~/.claude/rules/RULES.md` (append the row)
-4. `Edit` → `~/.claude/projects/-Users-denisparfionovich/memory/MEMORY.md` (append the line)
+4. `Edit` → `~/.claude/memory/MEMORY.md` (append the line)
 5. `Edit` → `~/.claude/CLAUDE.md` (add Rules Index row) — only if `W == "Yes — full"`
 6. If hook: invoke the `update-config` skill with the settings-merge spec. Do NOT directly hand-edit `settings.json` — the skill knows how to merge without clobbering foreign entries.
 7. `Edit` → append one line to `~/.claude/memory/recurrence-log.md` (create if absent):

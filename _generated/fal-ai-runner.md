@@ -398,6 +398,6 @@ Blockers / next: <list>
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
 - `~/.claude/rules/api-cost-guard.md`
 - `~/.claude/rules/project-cartoon-studio.md`
-- `~/.claude/projects/-Users-denisparfionovich/memory/fal-ai-models.md  (canonical model + price reference)`
-- `~/.claude/projects/-Users-denisparfionovich/memory/website-creation-playbook.md  (end-to-end web asset recipe)`
+- `~/.claude/memory/fal-ai-models.md  (canonical model + price reference)`
+- `~/.claude/memory/website-creation-playbook.md  (end-to-end web asset recipe)`
 - `https://fal.ai/pricing  (live pricing — WebFetch)`
