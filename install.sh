@@ -53,6 +53,8 @@ source "$LIB_DIR/lib-rust.sh"
 source "$LIB_DIR/lib-substrate.sh"
 # shellcheck source=install/lib-rust-mirror.sh
 source "$LIB_DIR/lib-rust-mirror.sh"
+# shellcheck source=install/lib-rust-prebuild.sh
+source "$LIB_DIR/lib-rust-prebuild.sh"
 # shellcheck source=install/lib-scaffold.sh
 source "$LIB_DIR/lib-scaffold.sh"
 # shellcheck source=install/lib-bridges.sh
