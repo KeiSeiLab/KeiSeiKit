@@ -27,7 +27,20 @@ IFS=$'\n\t'
 [ -f ~/.claude/secrets/.env ] && set -a && source ~/.claude/secrets/.env && set +a
 
 REPO_PATH="${KEI_MEMORY_REPO_PATH:-$HOME/.claude/memory/sync-repo}"
-KEI_MEMORY_BIN="${KEI_MEMORY_BIN:-$HOME/Projects/KeiSeiKit/_primitives/_rust/target/release/kei-memory}"
+# kei-memory binary resolution order (first hit wins):
+#   1. Explicit env override   KEI_MEMORY_BIN=/some/path
+#   2. PATH lookup             ~/.cargo/bin/kei-memory typically
+#   3. KeiSeiKit-public local-build target dir
+#   4. Legacy KeiSeiKit (pre-public-rebrand) target dir
+if [ -z "${KEI_MEMORY_BIN:-}" ]; then
+    if command -v kei-memory >/dev/null 2>&1; then
+        KEI_MEMORY_BIN="$(command -v kei-memory)"
+    elif [ -x "$HOME/Projects/KeiSeiKit-public/_primitives/_rust/target/release/kei-memory" ]; then
+        KEI_MEMORY_BIN="$HOME/Projects/KeiSeiKit-public/_primitives/_rust/target/release/kei-memory"
+    else
+        KEI_MEMORY_BIN="$HOME/Projects/KeiSeiKit/_primitives/_rust/target/release/kei-memory"
+    fi
+fi
 TODAY=$(date +%Y-%m-%d)
 NOW_TS=$(date +%s)
 WALL_BUDGET_S=3600
@@ -219,3 +232,12 @@ git commit -m "REM: consolidation $TODAY (${#NEW_TRACES[@]} new traces)" 2>&1 | 
 git push 2>&1 | tail -3 || { log "WARN: push failed"; exit 1; }
 
 log "DONE — $REPORT pushed"
+
+# Step 7 — Telegram delivery (defensive: never fails Phase B)
+log "Step 7/7: tg delivery"
+TG_HOOK="$HOME/.claude/hooks/sleep-report-tg.sh"
+if [ -x "$TG_HOOK" ]; then
+    "$TG_HOOK" "$REPORT" "$TODAY" 2>&1 | tail -3 || true
+else
+    log "WARN: $TG_HOOK not present, skipping tg"
+fi
