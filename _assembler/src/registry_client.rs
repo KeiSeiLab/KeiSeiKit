@@ -83,3 +83,111 @@ impl<T> OptionalExt<T> for rusqlite::Result<T> {
         }
     }
 }
+
+/// Check if `name` is a registered path-atom.
+///
+/// Convention: a path-atom is an atom whose source file is
+/// `_blocks/path-<name>.md` and whose YAML frontmatter declares
+/// `kind: path`. The DB stores only the file path (not body), so this
+/// function uses the filename convention as a fast first check, then
+/// reads the file and parses the frontmatter to confirm `kind: path`.
+///
+/// Returns:
+/// - `Ok(true)` — atom registered under `name`, file exists, frontmatter
+///   declares `kind: path`. Caller may emit an opaque resolved reference.
+/// - `Ok(false)` — atom not found, or found but not a path-atom. Caller
+///   should pass the original reference through unchanged (with optional
+///   warn-and-skip in caller).
+/// - `Err(msg)` — DB query failure. Propagate.
+pub fn is_path_atom(conn: &Connection, name: &str) -> Result<bool, String> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT path FROM blocks \
+             WHERE name = ?1 AND block_type = 'atom' AND superseded_by IS NULL \
+             LIMIT 1",
+        )
+        .map_err(|e| format!("prepare path-atom query for {name}: {e}"))?;
+    let path: Option<String> = stmt
+        .query_row(rusqlite::params![name], |r| r.get(0))
+        .optional()
+        .map_err(|e| format!("query path-atom {name}: {e}"))?;
+    let Some(p) = path else { return Ok(false) };
+    // Filename convention check: `_blocks/path-<name>.md`. Cheap O(1) string
+    // contains, avoids the file read on the common non-path-atom case.
+    let expected_suffix = format!("/_blocks/path-{name}.md");
+    if !p.ends_with(&expected_suffix) {
+        return Ok(false);
+    }
+    // Read frontmatter to confirm `kind: path`. Defensive — convention is
+    // not authoritative on its own; explicit declaration is.
+    let body = match std::fs::read_to_string(&p) {
+        Ok(b) => b,
+        Err(_) => return Ok(false),
+    };
+    Ok(frontmatter_has_kind_path(&body))
+}
+
+/// Return true if `body` starts with a YAML frontmatter block (`---\n...---\n`)
+/// containing a line whose key is `kind` and value is `path`. Tolerates
+/// `---\r\n`, surrounding whitespace, and YAML quoting.
+fn frontmatter_has_kind_path(body: &str) -> bool {
+    let stripped = match body
+        .strip_prefix("---\n")
+        .or_else(|| body.strip_prefix("---\r\n"))
+    {
+        Some(s) => s,
+        None => return false,
+    };
+    let end = match stripped
+        .find("\n---\n")
+        .or_else(|| stripped.find("\r\n---\r\n"))
+    {
+        Some(i) => i,
+        None => return false,
+    };
+    let frontmatter = &stripped[..end];
+    for line in frontmatter.lines() {
+        let line = line.trim();
+        if let Some(rest) = line.strip_prefix("kind:") {
+            let val = rest.trim().trim_matches(&['\'', '"'][..]);
+            return val == "path";
+        }
+    }
+    false
+}
+
+#[cfg(test)]
+mod tests {
+    use super::frontmatter_has_kind_path;
+
+    #[test]
+    fn detects_kind_path_in_frontmatter() {
+        let body = "---\ntype: atom\nkind: path\nname: foo\n---\n\n# body\n";
+        assert!(frontmatter_has_kind_path(body));
+    }
+
+    #[test]
+    fn rejects_kind_other() {
+        let body = "---\ntype: atom\nkind: other\n---\n";
+        assert!(!frontmatter_has_kind_path(body));
+    }
+
+    #[test]
+    fn rejects_no_frontmatter() {
+        let body = "# just markdown\n";
+        assert!(!frontmatter_has_kind_path(body));
+    }
+
+    #[test]
+    fn tolerates_quoted_value() {
+        let body = "---\nkind: \"path\"\n---\n";
+        assert!(frontmatter_has_kind_path(body));
+    }
+
+    #[test]
+    fn rejects_kind_path_substring() {
+        // `kind: pathological` must NOT match `kind: path`.
+        let body = "---\nkind: pathological\n---\n";
+        assert!(!frontmatter_has_kind_path(body));
+    }
+}

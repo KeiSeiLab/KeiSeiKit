@@ -100,9 +100,9 @@ trigger = "reported metrics must be verified before saving to `memory/{project}.
 # References (extra files beyond auto-included baseline/memory/project)
 [references]
 extra = [
-    "~/.claude/rules/api-cost-guard.md",
-    "~/.claude/rules/ml-protocol.md",
-    "~/.claude/memory/MEMORY.md  (Compute Cost Incident 2026-02-26)",
+    "path:user-rules/api-cost-guard.md",
+    "path:user-rules/ml-protocol.md",
+    "path:user-memory/MEMORY.md  (Compute Cost Incident 2026-02-26)",
     "https://modal.com/pricing  (live pricing — WebFetch or user browser)",
 ]
 

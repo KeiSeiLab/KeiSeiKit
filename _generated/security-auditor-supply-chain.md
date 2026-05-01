@@ -257,5 +257,5 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/code-style.md`
-- `~/.claude/rules/karpathy-behavioral.md`
+- `{path::user-rules}/code-style.md`
+- `{path::user-rules}/karpathy-behavioral.md`

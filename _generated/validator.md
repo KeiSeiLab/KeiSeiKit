@@ -231,5 +231,5 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/debugging.md`
-- `~/.claude/rules/no-downgrade-constructive.md`
+- `{path::user-rules}/debugging.md`
+- `{path::user-rules}/no-downgrade-constructive.md`

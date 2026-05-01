@@ -70,8 +70,8 @@ trigger = "code-smell sweep on existing Rust code (>500 LOC diff)"
 
 [references]
 extra = [
-    "~/.claude/rules/code-style.md",
-    "~/.claude/rules/git-conventions.md",
+    "path:user-rules/code-style.md",
+    "path:user-rules/git-conventions.md",
     "https://doc.rust-lang.org/book/",
 ]
 

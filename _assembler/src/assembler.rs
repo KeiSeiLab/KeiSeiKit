@@ -157,8 +157,84 @@ fn write_references(m: &Manifest, out: &mut String) {
         out.push_str(&format!("- `{pc}` — project CLAUDE.md\n"));
     }
     if let Some(refs) = &m.references {
+        // Open registry for path-atom resolution. Missing DB is non-fatal —
+        // references then fall through unchanged (advisory only).
+        let conn = {
+            let db_path = registry_client::default_db_path();
+            if db_path.exists() {
+                registry_client::open_read_only(&db_path).ok()
+            } else {
+                None
+            }
+        };
         for r in &refs.extra {
-            out.push_str(&format!("- `{r}`\n"));
+            let resolved = resolve_path_atom_ref(r, conn.as_ref());
+            out.push_str(&format!("- `{resolved}`\n"));
         }
+    }
+}
+
+/// Resolve a `path:NAME/file.md` reference to an opaque content-addressed
+/// form `{path::NAME}/file.md` if `NAME` is a registered path-atom.
+///
+/// Behaviour:
+/// - Input does not start with `path:` → return unchanged.
+/// - Input starts with `path:` but lookup fails (no atom / not a path-atom /
+///   no registry) → emit a stderr warning and return the input unchanged.
+///   This is advisory: the warn surfaces typos in manifests but never
+///   blocks rendering.
+/// - Lookup succeeds → return `{path::NAME}/<suffix>`.
+fn resolve_path_atom_ref(r: &str, conn: Option<&rusqlite::Connection>) -> String {
+    let Some(rest) = r.strip_prefix("path:") else {
+        return r.to_string();
+    };
+    let (name, suffix) = match rest.split_once('/') {
+        Some((n, s)) => (n, s),
+        // `path:NAME` with no `/file` part — atom-only ref. Resolve to
+        // `{path::NAME}` so the public output is still opaque.
+        None => (rest, ""),
+    };
+    let Some(c) = conn else {
+        eprintln!(
+            "warn [assembler]: 'path:{name}' reference but registry DB not open — passing through"
+        );
+        return r.to_string();
+    };
+    match registry_client::is_path_atom(c, name) {
+        Ok(true) => {
+            if suffix.is_empty() {
+                format!("{{path::{name}}}")
+            } else {
+                format!("{{path::{name}}}/{suffix}")
+            }
+        }
+        Ok(false) => {
+            eprintln!(
+                "warn [assembler]: 'path:{name}' not found in registry as path-atom — passing through"
+            );
+            r.to_string()
+        }
+        Err(e) => {
+            eprintln!("warn [assembler]: registry lookup for path-atom '{name}': {e}");
+            r.to_string()
+        }
+    }
+}
+
+#[cfg(test)]
+mod write_references_tests {
+    use super::resolve_path_atom_ref;
+
+    #[test]
+    fn passthrough_non_path_ref() {
+        let r = "~/.claude/memory/foo.md";
+        assert_eq!(resolve_path_atom_ref(r, None), r);
+    }
+
+    #[test]
+    fn passthrough_path_ref_when_no_db() {
+        // No registry conn → emit warn (suppressed in test) + passthrough.
+        let r = "path:user-memory/foo.md";
+        assert_eq!(resolve_path_atom_ref(r, None), r);
     }
 }

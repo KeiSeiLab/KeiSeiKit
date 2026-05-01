@@ -300,13 +300,46 @@ Rules: architectural decision → E1-E2. Financial (compute) → ONLY E1. Data >
 
 **Forbidden:** transitioning without saving; writing "works" without metrics; leaving credentials only in conversation context.
 
-# PRE-DEV GATE (before writing any code)
+# PRE-DEV GATE — three checks before any new code
 
-1. **Analogues check** — does a solution already exist in the project or its dependencies? Use `Grep`/`Glob`
-2. **Stack compatibility** — is any new dependency compatible with the current stack?
-3. **Duplication check** — are you about to duplicate existing code?
+This gate runs ONCE before you write a single line of new code on a non-trivial change. Skipping it is the most common cause of overlapping rewrites, dependency drift, and silent duplication.
 
-If any check fails → STOP and reconsider.
+## 1. Analogues check — does this already exist?
+
+Before designing your own solution, search the project + its direct dependencies for an existing one. Use `Grep` / `Glob` for symbols and patterns; use the keimd graph index (`keimd related <file>`, `keimd search <query>`) for semantic relatedness.
+
+- Search the symbol you'd name (function / type / struct).
+- Search adjacent verb forms (`scan_*`, `parse_*`, `*_handler`).
+- Read the README and `_primitives/MANIFEST.toml` (or equivalent index) for cubes that already cover this concern.
+
+If a usable analogue exists, **prefer reusing or extending it** over a parallel implementation. Branching the codebase on the same concern produces shotgun-surgery later.
+
+## 2. Stack compatibility — does the new dep belong?
+
+If your change pulls a new dependency, check it against the project's existing stack BEFORE adding to `Cargo.toml` / `package.json` / `pyproject.toml`:
+
+- **Language match** — does the dep's language fit the project's default? In Rust-first projects, a Python-only dep needs a stated exception.
+- **Maintenance signal** — last release date, open-issue count, transitive dep count.
+- **Conflict with existing deps** — runtime conflicts (two HTTP clients, two TLS stacks, two async runtimes) are silent foot-guns.
+- **License** — Apache-2.0 / MIT / BSD-3 are safe; AGPL / SSPL / proprietary need explicit approval.
+
+If the dep doesn't fit, prefer the existing stack's idiomatic primitive even if it's slightly less convenient.
+
+## 3. Duplication check — are you about to recreate something?
+
+The architecture-overlay incident (a single file ballooned 227 → 354 LOC purely from "fix" patches that duplicated the formula they were supposed to repair) is the canonical warning. Before adding new code on top of existing code, ask:
+
+- Am I patching around a problem instead of fixing it at the root?
+- Is this new function logically the same as one already in the codebase, just with different phrasing?
+- Is my change adding a third copy of a constant / config value / regex that should live in one place?
+
+If yes → STOP and refactor at the root before adding the new behaviour.
+
+## Failing the gate
+
+If ANY check fails, stop and reconsider. The cheapest pivot is at this gate; every layer downstream (commit, review, audit, deploy) is more expensive to walk back. Do not proceed to implementation while one of the three checks is unresolved.
+
+The gate is paired with **Plan Mode First** — you write the plan AFTER this gate (so the plan reflects what already exists), not before.
 
 # ERROR BUDGET — 3-Level Escalation
 
@@ -399,12 +432,12 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/security.md`
-- `~/.claude/rules/self-sufficiency.md`
-- `~/.claude/rules/api-cost-guard.md`
-- `~/.claude/rules/git-conventions.md`
-- `~/.claude/rules/dev-workflow.md`
-- `~/.claude/memory/security-restricted-projects.md`
+- `{path::user-rules}/security.md`
+- `{path::user-rules}/self-sufficiency.md`
+- `{path::user-rules}/api-cost-guard.md`
+- `{path::user-rules}/git-conventions.md`
+- `{path::user-rules}/dev-workflow.md`
+- `{path::user-memory}/security-restricted-projects.md`
 - `MEMORY.md → Compute Cost Incident (2026-02-26): $98.78 Modal overrun — no dashboard check, unverified prices.`
 - `MEMORY.md → Recruiter shared-EC2 risk (<ec2-instance-id> shared with 3 projects, default SECRET_KEY, no CSRF).`
 - `MEMORY.md → CloudSync 146 GB bloat: two duplicate LaunchAgents both writing logs. Scan for duplicates before adding infra.`
