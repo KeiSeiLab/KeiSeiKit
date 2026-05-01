@@ -1,0 +1,34 @@
+[capability]
+name = "quality::tests-green"
+category = "quality"
+version = "1.0"
+description = "Require `cargo test -p <crate>` to pass, with a minimum test count per task, in worktree AND simulated merge."
+rationale = "Self-reported green without a run is the most common substrate v1 failure. Test-count minimum prevents silently deleting tests to make the bar. Dual-pass catches integration regressions."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = ["cargo-test-crates", "test-count-min"]
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::quality_tests_green"
+run-mode = "both"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "quality"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

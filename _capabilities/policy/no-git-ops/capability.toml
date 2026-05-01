@@ -1,0 +1,39 @@
+[capability]
+name = "policy::no-git-ops"
+category = "policy"
+version = "1.0"
+description = "Forbid git, gh repo, and gh api /repos shell operations from the agent."
+rationale = "RULE 0.13 (orchestrator-branch-first.md): orchestrator owns branch + commit + push; agents sandbox-deny Bash inside .claude/worktrees/<agent>/. See ~/.claude/rules/orchestrator-branch-first.md."
+
+[restricts]
+tool-patterns = [
+  '^git( |$)',
+  '^gh repo',
+  '^gh api /?repos',
+]
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::policy_no_git_ops"
+event = "PreToolUse:Bash"
+severity = "block"
+bypass-env = "ORCHESTRATOR_META"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "policy"
+layer = "agent-substrate"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

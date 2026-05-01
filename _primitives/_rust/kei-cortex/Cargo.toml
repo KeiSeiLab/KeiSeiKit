@@ -1,0 +1,67 @@
+[package]
+name = "kei-cortex"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Local HTTP daemon exposing cortex state for UI consumption"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-cortex"
+path = "src/main.rs"
+
+[lib]
+name = "kei_cortex"
+path = "src/lib.rs"
+
+[dependencies]
+axum = { version = "0.7", features = ["multipart", "ws"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "sync"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+tower = { version = "0.4", features = ["limit", "buffer", "util"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+thiserror = "1"
+rusqlite = { version = "0.31", features = ["bundled"] }
+anyhow = "1"
+rand = "0.8"
+reqwest = { version = "0.12", features = ["json", "stream", "multipart", "rustls-tls"], default-features = false }
+tokio-stream = "0.1"
+futures = "0.3"
+uuid = { version = "1", features = ["v4"] }
+async-stream = "0.3"
+toml = "0.8"
+bytes = "1"
+tempfile = "3"
+dashmap = "5"
+walkdir = "2"
+which = "6"
+once_cell = "1"
+regex = "1.10"
+portable-pty = "0.8"
+# Wave 44a — tool-sandbox hardening
+shell-words = { workspace = true }
+url = { workspace = true }
+lru = { workspace = true }
+# Wave 44b — symlink-safe writes
+nix = { workspace = true }
+# Wave 44d — calendar usage boundaries
+chrono = { workspace = true }
+kei-pet = { path = "../kei-pet" }
+kei-router = { path = "../kei-router" }
+kei-shared = { path = "../kei-shared" }
+kei-ledger = { path = "../kei-ledger" }
+# Wave 55 Stage 2 — universal model registry. `default_model()` in
+# `anthropic.rs` consults this for the `kei-cortex-default` role before
+# falling back to the literal pin.
+kei-model = { path = "../kei-model" }
+# Phase 2 — per-turn token telemetry. Every chat handler fires a
+# fire-and-forget `Store::record_event` after Done so sleep-report has
+# real data. Open lazily on AppState init; tracker IO failures must
+# never break the chat call.
+kei-token-tracker = { path = "../kei-token-tracker" }
+
+[dev-dependencies]
+reqwest = { version = "0.12", features = ["json", "blocking", "stream", "rustls-tls"], default-features = false }

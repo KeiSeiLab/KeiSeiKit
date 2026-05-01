@@ -1,0 +1,64 @@
+_primitives/_rust/target/
+**/target/
+.DS_Store
+
+# Agent worktrees — ephemeral orchestrator scratch dirs, never commit.
+.claude/worktrees/
+**/.claude/worktrees/
+.claude/forks/
+_forks/
+
+# kei-spawn agent task-scratch dirs (transient ledger artefacts, RULE 0.12)
+tasks/ag-edit-shared-*/
+
+# kei-fork internal markers (should never leak into main)
+.DONE
+.KEI_FORK_META.toml
+_archive/forks/
+
+# Secrets
+.env
+.env.*
+!.env.example
+!.env.template
+secrets/
+**/secrets/
+.claude/secrets/
+
+# Keys and certs
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.gpg
+
+# Credentials / config with values
+credentials.json
+.netrc
+.authinfo
+.aws/credentials
+.ssh/
+
+# Locks (per-project policy — leave as existing if already tracked)
+# Do not add: Cargo.lock (tracked per RULE 0.1 for reproducibility)
+
+# OS + editor junk
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# Build
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+var/

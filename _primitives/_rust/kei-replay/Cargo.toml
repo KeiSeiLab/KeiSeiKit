@@ -1,0 +1,32 @@
+[package]
+name = "kei-replay"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Reconstruct agent spawn from DNA — reads ledger row + task.toml, re-composes, detects drift"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-replay"
+path = "src/main.rs"
+
+[lib]
+name = "kei_replay"
+path = "src/lib.rs"
+
+[dependencies]
+kei-agent-runtime = { path = "../kei-agent-runtime" }
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { workspace = true }
+anyhow = "1"
+thiserror = "1"
+sha2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+toml = "0.8"
+
+[package.metadata.keisei]
+backend = "none"
+description = "Reconstruct agent spawn from DNA — replay / verify / diff"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

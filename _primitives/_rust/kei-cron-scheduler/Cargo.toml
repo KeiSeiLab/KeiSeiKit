@@ -1,0 +1,42 @@
+[package]
+name = "kei-cron-scheduler"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "P4.2 — Hermes-equivalent cron/at/interval scheduler with JSON persistence."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+# NOTE: a separate crate `kei-scheduler` already exists in the workspace using
+# SQLite-backed metadata. This crate is the Hermes-port surface (JSON-on-disk,
+# `~/.keiseikit/scheduler/jobs.json` SSoT, fcntl-locked read-modify-write).
+# The two crates can coexist — they serve different deployment shapes:
+#   - kei-scheduler        : queryable metadata DB, SQL filters
+#   - kei-cron-scheduler   : flat-file portable schedule, easy backup, Hermes parity
+#
+# Feature flags
+#   default        — none required; the JSON store and tokio runner are always compiled
+#
+# Future feature gates (not yet wired):
+#   prometheus     — emit metrics from the runner
+#   webhook        — outbound HTTP delivery target
+
+[features]
+default = []
+
+[lib]
+name = "kei_cron_scheduler"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+cron = "0.15"
+fs2 = "0.4"
+
+[dev-dependencies]
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }

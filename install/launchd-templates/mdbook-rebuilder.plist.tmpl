@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.keisei.mdbook-rebuilder</string>
+
+    <!--
+      Timer-style service: regenerates SUMMARY.md + chapter tree from
+      ~/Projects/ and rebuilds the book once per hour. KeepAlive=false
+      so launchd does NOT restart the wrapper after it exits cleanly;
+      StartInterval re-launches it every 3600s.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>${KIT}/dev-hub/mdbook-rebuild.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>${DATA}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>${HOME}</string>
+        <key>USER</key>
+        <string>${USER}</string>
+        <key>PATH</key>
+        <string>${HOME}/.cargo/bin:${BREW}/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>StartInterval</key>
+    <integer>3600</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>${LOGS}/rebuilder.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>${LOGS}/rebuilder.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>8192</integer>
+    </dict>
+</dict>
+</plist>

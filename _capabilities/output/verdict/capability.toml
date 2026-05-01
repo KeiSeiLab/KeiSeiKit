@@ -1,0 +1,35 @@
+[capability]
+name = "output::verdict"
+category = "output"
+version = "1.0"
+description = "Require the agent's return to contain a structured PASS/FAIL/INCONCLUSIVE verdict with findings, suitable for automated pipeline routing."
+rationale = "Auditor-style roles emit a categorical verdict the merger consumes. Free-text 'looks good' returns force the orchestrator to re-parse intent. A typed verdict makes the pipeline's next step (merge, defer, reject) mechanical."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::output_verdict"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "output"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

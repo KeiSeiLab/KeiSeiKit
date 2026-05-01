@@ -1,0 +1,46 @@
+# tests/battle/Dockerfile.install-test-debian
+# Debian 12 (bookworm) — the default server distro. glibc, different apt
+# repo structure from Ubuntu (no `ubuntu-*` meta-packages).
+#
+# Build from repo root:
+#   docker build -t keisei-battle-debian:latest -f tests/battle/Dockerfile.install-test-debian .
+# Run (default: minimal profile):
+#   docker run --rm keisei-battle-debian:latest
+# Override:
+#   docker run --rm -e PROFILE=full keisei-battle-debian:latest
+
+FROM debian:12
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    CARGO_HOME=/root/.cargo \
+    RUSTUP_HOME=/root/.rustup \
+    PATH=/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Baseline deps + rustup-installed stable toolchain. Debian 12 ships
+# rustc 1.63 (too old for edition = "2024"), so apt-install of rustc is
+# explicitly NOT enough — same quirk the Ubuntu Dockerfile documents.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        bash curl ca-certificates git build-essential \
+        jq pandoc \
+ && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path \
+ && ln -sf /root/.cargo/bin/cargo /usr/local/bin/cargo \
+ && ln -sf /root/.cargo/bin/rustc /usr/local/bin/rustc \
+ && rm -rf /var/lib/apt/lists/* \
+ && rustc --version && cargo --version
+
+WORKDIR /opt/keiseikit
+COPY . /opt/keiseikit/
+
+COPY tests/battle/verify.sh       /usr/local/bin/verify.sh
+COPY tests/battle/battle-entry.sh /usr/local/bin/battle-entry.sh
+
+RUN chmod +x /usr/local/bin/verify.sh \
+             /usr/local/bin/battle-entry.sh \
+             /opt/keiseikit/install.sh
+
+ENV PROFILE=minimal
+ENTRYPOINT ["/usr/local/bin/battle-entry.sh"]

@@ -1,0 +1,39 @@
+[role]
+name = "read-only"
+display-name = "explorer (read-only analyst)"
+description = "Read-only agent: inspects code, emits structured report with severity grades. No shell, no edits, no git."
+spawnable = true
+# Read-only + severity-grade default maps to critic; architect-flavoured tasks
+# should override this per task via claude-subagent-type in task.toml.
+claude-subagent-type = "critic"
+
+[capabilities]
+# Ordered list — text.md fragments concatenated in this order.
+# v0.17 rename: `tools::read-only` → `tools::deny-tools` (alias still honored).
+required = [
+  "tools::deny-tools",
+  "output::report-format",
+  "output::severity-grade",
+]
+
+[tools]
+# Tool allowlist — anything not in this list is denied
+allowed = ["Read", "Glob", "Grep", "WebFetch"]
+# No Bash → no bash-patterns-allowed
+bash-patterns-allowed = []
+
+[escalation]
+policy = "ask-via-return"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

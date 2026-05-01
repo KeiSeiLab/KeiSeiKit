@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.keisei.restic-backup</string>
+
+    <!--
+      Timer-style agent: fires once daily at 03:00 system-local time.
+      Wrapper sources ~/.claude/secrets/.env (RULE 0.8) and runs
+      `restic backup` + `restic forget --prune`. Retention 7d/4w/12m.
+      See install/lib-dev-hub-restic.sh::write_backup_wrapper.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>${KIT}/dev-hub/restic-backup.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>${DATA}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>${HOME}</string>
+        <key>USER</key>
+        <string>${USER}</string>
+        <key>PATH</key>
+        <string>${BREW}/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>${LOGS}/timer.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>${LOGS}/timer.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>8192</integer>
+    </dict>
+</dict>
+</plist>

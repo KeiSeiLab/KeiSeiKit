@@ -1,0 +1,36 @@
+[package]
+name = "kei-skill-importer"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Universal parser/canonicalizer/emitter for external AI-coding-tool skill formats (OpenClaw, Cline, Cursor, Claude Code, Kimi)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-skill-importer"
+path = "src/main.rs"
+
+[lib]
+name = "kei_skill_importer"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml_ng = "0.10"
+toml = { workspace = true }
+regex = { workspace = true }
+clap = { workspace = true }
+anyhow = "1"
+chrono = { workspace = true }
+walkdir = { workspace = true }
+kei-atom-discovery = { path = "../kei-atom-discovery" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+pretty_assertions = "1"
+
+[package.metadata.keisei]
+backend = "none"
+description = "External skill-format importer for KeiSeiKit canonical shapes (atoms / recipes / proposed primitives)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

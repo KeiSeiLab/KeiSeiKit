@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "__CRATE__/atoms/schemas/__VERB__-output.json",
+  "title": "__CRATE__::__VERB__ output",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false,
+  "examples": [{}]
+}

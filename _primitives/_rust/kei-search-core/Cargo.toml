@@ -1,0 +1,26 @@
+[package]
+name = "kei-search-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "3-wave deep research scaffolding with budget cap. Port of LBM internal/search (fetch stubbed)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-search-core"
+path = "src/main.rs"
+
+[lib]
+name = "kei_search_core"
+path = "src/lib.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[dev-dependencies]
+tempfile = "3"

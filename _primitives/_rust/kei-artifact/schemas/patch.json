@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kei-artifact://patch",
+  "title": "File-Changes Manifest",
+  "description": "Implementer output — manifest of changed files with ops.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "changes"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "op", "summary"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "op": {"type": "string", "enum": ["add", "mod", "del"]},
+          "summary": {"type": "string", "minLength": 1},
+          "loc_delta": {"type": "integer"},
+          "diff": {"type": "string"}
+        }
+      }
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "enum": ["pass", "fail", "skip"]},
+          "reproduce": {"type": "string"}
+        }
+      }
+    }
+  }
+}

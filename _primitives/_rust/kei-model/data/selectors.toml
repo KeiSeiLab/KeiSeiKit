@@ -1,0 +1,28 @@
+# Role → default-model mappings + budget tiers.
+# Loader: see _primitives/_rust/kei-model/src/selector.rs
+#
+# Pricing in models.toml flipped to "verified" 2026-04-28 — budget thresholds
+# below are real per-Mtok input ceilings in micro-cents.
+
+[defaults]
+code-implementer    = "claude-opus-4-7"
+edit-shared         = "claude-opus-4-7"
+edit-local          = "claude-sonnet-4-6"
+kei-critic          = "claude-haiku-4-5"
+kei-architect       = "claude-opus-4-7"
+kei-researcher      = "claude-sonnet-4-6"
+kei-classifier      = "claude-haiku-4-5"
+# W55b stage 2+3+4 wirings expect these:
+kei-cortex-default  = "claude-haiku-4-5"
+kei-router-anthropic = "claude-haiku-4-5"
+kei-router-openai   = "gpt-4o-mini"
+kei-router-kimi     = "kimi-k2-thinking"
+
+[budget-tiers]
+# Real thresholds based on input rate per Mtok (micro-cents).
+# cheap   ≤ $0.50/Mtok input  (gpt-4o-mini, mistral-small, deepseek, kimi)
+# mid     ≤ $3/Mtok input     (sonnet, gpt-4o, mistral-large)
+# expensive — no cap          (opus, o1)
+cheap     = { max_micro_per_mtok_input = 50000000 }
+mid       = { max_micro_per_mtok_input = 300000000 }
+expensive = { max_micro_per_mtok_input = 0 }

@@ -1,0 +1,31 @@
+[package]
+name = "kei-auth-webauthn"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "WebAuthn passkey AuthProvider impl for kei-runtime-core (Wave 7 atomar). Wraps webauthn-rs 0.5; stateless ceremony APIs (registration + authentication). Sibling of kei-auth-{google,apple,github,microsoft}."
+license = "Apache-2.0"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_auth_webauthn"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+webauthn-rs = "0.5"
+uuid = { version = "1", features = ["v4", "serde"] }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[package.metadata.keisei]
+backend = "webauthn"
+trait = "AuthProvider"
+description = "WebAuthn passkey AuthProvider (passwordless, stateless ceremony)"

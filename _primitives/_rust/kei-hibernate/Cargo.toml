@@ -1,0 +1,29 @@
+[package]
+name = "kei-hibernate"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Whole-brain export/import — tar.zst bundle of KeiSeiKit state (Wave 14)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-hibernate"
+path = "src/main.rs"
+
+[lib]
+name = "kei_hibernate"
+path = "src/lib.rs"
+
+[dependencies]
+tar = "0.4"
+zstd = "0.13"
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+thiserror = "1"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

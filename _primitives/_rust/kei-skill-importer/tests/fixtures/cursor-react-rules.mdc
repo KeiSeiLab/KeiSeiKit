@@ -1,0 +1,17 @@
+---
+description: React + Tailwind component rules for the design-system package.
+globs:
+  - "packages/design-system/**/*.tsx"
+  - "packages/design-system/**/*.ts"
+alwaysApply: false
+---
+
+# React + Tailwind component rules
+
+- Tailwind utility classes ONLY. No inline `style={{}}`. No CSS-in-JS.
+- Components are functional. Class components forbidden.
+- Use `cn()` from `~/lib/utils` for conditional classnames.
+- Prefer `composite` props pattern over deeply-nested children.
+
+When stuck on layout, prefer `flex` over `grid` unless the use case
+requires explicit row/column tracks.

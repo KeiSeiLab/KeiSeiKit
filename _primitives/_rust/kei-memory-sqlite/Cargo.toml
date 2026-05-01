@@ -1,0 +1,30 @@
+[package]
+name = "kei-memory-sqlite"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "MemoryBackend impl over SQLite (rusqlite bundled). Wave 6 atomar."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_memory_sqlite"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+rusqlite = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+backend = "sqlite"
+trait = "MemoryBackend"
+description = "SQLite (rusqlite bundled) MemoryBackend; offline-first, embedded"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

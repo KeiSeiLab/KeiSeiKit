@@ -1,0 +1,30 @@
+[package]
+name = "kei-llm-ollama"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "HTTP adapter for the Ollama daemon (localhost:11434). Wave 57 of the local-LLM stack — wraps existing Ollama, does not reinvent inference."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-llm-ollama"
+path = "src/main.rs"
+
+[lib]
+name = "kei_llm_ollama"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+bytes = { workspace = true }
+futures = { workspace = true }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tempfile = { workspace = true }

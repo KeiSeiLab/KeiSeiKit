@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "_schemas/fragments/titled-content.json",
+  "title": "Titled + content input",
+  "description": "Input mixin — titled entity with an optional body/description/content string. Composition of `titled.json` + an additional string field.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "titled.json" }
+  ],
+  "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 8000,
+      "default": "",
+      "description": "Free-form body text. Indexed by FTS5 when the entity has fts_columns configured."
+    }
+  }
+}

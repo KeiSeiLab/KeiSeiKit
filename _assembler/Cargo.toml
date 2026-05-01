@@ -1,0 +1,23 @@
+[package]
+name = "agent-assembler"
+version = "0.1.0"
+edition = "2024"
+description = "Constructor-Pattern assembler for Claude agent .md files"
+
+[[bin]]
+name = "assemble"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+[dev-dependencies]
+insta = "1"
+tempfile = "3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true

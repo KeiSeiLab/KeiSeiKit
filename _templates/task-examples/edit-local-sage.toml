@@ -1,0 +1,36 @@
+# Example task.toml — edit-local role, scoped to kei-sage.
+# Mirrors edit-local-forge.toml with a different whitelist / crate.
+
+[task]
+role = "edit-local"
+agent-id = "edit-local-sage-EXAMPLE"
+parent-agent = ""
+
+[scope]
+files-whitelist = [
+  "_primitives/_rust/kei-sage/**",
+]
+files-denylist = [
+  "_primitives/_rust/Cargo.toml",
+  "_primitives/_rust/Cargo.lock",
+]
+
+[verification]
+cargo-check-crates = ["kei-sage"]
+cargo-test-crates = ["kei-sage"]
+test-count-min = 20
+
+[output]
+report-fields-required = [
+  "files-touched",
+  "cargo-check",
+  "cargo-test",
+  "loc-delta",
+]
+
+[body]
+text = """
+Extend `kei-sage atoms-discover` with a `--json` output flag. Maintain
+backward compatibility with the existing human-readable table format
+(default behaviour unchanged). Unit tests cover both formats.
+"""

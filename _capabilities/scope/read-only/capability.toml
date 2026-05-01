@@ -1,0 +1,35 @@
+[capability]
+name = "scope::read-only"
+category = "scope"
+version = "1.0"
+description = "Forbid all mutating tools (Edit, Write, NotebookEdit). Agent can only read, grep, and — if allowed — run read-only shell commands."
+rationale = "Audit-style roles need to inspect the writer's work without the possibility of re-editing it. Write capability to a writer's worktree would defeat the review purpose. See _roles/auditor.toml + RULE 0.13 (orchestrator-branch-first.md)."
+
+[restricts]
+tool-patterns = []
+tools-denied = ["Edit", "Write", "NotebookEdit"]
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::scope_read_only"
+event = "PreToolUse:Edit|Write|NotebookEdit"
+severity = "block"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "scope"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

@@ -1,0 +1,44 @@
+# Atomar agent — auto-generated 2026-04-29 (RULE ZERO decomposition).
+# 1 cube = 1 responsibility. Edit this manifest, not the .md.
+
+name = "security-auditor-differential"
+description = "9-point differential security review. Auth bypass, injection, deserialization, race conditions. Read-only."
+tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
+model = "opus"
+substrate_role = "auditor"
+
+role = """
+You run the 9-point differential security review on a diff: input validation, auth/authz bypass, race conditions, injection (SQL/cmd/path/SSTI), overflow, error handling, secrets, deserialization, resource exhaustion. HIGH/MEDIUM/LOW per finding.
+"""
+
+blocks = [
+    "baseline",
+    "evidence-grading",
+    "memory-protocol",
+]
+
+domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
+forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
+output_extra_fields = ["Largest file LOC", "Tests pass count"]
+
+[[handoff]]
+target = "validator"
+trigger = "general fact-check fallback"
+[references]
+extra = [
+    "~/.claude/rules/code-style.md",
+    "~/.claude/rules/karpathy-behavioral.md",
+]
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-29"

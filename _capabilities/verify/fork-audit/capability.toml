@@ -1,0 +1,35 @@
+[capability]
+name = "verify::fork-audit"
+category = "verify"
+version = "1.0"
+description = "Require the agent's return report to satisfy the 6-point fork-audit checklist (diff coverage, test evidence, scope adherence, capability enforcement, constructor-pattern LOC limits, blocker disclosure)."
+rationale = "Codifies the minimum review a writer's fork must receive before merger proceeds. A drive-by 'looks good' return is insufficient — the 6 points are each independently falsifiable from the fork diff."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = ["fork-audit-target"]
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::verify_fork_audit"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "verify"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

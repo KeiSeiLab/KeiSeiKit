@@ -1,0 +1,22 @@
+[package]
+name = "kei-prune"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Metadata primitive — mark unused ledger agents as retired (biological pruning analog)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_prune"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-prune"
+path = "src/main.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"

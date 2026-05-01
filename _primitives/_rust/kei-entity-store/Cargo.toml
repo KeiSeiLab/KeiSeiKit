@@ -1,0 +1,22 @@
+[package]
+name = "kei-entity-store"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Convergence-Layer-A engine: schema-driven SQLite CRUD + graph verbs shared across kei-*-store crates (kei-task pilot)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_entity_store"
+path = "src/lib.rs"
+
+[dependencies]
+rusqlite = { version = "0.31", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+thiserror = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[dev-dependencies]
+tempfile = "3"

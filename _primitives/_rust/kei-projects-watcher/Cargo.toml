@@ -1,0 +1,32 @@
+[package]
+name = "kei-projects-watcher"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Long-running fsevents daemon — watches ~/Projects/, debounces 2 s, calls kei_projects_index::reindex_one per touched project."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-projects-watcher"
+path = "src/main.rs"
+
+[lib]
+name = "kei_projects_watcher"
+path = "src/lib.rs"
+
+[dependencies]
+notify = "6"
+rusqlite = { version = "0.31", features = ["bundled"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "time", "sync"] }
+anyhow = "1"
+thiserror = "1"
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dirs = "5"
+kei-projects-index = { path = "../kei-projects-index" }
+
+[dev-dependencies]
+tempfile = "3"

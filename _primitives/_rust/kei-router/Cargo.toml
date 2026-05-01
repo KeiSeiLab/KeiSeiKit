@@ -1,0 +1,37 @@
+[package]
+name = "kei-router"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Routing primitives: (1) NL query → tool-call (LBM port). (2) Multi-provider LLM abstraction (Anthropic / OpenAI / Kimi)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-router"
+path = "src/main.rs"
+
+[lib]
+name = "kei_router"
+path = "src/lib.rs"
+
+[dependencies]
+regex = "1"
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+# LLM provider abstraction (v0.40 Wave 32)
+reqwest = { workspace = true }
+tokio = { workspace = true }
+bytes = { workspace = true }
+futures = { workspace = true }
+async-trait = { workspace = true }
+async-stream = "0.3"
+# W55 Stage 4 — universal model registry lookup (replaces hardcoded DEFAULT_MODEL)
+kei-model = { path = "../kei-model" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+wiremock = { workspace = true }
+tokio = { workspace = true }

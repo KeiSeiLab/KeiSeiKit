@@ -1,0 +1,35 @@
+[capability]
+name = "output::merge-result"
+category = "output"
+version = "1.0"
+description = "Require the merger agent's return to contain COMMIT_SHA and LEDGER_STATUS — the two facts the orchestrator needs to confirm the fork was merged and the ledger row closed."
+rationale = "Merger outcome is binary: either the fork is on main with a visible commit sha + the ledger row is `done`, or something broke and the fork is still alive. Structured output lets the orchestrator decide next step (proceed / rescue / re-spawn) without re-running git log."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::output_merge_result"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "output"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

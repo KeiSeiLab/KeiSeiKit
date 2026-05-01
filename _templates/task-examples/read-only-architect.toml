@@ -1,0 +1,46 @@
+# Example task.toml — read-only role for kei-architect.
+# Broader scope than critic: whole repo including docs.
+
+[task]
+role = "read-only"
+agent-id = "read-only-architect-EXAMPLE"
+parent-agent = ""
+
+[scope]
+files-whitelist = [
+  "_primitives/**",
+  "_assembler/**",
+  "_capabilities/**",
+  "_roles/**",
+  "_manifests/**",
+  "docs/**",
+]
+files-denylist = [
+  "**/target/**",
+  "**/node_modules/**",
+]
+
+[verification]
+cargo-check-crates = []
+cargo-test-crates = []
+
+[output]
+# Parameterises output::report-format + output::severity-grade.
+report-fields-required = [
+  "component-diagram",
+  "key-files",
+  "data-flow",
+  "pattern-inventory",
+  "dependency-graph",
+  "quality-assessment",
+  "decisive-verdict",
+]
+
+[body]
+text = """
+Architectural review of the agent substrate (phases 1-5): map module
+boundaries across _capabilities/, _roles/, _manifests/, _assembler/,
+and _primitives/_rust/kei-agent-runtime/. Call out coupling hotspots,
+SSoT violations, and Constructor-Pattern compliance. Decisive verdict
+— no 'it depends'. Evidence-graded (E1-E6).
+"""

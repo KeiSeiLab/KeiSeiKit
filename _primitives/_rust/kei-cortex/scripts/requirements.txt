@@ -1,0 +1,11 @@
+# Pinned dependencies for scripts/whisper_worker.py.
+#
+# Install once per host:
+#
+#     python3 -m pip install -r _primitives/_rust/kei-cortex/scripts/requirements.txt
+#
+# faster-whisper wraps CTranslate2 and downloads model weights from Hugging
+# Face on first run (cached under ~/.cache/huggingface/hub/). For fully
+# offline deployment set `KEI_WHISPER_LOCAL_ONLY=1` AFTER running the worker
+# once online so the cache is populated.
+faster-whisper==1.2.1

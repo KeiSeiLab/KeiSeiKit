@@ -1,0 +1,34 @@
+[capability]
+name = "quality::constructor-pattern"
+category = "quality"
+version = "1.0"
+description = "Enforce Constructor Pattern: file <= 200 LOC, function <= 30 LOC."
+rationale = "~/.claude/rules/code-style.md (RULE ZERO). Keeps one file = one class = one responsibility; forces decomposition before complexity compounds."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = []
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::quality_constructor_pattern"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "quality"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

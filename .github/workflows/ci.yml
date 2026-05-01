@@ -1,0 +1,159 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'CHANGELOG.md'
+
+# v0.21.0 cost optimisation (W15): cancel superseded runs on the same ref.
+# A rapid push train (common during batch work) used to launch one full
+# 12-job matrix per commit, even though only the last matters. This
+# top-level concurrency group cancels the older run as soon as a newer
+# one is queued. Effect: 60-80% saving on "rapid pushes" work days.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# v0.19.1 supply-chain hardening (H5): every third-party action is pinned
+# by full commit SHA. A floating tag like @v4 can be re-pointed by a
+# compromised maintainer (CVE-2025-30066 class). The `# vN.m.k` comment
+# next to each SHA is a human-readable hint only — the SHA is the load-
+# bearing identifier. When Dependabot proposes a bump, review the new SHA
+# against the release tag before merging.
+
+jobs:
+  rust-assembler:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # v0.21.0: macOS only on push-to-main (10x billing multiplier). PRs get ubuntu-only.
+      matrix:
+        os: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && fromJSON('["ubuntu-latest","macos-latest"]') || fromJSON('["ubuntu-latest"]') }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule: this action uses named-branch convention (stable/nightly/beta/1.NN.0) — pinning a SHA locks to a specific Rust version (validator V-2026-04-22 confirmed 3c5f7ea was rust 1.94.1 branch tip, not generic "install stable"). dtolnay is a trusted maintainer (author of serde/anyhow/cxx). Supply-chain risk of @stable re-point is LOW and accepted here.
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+        with:
+          workspaces: _assembler
+      - run: cd _assembler && cargo test --release
+
+  rust-primitives:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # v0.21.0: macOS only on push-to-main. --release dropped — debug mode
+      # runs 2-3× faster and still catches architectural breakage. Release-
+      # build regressions (debug_assertions!) caught by rust-assembler above.
+      matrix:
+        os: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && fromJSON('["ubuntu-latest","macos-latest"]') || fromJSON('["ubuntu-latest"]') }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule: this action uses named-branch convention (stable/nightly/beta/1.NN.0) — pinning a SHA locks to a specific Rust version (validator V-2026-04-22 confirmed 3c5f7ea was rust 1.94.1 branch tip, not generic "install stable"). dtolnay is a trusted maintainer (author of serde/anyhow/cxx). Supply-chain risk of @stable re-point is LOW and accepted here.
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+        with:
+          workspaces: _primitives/_rust
+      # v0.30+ CI fix (2026-04-29): 98-crate workspace OOMs the default
+      # GHA runner's 7 GB at link time. Iteration 2 (after lld+jobs=2 still
+      # OOM'd at signal 7): add 12 GB swap on Linux + use `mold` (smaller
+      # peak RSS than lld for large workspaces) + drop to JOBS=1 for the
+      # link phase. macOS runner has 14 GB RAM and was already passing.
+      - name: Free disk + resize swap (Linux runners only)
+        if: runner.os == 'Linux'
+        run: |
+          # Iter 4 fix: iter 3's 12 GB swap on /mnt filled the disk
+          # (`No space left on device` on syn rlib). GHA /mnt has only
+          # ~14 GB; cargo target/ + 12 GB swap = bust. Strategy now:
+          # (a) free ~30 GB on / by removing pre-installed bloat
+          #     (Android SDK, .NET, GHC, CodeQL — none used by Rust+Node);
+          # (b) resize the existing /swapfile (4 GB → 8 GB) in place.
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          echo "--- after rm ---"
+          df -h
+          sudo swapoff /swapfile
+          sudo rm /swapfile
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          echo "--- after swap ---"
+          free -h
+          df -h
+      - name: Install mold (Linux runners only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y mold
+      - name: cargo test --workspace (Linux)
+        if: runner.os == 'Linux'
+        run: cd _primitives/_rust && cargo test --workspace
+        env:
+          CARGO_BUILD_JOBS: '1'
+          RUSTFLAGS: '-C link-arg=-fuse-ld=mold'
+      - name: cargo test --workspace (macOS)
+        if: runner.os == 'macOS'
+        run: cd _primitives/_rust && cargo test --workspace
+        env:
+          CARGO_BUILD_JOBS: '2'
+
+  ts-packages:
+    # v0.21.0: ubuntu-only. Node is x-plat; no macOS-specific behaviour to
+    # test. Matrix: 2 jobs (ubuntu × 2 nodes) instead of 4. Saves 2 macOS jobs.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: ${{ matrix.node }}
+      - run: cd _ts_packages && npm ci
+      - run: cd _ts_packages && npm run build --workspaces
+      - run: cd _ts_packages && npm test --workspaces --if-present
+
+  install-dry-run:
+    # v0.21.0: ubuntu-only. All 3 profiles on main push; PRs get minimal-only
+    # (full profile pulls everything, rarely signals PR-specific regressions).
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        profile: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && fromJSON('["minimal","dev","full"]') || fromJSON('["minimal"]') }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule: this action uses named-branch convention (stable/nightly/beta/1.NN.0) — pinning a SHA locks to a specific Rust version (validator V-2026-04-22 confirmed 3c5f7ea was rust 1.94.1 branch tip, not generic "install stable"). dtolnay is a trusted maintainer (author of serde/anyhow/cxx). Supply-chain risk of @stable re-point is LOW and accepted here.
+      - name: Install hard deps
+        run: sudo apt-get update && sudo apt-get install -y jq pandoc
+      - run: bash -n install.sh
+      - run: ./install.sh --no-execute --profile=${{ matrix.profile }}
+
+  shell-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: shellcheck (advisory)
+        # v0.15.1: kept advisory because local shellcheck sweep not yet clean
+        # (quoted-var nits in hooks). Flip to fatal once the sweep is committed;
+        # planned for v0.16.
+        # v0.20.1: explicit `|| true` in addition to continue-on-error — the
+        # latter doesn't always suppress the step-level exit-1 in the GH
+        # Actions annotation stream.
+        run: |
+          find hooks _primitives -name '*.sh' -exec shellcheck -S warning {} + || \
+            echo "shellcheck emitted warnings (advisory-only, not blocking)"
+        continue-on-error: true
+
+  workflow-lint:
+    # v0.20.1: guards against the dtolnay-SHA-class incident (2026-04-22).
+    # actionlint catches workflow syntax; validate-workflow-shas.sh catches
+    # fabricated / force-pushed SHA pins. Runs fast (<30s).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - name: Install actionlint
+        run: bash scripts/install-actionlint.sh
+      - name: Lint workflows (actionlint)
+        run: PATH="${HOME}/.local/bin:${PATH}" bash scripts/lint-workflows.sh
+      - name: Validate pinned SHAs
+        run: bash scripts/validate-workflow-shas.sh

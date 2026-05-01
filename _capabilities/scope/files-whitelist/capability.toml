@@ -1,0 +1,39 @@
+[capability]
+name = "scope::files-whitelist"
+category = "scope"
+version = "1.0"
+description = "Restrict Edit/Write to paths matching a per-task whitelist of glob patterns."
+rationale = "Scope violations surfaced only after merge in substrate v1 audit waves. Whitelist makes scope explicit at spawn time; gate blocks at PreToolUse, verify walks git diff on return to catch any bypass."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = ["files-whitelist"]
+
+[text]
+path = "text.md"
+
+[gate]
+rust-module = "gates::scope_files_whitelist"
+event = "PreToolUse:Edit|Write"
+severity = "block"
+
+[verify]
+rust-module = "verifies::scope_files_whitelist"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "gate"
+domain = "scope"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

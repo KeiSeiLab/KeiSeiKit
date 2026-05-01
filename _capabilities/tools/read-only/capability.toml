@@ -1,0 +1,16 @@
+# Deprecated alias — see `tools::deny-tools` for the real capability.
+#
+# Why this file exists: `tools::read-only` was the original name shipped
+# in v0.16. v0.17 renamed it to `tools::deny-tools` because the old name
+# was a metaphor ("read-only") while the new name describes the actual
+# mechanism (the gate adds tools to a deny-list).
+#
+# The registry in `kei-agent-runtime` resolves the old name to the new
+# implementation at lookup time and emits a stderr deprecation warning.
+# No `text.md` lives here — alias stubs never ship agent-visible text;
+# role files should reference `tools::deny-tools` directly.
+
+[capability]
+name = "tools::read-only"
+alias = "tools::deny-tools"
+deprecated = "v0.17 — use tools::deny-tools; alias retained through v2"

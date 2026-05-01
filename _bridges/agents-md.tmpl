@@ -1,0 +1,42 @@
+# AGENTS.md
+
+> Read by Codex CLI (OpenAI spec), Copilot, Aider (when referenced), Windsurf, Warp, Zed, Antigravity (since v1.20.3, 2026-03-05), JetBrains Junie. See also: CLAUDE.md / .cursor/rules/ / GEMINI.md / .junie/guidelines.md / replit.md.
+
+## {{PROJECT_NAME}}
+
+{{PROJECT_DESCRIPTION}}
+
+## Before You Start
+1. Read `DECISIONS.md` — architectural choices already made
+2. Read `TODO.md` (if exists) — current priorities
+3. Read `CLAUDE.md` (if exists) — project-specific rules
+
+## Rules
+- **Constructor Pattern**: 1 file = 1 class. File <200 lines. Function <30 lines.
+- **Root cause**: fix causes, not symptoms
+- **SSOT**: types, routes, enums defined in ONE place
+- **Tests**: write WITH code, never defer
+
+## Do NOT
+- Rewrite working code without reason
+- Add abstractions for one-time operations
+- Skip reading DECISIONS.md before architectural changes
+- Commit .env, credentials, API keys
+
+## Available KeiSeiKit Tools (MCP-exposed)
+
+When the kit's MCP server is mounted (`keisei attach` or `keisei mount`), these
+Rust primitives are callable from any MCP-aware client (Cursor, Continue,
+Zed, Cline, Kimi, OpenClaw):
+
+- `kei-ledger` — append-only event log
+- `kei-memory` — local KV store (SQLite)
+- `kei-store` — content-addressed blobs
+- `kei-spawn` / `kei-fork` — agent ledger + worktree lifecycle
+- `kei-gdrive-import` — classify Google Drive folders (PROJECT / AMBIGUOUS /
+  NOT-A-PROJECT / ALREADY-REPO) via 8-marker scoring; pairs with the
+  `kei-drive-import` shell wizard for full Drive→Forgejo import pipeline
+- `kei-changelog` / `kei-migrate` / `kei-graph-check` — repo automation
+
+For natural-language routing across all primitives: call the `kei` meta-tool
+with a free-text query.

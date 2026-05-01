@@ -1,0 +1,28 @@
+[role]
+name = "merger"
+display-name = "Fork merger (git-ops scoped)"
+description = "Merges reviewed fork to main. Calls kei-fork collect. No code edits."
+spawnable = true
+claude-subagent-type = "infra-implementer"
+
+[capabilities]
+required = ["policy::git-ops-scope","output::merge-result"]
+
+[tools]
+allowed = ["Read","Bash"]
+bash-patterns-allowed = ['^git( |$)','^kei-fork( |$)','^kei-ledger( |$)']
+
+[escalation]
+policy = "ask-via-return"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "merge"
+domain = "agent"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "toml"
+
+[pipeline]
+handoff = []

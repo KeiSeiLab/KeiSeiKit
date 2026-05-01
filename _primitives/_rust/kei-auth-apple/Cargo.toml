@@ -1,0 +1,26 @@
+[package]
+name = "kei-auth-apple"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Sign in with Apple AuthProvider impl for kei-runtime-core (Wave 7). OAuth code → token endpoint → unverified id_token claim decode (sub/email)."
+license = "Apache-2.0"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+name = "kei_auth_apple"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+base64 = "0.22"
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }

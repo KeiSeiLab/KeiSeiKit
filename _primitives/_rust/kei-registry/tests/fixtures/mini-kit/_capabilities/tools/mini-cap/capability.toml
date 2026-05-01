@@ -1,0 +1,5 @@
+[capability]
+name = "tools::mini-cap"
+category = "tools"
+version = "1.0"
+description = "Fixture capability for index-substrate smoke test."

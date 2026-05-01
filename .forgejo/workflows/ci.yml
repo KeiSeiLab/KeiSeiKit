@@ -1,0 +1,90 @@
+name: CI (Forgejo Actions — self-hosted runner on Mac, host mode)
+
+# Forgejo Actions — drop-in compatible with GitHub Actions YAML.
+# Targets self-hosted forgejo-runner (Go, built from source) running
+# in HOST mode on the orchestrator Mac. No Docker needed.
+#
+# Runner registration token + setup: see .forgejo/README.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'CHANGELOG.md'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast pre-flight — workspace topology + audit gates.
+  # Runs on Mac (primary fast runner).
+  preflight:
+    runs-on: macos-arm64
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify workspace count
+        shell: bash
+        run: |
+          n=$(awk '/^members = \[/,/^\]/' _primitives/_rust/Cargo.toml | grep -c '^    "')
+          echo "workspace members: $n"
+          [ "$n" -ge 90 ] || { echo "fewer than 90 crates — workspace shrunk?"; exit 1; }
+      - name: cargo metadata sanity
+        shell: bash
+        run: cd _primitives/_rust && cargo metadata --no-deps --format-version=1 > /dev/null
+
+  # VPS smoke — lightweight check that the backup runner is alive +
+  # workspace topology is also valid on Linux. NO heavy compile (VPS
+  # is 1 GB RAM + 2.3 GB swap; full cargo test would OOM).
+  vps-smoke:
+    runs-on: linux-amd64
+    steps:
+      - uses: actions/checkout@v4
+      - name: VPS heartbeat
+        shell: bash
+        run: |
+          echo "VPS runner alive on $(uname -srm)"
+          n=$(awk '/^members = \[/,/^\]/' _primitives/_rust/Cargo.toml | grep -c '^    "')
+          echo "workspace members visible: $n"
+          [ "$n" -ge 90 ] || exit 1
+          # cargo metadata is light (no compile); OK on 1 GB VPS.
+          which cargo >/dev/null 2>&1 && cd _primitives/_rust && cargo metadata --no-deps --format-version=1 > /dev/null && echo "cargo metadata: PASS" || echo "cargo not installed on VPS — SKIP heavy check"
+
+  # Per-category matrix — split 98-crate workspace into 8 logical groups
+  # so each linker invocation has fewer .rlibs to link and stays under
+  # the runner's RAM budget. ~3-5 min per group instead of one long job.
+  rust-primitives:
+    runs-on: macos-arm64
+    needs: preflight
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - name: 'core'
+            crates: 'kei-ledger,kei-migrate,kei-changelog,kei-memory,kei-store,kei-conflict-scan,kei-refactor-engine,kei-graph-check,kei-shared,kei-dna-index,kei-pet'
+          - name: 'mcp-lbm'
+            crates: 'kei-router,kei-sage,kei-task,kei-chat-store,kei-crossdomain,kei-search-core,kei-content-store,kei-social-store,kei-curator,kei-auth,kei-artifact'
+          - name: 'atom-substrate'
+            crates: 'keisei,kei-forge,kei-runtime,kei-runtime-core,kei-atom-discovery,kei-agent-runtime,kei-capability,kei-provision,kei-entity-store,kei-pipe,kei-cache,kei-spawn,kei-replay'
+          - name: 'wave13-15'
+            crates: 'kei-diff,kei-scheduler,kei-watch,kei-prune,kei-discover,kei-brain-view,kei-hibernate,kei-ledger-sign,kei-fork'
+          - name: 'hosted-sleep-compute'
+            crates: 'kei-compute-baremetal,kei-compute-vultr,kei-compute-linode,kei-compute-digitalocean,kei-svc-systemd,kei-llm-bridge-mlx'
+          - name: 'hosted-sleep-backends'
+            crates: 'kei-git-gitea,kei-git-forgejo,kei-git-gitlab,kei-git-bitbucket,kei-memory-sled,kei-memory-redis,kei-memory-postgres,kei-memory-sqlite,kei-auth-google,kei-auth-apple,kei-auth-magiclink,kei-auth-webauthn,kei-notify-slack,kei-notify-discord,kei-notify-telegram,kei-notify-sms,kei-net-wireguard,kei-net-openvpn,kei-net-ipsec'
+          - name: 'llm-stack'
+            crates: 'kei-machine-probe,kei-llm-ollama,kei-llm-llamacpp,kei-llm-mlx,kei-llm-router,kei-model'
+          - name: 'misc'
+            crates: 'frustration-matrix,kei-frustration-loop,kei-skill-importer,kei-projects-index,kei-projects-watcher,kei-gdrive-import,kei-leak-matrix,kei-skills,kei-gateway,kei-cron-scheduler,kei-export-trajectories,kei-backend-daytona,kei-decision,kei-decompose,kei-registry,ssh-check,firewall-diff,mock-render,visual-diff,tokens-sync,kei-ping,kei-tlog'
+    steps:
+      - uses: actions/checkout@v4
+      - name: cargo test (group ${{ matrix.group.name }})
+        shell: bash
+        run: |
+          cd _primitives/_rust
+          ARGS=$(echo "${{ matrix.group.crates }}" | tr ',' '\n' | sed 's/^/-p /' | tr '\n' ' ')
+          echo "args: $ARGS"
+          cargo test --lib $ARGS

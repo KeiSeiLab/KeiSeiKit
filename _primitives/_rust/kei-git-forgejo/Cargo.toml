@@ -1,0 +1,32 @@
+[package]
+name = "kei-git-forgejo"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "GitBackend impl for public Forgejo (Gitea-compatible /api/v1). Wave 5 atomar; sibling of kei-git-keigit (private)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_git_forgejo"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+backend = "forgejo"
+trait = "GitBackend"
+description = "Public Forgejo (Codeberg-compatible) GitBackend"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

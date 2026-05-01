@@ -1,0 +1,1 @@
+# fixture-rust-project

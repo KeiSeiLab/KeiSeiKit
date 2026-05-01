@@ -1,0 +1,42 @@
+# tests/battle/Dockerfile.install-test-alpine
+# Alpine 3.19 — musl libc. Common container base; exposes musl-vs-glibc
+# compatibility for rusqlite, git2, aws-sdk-s3 (all include C code).
+#
+# Build from repo root:
+#   docker build -t keisei-battle-alpine:latest -f tests/battle/Dockerfile.install-test-alpine .
+# Run (default: minimal profile):
+#   docker run --rm keisei-battle-alpine:latest
+# Override:
+#   docker run --rm -e PROFILE=full keisei-battle-alpine:latest
+#
+# Known-issue: aws-sdk-s3 / rusqlite / git2 may fail to static-link on
+# musl. That IS what this matrix catches. Treat such failures as
+# "known-issue on musl", not as a blocker for this image.
+
+FROM alpine:3.19
+
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Baseline deps — jq (HARD prereq), pandoc (soft), git/curl/ca-certs
+# (kit + optional rustup), build-base (cc/ld), rust+cargo (distro pkg —
+# Alpine 3.19 ships 1.76; edition = "2024" (1.85+) crates may fail, that
+# failure is part of the test surface).
+RUN apk add --no-cache \
+    bash curl ca-certificates git build-base \
+    jq pandoc \
+    rust cargo
+
+WORKDIR /opt/keiseikit
+COPY . /opt/keiseikit/
+
+COPY tests/battle/verify.sh       /usr/local/bin/verify.sh
+COPY tests/battle/battle-entry.sh /usr/local/bin/battle-entry.sh
+
+RUN chmod +x /usr/local/bin/verify.sh \
+             /usr/local/bin/battle-entry.sh \
+             /opt/keiseikit/install.sh
+
+ENV PROFILE=minimal
+ENTRYPOINT ["/usr/local/bin/battle-entry.sh"]

@@ -1,0 +1,25 @@
+[package]
+name = "kei-changelog"
+version = "0.1.0"
+edition = "2021"
+description = "Git-cliff-style CHANGELOG.md generator from Conventional Commits."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-changelog"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+clap = { version = "4", features = ["derive"] }
+git2 = { version = "0.19", default-features = false }
+regex = "1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"

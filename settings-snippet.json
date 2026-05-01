@@ -1,0 +1,231 @@
+{
+  "_comment": "Merge these entries into your ~/.claude/settings.json under the matching keys. If you already have PostToolUse/PreToolUse/Stop arrays, append the objects below to them instead of overwriting. install.sh --activate-hooks automates the merge and de-dupes by hooks[].command.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/assemble-agents.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/site-wysiwyd-check.sh",
+            "statusMessage": "site-wysiwyd drift check..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-write-check.sh",
+            "statusMessage": "post-write checks..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/milestone-commit-hook.sh",
+            "statusMessage": "milestone self-audit check (RULE 0.14)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-commit-audit.sh",
+            "statusMessage": "post-commit audit..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/task-timer.sh",
+            "statusMessage": "task duration tracker (RULE 0.18)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-fork-done.sh",
+            "statusMessage": "agent-fork-done — close ledger lifecycle..."
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/error-spike-detector.sh",
+            "statusMessage": "error-spike rolling window (RULE 0.14)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-error-patterns.sh",
+            "statusMessage": "error-pattern check..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-heartbeat-tick.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/assemble-validate.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-capability-check.sh",
+            "statusMessage": "agent-capability-check (Agent Substrate v1, phase 4)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/destructive-guard.sh",
+            "statusMessage": "destructive-op guard..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-dangerous.sh",
+            "statusMessage": "dangerous-command block..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/safety-guard.sh",
+            "statusMessage": "safety-guard..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/disk-headroom-check.sh",
+            "statusMessage": "disk headroom (RULE 0.17)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-python-without-approval.sh",
+            "statusMessage": "rust-first python gate (RULE 0.2)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-hand-edit-agents.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-capability-check.sh",
+            "statusMessage": "agent-capability-check (Agent Substrate v1, phase 4)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/numeric-claims-guard.sh",
+            "statusMessage": "numeric-claims-guard (RULE 0.18)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/citation-verify.sh",
+            "statusMessage": "citation-verify (RULE 0.4)..."
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/tomd-preread.sh",
+            "statusMessage": "tomd pre-read auto-convert check..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-fork-logger.sh",
+            "statusMessage": "agent-fork-logger (RULE 0.12)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/orchestrator-dirty-check.sh",
+            "statusMessage": "orchestrator-dirty-check (RULE 0.13)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/orchestrator-branch-check.sh",
+            "statusMessage": "orchestrator branch ownership (RULE 0.13)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-stub-scan.sh",
+            "statusMessage": "STATUS-TRUTH marker scan (RULE 0.16)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/task-timer.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/recurrence-suggest.sh",
+            "statusMessage": "recurrence-escalate suggester (RULE 0.10)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rust-first.sh",
+            "statusMessage": "rust-first reminder (RULE 0.2)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-downgrade.sh",
+            "statusMessage": "no-downgrade reminder (RULE -1)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/alignment-check.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-end-dump.sh",
+            "statusMessage": "session-end trace dump (RULE 0.14)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop-verify.sh",
+            "statusMessage": "stop-verify (uncommitted/Modal-running warning)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/task-timer.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/extract-task-durations.sh",
+            "statusMessage": "extract-task-durations — pull async durations from notifications..."
+          }
+        ]
+      }
+    ]
+  }
+}

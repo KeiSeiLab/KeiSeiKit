@@ -1,0 +1,34 @@
+[capability]
+name = "output::report-format"
+category = "output"
+version = "1.0"
+description = "Require the agent's return report to contain a declared set of fields."
+rationale = "Structured return lets orchestrator parse a file-list for `git add`, test counts for verification cross-check, and LOC deltas for audit. Free-text returns force re-prompting."
+
+[restricts]
+tool-patterns = []
+tools-denied = []
+
+[parameterized]
+accepts = ["report-fields-required"]
+
+[text]
+path = "text.md"
+
+[verify]
+rust-module = "verifies::output_report_format"
+run-mode = "worktree"
+when = "on-return"
+
+[taxonomy]
+kingdom = "capability"
+mechanism = "verify"
+domain = "output"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "rust"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

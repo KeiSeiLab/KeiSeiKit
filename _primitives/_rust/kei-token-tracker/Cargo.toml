@@ -1,0 +1,32 @@
+[package]
+name = "kei-token-tracker"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "Per-LLM-call token + cost observability store. SQLite-backed TokenEvent log + nightly sleep-report aggregator."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-token-tracker"
+path = "src/bin/kei-token-tracker.rs"
+
+[lib]
+name = "kei_token_tracker"
+path = "src/lib.rs"
+
+[dependencies]
+rusqlite = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[package.metadata.keisei]
+trait = "TokenTracker"
+description = "Per-LLM-call token usage + cost SQLite store. Schema migrates on open(). Phase D sleep-report markdown emitter."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

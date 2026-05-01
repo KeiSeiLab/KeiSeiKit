@@ -1,0 +1,26 @@
+[package]
+name = "kei-llm-mlx"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Wave 59 — Apple MLX adapter (mlx_lm shell-out, macOS Apple Silicon only). Parallel sibling of kei-llm-ollama (W57) and kei-llm-llamacpp (W58). Glued by kei-llm-router (W60)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-llm-mlx"
+path = "src/main.rs"
+
+[lib]
+name = "kei_llm_mlx"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

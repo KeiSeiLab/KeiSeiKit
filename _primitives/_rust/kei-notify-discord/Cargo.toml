@@ -1,0 +1,31 @@
+[package]
+name = "kei-notify-discord"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+description = "NotifyChannel impl for Discord webhooks. Wave 8 atomar; sibling of kei-notify-email and kei-notify-slack."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[lib]
+name = "kei_notify_discord"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+kei-runtime-core = { path = "../kei-runtime-core" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }
+
+[package.metadata.keisei]
+backend = "discord"
+trait = "NotifyChannel"
+description = "Discord webhook NotifyChannel"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

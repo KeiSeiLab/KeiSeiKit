@@ -1,0 +1,30 @@
+[package]
+name = "kei-ping"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Cross-window agent presence (heartbeat / list / watch). Auto-selects backend: Redis if redis-cli ping == PONG on localhost, else SQLite."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+license = "Apache-2.0"
+
+[[bin]]
+name = "kei-ping"
+path = "src/main.rs"
+
+[lib]
+name = "kei_ping"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+rusqlite = { workspace = true }
+redis = { version = "0.27", default-features = false, features = ["aio", "tokio-comp"] }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+
+[package.metadata.keisei]
+trait = "PingStore"
+description = "Atomar — cross-window agent heartbeat. Two engines (SQLite default, Redis auto if running)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]

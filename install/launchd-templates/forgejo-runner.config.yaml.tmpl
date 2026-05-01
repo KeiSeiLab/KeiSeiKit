@@ -1,0 +1,29 @@
+# act_runner config — rendered by lib-dev-hub-forgejo-runner.sh.
+# Placeholders ${DATA} and ${LOGS} are substituted at install time.
+#
+# ${DATA} = ~/Library/Application Support/keisei/forgejo-runner
+# ${LOGS} = ~/Library/Logs/keisei/forgejo-runner
+#
+# Solo-developer profile: capacity 1 (one job at a time), no Docker isolation
+# (container.network=host, privileged=false). Re-render this file by
+# re-running `install_dev_hub_forgejo_runner` — registration (${DATA}/.runner)
+# is preserved separately.
+
+log:
+  level: info
+  dir: ${LOGS}
+
+runner:
+  file: ${DATA}/.runner
+  capacity: 1
+  timeout: 3h
+  fetch_timeout: 5s
+  fetch_interval: 2s
+
+container:
+  network: host
+  privileged: false
+  options: ""
+
+host:
+  workdir_parent: ${DATA}/cache

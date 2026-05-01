@@ -1,0 +1,37 @@
+[package]
+name = "kei-runtime"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Atom invocation runtime + schema linter"
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[[bin]]
+name = "kei-runtime"
+path = "src/main.rs"
+
+[lib]
+name = "kei_runtime"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# SSRF + IMDS hardening: disable default features (resolve-http, cli) so the
+# validator has no HTTP resolver by default. We configure a file-only
+# resolver explicitly in `validate.rs`.
+jsonschema = { version = "0.18", default-features = false, features = ["resolve-file"] }
+anyhow = "1"
+walkdir = "2"
+serde_yaml_ng = "0.10"
+kei-atom-discovery = { path = "../kei-atom-discovery" }
+url = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[package.metadata.keisei]
+backend = "none"
+description = "Atom invocation runtime + schema linter"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

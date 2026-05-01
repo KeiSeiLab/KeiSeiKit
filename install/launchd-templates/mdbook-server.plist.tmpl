@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.keisei.mdbook-server</string>
+
+    <!--
+      ProgramArguments invokes the wrapper so the mdbook binary is resolved
+      at launch time (cargo install location vs brew install location can
+      vary across hosts). See lib-dev-hub-mdbook.sh::write_serve_wrapper.
+      `--no-rebuild` is set because rebuilds are owned by the
+      mdbook-rebuilder timer plist.
+    -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>${KIT}/dev-hub/mdbook-serve.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>${DATA}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>${HOME}</string>
+        <key>USER</key>
+        <string>${USER}</string>
+        <key>PATH</key>
+        <string>${HOME}/.cargo/bin:${BREW}/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>${LOGS}/server.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>${LOGS}/server.err.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>4096</integer>
+    </dict>
+
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>8192</integer>
+    </dict>
+</dict>
+</plist>

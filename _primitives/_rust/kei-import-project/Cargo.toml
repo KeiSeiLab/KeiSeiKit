@@ -1,0 +1,34 @@
+[package]
+name = "kei-import-project"
+version = "0.1.0"
+edition = "2021"
+description = "Foreign project ingestion runtime: clone repo, walk tree, identify language modules, register in kei-registry. Composes existing primitives (kei-shared, kei-registry, kei-decompose, kei-skill-importer)."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-import-project"
+path = "src/main.rs"
+
+[[bin]]
+name = "kei-import"
+path = "src/bin/kei_import.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+anyhow = { workspace = true }
+walkdir = { workspace = true }
+clap = { workspace = true }
+regex = { workspace = true }
+kei-shared = { path = "../kei-shared" }
+kei-registry = { path = "../kei-registry" }
+kei-decompose = { path = "../kei-decompose" }
+sha2 = { workspace = true }
+rusqlite = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

@@ -1,0 +1,3 @@
+# `.git/HEAD` is materialised at test-runtime by ensure_already_repo_fixture()
+# in tests/classify_fixtures.rs — git refuses to track files inside .git/
+.git/

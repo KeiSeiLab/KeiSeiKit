@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "_schemas/fragments/titled.json",
+  "title": "Titled entity input",
+  "description": "Input mixin — non-empty bounded title. Extends `entity-base` with a required `title` string.",
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Human-readable label"
+    }
+  }
+}

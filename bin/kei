@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+# kei — KeiSeiKit launcher with TUI splash, then exec claude.
+#
+# Distinct from `keisei` (Rust exobrain CLI: `keisei attach/mount/...`).
+# `kei` is the lightweight splash + launch entry point most users want.
+#
+# Usage:
+#   kei                     # splash → claude (interactive REPL)
+#   kei --no-splash         # skip splash → exec claude
+#   kei --status            # status only, don't launch claude
+#   kei [args...]           # splash → claude args... (forwarded verbatim)
+#
+# The splash shows: substrate version, agent count, last sleep run,
+# active sessions (kei-ping). Press any key to skip the dwell.
+#
+# Returns: same exit code as `claude`.
+
+set -e
+
+# --- args ----------------------------------------------------------------
+SPLASH=1
+STATUS_ONLY=0
+PASSTHROUGH=()
+for arg in "$@"; do
+  case "$arg" in
+    --no-splash) SPLASH=0 ;;
+    --status)    STATUS_ONLY=1; SPLASH=1 ;;
+    *)           PASSTHROUGH+=("$arg") ;;
+  esac
+done
+
+# --- locate claude on PATH -----------------------------------------------
+CLAUDE_BIN="$(command -v claude 2>/dev/null || true)"
+if [ -z "$CLAUDE_BIN" ] && [ "$STATUS_ONLY" = "0" ]; then
+  echo "error: 'claude' not on PATH. Install Claude Code first:" >&2
+  echo "  curl -fsSL https://claude.ai/install.sh | sh" >&2
+  exit 127
+fi
+
+# --- read state ----------------------------------------------------------
+AGENTS_DIR="${HOME}/.claude/agents"
+SYNC_DIR="${HOME}/.claude/memory/sync-repo"
+
+# Agent count from generated .md files
+agent_count() {
+  local n=0
+  if [ -d "$AGENTS_DIR" ]; then
+    n=$(find "$AGENTS_DIR" -maxdepth 1 -name "*.md" -not -name "_*" 2>/dev/null | wc -l | tr -d ' ')
+  fi
+  printf '%s' "$n"
+}
+
+# Profile from .installed marker file
+profile_name() {
+  local f="${AGENTS_DIR}/_primitives/.installed"
+  if [ -f "$f" ]; then
+    grep -E "^profile" "$f" 2>/dev/null | head -1 | awk -F= '{gsub(/[ "]/,"",$2); print $2}' || echo "?"
+  else
+    echo "?"
+  fi
+}
+
+# Last Phase B sleep timestamp
+last_sleep_run() {
+  local f="${SYNC_DIR}/reports/last-run.txt"
+  if [ -f "$f" ]; then
+    local ts
+    ts=$(cat "$f" 2>/dev/null | head -1)
+    if [ -n "$ts" ]; then
+      # epoch → human; macOS date(1) -r and Linux date(1) -d differ
+      if date -r "$ts" '+%Y-%m-%d %H:%M' >/dev/null 2>&1; then
+        date -r "$ts" '+%Y-%m-%d %H:%M'
+      elif date -d "@$ts" '+%Y-%m-%d %H:%M' >/dev/null 2>&1; then
+        date -d "@$ts" '+%Y-%m-%d %H:%M'
+      else
+        echo "$ts"
+      fi
+    else
+      echo "never"
+    fi
+  else
+    echo "never"
+  fi
+}
+
+# Active session count via kei-ping (auto-selects redis or sqlite backend)
+active_sessions() {
+  if command -v kei-ping >/dev/null 2>&1; then
+    kei-ping list 2>/dev/null | grep -cE '^\s*[0-9]+s\s' || echo "0"
+  else
+    echo "n/a"
+  fi
+}
+
+# --- splash --------------------------------------------------------------
+splash() {
+  local p ac sl as
+  p="$(profile_name)"
+  ac="$(agent_count)"
+  sl="$(last_sleep_run)"
+  as="$(active_sessions)"
+
+  # Only color if stdout is a tty
+  local C0= C1= C2= C3=
+  if [ -t 1 ]; then
+    C0=$'\033[0m'
+    C1=$'\033[1;36m'    # cyan-bold
+    C2=$'\033[0;36m'    # cyan
+    C3=$'\033[2m'       # dim
+  fi
+
+  cat <<EOF
+
+${C1}    ██╗  ██╗███████╗██╗███████╗███████╗██╗${C0}
+${C1}    ██║ ██╔╝██╔════╝██║██╔════╝██╔════╝██║${C0}
+${C1}    █████╔╝ █████╗  ██║███████╗█████╗  ██║${C0}
+${C1}    ██╔═██╗ ██╔══╝  ██║╚════██║██╔══╝  ██║${C0}
+${C1}    ██║  ██╗███████╗██║███████║███████╗██║${C0}
+${C1}    ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚══════╝╚═╝${C0}
+
+${C2}    KeiSeiKit · substrate v0.16${C0}
+${C3}    ─────────────────────────────────────${C0}
+      profile        : ${p}
+      agents         : ${ac}
+      last sleep run : ${sl}
+      active sessions: ${as}
+${C3}    ─────────────────────────────────────${C0}
+
+EOF
+}
+
+# --- main ----------------------------------------------------------------
+if [ "$SPLASH" = "1" ]; then
+  splash
+fi
+
+if [ "$STATUS_ONLY" = "1" ]; then
+  exit 0
+fi
+
+# Brief dwell so user sees splash before claude takes over the screen.
+# Skipped if stdin not a tty (CI / piped) or if --no-splash.
+if [ "$SPLASH" = "1" ] && [ -t 0 ] && [ -t 1 ]; then
+  # Wait up to 0.6s; any keypress aborts immediately.
+  read -t 0.6 -n 1 -s _ 2>/dev/null || true
+fi
+
+exec "$CLAUDE_BIN" "${PASSTHROUGH[@]}"

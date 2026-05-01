@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "kei-task/atoms/schemas/add-dependency-output.json",
+  "title": "kei-task::add-dependency output",
+  "type": "object",
+  "required": ["ok"],
+  "properties": {
+    "ok": {
+      "type": "boolean",
+      "description": "True when the edge was written (or already present — idempotent via INSERT OR IGNORE)"
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    { "ok": true }
+  ]
+}

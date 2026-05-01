@@ -1,0 +1,3 @@
+[role]
+name = "mini-role"
+description = "Fixture role for index-substrate smoke test."

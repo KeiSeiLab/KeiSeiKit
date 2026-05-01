@@ -1,0 +1,35 @@
+[role]
+name = "git-ops"
+display-name = "git operator (orchestrator-only, NOT spawnable)"
+description = "Documented boundary of git authority. Per RULE 0.13, only the orchestrator (main session) holds git power: branch creation, commit, push, merge, rebase, reset, tag. This role is documented for completeness and is refused by kei-agent-runtime at spawn time."
+spawnable = false
+# Documented for completeness; never consumed because spawnable = false.
+claude-subagent-type = "NOT-SPAWNABLE"
+
+[capabilities]
+# No capability restrictions declared here — this role is never composed into
+# a prompt. The sole consumer is `kei-agent-runtime spawn`, which checks
+# `spawnable = false` and refuses the invocation with a pointer to RULE 0.13.
+required = []
+
+[tools]
+# Documented as "everything"; not enforced because role is non-spawnable.
+allowed = ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "WebFetch"]
+bash-patterns-allowed = ['.*']
+
+[escalation]
+# Not reachable at runtime — orchestrator owns this context directly.
+policy = "fail-fast"
+
+[taxonomy]
+kingdom = "role"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

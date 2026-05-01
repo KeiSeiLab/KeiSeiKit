@@ -1,0 +1,79 @@
+[task]
+role = "edit-shared"
+
+[scope]
+files-whitelist = [
+    "_primitives/_rust/Cargo.toml",
+    "_primitives/_rust/kei-router/src/providers/openai.rs",
+    "_primitives/_rust/kei-skills/Cargo.toml",
+    "_primitives/_rust/kei-export-trajectories/Cargo.toml",
+]
+
+[body]
+text = """
+Cleanup batch — closes Medium + Low audit findings.
+
+# M-2: RULE 0.4 violation — [VERIFY at integration time, not now] comment
+
+File: `kei-router/src/providers/openai.rs:5`
+Current: `// [VERIFY at integration time, not now] platform.openai.com/docs/pricing — gpt-4o-mini Apr 2026`
+Fix: replace with `// [VERIFIED: https://openai.com/api/pricing/ on 2026-04-28]`
+The kei-model verified pricing landed 2026-04-28; OpenAI prices were verified.
+
+# M-3: tokio-tungstenite version bump (security)
+
+File: `_primitives/_rust/Cargo.toml:165`
+Current: `tokio-tungstenite = "0.24"`
+Fix: bump to `"0.29"` (latest stable, 5 minor versions of security/bug fixes).
+
+After bump, `cargo check --workspace` must pass — if any consumer crate
+breaks on the new API, document the breaking call site in your report
+and DO NOT push the bump.
+
+Likely consumers: kei-cortex (PTY/WS endpoint per Wave 38a comment).
+Quick read of kei-cortex ws code can confirm 0.29 compat.
+
+# M-4: rust-version skew
+
+File: `_primitives/_rust/kei-skills/Cargo.toml:5`
+Current: `rust-version = "1.77"`
+Workspace floor: `_primitives/_rust/Cargo.toml:135` → `1.75`
+
+Two options:
+- (A) Lift workspace floor to 1.77 (workspace Cargo.toml line 135). All
+  crates already build on 1.95+ — no real impact.
+- (B) Drop kei-skills to 1.75 (audit which 1.77 feature it actually uses
+  → likely a let-else / let-chain that can be rewritten).
+
+Pick (A) — simpler, single-line workspace edit.
+
+# L-2: kei-export-trajectories description leak
+
+File: `kei-export-trajectories/Cargo.toml:6`
+Current: description references "HERMES-MIGRATION-PLAN" — internal
+sequencing leak in public bundle.
+Fix: rewrite description as generic: `"Export agent trajectories to ShareGPT
+JSONL format"`. Drop HERMES reference.
+
+# Quality gate
+
+1. `cargo check --workspace` → PASS (after each individual change)
+2. If tokio-tungstenite 0.29 breaks anything → report and revert that
+   bump only, keep M-2/M-4/L-2 fixes.
+
+# Final report
+
+```
+Files modified:
+- kei-router/src/providers/openai.rs (M-2: VERIFIED comment)
+- _primitives/_rust/Cargo.toml (M-3: tokio-tungstenite bump if compatible, M-4: rust-version 1.77)
+- kei-skills/Cargo.toml (M-4: drop rust-version override if workspace lifted)
+- kei-export-trajectories/Cargo.toml (L-2: generic description)
+
+cargo-check: PASS
+
+M-3 tokio-tungstenite status: <bumped / reverted-due-to-breaking-API>
+```
+
+Constraint: do not invoke git/gh; cargo allowed.
+"""

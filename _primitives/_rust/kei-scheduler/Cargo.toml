@@ -1,0 +1,35 @@
+[package]
+name = "kei-scheduler"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Durable task scheduler (cron / at / interval) — metadata primitive."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
+
+[package.metadata.keisei]
+backend = "sqlite"
+db_env = "KEI_SCHEDULER_DB"
+db_default = "~/.claude/scheduler/scheduler.sqlite"
+schema_version = 1
+
+[[bin]]
+name = "kei-scheduler"
+path = "src/main.rs"
+
+[lib]
+name = "kei_scheduler"
+path = "src/lib.rs"
+
+[dependencies]
+kei-entity-store = { path = "../kei-entity-store" }
+rusqlite = { version = "0.31", features = ["bundled"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+thiserror = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+cron = "0.15"
+
+[dev-dependencies]
+tempfile = "3"
