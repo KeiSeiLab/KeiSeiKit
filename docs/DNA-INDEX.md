@@ -1,12 +1,12 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T17:09:15Z.
-> Total blocks: 513. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T19:42:09Z.
+> Total blocks: 515. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 121 |
-| hook | 41 |
+| hook | 43 |
 | primitive | 109 |
 | rule | 174 |
 | skill | 68 |
@@ -838,7 +838,7 @@ Sorted alphabetically by name.
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
 
-## Hook (41)
+## Hook (43)
 
 Sorted alphabetically by name.
 
@@ -872,6 +872,7 @@ Sorted alphabetically by name.
 | no-hand-edit-agents | shell | hook::shell::ed728f1… | hooks/no-hand-edit-agents.sh |
 | no-python-without-approval | shell | hook::shell::cba75df… | hooks/no-python-without-approval.sh |
 | numeric-claims-guard | shell | hook::shell::e709fb1… | hooks/numeric-claims-guard.sh |
+| numeric-claims-record | shell | hook::shell::f35e238… | hooks/numeric-claims-record.sh |
 | orchestrator-branch-check | shell | hook::shell::ab3e1fe… | hooks/orchestrator-branch-check.sh |
 | orchestrator-dirty-check | shell | hook::shell::38a4db8… | hooks/orchestrator-dirty-check.sh |
 | phase-b-rem | shell | hook::shell::aaf4432… | hooks/phase-b-rem.sh |
@@ -882,6 +883,7 @@ Sorted alphabetically by name.
 | safety-guard | shell | hook::shell::96bef7a… | hooks/safety-guard.sh |
 | session-end-dump | shell | hook::shell::7c3e2d9… | hooks/session-end-dump.sh |
 | site-wysiwyd-check | shell | hook::shell::0683fa8… | hooks/site-wysiwyd-check.sh |
+| skill-record | shell | hook::shell::954ccee… | hooks/skill-record.sh |
 | stop-verify | shell | hook::shell::adedcfe… | hooks/stop-verify.sh |
 | task-timer | shell | hook::shell::dda5e94… | hooks/task-timer.sh |
 | tomd-preread | shell | hook::shell::8a95b76… | hooks/tomd-preread.sh |
@@ -1028,6 +1030,7 @@ Sorted alphabetically by name.
 - `STACK — Python ML (PyTorch / JAX)` — 2 versions: ceb1fc98 → 4afd934a
 - `Self-Audit — Session Retrospective Triage (index)` — 2 versions: 339cb507 → 38fd80b7
 - `agent-heartbeat-tick` — 2 versions: 5eb00dc3 → 560fa0f8
+- `agent-outcome-backfill` — 2 versions: 0e00d9ca → c901aaf2
 - `alignment-check` — 2 versions: 4e7389b1 → b1e18549
 - `extract-task-durations` — 2 versions: e6854ef5 → 859873eb
 - `firewall-diff` — 2 versions: e42f1e32 → 8260ffc0
@@ -1079,8 +1082,9 @@ Sorted alphabetically by name.
 - `kei-hibernate` — 2 versions: 25f6d5bc → 1ea136f5
 - `kei-import-project` — 2 versions: aa3750a0 → 2de0fd64
 - `kei-leak-matrix` — 2 versions: 06a89af2 → a3803ef9
-- `kei-ledger` — 2 versions: 8d59d685 → 269810bf
+- `kei-ledger` — 3 versions: 8d59d685 → 269810bf → 269810bf
 - `kei-ledger-sign` — 2 versions: 339bd55a → c12a2016
+- `kei-ledger::kei-ledger` — 6 versions: cbfb6330 → d44d16bb → 38851983 → dccd1493 → 6c25d3ca → 1c26fa43
 - `kei-llm-bridge-mlx` — 2 versions: 23e9e5b8 → b09d3703
 - `kei-llm-llamacpp` — 2 versions: 8cd7b0c0 → d6781358
 - `kei-llm-mlx` — 2 versions: 9fb79f0f → d276d3e6
@@ -1141,6 +1145,7 @@ Sorted alphabetically by name.
 - `mock-render` — 2 versions: 99b0927a → f5f4d966
 - `no-python-without-approval` — 2 versions: 45d3e0ab → 48fdb89e
 - `numeric-claims-guard` — 2 versions: 90f697e6 → d5ed33c8
+- `numeric-claims-record` — 2 versions: 59a9990f → 342361a3
 - `post-write-check` — 2 versions: 6ceb2237 → 4aaf1c5e
 - `safety-guard` — 2 versions: 32b889cf → 665e7cd1
 - `site-wysiwyd-check` — 2 versions: a0d38a22 → 416c0648

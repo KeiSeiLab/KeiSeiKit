@@ -7,7 +7,7 @@
 //! Module owner: the binary crate. Pulls library functions from the
 //! `kei_ledger` crate (defined in `src/lib.rs`).
 
-use kei_ledger::{cost, descendants, ledger, skill_aggregator_cli};
+use kei_ledger::{cost, descendants, ledger, skill_aggregator_cli, skill_metrics};
 use rusqlite::Connection;
 use serde_json::json;
 use std::path::Path;
@@ -118,6 +118,43 @@ pub fn cmd_record_cost(
         Ok(0) => err(&format!("no agent with id {agent_id}")),
         Ok(_) => emit_record_cost_json(conn, agent_id),
         Err(e) => err(&format!("record-cost failed: {e}")),
+    }
+}
+
+/// Record a skill invocation row in `skill_invocations` (schema v8+).
+/// Validates: skill_name non-empty, duration_ms ≥ 0 if provided.
+/// Emits a one-line JSON `{"ok":true,"skill":"<name>","ts":<unix>}` on success.
+pub fn cmd_record_skill(
+    conn: &Connection,
+    skill_name: &str,
+    success: u8,
+    agent_id: Option<String>,
+    trajectory_id: Option<String>,
+    duration_ms: Option<i64>,
+) -> ExitCode {
+    if skill_name.is_empty() {
+        return err("skill_name must not be empty");
+    }
+    if let Some(ms) = duration_ms {
+        if ms < 0 {
+            return err("duration_ms must be >= 0");
+        }
+    }
+    let ts = chrono::Utc::now().timestamp();
+    let inv = skill_metrics::SkillInvocation {
+        skill_name: skill_name.to_string(),
+        ts,
+        agent_id,
+        success: success != 0,
+        trajectory_id,
+        duration_ms,
+    };
+    match skill_metrics::record_invocation(conn, &inv) {
+        Ok(_) => {
+            println!("{}", serde_json::json!({"ok": true, "skill": skill_name, "ts": ts}));
+            ExitCode::SUCCESS
+        }
+        Err(e) => err(&format!("record-skill failed: {e}")),
     }
 }
 
