@@ -27,6 +27,7 @@ pub mod related;
 pub mod scan_orchestrator;
 pub mod scanners;
 pub mod stats;
+pub mod status;
 pub mod store;
 
 pub use block::{Block, BlockType};
@@ -35,4 +36,5 @@ pub use dna_block::{compose_for_block, compose_for_block_with_nonce};
 pub use registry::{find_by_path, get, list, list_by_type, mark_superseded, register};
 pub use related::{find_related, RelatedHit};
 pub use stats::{compute_stats, Stats};
+pub use status::{compute_status, render_ascii, Status};
 pub use store::{open_db, SCHEMA_VERSION};
