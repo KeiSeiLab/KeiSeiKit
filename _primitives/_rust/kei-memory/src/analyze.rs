@@ -41,8 +41,7 @@ pub fn recent_session_ids(conn: &Connection, n: usize) -> Result<Vec<String>> {
     )?;
     let rows = stmt
         .query_map(params![n as i64], |r| r.get::<_, String>(0))?
-        .filter_map(|r| r.ok())
-        .collect();
+        .collect::<Result<Vec<_>>>()?;
     Ok(rows)
 }
 

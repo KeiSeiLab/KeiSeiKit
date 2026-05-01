@@ -1,27 +1,10 @@
 //! Integration tests for kei-memory.
 //!
 //! Constructor Pattern: each test = one scenario, one assertion target.
-//! Uses tempfile for per-test isolated sqlite file. Loads source modules
-//! via `#[path]` so we don't need to expose a library crate surface.
+//! Uses tempfile for per-test isolated sqlite file. Imports the
+//! library crate directly (kei-memory now exposes [lib] + [bin]).
 
-#[path = "../src/schema.rs"]
-mod schema;
-#[path = "../src/similarity.rs"]
-mod similarity;
-#[path = "../src/coaccess.rs"]
-mod coaccess;
-#[path = "../src/tfidf.rs"]
-mod tfidf;
-#[path = "../src/injection_patterns.rs"]
-mod injection_patterns;
-#[path = "../src/injection_guard.rs"]
-mod injection_guard;
-#[path = "../src/ingest.rs"]
-mod ingest;
-#[path = "../src/analyze.rs"]
-mod analyze;
-#[path = "../src/patterns.rs"]
-mod patterns;
+use kei_memory::{analyze, coaccess, ingest, patterns, schema, similarity, tfidf};
 
 use rusqlite::Connection;
 use std::fs;

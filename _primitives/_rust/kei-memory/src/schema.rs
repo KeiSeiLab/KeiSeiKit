@@ -62,6 +62,21 @@ pub const MIGRATIONS: &[&str] = &[
         item TEXT NOT NULL,
         processed INTEGER NOT NULL DEFAULT 0
     );",
+    // v2 — TF-IDF dedup: mark token rows that need IDF recomputation
+    // (RULE 0.16 / Wave C, 2026-05-01). Default 1 so existing rows force
+    // a one-time recompute on first stale-check after upgrade.
+    "ALTER TABLE tokens ADD COLUMN idf_dirty INTEGER NOT NULL DEFAULT 1;",
+    // v3 — Wave A schema fix (2026-05-01):
+    //   * `events.cwd` — pulled from real Claude Code trace `cwd` field.
+    //     Lets retrospectives bucket by working directory.
+    //   * Hot-query indices on tool / file_path / ts.
+    //   * UNIQUE index on patterns(event_class, COALESCE(session_id,''))
+    //     enables the UPSERT planned for Wave D pattern persistence.
+    "ALTER TABLE events ADD COLUMN cwd TEXT;
+    CREATE INDEX IF NOT EXISTS idx_events_tool ON events(tool) WHERE tool IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_events_file_path ON events(file_path) WHERE file_path IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_patterns_class_session ON patterns(event_class, COALESCE(session_id, ''));",
 ];
 
 /// Apply all pending migrations. Stores version in `PRAGMA user_version`.

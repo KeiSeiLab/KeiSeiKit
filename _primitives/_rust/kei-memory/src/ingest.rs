@@ -1,37 +1,27 @@
 //! Ingest — read JSONL trace → insert events into DB.
 //!
 //! Constructor Pattern: one cube, single responsibility.
-//! Trace line shape (subset we care about):
-//!   {"ts": 1700000000, "kind": "tool_use", "tool": "Bash",
-//!    "file_path": "...", "is_error": false, "message": "..."}
-//! Unknown/empty lines are skipped silently.
+//! Trace-line shape lives in `trace_line.rs`; classification in
+//! `classifier.rs`; tool_use/tool_result extraction in `extract.rs`.
+//! This file owns the persistence + IO loop.
+//!
+//! Schema-mismatch fix: Wave A (2026-05-01). Pre-fix, ~50% of real
+//! traces silently dropped via `Err(_) => continue` — root cause was
+//! the old struct mapping `kind` to top-level `kind` field, which the
+//! real format calls `type`, plus tool calls being nested objects.
 
+pub use crate::trace_line::TraceLine;
+
+use crate::classifier::classify;
 use crate::coaccess::record_coaccess;
+use crate::error::{KeiMemoryError, Result as KmResult};
+use crate::extract::{extract_tool_result, extract_tool_uses, ToolUse};
 use crate::injection_guard;
 use chrono::Utc;
 use rusqlite::{params, Connection, Result};
-use serde::Deserialize;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
-
-#[derive(Debug, Deserialize, Default)]
-pub struct TraceLine {
-    #[serde(default)]
-    pub ts: Option<i64>,
-    #[serde(default)]
-    pub kind: Option<String>,
-    #[serde(default)]
-    pub tool: Option<String>,
-    #[serde(default)]
-    pub file_path: Option<String>,
-    #[serde(default)]
-    pub is_error: Option<bool>,
-    #[serde(default)]
-    pub event_class: Option<String>,
-    #[serde(default)]
-    pub message: Option<String>,
-}
 
 /// Ensure the sessions row exists (idempotent). Returns started_ts.
 pub fn ensure_session(conn: &Connection, session_id: &str) -> Result<i64> {
@@ -48,50 +38,112 @@ pub fn ensure_session(conn: &Connection, session_id: &str) -> Result<i64> {
     Ok(started)
 }
 
-/// Read a JSONL transcript line by line and insert one row per event.
-/// Returns the number of events actually inserted (malformed lines skipped).
-pub fn ingest_jsonl(conn: &Connection, session_id: &str, path: &Path) -> Result<usize> {
+/// Read a JSONL transcript line by line and insert events.
+///
+/// Returns total event-row count inserted (one assistant line with N
+/// tool_uses → N rows). Malformed JSON yields a stderr log line but
+/// does not abort the file. Schema and IO errors propagate.
+pub fn ingest_jsonl(conn: &Connection, session_id: &str, path: &Path) -> KmResult<usize> {
     ensure_session(conn, session_id)?;
-    let file = File::open(path)
-        .map_err(|e| rusqlite::Error::InvalidParameterName(format!("open {}: {e}", path.display())))?;
-    let reader = BufReader::new(file);
+    let file = File::open(path).map_err(KeiMemoryError::Io)?;
     let mut inserted = 0usize;
-    for line in reader.lines().map_while(|l| l.ok()) {
-        let trimmed = line.trim();
-        if trimmed.is_empty() || !trimmed.starts_with('{') {
-            continue;
+    for line in BufReader::new(file).lines().map_while(|l| l.ok()) {
+        if let Some(parsed) = parse_one_line(&line) {
+            inserted += process_line(conn, session_id, &parsed)?;
         }
-        let parsed: TraceLine = match serde_json::from_str(trimmed) {
-            Ok(p) => p,
-            Err(_) => continue,
-        };
-        insert_event(conn, session_id, &parsed)?;
-        inserted += 1;
     }
     finalize_session(conn, session_id)?;
     Ok(inserted)
 }
 
-/// Insert a single event row. Updates co-access if file_path present.
+/// Parse one JSONL line into a TraceLine, surfacing errors to stderr.
+/// Returns None for blank / non-object / unparseable lines.
+fn parse_one_line(line: &str) -> Option<TraceLine> {
+    let trimmed = line.trim();
+    if trimmed.is_empty() || !trimmed.starts_with('{') {
+        return None;
+    }
+    match serde_json::from_str::<TraceLine>(trimmed) {
+        Ok(p) => Some(p),
+        Err(e) => {
+            eprintln!("kei-memory: parse skip ({} chars): {e}", trimmed.len());
+            None
+        }
+    }
+}
+
+/// Persist all event rows derivable from one parsed trace line.
 ///
-/// P2.1.b — guards `e.message` via `injection_guard::scan` BEFORE
+/// Strategy (simpler model — no tool_use ↔ tool_result pairing):
+///   * If message has nested `tool_use` blocks: emit one row per block
+///     with `tool=name, file_path=input.file_path, is_error=false`.
+///   * If message has a `tool_result` block: emit one row with
+///     `is_error=<from JSON>` and the legacy `tool` if present.
+///   * Otherwise: emit a single row driven by kind + legacy fields.
+fn process_line(conn: &Connection, session_id: &str, e: &TraceLine) -> Result<usize> {
+    let tool_uses: Vec<ToolUse> = e.message.as_ref().map(extract_tool_uses).unwrap_or_default();
+    if !tool_uses.is_empty() {
+        for u in &tool_uses {
+            let fp = u.file_path.clone().or_else(|| e.file_path.clone());
+            insert_one(conn, session_id, e, Some(&u.name), fp.as_deref(), false)?;
+        }
+        return Ok(tool_uses.len());
+    }
+    let is_err = e
+        .message
+        .as_ref()
+        .and_then(extract_tool_result)
+        .map(|r| r.is_error)
+        .or(e.is_error)
+        .unwrap_or(false);
+    insert_one(conn, session_id, e, e.tool.as_deref(), e.file_path.as_deref(), is_err)?;
+    Ok(1)
+}
+
+/// Insert a single event row directly (legacy entrypoint kept for tests).
+///
+/// P2.1.b — guards `message_text()` via `injection_guard::scan` BEFORE
 /// persistence. A Block-tier hit logs to stderr and skips the row
-/// entirely (returns `Ok(())` so the surrounding ingest loop continues
-/// on the next line). This is a real memory-write path: the message
-/// later flows into the system prompt verbatim, so untrusted content
-/// must not land in the `events` table.
+/// (returns Ok so the surrounding ingest loop continues). This is a
+/// real memory-write path: the message later flows into the system
+/// prompt verbatim.
 pub fn insert_event(conn: &Connection, session_id: &str, e: &TraceLine) -> Result<()> {
-    if message_is_blocked(session_id, e.message.as_deref()) {
+    insert_one(
+        conn,
+        session_id,
+        e,
+        e.tool.as_deref(),
+        e.file_path.as_deref(),
+        e.is_error.unwrap_or(false),
+    )
+}
+
+/// Single insert path used by `process_line` AND `insert_event`.
+/// Applies guard, classifier, persists row, records co-access.
+fn insert_one(
+    conn: &Connection,
+    session_id: &str,
+    e: &TraceLine,
+    tool: Option<&str>,
+    file_path: Option<&str>,
+    is_err: bool,
+) -> Result<()> {
+    let msg_text = e.message_text();
+    if message_is_blocked(session_id, msg_text.as_deref()) {
         return Ok(());
     }
-    let ts = e.ts.unwrap_or_else(|| Utc::now().timestamp());
-    let kind = e.kind.clone().unwrap_or_else(|| "other".to_string());
+    let ts = e.resolved_ts();
+    let kind = e.kind.as_deref().unwrap_or("other");
     let class = e
         .event_class
         .clone()
-        .unwrap_or_else(|| classify_default(&kind, e.tool.as_deref(), e.message.as_deref()));
-    persist_event_row(conn, session_id, e, ts, &kind, &class)?;
-    if let Some(fp) = &e.file_path {
+        .unwrap_or_else(|| classify(Some(kind), tool, msg_text.as_deref(), is_err));
+    conn.execute(
+        "INSERT INTO events (session_id, ts, kind, tool, file_path, is_error, event_class, message, cwd)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+        params![session_id, ts, kind, tool, file_path, is_err as i64, class, msg_text, e.cwd],
+    )?;
+    if let Some(fp) = file_path {
         record_coaccess(conn, session_id, fp, ts)?;
     }
     Ok(())
@@ -101,60 +153,11 @@ pub fn insert_event(conn: &Connection, session_id: &str, e: &TraceLine) -> Resul
 fn message_is_blocked(session_id: &str, message: Option<&str>) -> bool {
     if let Some(msg) = message {
         if let Err(finding) = injection_guard::scan(msg) {
-            eprintln!(
-                "kei-memory: insert_event rejected (session={session_id}): {finding}"
-            );
+            eprintln!("kei-memory: insert_event rejected (session={session_id}): {finding}");
             return true;
         }
     }
     false
-}
-
-/// Issue the actual INSERT for one event row.
-fn persist_event_row(
-    conn: &Connection,
-    session_id: &str,
-    e: &TraceLine,
-    ts: i64,
-    kind: &str,
-    class: &str,
-) -> Result<()> {
-    let is_err = e.is_error.unwrap_or(false) as i64;
-    conn.execute(
-        "INSERT INTO events (session_id, ts, kind, tool, file_path, is_error, event_class, message)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-        params![
-            session_id,
-            ts,
-            kind,
-            e.tool,
-            e.file_path,
-            is_err,
-            class,
-            e.message
-        ],
-    )?;
-    Ok(())
-}
-
-/// Cheap heuristic classifier used when trace does not provide one.
-fn classify_default(kind: &str, tool: Option<&str>, message: Option<&str>) -> String {
-    if let Some(m) = message {
-        let lm = m.to_lowercase();
-        if lm.contains("permission denied") || lm.contains("denied") {
-            return "permission_denied".to_string();
-        }
-        if lm.contains("worktree") && lm.contains("error") {
-            return "worktree_error".to_string();
-        }
-        if lm.contains("cargo") && lm.contains("workspace") {
-            return "cargo_workspace".to_string();
-        }
-    }
-    match (kind, tool) {
-        ("tool_use", Some(t)) => format!("tool_use:{t}"),
-        _ => kind.to_string(),
-    }
 }
 
 /// Update aggregate counters on the sessions row.
