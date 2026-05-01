@@ -1,20 +1,10 @@
-//! kei-memory — offline session analyzer + recurring-pattern detector.
+//! kei-memory — offline session analyzer (binary entrypoint).
 //!
 //! Constructor Pattern: main.rs only dispatches; work lives in cubes.
 //! Storage: `~/.claude/memory/kei-memory.sqlite` (or $KEI_MEMORY_DB).
 //! RULE 0.14 — session self-audit, silent-first until 10 sessions ingested.
 
-mod analyze;
-mod backlog;
-mod coaccess;
-mod commands;
-mod ingest;
-mod injection_guard;
-mod injection_patterns;
-mod patterns;
-mod schema;
-mod similarity;
-mod tfidf;
+use kei_memory::{backlog, commands, schema};
 
 use clap::{Parser, Subcommand};
 use rusqlite::Connection;
