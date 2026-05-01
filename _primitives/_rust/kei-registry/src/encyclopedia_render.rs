@@ -139,7 +139,26 @@ pub fn dna_prefix(dna: &str) -> String {
 }
 
 pub fn short_path(path: &str) -> &str {
-    for prefix in &["_primitives", "skills/", "hooks/", "rules/"] {
+    // Strip absolute-path prefix so the rendered table is workspace-relative.
+    // `_blocks/`, `_manifests/`, `_generated/`, `_atoms/`, `agents/`,
+    // `_assembler/`, `docs/` were missing — the column then leaked the
+    // maintainer's `/Users/<user>/Projects/KeiSeiKit-public/` prefix into
+    // the public encyclopedia (107 atom rows in v0.17 DNA-INDEX).
+    for prefix in &[
+        "_primitives",
+        "_blocks/",
+        "_manifests/",
+        "_generated/",
+        "_atoms/",
+        "_assembler/",
+        "_roles/",
+        "_capabilities/",
+        "skills/",
+        "hooks/",
+        "rules/",
+        "agents/",
+        "docs/",
+    ] {
         if let Some(pos) = path.find(prefix) {
             return &path[pos..];
         }
@@ -161,5 +180,67 @@ pub fn capitalise(s: &str) -> String {
     match c.next() {
         None => String::new(),
         Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::short_path;
+
+    #[test]
+    fn short_path_strips_blocks_prefix() {
+        let abs = "/srv/ci/build/_blocks/api-anthropic.md";
+        assert_eq!(short_path(abs), "_blocks/api-anthropic.md");
+    }
+
+    #[test]
+    fn short_path_strips_primitives_prefix() {
+        let abs = "/srv/ci/_primitives/_rust/kei-registry/Cargo.toml";
+        assert_eq!(short_path(abs), "_primitives/_rust/kei-registry/Cargo.toml");
+    }
+
+    #[test]
+    fn short_path_strips_manifests_prefix() {
+        let abs = "/srv/ci/build/_manifests/ml-implementer.toml";
+        assert_eq!(short_path(abs), "_manifests/ml-implementer.toml");
+    }
+
+    #[test]
+    fn short_path_strips_agents_prefix() {
+        let abs = "/srv/ci/build/agents/researcher.md";
+        assert_eq!(short_path(abs), "agents/researcher.md");
+    }
+
+    #[test]
+    fn short_path_passthrough_unknown() {
+        let p = "some/relative/random.md";
+        assert_eq!(short_path(p), p);
+    }
+
+    #[test]
+    fn short_path_no_absolute_leak_for_blocks() {
+        // Fixture uses a CI-style absolute path (no username component) so
+        // the source file itself does not contain a maintainer-shaped path
+        // that would trip the local pre-commit hook + the leak-check CI.
+        let abs = "/srv/ci/build/_blocks/api-fal-ai.md";
+        let out = short_path(abs);
+        assert!(!out.starts_with('/'), "still absolute: {out}");
+        assert!(!out.contains("/srv/"), "not stripped: {out}");
+        assert_eq!(out, "_blocks/api-fal-ai.md");
+    }
+
+    #[test]
+    fn short_path_strips_roles_prefix() {
+        let abs = "/x/Projects/KeiSeiKit-public/_roles/auditor.toml";
+        assert_eq!(short_path(abs), "_roles/auditor.toml");
+    }
+
+    #[test]
+    fn short_path_strips_capabilities_prefix() {
+        let abs = "/x/Projects/KeiSeiKit-public/_capabilities/output/verdict/capability.toml";
+        assert_eq!(
+            short_path(abs),
+            "_capabilities/output/verdict/capability.toml"
+        );
     }
 }
