@@ -3410,6 +3410,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "kei-db-contract"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "regex",
+ "serde",
+ "serde_json",
+ "sqlparser",
+ "tempfile",
+ "walkdir",
+]
+
+[[package]]
 name = "kei-decision"
 version = "0.1.0"
 dependencies = [
@@ -6678,6 +6692,15 @@ checksum = "7bba3a93db0cc4f7bdece8bb09e77e2e785c20bfebf79eb8340ed80708048790"
 dependencies = [
  "nom 7.1.3",
  "unicode_categories",
+]
+
+[[package]]
+name = "sqlparser"
+version = "0.51.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fe11944a61da0da3f592e19a45ebe5ab92dc14a779907ff1f08fbb797bfefc7"
+dependencies = [
+ "log",
 ]
 
 [[package]]

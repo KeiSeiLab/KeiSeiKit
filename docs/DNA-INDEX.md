@@ -1,19 +1,19 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T06:08:41Z.
-> Total blocks: 498. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T07:31:58Z.
+> Total blocks: 500. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 117 |
-| hook | 35 |
-| primitive | 105 |
+| hook | 36 |
+| primitive | 106 |
 | rule | 174 |
 | skill | 67 |
 
 ---
 
-## Primitive (105)
+## Primitive (106)
 
 Sorted alphabetically by name.
 
@@ -45,6 +45,7 @@ Sorted alphabetically by name.
 | kei-cron-scheduler | primitive::md,networ… | _primitives/_rust/kei-cron-scheduler/Cargo.toml | da2674f5 |
 | kei-crossdomain | primitive::cli,md,sq… | _primitives/_rust/kei-crossdomain/Cargo.toml | 7a263b47 |
 | kei-curator | primitive::cli,md,sq… | _primitives/_rust/kei-curator/Cargo.toml | dad1e6e3 |
+| kei-db-contract::kei-db-contract | primitive::_::ef3f4c… | _primitives/_rust/kei-db-contract/Cargo.toml | e4c729d2 |
 | kei-decision | primitive::cli,fs,md… | _primitives/_rust/kei-decision/Cargo.toml | 29049ab5 |
 | kei-decompose | primitive::cli,fs,md… | _primitives/_rust/kei-decompose/Cargo.toml | 7495424e |
 | kei-diff | primitive::md::2f52c… | _primitives/_rust/kei-diff/Cargo.toml | 0b1d7d44 |
@@ -78,7 +79,7 @@ Sorted alphabetically by name.
 | kei-memory-redis | primitive::md,networ… | _primitives/_rust/kei-memory-redis/Cargo.toml | fd7a49a9 |
 | kei-memory-sled | primitive::md,networ… | _primitives/_rust/kei-memory-sled/Cargo.toml | 6bd5485f |
 | kei-memory-sqlite | primitive::md,networ… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | f64bbb1d |
-| kei-memory::kei-memory | primitive::_::e47cd8… | _primitives/_rust/kei-memory/Cargo.toml | 2f7698b2 |
+| kei-memory::kei-memory | primitive::_::e47cd8… | _primitives/_rust/kei-memory/Cargo.toml | 0dd1dfc8 |
 | kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | db2e7bd0 |
 | kei-model | primitive::cli,md,re… | _primitives/_rust/kei-model/Cargo.toml | 0a6ce8bc |
 | kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | 1280a1dd |
@@ -833,7 +834,7 @@ Sorted alphabetically by name.
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
 
-## Hook (35)
+## Hook (36)
 
 Sorted alphabetically by name.
 
@@ -848,6 +849,7 @@ Sorted alphabetically by name.
 | alignment-check | shell | hook::shell::01f8f21… | hooks/alignment-check.sh |
 | assemble-agents | shell | hook::shell::9cd98a7… | hooks/assemble-agents.sh |
 | assemble-validate | shell | hook::shell::eace6b3… | hooks/assemble-validate.sh |
+| auto-dev-guard | shell | hook::shell::96e1fb2… | hooks/auto-dev-guard.sh |
 | block-dangerous | shell | hook::shell::e26e2af… | hooks/block-dangerous.sh |
 | check-error-patterns | shell | hook::shell::3bdab81… | hooks/check-error-patterns.sh |
 | citation-verify | shell | hook::shell::180a844… | hooks/citation-verify.sh |
@@ -1003,10 +1005,12 @@ Sorted alphabetically by name.
 
 ## Supersede chains
 
+- `/dev-guard — Continuous Development Guard` — 4 versions: 66daa27e → 59e77fbc → a1f93eb9 → 7ed68721
 - `3D Scene Skill` — 2 versions: e31a87ca → ca06fcac
 - `foo` — 10 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
 - `kei-cortex::kei-cortex` — 50 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc
-- `kei-memory::kei-memory` — 32 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2
+- `kei-db-contract::kei-db-contract` — 17 versions: 2e9d962a → 07651211 → e4200114 → facc4312 → 20bb0441 → dcd5de23 → bbd7a9df → 2662f63e → e067292d → e39caba6 → 42411821 → ec449d79 → 48d6d10f → c06e17c1 → 82de90e6 → e4c729d2 → 2ef926dc
+- `kei-memory::kei-memory` — 33 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2 → 0dd1dfc8
 - `kei-registry::kei-registry` — 3 versions: a9d4104f → 4110ba86 → 6e2dc3fd
 - `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd
 - `kei-token-tracker::kei-token-tracker` — 10 versions: 2e9d962a → 425b08f0 → 9a5196eb → 200eba01 → 2caec2d6 → 4538adbc → 0acb6793 → 1fa333e0 → dffb827c → 28bdb3b1
