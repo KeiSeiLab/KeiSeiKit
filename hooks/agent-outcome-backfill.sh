@@ -113,4 +113,28 @@ sqlite3 "$DB" \
         exit 0
     }
 
+# Sidecar journal: capture toolStats / totalToolUseCount / totalDurationMs
+# for tool-call-pattern analysis. Lives outside the ledger schema so we
+# don't need a migration on every payload-shape change. Append-only JSONL.
+TOOLSTATS_JSONL="$HOME/.claude/memory/time-metrics/agent-toolstats.jsonl"
+mkdir -p "$(dirname "$TOOLSTATS_JSONL")" 2>/dev/null || true
+printf '%s' "$PAYLOAD" | jq -c \
+    --arg id "$TOOL_USE_ID" \
+    --arg outcome "$SHIPPED" \
+    --arg stubs "$STUBS" \
+    '{
+        agent_id: $id,
+        outcome: $outcome,
+        stubs: ($stubs | tonumber),
+        ts: now | floor,
+        tool_use_count: (.tool_response.totalToolUseCount // null),
+        duration_ms: (.tool_response.totalDurationMs // null),
+        tool_stats: (.tool_response.toolStats // null),
+        tokens_in: (.tool_response.usage.input_tokens // null),
+        tokens_out: (.tool_response.usage.output_tokens // null),
+        cache_read: (.tool_response.usage.cache_read_input_tokens // null),
+        cache_write: (.tool_response.usage.cache_creation_input_tokens // null)
+     }' \
+    >> "$TOOLSTATS_JSONL" 2>/dev/null || true
+
 exit 0

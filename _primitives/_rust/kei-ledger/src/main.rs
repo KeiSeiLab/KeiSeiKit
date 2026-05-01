@@ -11,7 +11,8 @@ mod dispatch;
 
 use clap::{Parser, Subcommand};
 use dispatch::{
-    cmd_aggregate_skills, cmd_descendants, cmd_list, cmd_record_cost, cmd_tree, cmd_validate, err,
+    cmd_aggregate_skills, cmd_descendants, cmd_list, cmd_record_cost, cmd_record_skill, cmd_tree,
+    cmd_validate, err,
 };
 use kei_ledger::{ledger, schema};
 use std::path::PathBuf;
@@ -91,6 +92,23 @@ enum Cmd {
         /// Output format: json or markdown (default: markdown).
         #[arg(long, default_value = "markdown")]
         format: String,
+    },
+    /// Record a skill invocation in `skill_invocations` (schema v8+).
+    RecordSkill {
+        /// Skill name as registered in `~/.claude/skills/<name>/SKILL.md`.
+        skill_name: String,
+        /// 1 = succeeded, 0 = bailed/failed.
+        #[arg(long, value_parser = clap::value_parser!(u8).range(0..=1))]
+        success: u8,
+        /// Optional agent invocation that triggered this skill.
+        #[arg(long)]
+        agent_id: Option<String>,
+        /// Optional trajectory id for skill-chain grouping.
+        #[arg(long)]
+        trajectory_id: Option<String>,
+        /// Wall-clock duration in milliseconds (≥ 0).
+        #[arg(long)]
+        duration_ms: Option<i64>,
     },
     /// Record cost-tracking metadata (v6+) for an existing agent row.
     /// Wave 44c: ADDITIVE by default — repeated calls accumulate. Pass
@@ -204,6 +222,9 @@ fn main() -> ExitCode {
         Cmd::Descendants { dna } => cmd_descendants(&conn, &dna),
         Cmd::AggregateSkills { since, format } => {
             cmd_aggregate_skills(&conn, since, &format)
+        }
+        Cmd::RecordSkill { skill_name, success, agent_id, trajectory_id, duration_ms } => {
+            cmd_record_skill(&conn, &skill_name, success, agent_id, trajectory_id, duration_ms)
         }
         Cmd::RecordCost { agent_id, cents, provider, model, replace } => {
             cmd_record_cost(&conn, &agent_id, cents, &provider, &model, replace)
