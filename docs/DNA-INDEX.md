@@ -1,7 +1,7 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T07:31:58Z.
-> Total blocks: 500. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-01T07:41:26Z.
+> Total blocks: 501. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
@@ -9,7 +9,7 @@
 | hook | 36 |
 | primitive | 106 |
 | rule | 174 |
-| skill | 67 |
+| skill | 68 |
 
 ---
 
@@ -45,7 +45,7 @@ Sorted alphabetically by name.
 | kei-cron-scheduler | primitive::md,networ… | _primitives/_rust/kei-cron-scheduler/Cargo.toml | da2674f5 |
 | kei-crossdomain | primitive::cli,md,sq… | _primitives/_rust/kei-crossdomain/Cargo.toml | 7a263b47 |
 | kei-curator | primitive::cli,md,sq… | _primitives/_rust/kei-curator/Cargo.toml | dad1e6e3 |
-| kei-db-contract::kei-db-contract | primitive::_::ef3f4c… | _primitives/_rust/kei-db-contract/Cargo.toml | e4c729d2 |
+| kei-db-contract::kei-db-contract | primitive::_::ef3f4c… | _primitives/_rust/kei-db-contract/Cargo.toml | 2ef926dc |
 | kei-decision | primitive::cli,fs,md… | _primitives/_rust/kei-decision/Cargo.toml | 29049ab5 |
 | kei-decompose | primitive::cli,fs,md… | _primitives/_rust/kei-decompose/Cargo.toml | 7495424e |
 | kei-diff | primitive::md::2f52c… | _primitives/_rust/kei-diff/Cargo.toml | 0b1d7d44 |
@@ -126,7 +126,7 @@ Sorted alphabetically by name.
 | tokens-sync | primitive::md::32f10… | _primitives/_rust/tokens-sync/Cargo.toml | 54c149ab |
 | visual-diff | primitive::_::d495df… | _primitives/_rust/visual-diff/Cargo.toml | 557bdc21 |
 
-## Skill (67)
+## Skill (68)
 
 Sorted alphabetically by name.
 
@@ -143,6 +143,7 @@ Sorted alphabetically by name.
 | /site-create — 7-Phase Website Pipeline (index) | md | skill::md::8b8b3ad5:… | skills/site-create/SKILL.md |
 | /spawn-agent — Click-only Agent-tool composer (index) | md | skill::md::81c46bb3:… | skills/spawn-agent/SKILL.md |
 | /test-matrix — Testing beyond unit tests (index) | md | skill::md::a6272bbf:… | skills/test-matrix/SKILL.md |
+| /visual-loop — Visual / A11y / Responsive Regression Loop | md | skill::md::ea70d3a9:… | skills/visual-loop/SKILL.md |
 | /vm-provision — 6-Phase VPS Pipeline (index) | md | skill::md::ffc6787b:… | skills/vm-provision/SKILL.md |
 | /wave-audit — 3-Wave Parallel Audit | md | skill::md::11ba3da8:… | skills/wave-audit/SKILL.md |
 | 3D Scene Skill | md | skill::md::53fc17a0:… | skills/3d-scene/SKILL.md |
@@ -1006,6 +1007,7 @@ Sorted alphabetically by name.
 ## Supersede chains
 
 - `/dev-guard — Continuous Development Guard` — 4 versions: 66daa27e → 59e77fbc → a1f93eb9 → 7ed68721
+- `/dev-ship — Pre-Merge Quality Gate` — 4 versions: d698e957 → 405cd8c5 → f621cf3c → c124440b
 - `3D Scene Skill` — 2 versions: e31a87ca → ca06fcac
 - `foo` — 10 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
 - `kei-cortex::kei-cortex` — 50 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc
