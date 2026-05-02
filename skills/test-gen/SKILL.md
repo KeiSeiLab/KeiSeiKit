@@ -7,6 +7,12 @@ arguments:
     required: true
 ---
 
+## When to use
+
+- Generating unit tests for a specific function or file (happy path, edge cases, error handling).
+- Writing tests first (TDD) before implementing new functionality.
+- Use `/test-gen` for per-function unit tests; use `/test-matrix` for project-wide testing strategy.
+
 > **Complements `/test-matrix`.** `/test-gen` owns per-function unit tests
 > (happy / edge / error). `/test-matrix` owns project-wide testing strategy
 > (fuzz / property / load / e2e / mutation) and CI wiring. Use `/test-gen`

@@ -12,6 +12,12 @@ arguments:
 
 # Batch Workflow — Multi-Skill Pipelines
 
+## When to use
+
+- Running a multi-step workflow that chains several skills together (new-feature, marketing-launch, design-to-code, web-creation, full-audit, rag-setup).
+- Kicking off a named workflow pipeline rather than invoking individual skills manually.
+- Orchestrating sequential tasks that each depend on the output of the previous step.
+
 ## Available Workflows
 
 ### new-feature

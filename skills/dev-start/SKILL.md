@@ -5,6 +5,12 @@ description: Parallel-agent project/feature kickoff — 4 agents design contract
 
 # /dev-start — Parallel Feature Kickoff
 
+## When to use
+
+- Starting a new feature or project slice — design contracts, scaffold tests, and security review BEFORE any code is written.
+- Preventing the most common audit findings at the root (no contracts, no tests, no security review).
+- Kickoff for a PR-sized chunk of work: `/dev-start [feature description]`.
+
 > 80% проблем из аудитов = код написан без подготовки. Нет контрактов, нет тестов, нет security review.
 > dev-start запускает 4 агента ПАРАЛЛЕЛЬНО до первой строки кода.
 

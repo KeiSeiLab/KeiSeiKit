@@ -6,6 +6,12 @@ argument-hint: <project-path or glob scope>
 
 # Onboard — Auto Project Analysis (index)
 
+## When to use
+
+- Analysing an existing project to propose the right agents, hooks, and primitives for its stack.
+- First-time KeiSeiKit setup on a project: scan → score → propose → apply artefacts.
+- Adding KeiSeiKit coverage to a project that has grown beyond its original scope.
+
 You are analysing an existing project (or a scope of projects) and proposing
 the right kit artefacts for it: project-specialist agents, stack-specific
 hooks, and install-time primitives.

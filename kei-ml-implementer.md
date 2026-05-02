@@ -440,3 +440,17 @@ Blockers / next: <list>
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
 - `Background incident: a real cost-overrun (triple digits lost to unchecked Modal runs) motivates the Modal Protocol above.`
 - `Background pattern: audit fixes can balloon a file by 50%+ when bolted on as overlays — fix at the root, not on top.`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

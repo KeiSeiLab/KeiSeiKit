@@ -126,7 +126,7 @@ Not a consolidation per se — a DRY refactor. Each saved LOC is LOC that was du
 |---|---|---|
 | `_blocks/pipeline-5phase-template.md` | 5 pipeline skills | ~150 |
 | `_blocks/rule-pure-click-contract.md` | 5+ skills | ~50 |
-| `_blocks/evidence-grading.md` (already exists?) | unclear — confirm not duplicated | TBD |
+| `_blocks/evidence-grading.md` (already exists?) | RESOLVED 2026-05-02: file exists, not duplicated | TBD |
 
 ---
 

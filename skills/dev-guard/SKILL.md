@@ -5,6 +5,12 @@ description: Continuous parallel quality gate during development — 3 backend a
 
 # /dev-guard — Continuous Development Guard
 
+## When to use
+
+- After writing a new file or module to catch security, performance, or structural issues before committing.
+- Before every commit, or in place of a manual commit (`/dev-guard commit`).
+- After refactoring 3+ files or changing auth / payments / data layer code.
+
 > wave-audit находит проблемы ПОСЛЕ. dev-guard ловит их ПОКА пишешь код.
 > 3 backend агента + опциональный frontend-validator проверяют каждое значимое изменение.
 

@@ -6,6 +6,12 @@ argument-hint: <optional session id; defaults to last session>
 
 # Self-Audit — Session Retrospective Triage (index)
 
+## When to use
+
+- After a session ends: run RULE 0.14 retrospective to surface recurring mistakes and route them to `/escalate-recurrence`.
+- When a milestone commit fires the self-audit hook and findings need triage.
+- After an error spike (3+ errors in 20 tool calls) to understand the pattern before the next session.
+
 You are running the RULE 0.14 self-audit on the last (or named) session.
 You convert the session's trace into a short list of findings, classify
 each, present them as a multi-select click batch, and route each selection

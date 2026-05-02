@@ -6,6 +6,12 @@ argument-hint: (no arguments)
 
 # Sleep Setup — Cloud REM Sync Wizard (index)
 
+## When to use
+
+- One-time setup of the KeiSeiKit sleep layer (local-only, remote-only, or hybrid nightly REM sync).
+- Configuring the SSH deploy key, memory-repo, and `/schedule` trigger for the cloud consolidation agent.
+- Enabling v0.13.0 deep-sleep NREM consolidation (Phase 3b store backend + fork mode).
+
 You are running the one-time configuration wizard for the KeiSeiKit v0.11
 sleep layer. Each session-end dump pushes to a private git repo; a cloud
 Claude Code agent on `/schedule` clones the repo nightly, analyzes traces,

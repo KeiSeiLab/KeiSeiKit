@@ -1,131 +1,135 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-02T05:30:23Z.
-> Total blocks: 522. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-02T12:59:44Z.
+> Total blocks: 564. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
-| atom | 121 |
-| hook | 48 |
-| primitive | 111 |
-| rule | 174 |
+| atom | 149 |
+| hook | 52 |
+| primitive | 115 |
+| rule | 180 |
 | skill | 68 |
 
 ---
 
-## Primitive (111)
+## Primitive (115)
 
 Sorted alphabetically by name.
 
 | Name | DNA prefix | Path | Body sha8 |
 |---|---|---|---|
 | firewall-diff | primitive::cli,md::c… | _primitives/_rust/firewall-diff/Cargo.toml | 8260ffc0 |
-| frustration-matrix | primitive::cli,fs,md… | _primitives/_rust/frustration-matrix/Cargo.toml | d51e63c8 |
-| kei-agent-runtime | primitive::cli,fs,ha… | _primitives/_rust/kei-agent-runtime/Cargo.toml | 33b44d6c |
-| kei-artifact | primitive::cli,hash,… | _primitives/_rust/kei-artifact/Cargo.toml | a33abf97 |
-| kei-atom-discovery | primitive::fs,md::85… | _primitives/_rust/kei-atom-discovery/Cargo.toml | ca9202b5 |
-| kei-auth | primitive::cli,hash,… | _primitives/_rust/kei-auth/Cargo.toml | 28e0b700 |
-| kei-auth-apple | primitive::md,networ… | _primitives/_rust/kei-auth-apple/Cargo.toml | 166a2e48 |
-| kei-auth-google | primitive::md,networ… | _primitives/_rust/kei-auth-google/Cargo.toml | 0ff85382 |
-| kei-auth-magiclink | primitive::hash,md,n… | _primitives/_rust/kei-auth-magiclink/Cargo.toml | 96da0df3 |
-| kei-auth-webauthn | primitive::md,networ… | _primitives/_rust/kei-auth-webauthn/Cargo.toml | 4560153e |
-| kei-backend-daytona | primitive::md,networ… | _primitives/_rust/kei-backend-daytona/Cargo.toml | 4b57d079 |
-| kei-brain-view | primitive::cli,md,sq… | _primitives/_rust/kei-brain-view/Cargo.toml | d9d812f1 |
-| kei-cache | primitive::cli,hash,… | _primitives/_rust/kei-cache/Cargo.toml | 9d482614 |
-| kei-capability | primitive::cli,md::d… | _primitives/_rust/kei-capability/Cargo.toml | daf6cc6b |
-| kei-changelog | primitive::cli,regex… | _primitives/_rust/kei-changelog/Cargo.toml | 1146ef08 |
-| kei-chat-store | primitive::cli,md,sq… | _primitives/_rust/kei-chat-store/Cargo.toml | 87fa079c |
-| kei-compute-baremetal | primitive::cli,md,ne… | _primitives/_rust/kei-compute-baremetal/Cargo.toml | 1dd98120 |
-| kei-compute-digitalocean | primitive::md,networ… | _primitives/_rust/kei-compute-digitalocean/Cargo.toml | e502d22d |
-| kei-compute-linode | primitive::cli,md,ne… | _primitives/_rust/kei-compute-linode/Cargo.toml | df87593e |
-| kei-compute-vultr | primitive::cli,md,ne… | _primitives/_rust/kei-compute-vultr/Cargo.toml | eb1cd34c |
-| kei-conflict-scan | primitive::cli,fs,md… | _primitives/_rust/kei-conflict-scan/Cargo.toml | dee396b9 |
-| kei-content-store | primitive::cli,hash,… | _primitives/_rust/kei-content-store/Cargo.toml | ea462cc4 |
-| kei-cortex | primitive::cli,fs,md… | _primitives/_rust/kei-cortex/Cargo.toml | 47d1b6ba |
-| kei-cron-scheduler | primitive::md,networ… | _primitives/_rust/kei-cron-scheduler/Cargo.toml | a702296b |
-| kei-crossdomain | primitive::cli,md,sq… | _primitives/_rust/kei-crossdomain/Cargo.toml | b8e72f87 |
-| kei-curator | primitive::cli,md,sq… | _primitives/_rust/kei-curator/Cargo.toml | b244d7b8 |
-| kei-db-contract | primitive::cli,fs,md… | _primitives/_rust/kei-db-contract/Cargo.toml | d29338b0 |
-| kei-decision | primitive::cli,fs,md… | _primitives/_rust/kei-decision/Cargo.toml | ec7583ad |
-| kei-decompose | primitive::cli,fs,md… | _primitives/_rust/kei-decompose/Cargo.toml | d08c5b40 |
-| kei-diff | primitive::md::2f52c… | _primitives/_rust/kei-diff/Cargo.toml | 5503a110 |
-| kei-discover | primitive::cli,md,sq… | _primitives/_rust/kei-discover/Cargo.toml | 88c299e4 |
-| kei-dna-index | primitive::cli,md,sq… | _primitives/_rust/kei-dna-index/Cargo.toml | 6a5b990e |
-| kei-entity-store | primitive::md,sqlite… | _primitives/_rust/kei-entity-store/Cargo.toml | 3c138274 |
-| kei-export-trajectories | primitive::cli,md,sq… | _primitives/_rust/kei-export-trajectories/Cargo.toml | d765f055 |
-| kei-forge | primitive::md,networ… | _primitives/_rust/kei-forge/Cargo.toml | e9116d6a |
-| kei-fork | primitive::cli,md,sq… | _primitives/_rust/kei-fork/Cargo.toml | a3252cb9 |
+| frustration-matrix | primitive::cli,fs,md… | _primitives/_rust/frustration-matrix/Cargo.toml | 4df8a04e |
+| kei-agent-runtime | primitive::cli,fs,ha… | _primitives/_rust/kei-agent-runtime/Cargo.toml | 841ac805 |
+| kei-artifact | primitive::cli,hash,… | _primitives/_rust/kei-artifact/Cargo.toml | 50e8c9cd |
+| kei-atom-discovery | primitive::fs,md::85… | _primitives/_rust/kei-atom-discovery/Cargo.toml | e1fde01b |
+| kei-auth | primitive::cli,hash,… | _primitives/_rust/kei-auth/Cargo.toml | 1ecaa9b2 |
+| kei-auth-apple::kei-auth-apple | primitive::_::95b0b0… | _primitives/_rust/kei-auth-apple/Cargo.toml | 611219a6 |
+| kei-auth-google::kei-auth-google | primitive::_::19201d… | _primitives/_rust/kei-auth-google/Cargo.toml | 09127bd6 |
+| kei-auth-magiclink | primitive::hash,md,n… | _primitives/_rust/kei-auth-magiclink/Cargo.toml | 4d4f9332 |
+| kei-auth-webauthn | primitive::md,networ… | _primitives/_rust/kei-auth-webauthn/Cargo.toml | 041455cf |
+| kei-backend-daytona | primitive::md,networ… | _primitives/_rust/kei-backend-daytona/Cargo.toml | c609bc80 |
+| kei-brain-view | primitive::cli,md,sq… | _primitives/_rust/kei-brain-view/Cargo.toml | 4b4a3102 |
+| kei-cache | primitive::cli,hash,… | _primitives/_rust/kei-cache/Cargo.toml | 8163d8a6 |
+| kei-capability | primitive::cli,md::d… | _primitives/_rust/kei-capability/Cargo.toml | 458ecddd |
+| kei-changelog | primitive::cli,regex… | _primitives/_rust/kei-changelog/Cargo.toml | 3d788d60 |
+| kei-chat-store | primitive::cli,md,sq… | _primitives/_rust/kei-chat-store/Cargo.toml | eaf68a32 |
+| kei-compute-baremetal | primitive::cli,md,ne… | _primitives/_rust/kei-compute-baremetal/Cargo.toml | bfcd22c2 |
+| kei-compute-digitalocean | primitive::md,networ… | _primitives/_rust/kei-compute-digitalocean/Cargo.toml | e6346593 |
+| kei-compute-linode | primitive::cli,md,ne… | _primitives/_rust/kei-compute-linode/Cargo.toml | 40a2bdc5 |
+| kei-compute-vultr | primitive::cli,md,ne… | _primitives/_rust/kei-compute-vultr/Cargo.toml | f1f785f4 |
+| kei-conflict-scan | primitive::cli,fs,md… | _primitives/_rust/kei-conflict-scan/Cargo.toml | 8c4cda9a |
+| kei-content-store | primitive::cli,hash,… | _primitives/_rust/kei-content-store/Cargo.toml | b86f6d90 |
+| kei-cortex | primitive::cli,fs,md… | _primitives/_rust/kei-cortex/Cargo.toml | 6e01fa0d |
+| kei-cron-scheduler | primitive::md,networ… | _primitives/_rust/kei-cron-scheduler/Cargo.toml | e59b51d5 |
+| kei-crossdomain | primitive::cli,md,sq… | _primitives/_rust/kei-crossdomain/Cargo.toml | 7a6505bb |
+| kei-curator | primitive::cli,md,sq… | _primitives/_rust/kei-curator/Cargo.toml | 35bfa6bd |
+| kei-db-contract | primitive::cli,fs,md… | _primitives/_rust/kei-db-contract/Cargo.toml | 75c8bc23 |
+| kei-decision | primitive::cli,fs,md… | _primitives/_rust/kei-decision/Cargo.toml | db7a5620 |
+| kei-decompose::kei-decompose | primitive::_::db5109… | _primitives/_rust/kei-decompose/Cargo.toml | 6bea00bf |
+| kei-diff::kei-diff | primitive::_::2f52ca… | _primitives/_rust/kei-diff/Cargo.toml | 17ebc909 |
+| kei-discover | primitive::cli,md,sq… | _primitives/_rust/kei-discover/Cargo.toml | 6fe7269e |
+| kei-dna-index | primitive::cli,md,sq… | _primitives/_rust/kei-dna-index/Cargo.toml | 4f1b6703 |
+| kei-entity-store | primitive::md,sqlite… | _primitives/_rust/kei-entity-store/Cargo.toml | 4b0cdc95 |
+| kei-export-trajectories | primitive::cli,md,sq… | _primitives/_rust/kei-export-trajectories/Cargo.toml | 125acd5d |
+| kei-forge | primitive::md,networ… | _primitives/_rust/kei-forge/Cargo.toml | 396ec615 |
+| kei-fork | primitive::cli,md,sq… | _primitives/_rust/kei-fork/Cargo.toml | 69edfa7d |
 | kei-frustration-loop | primitive::cli,fs,md… | _primitives/_rust/kei-frustration-loop/Cargo.toml | 8bf9dddb |
-| kei-gateway | primitive::md,networ… | _primitives/_rust/kei-gateway/Cargo.toml | 91173d2d |
-| kei-gdrive-import | primitive::cli,md::c… | _primitives/_rust/kei-gdrive-import/Cargo.toml | d5b115ef |
-| kei-git-bitbucket | primitive::md,networ… | _primitives/_rust/kei-git-bitbucket/Cargo.toml | b2298cc9 |
-| kei-git-forgejo | primitive::md,networ… | _primitives/_rust/kei-git-forgejo/Cargo.toml | d71efb0f |
-| kei-git-gitea | primitive::md,networ… | _primitives/_rust/kei-git-gitea/Cargo.toml | 0de210a2 |
-| kei-git-gitlab | primitive::md,networ… | _primitives/_rust/kei-git-gitlab/Cargo.toml | 59a5271b |
-| kei-graph-check | primitive::cli,fs,md… | _primitives/_rust/kei-graph-check/Cargo.toml | 2c0e38d8 |
+| kei-gateway::kei-gateway | primitive::_::851c89… | _primitives/_rust/kei-gateway/Cargo.toml | dfcb92ad |
+| kei-gdrive-import::fixture-already-repo | primitive::_::5f4848… | _primitives/_rust/kei-gdrive-import/tests/fixtures/already-repo/Cargo.toml | c5836332 |
+| kei-gdrive-import::fixture-node-project | primitive::_::4e84a0… | _primitives/_rust/kei-gdrive-import/tests/fixtures/node-project/package.json | ee916544 |
+| kei-gdrive-import::fixture-python-project | primitive::_::1ab97c… | _primitives/_rust/kei-gdrive-import/tests/fixtures/python-project/pyproject.toml | bf833e71 |
+| kei-gdrive-import::fixture-rust-project | primitive::_::ac3c5d… | _primitives/_rust/kei-gdrive-import/tests/fixtures/rust-project/Cargo.toml | 536e506b |
+| kei-gdrive-import::kei-gdrive-import | primitive::_::cd682f… | _primitives/_rust/kei-gdrive-import/Cargo.toml | 0534882b |
+| kei-git-bitbucket::kei-git-bitbucket | primitive::_::07f898… | _primitives/_rust/kei-git-bitbucket/Cargo.toml | abdc8eff |
+| kei-git-forgejo::kei-git-forgejo | primitive::_::57d793… | _primitives/_rust/kei-git-forgejo/Cargo.toml | 5da0f781 |
+| kei-git-gitea::kei-git-gitea | primitive::_::75aaab… | _primitives/_rust/kei-git-gitea/Cargo.toml | 6de03d7a |
+| kei-git-gitlab::kei-git-gitlab | primitive::_::b76763… | _primitives/_rust/kei-git-gitlab/Cargo.toml | 69b696f4 |
+| kei-graph-check | primitive::cli,fs,md… | _primitives/_rust/kei-graph-check/Cargo.toml | fa07cf8a |
 | kei-graph-export | primitive::cli,md,sq… | _primitives/_rust/kei-graph-export/Cargo.toml | de93b403 |
-| kei-graph-stream | primitive::cli,md,ne… | _primitives/_rust/kei-graph-stream/Cargo.toml | 04ef818f |
-| kei-hibernate | primitive::cli,hash,… | _primitives/_rust/kei-hibernate/Cargo.toml | 1ea136f5 |
+| kei-graph-stream | primitive::cli,md,ne… | _primitives/_rust/kei-graph-stream/Cargo.toml | f50e21a6 |
+| kei-hibernate | primitive::cli,hash,… | _primitives/_rust/kei-hibernate/Cargo.toml | ec920564 |
 | kei-import-project | primitive::cli,fs,ha… | _primitives/_rust/kei-import-project/Cargo.toml | 2de0fd64 |
 | kei-leak-matrix | primitive::cli,fs,md… | _primitives/_rust/kei-leak-matrix/Cargo.toml | a3803ef9 |
-| kei-ledger | primitive::cli,md,sq… | _primitives/_rust/kei-ledger/Cargo.toml | 269810bf |
-| kei-ledger-sign | primitive::cli,md::e… | _primitives/_rust/kei-ledger-sign/Cargo.toml | c12a2016 |
-| kei-llm-bridge-mlx | primitive::network::… | _primitives/_rust/kei-llm-bridge-mlx/Cargo.toml | b09d3703 |
+| kei-ledger | primitive::cli,md,sq… | _primitives/_rust/kei-ledger/Cargo.toml | 113b5db1 |
+| kei-ledger-sign | primitive::cli,md::e… | _primitives/_rust/kei-ledger-sign/Cargo.toml | fd0abad1 |
+| kei-llm-bridge-mlx::kei-llm-bridge-mlx | primitive::_::275844… | _primitives/_rust/kei-llm-bridge-mlx/Cargo.toml | 73401169 |
 | kei-llm-llamacpp | primitive::cli,md,ne… | _primitives/_rust/kei-llm-llamacpp/Cargo.toml | d6781358 |
-| kei-llm-mlx | primitive::cli,md,ne… | _primitives/_rust/kei-llm-mlx/Cargo.toml | d276d3e6 |
-| kei-llm-ollama | primitive::cli,md,ne… | _primitives/_rust/kei-llm-ollama/Cargo.toml | 6876e1e7 |
-| kei-llm-router | primitive::cli,md,ne… | _primitives/_rust/kei-llm-router/Cargo.toml | a59cb2e9 |
-| kei-machine-probe | primitive::cli,md,re… | _primitives/_rust/kei-machine-probe/Cargo.toml | 6810f0b5 |
-| kei-mcp | primitive::md,networ… | _primitives/_rust/kei-mcp/Cargo.toml | 3a39649c |
-| kei-memory | primitive::cli,md,re… | _primitives/_rust/kei-memory/Cargo.toml | 654e3516 |
-| kei-memory-postgres | primitive::md,networ… | _primitives/_rust/kei-memory-postgres/Cargo.toml | c95bff7d |
-| kei-memory-redis | primitive::md,networ… | _primitives/_rust/kei-memory-redis/Cargo.toml | e749b491 |
-| kei-memory-sled | primitive::md,networ… | _primitives/_rust/kei-memory-sled/Cargo.toml | 6fdae904 |
-| kei-memory-sqlite | primitive::md,networ… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | 93761682 |
-| kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | fd996e76 |
-| kei-model | primitive::cli,md,re… | _primitives/_rust/kei-model/Cargo.toml | 1a4038fd |
-| kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | b67e44b9 |
-| kei-net-ipsec | primitive::md,networ… | _primitives/_rust/kei-net-ipsec/Cargo.toml | edb79478 |
-| kei-net-openvpn | primitive::md,networ… | _primitives/_rust/kei-net-openvpn/Cargo.toml | a209e645 |
+| kei-llm-mlx::kei-llm-mlx | primitive::_::a7cf47… | _primitives/_rust/kei-llm-mlx/Cargo.toml | e55665b6 |
+| kei-llm-ollama::kei-llm-ollama | primitive::_::724cf6… | _primitives/_rust/kei-llm-ollama/Cargo.toml | ce4124e0 |
+| kei-llm-router::kei-llm-router | primitive::_::c4ea9d… | _primitives/_rust/kei-llm-router/Cargo.toml | 1f5a9bb6 |
+| kei-machine-probe::kei-machine-probe | primitive::_::4b0fe6… | _primitives/_rust/kei-machine-probe/Cargo.toml | 2f616a0d |
+| kei-mcp | primitive::md,networ… | _primitives/_rust/kei-mcp/Cargo.toml | 8a9cefd6 |
+| kei-memory | primitive::cli,md,re… | _primitives/_rust/kei-memory/Cargo.toml | 8d05f749 |
+| kei-memory-postgres::kei-memory-postgres | primitive::_::38caf4… | _primitives/_rust/kei-memory-postgres/Cargo.toml | e5c92dd5 |
+| kei-memory-redis::kei-memory-redis | primitive::_::4678f8… | _primitives/_rust/kei-memory-redis/Cargo.toml | 8fdc9c77 |
+| kei-memory-sled::kei-memory-sled | primitive::_::310d39… | _primitives/_rust/kei-memory-sled/Cargo.toml | 4303778a |
+| kei-memory-sqlite::kei-memory-sqlite | primitive::_::aa1cc9… | _primitives/_rust/kei-memory-sqlite/Cargo.toml | de2b8e99 |
+| kei-migrate | primitive::cli,hash,… | _primitives/_rust/kei-migrate/Cargo.toml | b47bd103 |
+| kei-model-router | primitive::md,sqlite… | _primitives/_rust/kei-model-router/Cargo.toml | 5021bf7b |
+| kei-model::kei-model | primitive::_::6a479a… | _primitives/_rust/kei-model/Cargo.toml | 3f74b167 |
+| kei-net-ipsec::kei-net-ipsec | primitive::_::88948e… | _primitives/_rust/kei-net-ipsec/Cargo.toml | facbfd71 |
+| kei-net-openvpn::kei-net-openvpn | primitive::_::90f404… | _primitives/_rust/kei-net-openvpn/Cargo.toml | 6a5d03f7 |
 | kei-net-wireguard | primitive::md,networ… | _primitives/_rust/kei-net-wireguard/Cargo.toml | 05a75c60 |
 | kei-notify-discord | primitive::md,networ… | _primitives/_rust/kei-notify-discord/Cargo.toml | a080b52b |
 | kei-notify-slack | primitive::md,networ… | _primitives/_rust/kei-notify-slack/Cargo.toml | 241f0aa1 |
 | kei-notify-sms | primitive::md,networ… | _primitives/_rust/kei-notify-sms/Cargo.toml | d0fb8237 |
-| kei-notify-telegram | primitive::md,networ… | _primitives/_rust/kei-notify-telegram/Cargo.toml | d3bff93d |
-| kei-pet | primitive::cli,hash,… | _primitives/_rust/kei-pet/Cargo.toml | 2af7e9fd |
-| kei-ping | primitive::md,networ… | _primitives/_rust/kei-ping/Cargo.toml | 23b06c85 |
-| kei-pipe | primitive::cli,md,sq… | _primitives/_rust/kei-pipe/Cargo.toml | a23aec78 |
-| kei-projects-index | primitive::cli,fs,md… | _primitives/_rust/kei-projects-index/Cargo.toml | c5ecb5ee |
-| kei-projects-watcher | primitive::cli,md,ne… | _primitives/_rust/kei-projects-watcher/Cargo.toml | dd3a3b8c |
-| kei-provision | primitive::cli,md::1… | _primitives/_rust/kei-provision/Cargo.toml | cfa53bb3 |
-| kei-prune | primitive::cli,md,sq… | _primitives/_rust/kei-prune/Cargo.toml | 4454513b |
-| kei-refactor-engine | primitive::cli,md::c… | _primitives/_rust/kei-refactor-engine/Cargo.toml | 92e83ce0 |
-| kei-registry | primitive::cli,fs,ha… | _primitives/_rust/kei-registry/Cargo.toml | 5a2e79d8 |
+| kei-notify-telegram::kei-notify-telegram | primitive::_::d479a3… | _primitives/_rust/kei-notify-telegram/Cargo.toml | 868e0ce5 |
+| kei-pet | primitive::cli,hash,… | _primitives/_rust/kei-pet/Cargo.toml | fc580031 |
+| kei-ping::kei-ping | primitive::_::2d6344… | _primitives/_rust/kei-ping/Cargo.toml | 42f46c5d |
+| kei-pipe | primitive::cli,md,sq… | _primitives/_rust/kei-pipe/Cargo.toml | eca93d66 |
+| kei-projects-index | primitive::cli,fs,md… | _primitives/_rust/kei-projects-index/Cargo.toml | 8e2e7128 |
+| kei-projects-watcher | primitive::cli,md,ne… | _primitives/_rust/kei-projects-watcher/Cargo.toml | a9504a37 |
+| kei-provision | primitive::cli,md::1… | _primitives/_rust/kei-provision/Cargo.toml | 86821ebb |
+| kei-prune | primitive::cli,md,sq… | _primitives/_rust/kei-prune/Cargo.toml | dab125ef |
+| kei-refactor-engine | primitive::cli,md::c… | _primitives/_rust/kei-refactor-engine/Cargo.toml | 01f1f681 |
 | kei-registry::foo | primitive::_::12366c… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
 | kei-registry::foo | primitive::_::3937fa… | _primitives/_rust/kei-registry/tests/fixtures/fake-kit/_primitives/_rust/foo/Cargo.toml | 403bc4b0 |
 | kei-registry::kei-registry | primitive::_::30e60a… | _primitives/_rust/kei-registry/Cargo.toml | d5146bbd |
+| kei-registry::kei-registry | primitive::_::4744f0… | _primitives/_rust/kei-registry/Cargo.toml | 4e595599 |
 | kei-registry::mini-prim | primitive::_::57f8eb… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-registry::mini-prim | primitive::_::bb2052… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
-| kei-replay | primitive::cli,hash,… | _primitives/_rust/kei-replay/Cargo.toml | 74f2fcc4 |
-| kei-router | primitive::cli,md,ne… | _primitives/_rust/kei-router/Cargo.toml | 2cfaa362 |
-| kei-runtime | primitive::cli,fs,md… | _primitives/_rust/kei-runtime/Cargo.toml | c19f68cf |
-| kei-runtime-core | primitive::hash,md,n… | _primitives/_rust/kei-runtime-core/Cargo.toml | dedb3de0 |
-| kei-sage | primitive::cli,fs,md… | _primitives/_rust/kei-sage/Cargo.toml | e7617e42 |
-| kei-scheduler | primitive::cli,md,sq… | _primitives/_rust/kei-scheduler/Cargo.toml | b20fdba2 |
-| kei-search-core | primitive::cli,md,sq… | _primitives/_rust/kei-search-core/Cargo.toml | 7f980b0f |
-| kei-shared | primitive::md::9db37… | _primitives/_rust/kei-shared/Cargo.toml | c9abc1ac |
-| kei-skill-importer | primitive::cli,fs,md… | _primitives/_rust/kei-skill-importer/Cargo.toml | 8a09d39e |
-| kei-skills | primitive::fs,md,reg… | _primitives/_rust/kei-skills/Cargo.toml | 9b27964c |
-| kei-social-store | primitive::cli,md,sq… | _primitives/_rust/kei-social-store/Cargo.toml | f5409d5f |
-| kei-spawn | primitive::cli,hash,… | _primitives/_rust/kei-spawn/Cargo.toml | fd4e54ad |
-| kei-store | primitive::cli,md,ne… | _primitives/_rust/kei-store/Cargo.toml | cd08369f |
-| kei-svc-systemd | primitive::cli,md,ne… | _primitives/_rust/kei-svc-systemd/Cargo.toml | cb3a6e65 |
-| kei-task | primitive::cli,md,sq… | _primitives/_rust/kei-task/Cargo.toml | bba6a7b7 |
-| kei-tlog | primitive::md::9efee… | _primitives/_rust/kei-tlog/Cargo.toml | b3a16003 |
+| kei-replay | primitive::cli,hash,… | _primitives/_rust/kei-replay/Cargo.toml | 3d43da58 |
+| kei-router::kei-router | primitive::_::1e654e… | _primitives/_rust/kei-router/Cargo.toml | 98ab93cd |
+| kei-runtime | primitive::cli,fs,md… | _primitives/_rust/kei-runtime/Cargo.toml | b372ab7c |
+| kei-runtime-core | primitive::hash,md,n… | _primitives/_rust/kei-runtime-core/Cargo.toml | b9a37dea |
+| kei-sage | primitive::cli,fs,md… | _primitives/_rust/kei-sage/Cargo.toml | 70873353 |
+| kei-scheduler | primitive::cli,md,sq… | _primitives/_rust/kei-scheduler/Cargo.toml | f1f1ebf8 |
+| kei-search-core | primitive::cli,md,sq… | _primitives/_rust/kei-search-core/Cargo.toml | 5c3a0ced |
+| kei-shared | primitive::md::9db37… | _primitives/_rust/kei-shared/Cargo.toml | 9effa42e |
+| kei-skill-importer | primitive::cli,fs,md… | _primitives/_rust/kei-skill-importer/Cargo.toml | cb92de6f |
+| kei-skills | primitive::fs,md,reg… | _primitives/_rust/kei-skills/Cargo.toml | 8b8fa1ed |
+| kei-social-store | primitive::cli,md,sq… | _primitives/_rust/kei-social-store/Cargo.toml | 8c7bba92 |
+| kei-spawn | primitive::cli,hash,… | _primitives/_rust/kei-spawn/Cargo.toml | 6f581999 |
+| kei-store | primitive::cli,md,ne… | _primitives/_rust/kei-store/Cargo.toml | 496176e1 |
+| kei-svc-systemd::kei-svc-systemd | primitive::_::e0de92… | _primitives/_rust/kei-svc-systemd/Cargo.toml | a037fe33 |
+| kei-task | primitive::cli,md,sq… | _primitives/_rust/kei-task/Cargo.toml | 8a46ec72 |
+| kei-tlog::kei-tlog | primitive::_::9efeed… | _primitives/_rust/kei-tlog/Cargo.toml | ad07d93d |
 | kei-token-tracker | primitive::cli,md,sq… | _primitives/_rust/kei-token-tracker/Cargo.toml | 16feb4d4 |
-| kei-tty | primitive::cli,md,ne… | _primitives/_rust/kei-tty/Cargo.toml | fa00dbff |
-| kei-watch | primitive::cli,md::2… | _primitives/_rust/kei-watch/Cargo.toml | 5889eebd |
-| keisei | primitive::cli,md,re… | _primitives/_rust/keisei/Cargo.toml | 94467a31 |
+| kei-tty::kei-tty | primitive::_::b5b0e7… | _primitives/_rust/kei-tty/Cargo.toml | f1a45915 |
+| kei-watch | primitive::cli,md::2… | _primitives/_rust/kei-watch/Cargo.toml | 58d6e5ed |
+| keisei | primitive::cli,md,re… | _primitives/_rust/keisei/Cargo.toml | 5b045150 |
 | mock-render | primitive::hash,md::… | _primitives/_rust/mock-render/Cargo.toml | f5f4d966 |
 | ssh-check | primitive::cli,md::8… | _primitives/_rust/ssh-check/Cargo.toml | ebd97541 |
 | tokens-sync | primitive::md::32f10… | _primitives/_rust/tokens-sync/Cargo.toml | 69857925 |
@@ -206,7 +210,7 @@ Sorted alphabetically by name.
 | Web Effects Skill | md | skill::md::78ada116:… | skills/web-effects/SKILL.md |
 | nano-banana | md | skill::md::840e10fb:… | skills/nano-banana/SKILL.md |
 
-## Rule (174)
+## Rule (180)
 
 Sorted alphabetically by name.
 
@@ -839,8 +843,19 @@ Sorted alphabetically by name.
 |---|---|---|
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
+### verify-external
 
-## Hook (48)
+| Section | DNA prefix | Body sha8 |
+|---|---|---|
+| verify-external-api-before-use::companion-files | rule::_::90de5028::d… | d1b78dda |
+| verify-external-api-before-use::enforcement | rule::_::94975dd1::7… | 73608ee2 |
+| verify-external-api-before-use::incident-2026-05-02-single-session | rule::_::126620ac::4… | 46eadf6a |
+| verify-external-api-before-use::rule-lock | rule::_::9dff8f6e::d… | de042552 |
+| verify-external-api-before-use::the-rule | rule::_::0a5a3335::d… | df7fc881 |
+| verify-external-api-before-use::why-this-is-new-vs-existing-rules | rule::_::f8b2dab9::b… | be5b639d |
+
+
+## Hook (52)
 
 Sorted alphabetically by name.
 
@@ -863,6 +878,8 @@ Sorted alphabetically by name.
 | auto-encyclopedia-refresh | shell | hook::shell::e585647… | hooks/auto-encyclopedia-refresh.sh |
 | auto-register-on-edit | shell | hook::shell::80be71a… | hooks/auto-register-on-edit.sh |
 | block-dangerous | shell | hook::shell::e26e2af… | hooks/block-dangerous.sh |
+| chat-numeric-postflag | shell | hook::shell::7ba854e… | hooks/chat-numeric-postflag.sh |
+| chat-numeric-prewarn | shell | hook::shell::aacbf7b… | hooks/chat-numeric-prewarn.sh |
 | check-error-patterns | shell | hook::shell::3bdab81… | hooks/check-error-patterns.sh |
 | citation-verify | shell | hook::shell::180a844… | hooks/citation-verify.sh |
 | decompose-rules-on-edit | shell | hook::shell::d504b63… | hooks/decompose-rules-on-edit.sh |
@@ -874,6 +891,7 @@ Sorted alphabetically by name.
 | graph-export-watcher | shell | hook::shell::8d87d02… | hooks/graph-export-watcher.sh |
 | milestone-commit-hook | shell | hook::shell::18347ff… | hooks/milestone-commit-hook.sh |
 | no-downgrade | shell | hook::shell::db31e58… | hooks/no-downgrade.sh |
+| no-github-push | shell | hook::shell::530cc2a… | hooks/no-github-push.sh |
 | no-hand-edit-agents | shell | hook::shell::ed728f1… | hooks/no-hand-edit-agents.sh |
 | no-python-without-approval | shell | hook::shell::cba75df… | hooks/no-python-without-approval.sh |
 | numeric-claims-guard | shell | hook::shell::e709fb1… | hooks/numeric-claims-guard.sh |
@@ -886,6 +904,7 @@ Sorted alphabetically by name.
 | recurrence-suggest | shell | hook::shell::5c73e0d… | hooks/recurrence-suggest.sh |
 | rust-first | shell | hook::shell::ff62ef7… | hooks/rust-first.sh |
 | safety-guard | shell | hook::shell::96bef7a… | hooks/safety-guard.sh |
+| secrets-pre-guard | shell | hook::shell::bbdd013… | hooks/secrets-pre-guard.sh |
 | session-end-dump | shell | hook::shell::7c3e2d9… | hooks/session-end-dump.sh |
 | site-wysiwyd-check | shell | hook::shell::0683fa8… | hooks/site-wysiwyd-check.sh |
 | skill-record | shell | hook::shell::954ccee… | hooks/skill-record.sh |
@@ -895,7 +914,7 @@ Sorted alphabetically by name.
 | tomd-preread | shell | hook::shell::8a95b76… | hooks/tomd-preread.sh |
 | tool-use-event | shell | hook::shell::34bb788… | hooks/tool-use-event.sh |
 
-## Atom (121)
+## Atom (149)
 
 Sorted alphabetically by name.
 
@@ -983,10 +1002,10 @@ Sorted alphabetically by name.
 | TEST — Property-based testing (invariants + shrinking) | atom::_::d2c8bd9e::3… | _blocks/test-property.md | 329287ab |
 | TEST-FIRST | atom::_::2158b933::b… | _blocks/rule-test-first.md | b65a0c3a |
 | `_blocks/` — Composable Agent Content | atom::_::c8144990::b… | _blocks/README.md | bd6e19ee |
-| auditor | atom::_::b46e86db::7… | _roles/auditor.toml | 7eb6ab3a |
+| auditor | atom::_::b46e86db::7… | _roles/auditor.toml | 74d9689e |
 | edit-local | atom::_::b7724e4f::3… | _roles/edit-local.toml | 35ca9971 |
 | edit-shared | atom::_::db022330::3… | _roles/edit-shared.toml | 332b1a8b |
-| explorer | atom::_::892af912::d… | _roles/explorer.toml | d61c4f89 |
+| explorer | atom::_::892af912::e… | _roles/explorer.toml | e852f2df |
 | foo | atom::md::36904b21::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::71c0f62c::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::b61b8509::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
@@ -998,121 +1017,201 @@ Sorted alphabetically by name.
 | foo | atom::md::0f507ef3::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::40c9240c::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | foo | atom::md::077f9361::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::df5f173f::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::52c0759a::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::86220683::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::57bbdb24::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::46b291f2::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::cfb78e15::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
+| foo | atom::md::e0797619::… | _primitives/_rust/kei-registry/tests/fixtures/atom-sample/atom.md | 309b88fa |
 | git-ops | atom::_::6da713d3::d… | _roles/git-ops.toml | da80a8e7 |
-| merger | atom::_::183b6add::a… | _roles/merger.toml | af2bf880 |
+| merger | atom::_::183b6add::a… | _roles/merger.toml | a9f3f180 |
 | output::merge-result | atom::output::d58ef5… | _capabilities/output/merge-result/capability.toml | 91cb9245 |
-| output::report-format | atom::output::ad3888… | _capabilities/output/report-format/capability.toml | 2051e906 |
-| output::severity-grade | atom::output::cad67a… | _capabilities/output/severity-grade/capability.toml | ed37a6c0 |
+| output::report-format | atom::output::ad3888… | _capabilities/output/report-format/capability.toml | 4da32467 |
+| output::severity-grade | atom::output::cad67a… | _capabilities/output/severity-grade/capability.toml | d58af2b1 |
 | output::verdict | atom::output::33808e… | _capabilities/output/verdict/capability.toml | b7b8f09e |
 | policy::git-ops-scope | atom::policy::223791… | _capabilities/policy/git-ops-scope/capability.toml | 4d43202c |
-| policy::no-git-ops | atom::policy::62703a… | _capabilities/policy/no-git-ops/capability.toml | eed5a2d2 |
-| quality::cargo-check-green | atom::quality::4ee65… | _capabilities/quality/cargo-check-green/capability.toml | 58fde9c4 |
-| quality::constructor-pattern | atom::quality::9f509… | _capabilities/quality/constructor-pattern/capability.toml | a9c646b2 |
-| quality::tests-green | atom::quality::4502c… | _capabilities/quality/tests-green/capability.toml | aa3903f9 |
+| policy::no-git-ops | atom::policy::62703a… | _capabilities/policy/no-git-ops/capability.toml | 883d37bb |
+| quality::cargo-check-green | atom::quality::4ee65… | _capabilities/quality/cargo-check-green/capability.toml | 6546bfa8 |
+| quality::constructor-pattern | atom::quality::9f509… | _capabilities/quality/constructor-pattern/capability.toml | fd53eef5 |
+| quality::tests-green | atom::quality::4502c… | _capabilities/quality/tests-green/capability.toml | 3988631a |
 | read-only | atom::_::ebbf642d::8… | _roles/read-only.toml | 87b7cee9 |
-| safety::no-dep-bump | atom::safety::ec5c73… | _capabilities/safety/no-dep-bump/capability.toml | 52f17bcf |
-| scope::files-denylist | atom::scope::2062ed2… | _capabilities/scope/files-denylist/capability.toml | 7a3eb264 |
-| scope::files-whitelist | atom::scope::dff44fd… | _capabilities/scope/files-whitelist/capability.toml | 5a2b126c |
+| safety::no-dep-bump | atom::safety::ec5c73… | _capabilities/safety/no-dep-bump/capability.toml | c82a1651 |
+| scope::files-denylist | atom::scope::2062ed2… | _capabilities/scope/files-denylist/capability.toml | 3bd54553 |
+| scope::files-whitelist | atom::scope::dff44fd… | _capabilities/scope/files-whitelist/capability.toml | 20d7510d |
 | scope::read-only | atom::scope::9a26ff2… | _capabilities/scope/read-only/capability.toml | eeffc63a |
 | tools::bash-allowlist | atom::tools::b154595… | _capabilities/tools/bash-allowlist/capability.toml | f18330d4 |
 | tools::cargo-only-bash | atom::_::692833ce::9… | _capabilities/tools/cargo-only-bash/capability.toml | 98e70f68 |
-| tools::deny-tools | atom::tools::d64414a… | _capabilities/tools/deny-tools/capability.toml | 8f342dd8 |
+| tools::deny-tools | atom::tools::d64414a… | _capabilities/tools/deny-tools/capability.toml | 5f725724 |
 | tools::read-only | atom::_::eded5636::2… | _capabilities/tools/read-only/capability.toml | 22bba452 |
 | user-hooks | atom::md::331b9a34::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::5b86a4b7::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::bb51a844::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::aa62e0d8::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::1ddda625::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::b87b357e::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::aaab2cbb::… | _blocks/path-user-hooks.md | 023e5a08 |
+| user-hooks | atom::md::8476a9f3::… | _blocks/path-user-hooks.md | 023e5a08 |
 | user-memory | atom::md::1a771d51::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::3b6efc96::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::dcd160ef::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::70d0f1af::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::7be8f832::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::64a3d7f7::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::16b1f5de::… | _blocks/path-user-memory.md | b8f9e85f |
+| user-memory | atom::md::7578f37c::… | _blocks/path-user-memory.md | b8f9e85f |
 | user-rules | atom::md::97292045::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::0cef3626::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::aadea12a::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::4560d039::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::667893d3::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::e5788bb0::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::fe6a4a66::… | _blocks/path-user-rules.md | bc8e0acf |
+| user-rules | atom::md::f344a76b::… | _blocks/path-user-rules.md | bc8e0acf |
 | verify::fork-audit | atom::verify::81e519… | _capabilities/verify/fork-audit/capability.toml | 3fb8694d |
 
 ---
 
 ## Supersede chains
 
-- `/dev-guard — Continuous Development Guard` — 4 versions: 66daa27e → 59e77fbc → a1f93eb9 → 7ed68721
-- `/dev-ship — Pre-Merge Quality Gate` — 4 versions: d698e957 → 405cd8c5 → f621cf3c → c124440b
+- `/competitor-analysis — Deprecated Alias` — 2 versions: e176cf07 → 9aa4fd6b
+- `/design-inspiration — Deprecated Alias` — 2 versions: 0c34c029 → 153d7a63
+- `/dev-guard — Continuous Development Guard` — 5 versions: 66daa27e → 59e77fbc → a1f93eb9 → 7ed68721 → 4b251309
+- `/dev-ship — Pre-Merge Quality Gate` — 5 versions: d698e957 → 405cd8c5 → f621cf3c → c124440b → ace99b99
+- `/dev-start — Parallel Feature Kickoff` — 2 versions: c9ab5b12 → d7fd4796
+- `/drive-import — Google Drive → Forgejo project import` — 2 versions: 32b0a64e → 2d68d9c8
+- `/site-builder — WYSIWYD website builder` — 2 versions: b5f7c090 → 2508e02d
+- `/site-create — 7-Phase Website Pipeline (index)` — 2 versions: 1223899c → bd31968f
+- `/spawn-agent — Click-only Agent-tool composer (index)` — 2 versions: 86daa3a8 → a6c00648
+- `/test-matrix — Testing beyond unit tests (index)` — 2 versions: 8e6e1f56 → c4653cc6
+- `/vm-provision — 6-Phase VPS Pipeline (index)` — 2 versions: c3cdf6f2 → 04a5eb35
+- `/wave-audit — 3-Wave Parallel Audit` — 2 versions: b754cd05 → 01329795
 - `3D Scene Skill` — 3 versions: e31a87ca → ca06fcac → e31a87ca
+- `AI Animation Pipeline` — 2 versions: 7c4b005c → 92865368
+- `API-Design — Style, Contract & Lifecycle Pipeline (index)` — 2 versions: f1c44fb3 → c4505796
+- `Architecture Rules Engine` — 2 versions: be478f74 → b99a2e1d
+- `Auth-Setup — Identity, Session & Authorization Pipeline (index)` — 2 versions: 46ba8b08 → f7cf0f58
+- `Batch Workflow — Multi-Skill Pipelines` — 2 versions: d36e11f0 → 66388c1e
+- `Browser Automation with playwright-cli` — 2 versions: c321bbfb → 6202d726
+- `CI-Scaffold — CI/CD Pipeline Generator (index)` — 2 versions: 6a596ab2 → f922e52e
+- `Compose-Solution — Meta-Orchestrator (index)` — 2 versions: 8229941b → 1e9e2c0b
+- `Content Pipeline Workflow` — 2 versions: 3d5beb6f → c99020f4
 - `DEPLOY — Modal (GPU compute)` — 2 versions: 9598fb12 → e3c07b09
+- `Design System Workflow` — 2 versions: f08a4677 → 39d4a387
+- `Docs-Scaffold — Project Documentation Pipeline (index)` — 2 versions: 3802caeb → 8098221e
 - `Escalate Recurrence — Interactive Codifier` — 2 versions: c1111db8 → db16763f
+- `Figma to Code Workflow` — 2 versions: 62fb6faa → 69944bb2
+- `Fix Issue Workflow` — 2 versions: 57db7744 → 1eca9feb
+- `Holographic Architecture Analysis` — 2 versions: 8d8ab802 → 7339eeb2
+- `Hooks Control — Runtime Hook Enable/Disable` — 2 versions: ca96aa22 → de67c957
 - `MODE — Agent × Cognitive-Mode Matrix` — 2 versions: 51067491 → e9a7019b
 - `New Agent — Project-Specialist Wizard` — 2 versions: dfdaea5c → bcf5a0d9
+- `New-Project — 4-Phase Pipeline (index)` — 2 versions: a4823708 → 72223ad9
+- `Observability-Setup — 5-Phase Pipeline (index)` — 2 versions: d63cee11 → 9a1e6ef4
+- `Onboard — Auto Project Analysis (index)` — 2 versions: 68bc3eac → 41c7dec0
+- `Performance Audit Workflow` — 2 versions: 07cb23c9 → 0c0ad38b
+- `Pet Init — Interactive Persona Wizard (index)` — 2 versions: 097926f7 → e89cd71d
+- `Refactor Workflow` — 2 versions: aab43956 → 0c0163b1
+- `SEO Audit Workflow` — 2 versions: d43aa52e → e7f5e161
 - `STACK — Python ML (PyTorch / JAX)` — 2 versions: ceb1fc98 → 4afd934a
-- `Self-Audit — Session Retrospective Triage (index)` — 2 versions: 339cb507 → 38fd80b7
-- `agent-event-done` — 2 versions: ef70393c → 598bc917
-- `agent-event-spawn` — 2 versions: b4573a30 → fb3603c7
+- `Schema-Design — Relational Schema & Migration Pipeline (index)` — 2 versions: 06a0f2c0 → 8d662c40
+- `Self-Audit — Session Retrospective Triage (index)` — 3 versions: 339cb507 → 38fd80b7 → 44427a22
+- `Sleep On It — Incubation Wizard (index)` — 2 versions: c62ae34a → e1553680
+- `Sleep Setup — Cloud REM Sync Wizard (index)` — 2 versions: 470f7902 → d9877f2a
+- `Test Generation Workflow` — 2 versions: a3a67707 → 6c187beb
+- `agent-event-done` — 3 versions: ef70393c → 598bc917 → aa05dec9
+- `agent-event-spawn` — 3 versions: b4573a30 → fb3603c7 → 1f32efc5
 - `agent-heartbeat-tick` — 2 versions: 5eb00dc3 → 560fa0f8
 - `agent-outcome-backfill` — 2 versions: 0e00d9ca → c901aaf2
-- `alignment-check` — 2 versions: 4e7389b1 → b1e18549
+- `alignment-check` — 3 versions: 4e7389b1 → b1e18549 → 31600957
+- `auditor` — 2 versions: 7eb6ab3a → 74d9689e
+- `block-dangerous` — 2 versions: c4aea975 → d479220b
+- `check-error-patterns` — 2 versions: de2866b5 → be07f0de
+- `citation-verify` — 2 versions: e65d32af → c7d4715f
+- `destructive-guard` — 2 versions: 80c352e6 → a329d569
+- `explorer` — 2 versions: d61c4f89 → e852f2df
 - `extract-task-durations` — 2 versions: e6854ef5 → 859873eb
 - `firewall-diff` — 2 versions: e42f1e32 → 8260ffc0
-- `foo` — 11 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
-- `frustration-matrix` — 2 versions: 0923b30a → d51e63c8
-- `kei-agent-runtime` — 2 versions: 708830d4 → 33b44d6c
-- `kei-artifact` — 2 versions: 2c55b84a → a33abf97
-- `kei-atom-discovery` — 2 versions: 0d532c9f → ca9202b5
-- `kei-auth` — 2 versions: bb941dd2 → 28e0b700
-- `kei-auth-apple` — 2 versions: 29ddf78c → 166a2e48
-- `kei-auth-google` — 2 versions: 49664ff6 → 0ff85382
-- `kei-auth-magiclink` — 2 versions: 526ecba4 → 96da0df3
-- `kei-auth-webauthn` — 2 versions: 4ad3dfc1 → 4560153e
-- `kei-backend-daytona` — 2 versions: 83b09611 → 4b57d079
-- `kei-brain-view` — 2 versions: ecad62ab → d9d812f1
-- `kei-cache` — 2 versions: 77c8ff97 → 9d482614
-- `kei-capability` — 2 versions: 6a5b93b1 → daf6cc6b
-- `kei-changelog` — 2 versions: 3753d7ec → 1146ef08
-- `kei-chat-store` — 2 versions: ecae9608 → 87fa079c
-- `kei-compute-baremetal` — 2 versions: 5b90defe → 1dd98120
-- `kei-compute-digitalocean` — 2 versions: 369b3a00 → e502d22d
-- `kei-compute-linode` — 2 versions: f63c4aa6 → df87593e
-- `kei-compute-vultr` — 2 versions: 4cb6c0b7 → eb1cd34c
-- `kei-conflict-scan` — 2 versions: 381b80ad → dee396b9
-- `kei-content-store` — 2 versions: 11ed9bd8 → ea462cc4
-- `kei-cortex` — 2 versions: 4815eb79 → 47d1b6ba
-- `kei-cortex::kei-cortex` — 50 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc
-- `kei-cron-scheduler` — 2 versions: da2674f5 → a702296b
-- `kei-crossdomain` — 2 versions: 7a263b47 → b8e72f87
-- `kei-curator` — 2 versions: dad1e6e3 → b244d7b8
-- `kei-db-contract::kei-db-contract` — 17 versions: 2e9d962a → 07651211 → e4200114 → facc4312 → 20bb0441 → dcd5de23 → bbd7a9df → 2662f63e → e067292d → e39caba6 → 42411821 → ec449d79 → 48d6d10f → c06e17c1 → 82de90e6 → e4c729d2 → 2ef926dc
-- `kei-decision` — 2 versions: 29049ab5 → ec7583ad
+- `foo` — 18 versions: 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa → 309b88fa
+- `frustration-matrix` — 3 versions: 0923b30a → d51e63c8 → 4df8a04e
+- `kei-agent-runtime` — 3 versions: 708830d4 → 33b44d6c → 841ac805
+- `kei-artifact` — 3 versions: 2c55b84a → a33abf97 → 50e8c9cd
+- `kei-atom-discovery` — 3 versions: 0d532c9f → ca9202b5 → e1fde01b
+- `kei-auth` — 3 versions: bb941dd2 → 28e0b700 → 1ecaa9b2
+- `kei-auth-apple` — 5 versions: 29ddf78c → 166a2e48 → f005a8c3 → f005a8c3 → fec3df65
+- `kei-auth-apple::kei-auth-apple` — 13 versions: a0658111 → d73d70d6 → c6dca77c → f110be2f → cbaa983c → 54f8559a → f10e1d01 → 2007964c → 3bf68c0d → 880565f7 → f2186558 → 7d4800b7 → 611219a6
+- `kei-auth-google` — 4 versions: 49664ff6 → 0ff85382 → 6aeb13c9 → bf1d45b8
+- `kei-auth-google::kei-auth-google` — 9 versions: f09d7692 → 1907bb1f → e45b999d → d002bf00 → d002bf00 → c0d9562c → 61de2f0f → 39a688a6 → 09127bd6
+- `kei-auth-magiclink` — 3 versions: 526ecba4 → 96da0df3 → 4d4f9332
+- `kei-auth-webauthn` — 3 versions: 4ad3dfc1 → 4560153e → 041455cf
+- `kei-auth::kei-auth` — 4 versions: 6168365b → eaa3e9f3 → 639ff2ab → b043cf11
+- `kei-backend-daytona` — 3 versions: 83b09611 → 4b57d079 → c609bc80
+- `kei-brain-view` — 3 versions: ecad62ab → d9d812f1 → 4b4a3102
+- `kei-cache` — 3 versions: 77c8ff97 → 9d482614 → 8163d8a6
+- `kei-capability` — 3 versions: 6a5b93b1 → daf6cc6b → 458ecddd
+- `kei-changelog` — 3 versions: 3753d7ec → 1146ef08 → 3d788d60
+- `kei-chat-store` — 3 versions: ecae9608 → 87fa079c → eaf68a32
+- `kei-compute-baremetal` — 4 versions: 5b90defe → 1dd98120 → 0a9d8909 → bfcd22c2
+- `kei-compute-baremetal::kei-compute-baremetal` — 11 versions: 0dfa0ccb → c1ed6b0a → 59359ec3 → ad9deec9 → dee408ff → abb3f302 → 3768ab43 → 4b98473c → c01dcea1 → 629e3d88 → 629e3d88
+- `kei-compute-digitalocean` — 3 versions: 369b3a00 → e502d22d → e6346593
+- `kei-compute-linode` — 3 versions: f63c4aa6 → df87593e → 40a2bdc5
+- `kei-compute-vultr` — 3 versions: 4cb6c0b7 → eb1cd34c → f1f785f4
+- `kei-conflict-scan` — 3 versions: 381b80ad → dee396b9 → 8c4cda9a
+- `kei-content-store` — 3 versions: 11ed9bd8 → ea462cc4 → b86f6d90
+- `kei-cortex` — 6 versions: 4815eb79 → 47d1b6ba → 6e01fa0d → 6e01fa0d → 6e01fa0d → 6e01fa0d
+- `kei-cortex::kei-cortex` — 108 versions: 2305a894 → b046411d → 31e30021 → 0e1fdd58 → ee42ea3c → ea55151c → 5a91990e → 48b55962 → 9d197f44 → 44dcf2b8 → f82717c3 → 6beb14d1 → 7c783b8b → 6f4566d6 → ae6673fb → cb55caac → 0544a125 → 906fe71e → dda08557 → a9d9835c → c6bb1a76 → ff69e910 → 8c2a2cd0 → a4f10ba1 → 3e1d80b9 → a42dc172 → 9d1faba6 → 8c098c2a → ed51e643 → 8e611e78 → b0e5fc42 → d5acba40 → ea37b0a2 → ef485e8b → 4ee863b3 → 7b9b0b84 → b75a06c5 → 154d5906 → ccf3586b → bfa4e51e → 2d4d2abe → 5f7a5fac → ae4e5a1a → 81387a8b → 98f37df7 → 1f8a6a5e → a7910ea4 → bcbb7ede → 44165ca9 → 213f02fc → 2f0a30bd → 72bb72f0 → b5167b4d → b547ea78 → 22fd0a17 → 48c02bd1 → 5dc0ae1b → f92ef035 → d88d40c8 → 304b82c3 → 1aae122b → 2dd97fb1 → 0c0763ba → 3a2dc192 → db0268b2 → 96d4c01e → ad8c681f → 96d4c01e → 42442b7d → 4f866eae → 78f70ea8 → 7f18e568 → 43f90d7d → fa410710 → 875d5a2a → b6203887 → 8ead3163 → e76cddd8 → dd9c9514 → b66b6cba → 4bbaf015 → b58768b5 → b179e553 → 1da94835 → 0da17c6a → e7b4f1b0 → d4db0252 → 01226b1a → 750f5ffd → 1c0a1a8e → d55eb5bd → 87588688 → b4f95eb5 → aee28766 → 29e25e78 → 6275797b → f7c79fb5 → 34de185c → 3028f8a9 → 34de185c → b77a7549 → 7d2685d5 → 189ebf41 → e08cd8fc → 1db22f1c → 76ee9811 → 56bc509b → 64281b3f
+- `kei-cron-scheduler` — 3 versions: da2674f5 → a702296b → e59b51d5
+- `kei-crossdomain` — 3 versions: 7a263b47 → b8e72f87 → 7a6505bb
+- `kei-curator` — 3 versions: dad1e6e3 → b244d7b8 → 35bfa6bd
+- `kei-db-contract` — 2 versions: d29338b0 → 75c8bc23
+- `kei-db-contract::kei-db-contract` — 18 versions: 2e9d962a → 07651211 → e4200114 → facc4312 → 20bb0441 → dcd5de23 → bbd7a9df → 2662f63e → e067292d → e39caba6 → 42411821 → ec449d79 → 48d6d10f → c06e17c1 → 82de90e6 → e4c729d2 → 2ef926dc → 2ef926dc
+- `kei-decision` — 3 versions: 29049ab5 → ec7583ad → db7a5620
 - `kei-decompose` — 2 versions: 7495424e → d08c5b40
 - `kei-diff` — 2 versions: 0b1d7d44 → 5503a110
-- `kei-discover` — 2 versions: 9e30c653 → 88c299e4
-- `kei-dna-index` — 2 versions: d4050bea → 6a5b990e
-- `kei-entity-store` — 2 versions: e0856206 → 3c138274
-- `kei-export-trajectories` — 2 versions: 55753570 → d765f055
-- `kei-forge` — 2 versions: b11967b7 → e9116d6a
-- `kei-fork` — 2 versions: 980d5588 → a3252cb9
+- `kei-discover` — 3 versions: 9e30c653 → 88c299e4 → 6fe7269e
+- `kei-dna-index` — 3 versions: d4050bea → 6a5b990e → 4f1b6703
+- `kei-entity-store` — 3 versions: e0856206 → 3c138274 → 4b0cdc95
+- `kei-export-trajectories` — 3 versions: 55753570 → d765f055 → 125acd5d
+- `kei-forge` — 3 versions: b11967b7 → e9116d6a → 396ec615
+- `kei-fork` — 3 versions: 980d5588 → a3252cb9 → 69edfa7d
 - `kei-frustration-loop` — 2 versions: 474e1d3d → 8bf9dddb
-- `kei-gateway` — 2 versions: 28d41236 → 91173d2d
+- `kei-gateway` — 3 versions: 28d41236 → 91173d2d → d1e9cdfd
+- `kei-gateway::kei-gateway` — 2 versions: dfcb92ad → dfcb92ad
 - `kei-gdrive-import` — 2 versions: 99ffbed8 → d5b115ef
 - `kei-git-bitbucket` — 2 versions: 85c850ba → b2298cc9
 - `kei-git-forgejo` — 2 versions: a0f19163 → d71efb0f
 - `kei-git-gitea` — 2 versions: ea30f0cc → 0de210a2
-- `kei-git-gitlab` — 2 versions: 744859c4 → 59a5271b
-- `kei-graph-check` — 2 versions: e08f240e → 2c0e38d8
+- `kei-git-gitlab` — 3 versions: 744859c4 → 59a5271b → a3e126b1
+- `kei-git-gitlab::kei-git-gitlab` — 2 versions: 69b696f4 → 69b696f4
+- `kei-graph-check` — 3 versions: e08f240e → 2c0e38d8 → fa07cf8a
 - `kei-graph-export::kei-graph-export` — 26 versions: 2e9d962a → b0f840b1 → 4a42d5f4 → a9d35468 → 1f0c066f → 6f5cd1a9 → 89ae1693 → fbebe21d → 63b761f6 → 643d3f08 → 7ba05286 → ca606a00 → c1f97c41 → 237d050b → 094ddc72 → 006b0f7d → c3d7c243 → a67fc02f → 33beda01 → 615a6cfb → 6dbfd254 → bb6ca1bb → 48cb9c62 → 5529822c → 1b597838 → f17c1aeb
-- `kei-graph-stream::kei-graph-stream` — 8 versions: 2e9d962a → d3087d32 → eefe8fc1 → 021bb6f8 → 96a32fa0 → 9ca6470e → d527efb1 → 28e6d9b6
-- `kei-hibernate` — 2 versions: 25f6d5bc → 1ea136f5
+- `kei-graph-stream` — 2 versions: 04ef818f → f50e21a6
+- `kei-graph-stream::kei-graph-stream` — 14 versions: 2e9d962a → d3087d32 → eefe8fc1 → 021bb6f8 → 96a32fa0 → 9ca6470e → d527efb1 → 28e6d9b6 → d364149d → 2db7af4f → a7ab6633 → 4e5e1e6f → e189e95e → d2a0312a
+- `kei-hibernate` — 3 versions: 25f6d5bc → 1ea136f5 → ec920564
 - `kei-import-project` — 2 versions: aa3750a0 → 2de0fd64
 - `kei-leak-matrix` — 2 versions: 06a89af2 → a3803ef9
-- `kei-ledger` — 3 versions: 8d59d685 → 269810bf → 269810bf
-- `kei-ledger-sign` — 2 versions: 339bd55a → c12a2016
-- `kei-ledger::kei-ledger` — 6 versions: cbfb6330 → d44d16bb → 38851983 → dccd1493 → 6c25d3ca → 1c26fa43
-- `kei-llm-bridge-mlx` — 2 versions: 23e9e5b8 → b09d3703
+- `kei-ledger` — 4 versions: 8d59d685 → 269810bf → 269810bf → 113b5db1
+- `kei-ledger-sign` — 3 versions: 339bd55a → c12a2016 → fd0abad1
+- `kei-ledger::kei-ledger` — 7 versions: cbfb6330 → d44d16bb → 38851983 → dccd1493 → 6c25d3ca → 1c26fa43 → 1c26fa43
+- `kei-llm-bridge-mlx` — 3 versions: 23e9e5b8 → b09d3703 → b919ddcd
+- `kei-llm-bridge-mlx::kei-llm-bridge-mlx` — 2 versions: 73401169 → 73401169
 - `kei-llm-llamacpp` — 2 versions: 8cd7b0c0 → d6781358
 - `kei-llm-mlx` — 2 versions: 9fb79f0f → d276d3e6
 - `kei-llm-ollama` — 2 versions: cb99ce2c → 6876e1e7
 - `kei-llm-router` — 2 versions: bd772802 → a59cb2e9
 - `kei-machine-probe` — 2 versions: 634b2e86 → 6810f0b5
-- `kei-mcp` — 2 versions: 3425ff56 → 3a39649c
-- `kei-memory` — 2 versions: fd941920 → 654e3516
+- `kei-mcp` — 3 versions: 3425ff56 → 3a39649c → 8a9cefd6
+- `kei-memory` — 3 versions: fd941920 → 654e3516 → 8d05f749
 - `kei-memory-postgres` — 2 versions: a9da92d3 → c95bff7d
-- `kei-memory-redis` — 2 versions: fd7a49a9 → e749b491
+- `kei-memory-redis` — 3 versions: fd7a49a9 → e749b491 → b4205e9d
+- `kei-memory-redis::kei-memory-redis` — 2 versions: 8fdc9c77 → 8fdc9c77
 - `kei-memory-sled` — 2 versions: 6bd5485f → 6fdae904
 - `kei-memory-sqlite` — 2 versions: f64bbb1d → 93761682
-- `kei-memory::kei-memory` — 33 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2 → 0dd1dfc8
-- `kei-migrate` — 2 versions: db2e7bd0 → fd996e76
+- `kei-memory::kei-memory` — 34 versions: adcd4146 → 4645a074 → a8883527 → 898880d6 → 63248191 → 13461cd3 → 43470a70 → a2665f92 → fc8f7afb → 347c6675 → 2405f427 → a64eaf5c → 6fd5449b → d8509f53 → bba89ea5 → 4c12d77d → 5940f848 → e3b6aa5d → 7de01ed1 → fd2b0d2d → 2054601f → 04b9f270 → 0e6a981d → 802f8487 → 0da8e0c7 → c136273f → 1035f140 → a02e197e → 739a6c0f → 5a1ebf4f → 0bf3b6f7 → 2f7698b2 → 0dd1dfc8 → ee193625
+- `kei-migrate` — 3 versions: db2e7bd0 → fd996e76 → b47bd103
 - `kei-model` — 3 versions: 0a6ce8bc → 1a4038fd → 1a4038fd
-- `kei-model-router` — 2 versions: 1280a1dd → b67e44b9
-- `kei-model::kei-model` — 2 versions: 0948fb4f → 3f74b167
+- `kei-model-router` — 3 versions: 1280a1dd → b67e44b9 → 5021bf7b
+- `kei-model::kei-model` — 3 versions: 0948fb4f → 3f74b167 → 3f74b167
 - `kei-net-ipsec` — 2 versions: 600684a8 → edb79478
 - `kei-net-openvpn` — 2 versions: d4c94d69 → a209e645
 - `kei-net-wireguard` — 2 versions: e2c8fab8 → 05a75c60
@@ -1120,52 +1219,73 @@ Sorted alphabetically by name.
 - `kei-notify-slack` — 2 versions: 6ecc85e5 → 241f0aa1
 - `kei-notify-sms` — 2 versions: 97776ab9 → d0fb8237
 - `kei-notify-telegram` — 2 versions: b2384d0d → d3bff93d
-- `kei-pet` — 2 versions: 8b7b8ee7 → 2af7e9fd
+- `kei-pet` — 3 versions: 8b7b8ee7 → 2af7e9fd → fc580031
 - `kei-ping` — 2 versions: d0c626c3 → 23b06c85
-- `kei-pipe` — 2 versions: 3efc46a4 → a23aec78
-- `kei-projects-index` — 2 versions: ce1576f0 → c5ecb5ee
-- `kei-projects-watcher` — 2 versions: dedc5323 → dd3a3b8c
-- `kei-provision` — 2 versions: 1d613e5d → cfa53bb3
-- `kei-prune` — 2 versions: 7c0a0c11 → 4454513b
-- `kei-refactor-engine` — 2 versions: 90048888 → 92e83ce0
+- `kei-pipe` — 3 versions: 3efc46a4 → a23aec78 → eca93d66
+- `kei-projects-index` — 3 versions: ce1576f0 → c5ecb5ee → 8e2e7128
+- `kei-projects-watcher` — 3 versions: dedc5323 → dd3a3b8c → a9504a37
+- `kei-provision` — 3 versions: 1d613e5d → cfa53bb3 → 86821ebb
+- `kei-prune` — 3 versions: 7c0a0c11 → 4454513b → dab125ef
+- `kei-refactor-engine` — 3 versions: 90048888 → 92e83ce0 → 01f1f681
 - `kei-registry` — 4 versions: 7d9570ad → 5a2e79d8 → 5a2e79d8 → 5a2e79d8
 - `kei-registry::foo` — 2 versions: 403bc4b0 → 403bc4b0
-- `kei-registry::kei-registry` — 36 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf → 713f693b → 5faa1d45 → 84b3d3aa → f0fd45d4 → a50c01c9 → a4b4526d → b6f981f1 → 93eeffff → d3feb512 → f21fe020 → cbe1a45d → d5146bbd → a33bb21f → a3f03a74 → 4e595599
+- `kei-registry::kei-registry` — 37 versions: a9d4104f → 4110ba86 → 6e2dc3fd → 1f486539 → f10a08ba → 48886c98 → 6aeaf85c → ca0c09e0 → 130372c0 → f69680b3 → 50364568 → 30e6dee3 → 3bb6d4f8 → 26a25696 → 0951d355 → 3261f321 → 5a190e74 → 80762a78 → d2bd49f3 → 99859be7 → b134cecf → 713f693b → 5faa1d45 → 84b3d3aa → f0fd45d4 → a50c01c9 → a4b4526d → b6f981f1 → 93eeffff → d3feb512 → f21fe020 → cbe1a45d → d5146bbd → a33bb21f → a3f03a74 → 4e595599 → 4e595599
 - `kei-registry::mini-prim` — 2 versions: 9fa2b304 → 9fa2b304
-- `kei-replay` — 2 versions: 420ceb46 → 74f2fcc4
-- `kei-router` — 2 versions: fc8c6820 → 2cfaa362
-- `kei-router::kei-router` — 15 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd
-- `kei-runtime` — 2 versions: 44b695ea → c19f68cf
-- `kei-runtime-core` — 2 versions: 100eec0c → dedb3de0
-- `kei-sage` — 2 versions: 773af2fd → e7617e42
-- `kei-scheduler` — 2 versions: 589d4c96 → b20fdba2
-- `kei-search-core` — 2 versions: 3e15b74a → 7f980b0f
-- `kei-shared` — 2 versions: 5990b174 → c9abc1ac
-- `kei-skill-importer` — 2 versions: 18270170 → 8a09d39e
-- `kei-skills` — 2 versions: 0bc302bc → 9b27964c
-- `kei-social-store` — 2 versions: 901fa890 → f5409d5f
-- `kei-spawn` — 2 versions: fd3b3939 → fd4e54ad
-- `kei-store` — 2 versions: 381485a1 → cd08369f
-- `kei-svc-systemd` — 2 versions: 13da0fd2 → cb3a6e65
-- `kei-task` — 2 versions: f1204d34 → bba6a7b7
+- `kei-replay` — 3 versions: 420ceb46 → 74f2fcc4 → 3d43da58
+- `kei-router` — 3 versions: fc8c6820 → 2cfaa362 → eef0157c
+- `kei-router::kei-router` — 17 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd → 98ab93cd → 98ab93cd
+- `kei-runtime` — 3 versions: 44b695ea → c19f68cf → b372ab7c
+- `kei-runtime-core` — 3 versions: 100eec0c → dedb3de0 → b9a37dea
+- `kei-runtime-core::kei-runtime-core` — 5 versions: 7980a704 → d64f3fbc → 9822303c → 80ad147f → ee80f871
+- `kei-runtime::kei-runtime` — 6 versions: e23e203b → 45e2bb3a → 93b703b3 → bd5a94ce → 15d85045 → 2aa2f1e3
+- `kei-sage` — 3 versions: 773af2fd → e7617e42 → 70873353
+- `kei-scheduler` — 3 versions: 589d4c96 → b20fdba2 → f1f1ebf8
+- `kei-search-core` — 3 versions: 3e15b74a → 7f980b0f → 5c3a0ced
+- `kei-shared` — 3 versions: 5990b174 → c9abc1ac → 9effa42e
+- `kei-skill-importer` — 3 versions: 18270170 → 8a09d39e → cb92de6f
+- `kei-skills` — 3 versions: 0bc302bc → 9b27964c → 8b8fa1ed
+- `kei-social-store` — 3 versions: 901fa890 → f5409d5f → 8c7bba92
+- `kei-spawn` — 3 versions: fd3b3939 → fd4e54ad → 6f581999
+- `kei-store` — 3 versions: 381485a1 → cd08369f → 496176e1
+- `kei-svc-systemd` — 3 versions: 13da0fd2 → cb3a6e65 → 71d27f32
+- `kei-svc-systemd::kei-svc-systemd` — 2 versions: a037fe33 → a037fe33
+- `kei-task` — 3 versions: f1204d34 → bba6a7b7 → 8a46ec72
 - `kei-tlog` — 2 versions: 8a4a1f56 → b3a16003
 - `kei-token-tracker::kei-token-tracker` — 10 versions: 2e9d962a → 425b08f0 → 9a5196eb → 200eba01 → 2caec2d6 → 4538adbc → 0acb6793 → 1fa333e0 → dffb827c → 28bdb3b1
 - `kei-tty` — 2 versions: 42f78a71 → fa00dbff
-- `kei-watch` — 2 versions: c7e67afd → 5889eebd
-- `keisei` — 2 versions: 6911bb1e → 94467a31
+- `kei-watch` — 3 versions: c7e67afd → 5889eebd → 58d6e5ed
+- `keisei` — 3 versions: 6911bb1e → 94467a31 → 5b045150
+- `merger` — 2 versions: af2bf880 → a9f3f180
 - `mock-render` — 2 versions: 99b0927a → f5f4d966
+- `nano-banana` — 2 versions: af1cdb93 → beb1649e
+- `no-downgrade` — 3 versions: ff6a5fe0 → e9aa1cf2 → 13087e5b
 - `no-python-without-approval` — 2 versions: 45d3e0ab → 48fdb89e
-- `numeric-claims-guard` — 2 versions: 90f697e6 → d5ed33c8
+- `numeric-claims-guard` — 5 versions: 90f697e6 → d5ed33c8 → 52e330ae → 943abcf7 → afc73756
 - `numeric-claims-record` — 2 versions: 59a9990f → 342361a3
+- `output::report-format` — 2 versions: 2051e906 → 4da32467
+- `output::severity-grade` — 2 versions: ed37a6c0 → d58af2b1
 - `phase-b-rem` — 4 versions: 69fdc9bc → df6af06f → 223c0c99 → 8545aba8
+- `policy::no-git-ops` — 2 versions: eed5a2d2 → 883d37bb
+- `post-commit-audit` — 2 versions: 045545fb → f57932b8
 - `post-write-check` — 2 versions: 6ceb2237 → 4aaf1c5e
+- `quality::cargo-check-green` — 2 versions: 58fde9c4 → 6546bfa8
+- `quality::constructor-pattern` — 2 versions: a9c646b2 → fd53eef5
+- `quality::tests-green` — 2 versions: aa3903f9 → 3988631a
 - `safety-guard` — 2 versions: 32b889cf → 665e7cd1
+- `safety::no-dep-bump` — 2 versions: 52f17bcf → c82a1651
+- `scope::files-denylist` — 2 versions: 7a3eb264 → 3bd54553
+- `scope::files-whitelist` — 2 versions: 5a2b126c → 20d7510d
 - `site-wysiwyd-check` — 2 versions: a0d38a22 → 416c0648
 - `skill-record` — 3 versions: cdf67741 → e2444805 → 44e464fe
 - `sleep-report-tg` — 3 versions: acc3ebfb → ef101ab6 → 9529ec50
 - `ssh-check` — 2 versions: f419e2b0 → ebd97541
-- `task-timer` — 2 versions: 202823f9 → 16e4f0a3
+- `task-timer` — 5 versions: 202823f9 → 16e4f0a3 → a48f5401 → 4482de6f → d1289992
 - `tokens-sync` — 2 versions: 54c149ab → 69857925
+- `tool-use-event` — 2 versions: 8903ffd4 → a7a0cfd9
+- `tools::deny-tools` — 2 versions: 8f342dd8 → 5f725724
+- `user-hooks` — 8 versions: 023e5a08 → 023e5a08 → 023e5a08 → 023e5a08 → 023e5a08 → 023e5a08 → 023e5a08 → 023e5a08
+- `user-memory` — 8 versions: b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f
+- `user-rules` — 8 versions: bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf
 - `visual-diff` — 2 versions: 557bdc21 → 4516e372
 
 ---

@@ -12,6 +12,12 @@ arguments:
 
 # Refactor Workflow
 
+## When to use
+
+- Restructuring code that violates the Constructor Pattern (file >200 LOC, function >30 LOC, multiple responsibilities, duplicated code).
+- Safe refactoring that must preserve existing behaviour — checkpoint, tests baseline, extract, verify.
+- When `wave-audit` or `/dev-guard` flags a structural issue that requires decomposition.
+
 ## Step 1: Understand Current State
 - Read target file(s) completely
 - Identify existing tests for the target

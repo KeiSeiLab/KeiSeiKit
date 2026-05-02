@@ -369,3 +369,17 @@ Blockers / next: <list>
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
 - `{path::user-rules}/code-style.md`
 - `{path::user-rules}/karpathy-behavioral.md`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

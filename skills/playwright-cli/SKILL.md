@@ -5,6 +5,12 @@ description: Browser automation via Playwright CLI — UI testing, form filling,
 
 # Browser Automation with playwright-cli
 
+## When to use
+
+- Automating browser tasks: UI testing, form filling, taking screenshots, or scraping web pages.
+- Token-efficient alternative to the Playwright MCP — saves ~90K tokens per task by passing only an accessibility-tree summary.
+- Any task asking to "test UI", "automate browser", "take a screenshot", "fill a form", or "scrape a page".
+
 ## Overview
 
 `playwright-cli` is a token-efficient CLI tool for browser automation. It saves the accessibility tree to disk and only passes a summary to the agent — ~90K tokens cheaper than MCP per task.

@@ -6,6 +6,12 @@ argument-hint: (optional) "drive:path/to/folder"
 
 # /drive-import — Google Drive → Forgejo project import
 
+## When to use
+
+- Importing one or more Google Drive folders as private repos into a local Forgejo dev-hub.
+- Auto-discovering and classifying Drive project folders via `--scan` before import.
+- Migrating Drive-based project archives to version-controlled Forgejo repos.
+
 Bridge to the kei-drive-import wizard. Two modes:
 
 | Mode | When | How |

@@ -410,3 +410,17 @@ Blockers / next: <list>
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
 - `Background pattern: a real architectural-overlay case where audit fixes ballooned a file by over 50% of its original size — never patch, fix root formulas.`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

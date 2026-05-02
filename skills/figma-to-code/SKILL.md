@@ -9,6 +9,12 @@ arguments:
 
 # Figma to Code Workflow
 
+## When to use
+
+- Converting a Figma design to code: extract design context → analyse layout/typography/tokens → implement responsive component.
+- Translating a specific Figma frame or node into a project's existing component library and design token system.
+- Any task starting with a Figma URL that needs accurate pixel-level implementation.
+
 ## Step 1: Extract from Figma
 - Parse URL to get fileKey and nodeId
 - Call `get_design_context` with fileKey and nodeId (Figma MCP / REST)

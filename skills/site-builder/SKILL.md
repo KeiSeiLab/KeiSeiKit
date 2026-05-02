@@ -7,7 +7,7 @@ description: Build a website from block recipes via interactive wizard. Asks sta
 
 > **[DEPRECATED — v0.17+]** This skill is a subset of `/site-create`. Prefer
 > `/site-create` for new work. `/site-builder` remains for backwards
-> compatibility and will not be removed before v2.
+> compatibility. `removed-after: v2.0 (~2026-09-01)`
 
 > **Core promise:** every section you approve in the preview IS the file that gets deployed. No "approximately like this". Byte-for-byte.
 

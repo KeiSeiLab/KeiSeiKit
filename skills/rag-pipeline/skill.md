@@ -1,3 +1,4 @@
+<!-- migrated from skills/rag-pipeline/skill.md (lowercase legacy filename) on 2026-05-02 -->
 ---
 name: rag-pipeline
 description: Use when building RAG (Retrieval-Augmented Generation) systems — embedding pipeline, vector database, document ingestion, semantic search, hybrid search. Triggers on "RAG", "embeddings", "vector search", "semantic search", "document ingestion", "knowledge base".
@@ -11,6 +12,12 @@ arguments:
 ---
 
 # RAG Pipeline Skill
+
+## When to use
+
+- Building a RAG system: embedding pipeline, vector store ingestion, semantic or hybrid search over documents.
+- Choosing between embedding providers (OpenAI, Gemini, Voyage, local) or vector databases (LanceDB, Qdrant, Pinecone).
+- Adding a knowledge base or document search capability to an existing application.
 
 Build retrieval-augmented generation systems with swappable components.
 

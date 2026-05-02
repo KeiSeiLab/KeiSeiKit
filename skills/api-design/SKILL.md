@@ -6,6 +6,12 @@ argument-hint: <one-line API description, e.g. "B2C SaaS, public REST API, 3 cli
 
 # API-Design — Style, Contract & Lifecycle Pipeline (index)
 
+## When to use
+
+- Designing a new public or internal API from scratch (REST, GraphQL, tRPC, gRPC).
+- Producing an OpenAPI 3.1 or GraphQL SDL contract skeleton before implementation begins.
+- Deciding versioning strategy, rate-limit policy, and codegen toolchain for an evolving service.
+
 You are converting "I need an API for X" into a concrete, reviewable plan:
 which style to ship, what resources exist, what the machine-readable
 contract looks like, how versions evolve, how rate limits + auth integrate,

@@ -6,6 +6,12 @@ argument-hint: <free-text description of what needs testing and why>
 
 # /test-matrix — Testing beyond unit tests (index)
 
+## When to use
+
+- A project needs testing beyond unit tests: fuzzing, property-based, load, E2E, or mutation testing.
+- At project kickoff or when coverage gaps span multiple test paradigms across the stack.
+- Use `/test-matrix` for project-wide strategy; use `/test-gen` for per-function unit tests.
+
 You are designing a **testing matrix** for a project that already has (or
 should have) unit-test coverage via `/test-gen`. This skill owns the
 orthogonal axes:

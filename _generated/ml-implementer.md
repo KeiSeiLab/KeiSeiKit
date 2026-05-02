@@ -485,3 +485,17 @@ Blockers / next: <list>
 - `{path::user-memory}/wrong-paths-specialized-ml.md`
 - `MEMORY.md → Compute Cost Incident (2026-02-26): promised $27, spent $98.78 on Modal. NEVER AGAIN.`
 - `MEMORY.md → Architecture Overlay Incident: model_brain.py 227→354 LOC from audit fixes. No Patching.`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

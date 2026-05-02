@@ -9,6 +9,12 @@ arguments:
 
 # Performance Audit Workflow
 
+## When to use
+
+- Auditing an API endpoint, page, or function for performance regressions (baseline → profile → fix → remeasure).
+- Identifying the top 3 bottlenecks (DB N+1, sequential network calls, CPU hotspots, bundle bloat).
+- Before shipping a feature that touches a known hot path and needs measured before/after numbers.
+
 ## Step 1: Establish Baseline
 - Measure current performance:
   - API: response time (p50, p95, p99), throughput

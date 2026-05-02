@@ -15,6 +15,12 @@ arguments:
 
 # Content Pipeline Workflow
 
+## When to use
+
+- Writing a blog post, article, or documentation page from scratch (research → outline → draft → SEO → format → social promo).
+- Producing platform-targeted content for blog, Medium, Dev.to, or project docs.
+- Creating launch content for a product or feature release.
+
 ## Step 1: Research
 - WebSearch for existing content on the topic (top 5 results)
 - Identify gaps — what's NOT covered well?

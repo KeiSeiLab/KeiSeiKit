@@ -6,6 +6,12 @@ argument-hint: (none — fully click-driven)
 
 # Hooks Control — Runtime Hook Enable/Disable
 
+## When to use
+
+- Temporarily disabling noisy advisory hooks for the current shell session without editing `~/.claude/settings.json`.
+- Switching hook profiles (full / advisory-off / minimal / off) for a focused debugging session.
+- Re-enabling hooks after a session where they were selectively turned off.
+
 Click-only wizard. Helps you toggle KeiSeiKit hooks **for the current shell
 session** via env vars, without editing `~/.claude/settings.json`. The skill
 emits shell commands; it NEVER runs them.

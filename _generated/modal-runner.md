@@ -431,3 +431,17 @@ Blockers / next: <list>
 - `{path::user-rules}/ml-protocol.md`
 - `{path::user-memory}/MEMORY.md  (Compute Cost Incident 2026-02-26)`
 - `https://modal.com/pricing  (live pricing — WebFetch or user browser)`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

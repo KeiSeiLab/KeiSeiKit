@@ -6,6 +6,12 @@ argument-hint: <project directory | omit to use $PWD>
 
 # Docs-Scaffold — Project Documentation Pipeline (index)
 
+## When to use
+
+- Bootstrapping documentation for a new or existing repo (CLAUDE.md, DECISIONS.md, README, runbook, CHANGELOG).
+- Auditing gaps in existing docs and generating missing files from KeiSeiKit templates.
+- Auto-detecting project type and stack to produce the right starter documentation set.
+
 > See `_blocks/pipeline-5phase-template.md` for the 5-phase wizard contract
 > and `_blocks/rule-pure-click-contract.md` for the AskUserQuestion rule.
 > Skill-specific phase tables are inline below.

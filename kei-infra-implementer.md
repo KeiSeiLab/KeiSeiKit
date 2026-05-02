@@ -403,3 +403,17 @@ Blockers / next: <list>
 - `Background incident: a real cost-overrun (triple digits lost to unchecked GPU runs) — always dashboard-check + live pricing before paid compute.`
 - `Background pattern: when several apps share one EC2/VPS host, host-level changes need cross-project sanity first; default SECRET_KEY + missing CSRF on touch-points must be fixed, not papered over.`
 - `Background pattern: duplicate LaunchAgents or chatty sync daemons without log-silencing can fill disks with tens of GB — scan for duplicates before adding infra.`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```
