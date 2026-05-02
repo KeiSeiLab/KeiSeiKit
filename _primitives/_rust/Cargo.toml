@@ -179,6 +179,8 @@ members = [
     "kei-db-contract",
     # Live runtime-graph exporter (registry + ledger → D3 space fragment)
     "kei-graph-export",
+    # Live agent-events.jsonl tail → WebSocket stream (kei-graph-stream daemon)
+    "kei-graph-stream",
 ]
 
 [workspace.package]

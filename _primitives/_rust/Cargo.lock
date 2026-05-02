@@ -3676,6 +3676,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "kei-graph-stream"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "futures",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tokio-tungstenite 0.29.0",
+]
+
+[[package]]
 name = "kei-hibernate"
 version = "0.1.0"
 dependencies = [
