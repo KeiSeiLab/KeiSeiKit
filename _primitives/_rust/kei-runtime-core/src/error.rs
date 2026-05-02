@@ -22,6 +22,9 @@ pub enum Error {
     #[error("auth: {0}")]
     Auth(String),
 
+    #[error("CSRF state mismatch")]
+    CsrfStateMismatch,
+
     #[error("provider: {0}")]
     Provider(String),
 

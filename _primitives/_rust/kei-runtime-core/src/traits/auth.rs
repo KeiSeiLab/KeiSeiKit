@@ -3,6 +3,7 @@
 
 use crate::dna::{Dna, HasDna};
 use crate::error::Result;
+use crate::secrets::SecretString;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,8 +18,19 @@ pub struct AuthSession {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AuthChallenge {
     MagicLink { email: String },
-    Password { email: String, password: String },
-    OAuthCode { provider: String, code: String, state: String },
+    /// `password` is wrapped in [`SecretString`] so it prints as
+    /// `<redacted>` in logs and is zeroed on drop.
+    Password { email: String, password: SecretString },
+    /// `state` — the value returned by the OAuth provider in the callback.
+    /// `expected_state` — the nonce generated when the auth URL was built;
+    /// must equal `state` (verified via constant-time comparison in each
+    /// provider's `verify()` impl).
+    OAuthCode {
+        provider: String,
+        code: String,
+        state: String,
+        expected_state: String,
+    },
     SshKeySig { key_id: String, signature: String },
 }
 

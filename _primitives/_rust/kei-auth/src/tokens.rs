@@ -11,7 +11,7 @@ use anyhow::{anyhow, Result};
 use base64::Engine;
 use chrono::Utc;
 use rand::RngCore;
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::str::FromStr;
@@ -94,9 +94,11 @@ pub fn verify(conn: &Connection, token: &str, key: &[u8]) -> Result<VerifyOutcom
         return Err(anyhow!("token expired"));
     }
     let hash = sha256_hex(token.as_bytes());
+    // Use `.optional()?` to distinguish DB errors (propagated) from
+    // genuine absence (token not in DB → "unknown to server").
     let row: Option<i64> = conn.query_row(
         "SELECT revoked_at FROM auth_tokens WHERE token_hash=?1",
-        params![hash], |r| r.get(0)).ok();
+        params![hash], |r| r.get(0)).optional()?;
     match row {
         None => Err(anyhow!("token unknown to server")),
         Some(rev) if rev > 0 => Err(anyhow!("token revoked")),

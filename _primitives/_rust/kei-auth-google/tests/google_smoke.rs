@@ -39,7 +39,7 @@ async fn token_endpoint_200_returns_access_token() {
         .await;
 
     let client = client_for(&server);
-    let token = client.exchange_code("abc123").await.unwrap();
+    let token = client.exchange_code("abc123", None).await.unwrap();
     assert_eq!(token.access_token, "ya29.a0AfH-test");
     assert_eq!(token.expires_in, 3600);
     assert_eq!(token.id_token.as_deref(), Some("eyJ.fake.jwt"));
@@ -98,6 +98,7 @@ async fn verify_end_to_end_builds_auth_session() {
         provider: "google".into(),
         code: "code-xyz".into(),
         state: "csrf-state-xyz".into(),
+        expected_state: "csrf-state-xyz".into(),
     };
     let session = provider.verify(&challenge).await.unwrap();
     assert_eq!(session.user_id, "bob@example.com");
@@ -122,7 +123,7 @@ async fn exchange_code_400_returns_api_error() {
         .await;
 
     let client = client_for(&server);
-    let err = client.exchange_code("bad-code").await.unwrap_err();
+    let err = client.exchange_code("bad-code", None).await.unwrap_err();
     let msg = format!("{err}");
     assert!(msg.contains("api"), "expected api variant, got {msg}");
     assert!(msg.contains("400"), "expected status 400 in message, got {msg}");
@@ -148,6 +149,29 @@ async fn verify_rejects_wrong_provider() {
         provider: "github".into(),
         code: "x".into(),
         state: "y".into(),
+        expected_state: "y".into(),
     };
     assert!(provider.verify(&challenge).await.is_err());
+}
+
+#[tokio::test]
+async fn verify_rejects_csrf_state_mismatch() {
+    let server = MockServer::start().await;
+    let client = GoogleAuthClient::with_urls(
+        format!("{}/token", server.uri()),
+        format!("{}/userinfo", server.uri()),
+        "cid", "secret", "https://example.com/cb",
+    ).unwrap();
+    let provider = GoogleAuthProvider::new(client, None).unwrap();
+    let challenge = AuthChallenge::OAuthCode {
+        provider: "google".into(),
+        code: "code".into(),
+        state: "got-this-state".into(),
+        expected_state: "expected-state".into(),
+    };
+    let err = provider.verify(&challenge).await.unwrap_err();
+    assert!(
+        format!("{err}").contains("CSRF"),
+        "expected CSRF error, got: {err}"
+    );
 }

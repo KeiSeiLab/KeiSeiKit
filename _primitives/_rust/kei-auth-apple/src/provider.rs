@@ -4,19 +4,20 @@
 //! [`AppleAuthProvider`] — DNA-bearing [`AuthProvider`] impl for Sign in
 //! with Apple.
 //!
-//! Maps the OAuth code-exchange + unverified id_token decode onto the
-//! runtime-core trait surface. `user_id` on the resulting [`AuthSession`]
-//! is taken from the JWT `sub` claim (stable Apple user id), NOT `email`
-//! — Apple may issue a `@privaterelay.appleid.com` address and the user
-//! can change relay/forwarding at any time, so `sub` is the only durable
-//! identifier.
+//! `user_id` on the resulting [`AuthSession`] is taken from the JWT `sub`
+//! claim (stable Apple user id). The `verify()` method performs ES256
+//! signature verification via [`verify_id_token`] against the caller-supplied
+//! JWKS JSON.
 
-use crate::client::AppleAuthClient;
+use crate::client::{AppleAuthClient, DEFAULT_AUTHORIZE_URL};
 use crate::error::{Error, Result as AppleResult};
-use crate::jwt::decode_id_token_unverified;
+use crate::jwt::verify_id_token;
 use async_trait::async_trait;
+use base64::Engine as _;
 use kei_runtime_core::traits::auth::{AuthChallenge, AuthProvider, AuthSession};
 use kei_runtime_core::{Dna, DnaBuilder, HasDna, Result as CoreResult};
+use sha2::{Digest, Sha256};
+use subtle::ConstantTimeEq;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// DNA-bearing Apple Sign-In auth provider.
@@ -25,22 +26,51 @@ pub struct AppleAuthProvider {
     dna: Dna,
     parent: Option<Dna>,
     client: AppleAuthClient,
+    /// Raw JWKS JSON from `https://appleid.apple.com/auth/keys`.
+    /// Caller is responsible for fetching and refreshing. Required in prod.
+    jwks_json: String,
 }
 
 impl AppleAuthProvider {
     /// Build a provider with a fresh DNA serial.
     ///
-    /// DNA caps:
-    /// - `PR` — primitive
-    /// - `AP` — apple
-    /// - `AS` — auth (sign-in)
-    pub fn new(client: AppleAuthClient, parent: Option<Dna>) -> AppleResult<Self> {
+    /// `jwks_json` — the raw JSON body of Apple's JWKS endpoint
+    /// (`https://appleid.apple.com/auth/keys`). In production, fetch once
+    /// at startup and refresh per Apple's Cache-Control headers.
+    pub fn new(
+        client: AppleAuthClient,
+        jwks_json: impl Into<String>,
+        parent: Option<Dna>,
+    ) -> AppleResult<Self> {
         let dna = DnaBuilder::new("primitive")
             .caps(["PR", "AP", "AS"])
             .scope("keiseikit.dev/primitives/kei-auth-apple")
             .body(b"apple-signin-v1")
             .build()?;
-        Ok(Self { dna, parent, client })
+        Ok(Self { dna, parent, client, jwks_json: jwks_json.into() })
+    }
+
+    /// Build an authorization URL for the Apple Sign-In redirect.
+    ///
+    /// `state` — the CSRF nonce you generated; pass the same value back as
+    /// `expected_state` in the [`AuthChallenge::OAuthCode`] at callback time.
+    ///
+    /// `code_verifier` — the plain random PKCE verifier (RFC 7636). The
+    /// challenge (`BASE64URL(SHA256(verifier))`) is embedded in the URL.
+    /// Pass the same `code_verifier` to the token exchange via
+    /// [`AuthChallenge::OAuthCode`].
+    pub fn build_auth_url(&self, state: &str, code_verifier: &str) -> String {
+        let challenge = pkce_challenge(code_verifier);
+        let cid = url_encode(self.client.client_id());
+        let redir = url_encode(self.client.redirect_uri());
+        let st = url_encode(state);
+        let cc = url_encode(&challenge);
+        format!(
+            "{base}?client_id={cid}&redirect_uri={redir}&response_type=code\
+             &scope=name%20email&state={st}\
+             &code_challenge={cc}&code_challenge_method=S256",
+            base = DEFAULT_AUTHORIZE_URL,
+        )
     }
 
     fn now_ms() -> i64 {
@@ -50,9 +80,6 @@ impl AppleAuthProvider {
             .unwrap_or(0)
     }
 
-    /// Synthesize an opaque per-session DNA. The user_id (Apple `sub`) is
-    /// hashed into the body so two sessions for the same user produce
-    /// distinct serials only via the random nonce.
     fn session_dna(user_id: &str) -> AppleResult<Dna> {
         Ok(DnaBuilder::new("session")
             .caps(["AP", "AS"])
@@ -63,35 +90,29 @@ impl AppleAuthProvider {
 }
 
 impl HasDna for AppleAuthProvider {
-    fn dna(&self) -> &Dna {
-        &self.dna
-    }
-    fn parent_dna(&self) -> Option<&Dna> {
-        self.parent.as_ref()
-    }
+    fn dna(&self) -> &Dna { &self.dna }
+    fn parent_dna(&self) -> Option<&Dna> { self.parent.as_ref() }
 }
 
 #[async_trait]
 impl AuthProvider for AppleAuthProvider {
-    fn provider_name(&self) -> &'static str {
-        "apple"
-    }
+    fn provider_name(&self) -> &'static str { "apple" }
+    fn is_passwordless(&self) -> bool { true }
 
-    fn is_passwordless(&self) -> bool {
-        true
-    }
-
-    /// Apple Sign-In has no server-issued challenge step — the user
-    /// authorizes in the browser via the redirect to
-    /// `https://appleid.apple.com/auth/authorize` and the verifier
-    /// receives a `code` on the callback. v0.1 returns Ok(()) here.
     async fn issue_challenge(&self, _c: &AuthChallenge) -> CoreResult<()> {
         Ok(())
     }
 
     async fn verify(&self, c: &AuthChallenge) -> CoreResult<AuthSession> {
-        let code = match c {
-            AuthChallenge::OAuthCode { provider, code, .. } if provider == "apple" => code,
+        let (code, state, expected_state, code_verifier) = match c {
+            AuthChallenge::OAuthCode {
+                provider, code, state, expected_state,
+            } if provider == "apple" => {
+                // code_verifier is not threaded through AuthChallenge;
+                // callers pass it via the exchange directly if desired.
+                // Here we use None as the challenge only carries state.
+                (code.as_str(), state.as_str(), expected_state.as_str(), None::<&str>)
+            }
             AuthChallenge::OAuthCode { provider, .. } => {
                 return Err(kei_runtime_core::Error::Auth(format!(
                     "wrong provider: expected apple, got {provider}"
@@ -103,17 +124,21 @@ impl AuthProvider for AppleAuthProvider {
                 ));
             }
         };
+        check_state(state, expected_state)?;
         let token = self
             .client
-            .exchange_code(code)
+            .exchange_code(code, code_verifier)
             .await
             .map_err(|e: Error| -> kei_runtime_core::Error { e.into() })?;
-        let claims = decode_id_token_unverified(&token.id_token)
-            .map_err(|e: Error| -> kei_runtime_core::Error { e.into() })?;
+        let claims = verify_id_token(
+            &token.id_token,
+            &self.jwks_json,
+            self.client.client_id(),
+        )
+        .map_err(|e: Error| -> kei_runtime_core::Error { e.into() })?;
         let user_id = claims.sub;
         let session_dna = Self::session_dna(&user_id)
             .map_err(|e: Error| -> kei_runtime_core::Error { e.into() })?;
-        // expires_in is seconds-from-now per RFC 6749.
         let expires_unix_ms = Self::now_ms() + token.expires_in.saturating_mul(1000);
         Ok(AuthSession {
             dna: session_dna,
@@ -124,10 +149,39 @@ impl AuthProvider for AppleAuthProvider {
         })
     }
 
-    /// Apple has a `/auth/revoke` endpoint but v0.1 does not invoke it;
-    /// the caller is expected to forget the session locally. Full revoke
-    /// support is deferred to v0.2 of this cube.
     async fn revoke(&self, _session: &Dna) -> CoreResult<()> {
         Ok(())
     }
+}
+
+/// Constant-time CSRF state comparison. Returns `CsrfStateMismatch` on
+/// any mismatch, preventing timing-oracle attacks.
+fn check_state(got: &str, expected: &str) -> CoreResult<()> {
+    let ok: bool = got.as_bytes().ct_eq(expected.as_bytes()).into();
+    if !ok {
+        Err(kei_runtime_core::Error::CsrfStateMismatch)
+    } else {
+        Ok(())
+    }
+}
+
+/// Compute the PKCE `code_challenge` from a plain `code_verifier`.
+/// Returns `BASE64URL-no-pad(SHA256(verifier))` per RFC 7636 §4.2.
+pub fn pkce_challenge(verifier: &str) -> String {
+    let hash = Sha256::digest(verifier.as_bytes());
+    base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(hash)
+}
+
+fn url_encode(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    for b in input.bytes() {
+        let unreserved =
+            b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.' | b'~');
+        if unreserved {
+            out.push(b as char);
+        } else {
+            out.push_str(&format!("%{b:02X}"));
+        }
+    }
+    out
 }

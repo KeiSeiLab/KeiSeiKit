@@ -4,11 +4,15 @@
 //! leaked the HMAC signing secret through `/proc/<pid>/cmdline` and
 //! shell history. The only supported key source is the `KEI_AUTH_KEY`
 //! env var (sourced from `~/.claude/secrets/.env` per RULE 0.8).
+//!
+//! Token argument: pass `-` or set `KEI_AUTH_TOKEN` env var to avoid
+//! leaking tokens via shell history or `/proc/<pid>/cmdline`.
 
 use clap::{Parser, Subcommand};
 use kei_auth::schema::open;
 use kei_auth::scopes::Scope;
 use kei_auth::tokens::{issue, revoke, verify};
+use std::io::Read;
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::str::FromStr;
@@ -37,6 +41,20 @@ fn db_path(o: Option<PathBuf>) -> PathBuf {
     PathBuf::from(home).join(".claude/auth/auth.sqlite")
 }
 
+/// Read token from env `KEI_AUTH_TOKEN`, or from stdin when arg is `-`,
+/// or return the arg as-is. Avoids token leakage via shell history.
+fn resolve_token(arg: &str) -> anyhow::Result<String> {
+    if let Ok(t) = std::env::var("KEI_AUTH_TOKEN") {
+        return Ok(t.trim().to_owned());
+    }
+    if arg == "-" {
+        let mut buf = String::new();
+        std::io::stdin().read_to_string(&mut buf)?;
+        return Ok(buf.trim().to_owned());
+    }
+    Ok(arg.to_owned())
+}
+
 fn key() -> anyhow::Result<Vec<u8>> {
     let k = std::env::var("KEI_AUTH_KEY").map_err(|_| {
         anyhow::anyhow!(
@@ -48,6 +66,13 @@ fn key() -> anyhow::Result<Vec<u8>> {
              it leaked the secret via /proc/<pid>/cmdline."
         )
     })?;
+    if k.len() < 32 {
+        anyhow::bail!(
+            "KEI_AUTH_KEY must be ≥32 bytes (got {}). \
+             Generate a strong key: export KEI_AUTH_KEY=\"$(openssl rand -hex 32)\"",
+            k.len()
+        );
+    }
     Ok(k.into_bytes())
 }
 
@@ -61,11 +86,13 @@ fn run() -> anyhow::Result<()> {
             println!("{}", issue(&conn, &user, &project, sc, ttl, &k)?);
         }
         Cmd::Verify { token } => {
-            let out = verify(&conn, &token, &k)?;
+            let t = resolve_token(&token)?;
+            let out = verify(&conn, &t, &k)?;
             println!("user={} project={} scope={}", out.user_id, out.project, out.scope);
         }
         Cmd::Revoke { token } => {
-            let n = revoke(&conn, &token)?;
+            let t = resolve_token(&token)?;
+            let n = revoke(&conn, &t)?;
             println!("revoked {} row(s)", n);
         }
     }
