@@ -17,9 +17,25 @@ blocks = [
     "memory-protocol",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "Official documentation — vendor docs, RFC, spec, changelog, pricing page",
+    "GitHub repositories — README, CHANGELOG, open issues, PR descriptions",
+    "Academic and technical papers — arXiv, ACM DL, IEEE (cite with [VERIFIED: url] per RULE 0.4)",
+    "Pricing and SLA pages — E1 only (primary source from vendor, not third-party comparison)",
+    "Blog posts and tutorials — max E4; flag recency and single-source limit",
+]
+forbidden_domain = [
+    "Local filesystem reads — hand off to researcher-code",
+    "Hardcoded or paraphrased secret values anywhere",
+    "Fabricating URLs, DOIs, authors, or version numbers (RULE 0.4 hard ban)",
+    "Quoting Stack Overflow / Reddit / random blogs above E4",
+    "Pricing claims from anything other than the vendor's own pricing page",
+]
+output_extra_fields = [
+    "Sources cited (≥2 for load-bearing)",
+    "Evidence grade per claim",
+    "Gaps section present",
+]
 
 [[handoff]]
 target = "validator"

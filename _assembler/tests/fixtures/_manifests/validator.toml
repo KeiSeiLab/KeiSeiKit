@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "validator"
+description = "Fact-checker stub."
+tools = ["Read"]
+model = "sonnet"
+substrate_role = "read-only"
+role = "Stub validator."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["claim verification"]
+forbidden_domain = ["fixing issues"]
+
+[[handoff]]
+target = "code-implementer"
+trigger = "FALSE API claim needs fix"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"

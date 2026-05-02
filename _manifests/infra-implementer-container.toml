@@ -21,9 +21,28 @@ blocks = [
     "rule-double-audit",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "Dockerfiles — multi-stage builds with cargo-chef (Rust), distroless final image",
+    "OCI image labelling — `org.opencontainers.image.*` standard labels",
+    "docker-compose for local dev + integration tests",
+    "Helm chart templates for Kubernetes deployments",
+    "Non-root user (`USER nonroot:nonroot`), layer-pinning with digest locks",
+    "Build-cache optimisation: COPY Cargo.toml first, then src — avoid rebuilding deps on code changes",
+]
+forbidden_domain = [
+    "App code changes — hand off to matching code-implementer sibling",
+    "Kubernetes manifests outside Helm chart templates — hand off to infra-implementer-iac",
+    "Hardcoded secrets in Dockerfile / compose (RULE 0.8) — use build-args + secret mounts only",
+    "Running as root in final image",
+    "FROM latest — always pin to a specific digest or version tag",
+]
+output_extra_fields = [
+    "Base image: <registry/image:tag@digest>",
+    "Plan-Mode used: <yes | no + trivial-edit exemption reason>",
+    "Stages: <list of stage names + purpose>",
+    "Final image size estimate: <MB>",
+    "Non-root user: <yes | no>",
+]
 
 [[handoff]]
 target = "validator"

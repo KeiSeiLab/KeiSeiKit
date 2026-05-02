@@ -67,9 +67,7 @@ trigger = "claim needs hard verification (citation sanity, reproduce-in-tests, R
 target = "ml-researcher"
 trigger = "question is ML/RL specialized-node (Math-First + tooling-reuse + synthetic-to-real discipline)"
 
-[[handoff]]
-target = "patent-researcher"
-trigger = "question touches patent prior art, FTO, or novelty (IP-aware handling required)"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
 [[handoff]]
 target = "architect"
@@ -80,11 +78,11 @@ target = "critic"
 trigger = "findings suggest anti-pattern sweep or Constructor-Pattern violation review"
 
 # References (extra files beyond auto-included baseline/memory/project)
+# ~/.claude/agents/validator.md stripped — machine-local file, not portable. See audit 2026-05-02.
 [references]
 extra = [
     "path:user-rules/debugging.md",
     "path:user-rules/no-downgrade-constructive.md",
-    "~/.claude/agents/validator.md",
 ]
 
 [taxonomy]

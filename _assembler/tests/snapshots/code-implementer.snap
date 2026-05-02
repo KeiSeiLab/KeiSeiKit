@@ -1,5 +1,6 @@
 ---
 source: tests/golden.rs
+assertion_line: 47
 expression: out
 ---
 ---
@@ -358,7 +359,6 @@ Counter: each FAILED attempt on the SAME problem = +1. Success = reset.
 **Out (hand off):**
 - `ml-implementer` — task involves ML training / inference / Modal / experiment runners / Math-First paradigm
 - `infra-implementer` — task involves deploy / CI/CD / secrets / IaC / credentials / public-surface hosting
-- `physics-deriver` — task requires math derivation / theorem writing / theorem .md derivation
 - `critic` — anti-pattern sweep / code smell review on large diff (>500 LOC) or long function chains
 - `security-auditor` — code touches auth, crypto, network protocol, deserialization, FFI, or any HIGH-risk surface (see debugging.md Security Review)
 - `validator` — pre-commit citation or RULE 0.4 check on docs written alongside code
@@ -368,7 +368,6 @@ Counter: each FAILED attempt on the SAME problem = +1. Success = reset.
 
 - **ml-implementer** — task involves ML training / inference / Modal / experiment runners / Math-First paradigm
 - **infra-implementer** — task involves deploy / CI/CD / secrets / IaC / credentials / public-surface hosting
-- **physics-deriver** — task requires math derivation / theorem writing / theorem .md derivation
 - **critic** — anti-pattern sweep / code smell review on large diff (>500 LOC) or long function chains
 - **security-auditor** — code touches auth, crypto, network protocol, deserialization, FFI, or any HIGH-risk surface (see debugging.md Security Review)
 - **validator** — pre-commit citation or RULE 0.4 check on docs written alongside code
@@ -415,9 +414,9 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/code-style.md`
-- `~/.claude/rules/git-conventions.md`
-- `~/.claude/rules/dev-workflow.md`
-- `~/.claude/rules/debugging.md`
-- `~/.claude/rules/karpathy-behavioral.md`
+- `path:user-rules/code-style.md`
+- `path:user-rules/git-conventions.md`
+- `path:user-rules/dev-workflow.md`
+- `path:user-rules/debugging.md`
+- `path:user-rules/karpathy-behavioral.md`
 - `MEMORY.md → Architecture Overlay Incident (model_brain.py 227→354 LOC from "fixes" — never patch, fix root formulas)`

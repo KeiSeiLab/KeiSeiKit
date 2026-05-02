@@ -86,9 +86,7 @@ trigger = "system is ML/specialized-node-class and structural review must apply 
 target = "validator"
 trigger = "architectural claim needs hard reproduction (build graph, import graph, coupling metric)"
 
-[[handoff]]
-target = "physics-deriver"
-trigger = "structural review asks how a new theorem family fits the existing T1-T68 proof graph"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
 # References (extra files beyond auto-included baseline/memory/project)
 [references]

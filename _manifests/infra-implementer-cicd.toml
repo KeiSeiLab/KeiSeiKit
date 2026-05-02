@@ -21,9 +21,27 @@ blocks = [
     "rule-double-audit",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "GitHub Actions workflows — build matrices, caching, artifact upload/download",
+    "GitLab CI pipelines — stages, rules, variables, Docker-in-Docker runners",
+    "Forgejo / Gitea workflows (subset of GitHub Actions syntax)",
+    "Build-and-deploy scripts — cargo build --release, docker build+push, npm run build",
+    "Secret-injection from vault / GitHub Secrets / GitLab CI variables — ENV only, never inline",
+    "Staged deploys — canary, blue/green, rollback triggers",
+]
+forbidden_domain = [
+    "IaC (Terraform/Pulumi/CDK) — hand off to infra-implementer-iac",
+    "Dockerfiles or OCI images — hand off to infra-implementer-container",
+    "Secrets management (Vault, sops, age) — hand off to infra-implementer-secrets",
+    "Hardcoded secrets in workflow YAML (RULE 0.8) — use `${{ secrets.NAME }}` / ENV refs",
+    "Skipping build-cache steps — always cache cargo registry + target, node_modules, pip cache",
+]
+output_extra_fields = [
+    "CI platform: GitHub Actions | GitLab CI | Forgejo",
+    "Plan-Mode used: <yes | no + trivial-edit exemption reason>",
+    "Jobs defined: <list with trigger events>",
+    "Secrets used: <list of secret names — verify RULE 0.8 compliance>",
+]
 
 [[handoff]]
 target = "validator"

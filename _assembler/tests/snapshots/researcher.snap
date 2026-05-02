@@ -1,5 +1,6 @@
 ---
 source: tests/golden.rs
+assertion_line: 33
 expression: out
 ---
 ---
@@ -188,7 +189,6 @@ Rules: architectural decision → E1-E2. Financial (compute) → ONLY E1. Data >
 **Out (hand off):**
 - `validator` — claim needs hard verification (citation sanity, reproduce-in-tests, RULE 0.4 gate before commit)
 - `ml-researcher` — question is ML/RL specialized-node (Math-First + tooling-reuse + synthetic-to-real discipline)
-- `patent-researcher` — question touches patent prior art, FTO, or novelty (IP-aware handling required)
 - `architect` — question is structural/architectural — dependency graph, pattern inventory, module boundaries
 - `critic` — findings suggest anti-pattern sweep or Constructor-Pattern violation review
 
@@ -196,7 +196,6 @@ Rules: architectural decision → E1-E2. Financial (compute) → ONLY E1. Data >
 
 - **validator** — claim needs hard verification (citation sanity, reproduce-in-tests, RULE 0.4 gate before commit)
 - **ml-researcher** — question is ML/RL specialized-node (Math-First + tooling-reuse + synthetic-to-real discipline)
-- **patent-researcher** — question touches patent prior art, FTO, or novelty (IP-aware handling required)
 - **architect** — question is structural/architectural — dependency graph, pattern inventory, module boundaries
 - **critic** — findings suggest anti-pattern sweep or Constructor-Pattern violation review
 
@@ -239,6 +238,5 @@ Blockers / next: <list>
 
 - `~/.claude/CLAUDE.md` — baseline umbrella
 - `~/.claude/memory/MEMORY.md` — memory index (adjust if your Claude Code user-slug path differs)
-- `~/.claude/rules/debugging.md`
-- `~/.claude/rules/no-downgrade-constructive.md`
-- `~/.claude/agents/validator.md`
+- `path:user-rules/debugging.md`
+- `path:user-rules/no-downgrade-constructive.md`

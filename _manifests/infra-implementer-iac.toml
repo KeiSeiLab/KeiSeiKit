@@ -21,9 +21,27 @@ blocks = [
     "rule-double-audit",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "Terraform HCL modules — resource-per-file, remote backend (S3/GCS/Terraform Cloud), lock file",
+    "Pulumi (TypeScript or Go) — stack-per-env, explicit outputs, state in Pulumi Cloud or S3",
+    "OpenTofu (Terraform OSS fork) — drop-in compatible HCL",
+    "AWS CDK (TypeScript) — construct libraries, stack separation by lifecycle",
+    "Module-per-resource-type layout: one directory per resource family",
+    "State-management discipline: remote backend required, local state forbidden in production",
+]
+forbidden_domain = [
+    "CI/CD yaml pipelines — hand off to infra-implementer-cicd",
+    "Dockerfiles or OCI images — hand off to infra-implementer-container",
+    "Hardcoded secrets in .tf / .ts / pulumi config (RULE 0.8) — use var + SecretManager refs",
+    "Monolithic single-file IaC (>200 LOC) — decompose into modules",
+    "Committing `terraform.tfstate` or `.tfstate.backup` to git — use remote backend only",
+]
+output_extra_fields = [
+    "IaC tool: Terraform | Pulumi | OpenTofu | CDK",
+    "Plan-Mode used: <yes | no + trivial-edit exemption reason>",
+    "Resources defined: <list with provider + resource type>",
+    "State backend: <remote backend details>",
+]
 
 [[handoff]]
 target = "validator"

@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "critic"
+description = "Code critic stub."
+tools = ["Read", "Glob", "Grep"]
+model = "sonnet"
+substrate_role = "read-only"
+role = "Stub critic."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["anti-pattern detection"]
+forbidden_domain = ["fixing issues"]
+
+[[handoff]]
+target = "code-implementer"
+trigger = "confirmed findings need code edits"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"

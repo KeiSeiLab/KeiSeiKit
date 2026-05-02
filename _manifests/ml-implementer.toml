@@ -78,9 +78,7 @@ output_extra_fields = [
 ]
 
 # Handoffs MUST come after all top-level keys (TOML array-of-tables scope rule)
-[[handoff]]
-target = "physics-deriver"
-trigger = "numerical result implies a new theorem / refutation / observable classification (write to `theory/**/*.md`)"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
 [[handoff]]
 target = "ml-researcher"
@@ -104,7 +102,7 @@ trigger = "anti-pattern sweep on training script (coefficient creep, E1-E11 chec
 
 [[handoff]]
 target = "architect"
-trigger = "multi-node multi-node composition design, experiment matrix layout, benchmark/baseline integration"
+trigger = "multi-node composition design, experiment matrix layout, benchmark/baseline integration"
 
 [references]
 extra = [
@@ -114,7 +112,7 @@ extra = [
     "path:user-rules/observable-classification.md",
     "path:user-rules/manifold-tangent-sanity.md",
     "path:user-rules/no-downgrade-constructive.md",
-    "path:user-memory/wrong-paths-specialized-ml.md",
+    "path:user-memory/wrong-paths-specialized-ml.md",  # TODO verify path:user-memory exists in assembler resolver
     "MEMORY.md → Compute Cost Incident (2026-02-26): promised $27, spent $98.78 on Modal. NEVER AGAIN.",
     "MEMORY.md → Architecture Overlay Incident: model_brain.py 227→354 LOC from audit fixes. No Patching.",
 ]

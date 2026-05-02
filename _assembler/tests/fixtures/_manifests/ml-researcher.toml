@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "ml-researcher"
+description = "ML researcher stub."
+tools = ["Read", "WebFetch", "WebSearch"]
+model = "opus"
+substrate_role = "read-only"
+role = "Stub ml-researcher."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["ML literature review"]
+forbidden_domain = ["running experiments"]
+
+[[handoff]]
+target = "ml-implementer"
+trigger = "hypothesis ready to run"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"
