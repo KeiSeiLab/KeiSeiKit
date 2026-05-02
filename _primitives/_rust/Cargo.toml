@@ -177,6 +177,8 @@ members = [
     "kei-mcp",
     # SQL ↔ TypeScript schema drift detector
     "kei-db-contract",
+    # Live runtime-graph exporter (registry + ledger → D3 space fragment)
+    "kei-graph-export",
 ]
 
 [workspace.package]
