@@ -106,13 +106,13 @@ impl AuthProvider for AppleAuthProvider {
     async fn verify(&self, c: &AuthChallenge) -> CoreResult<AuthSession> {
         let (code, state, expected_state, code_verifier) = match c {
             AuthChallenge::OAuthCode {
-                provider, code, state, expected_state,
-            } if provider == "apple" => {
-                // code_verifier is not threaded through AuthChallenge;
-                // callers pass it via the exchange directly if desired.
-                // Here we use None as the challenge only carries state.
-                (code.as_str(), state.as_str(), expected_state.as_str(), None::<&str>)
-            }
+                provider, code, state, expected_state, code_verifier,
+            } if provider == "apple" => (
+                code.as_str(),
+                state.as_str(),
+                expected_state.as_str(),
+                code_verifier.as_deref(),
+            ),
             AuthChallenge::OAuthCode { provider, .. } => {
                 return Err(kei_runtime_core::Error::Auth(format!(
                     "wrong provider: expected apple, got {provider}"

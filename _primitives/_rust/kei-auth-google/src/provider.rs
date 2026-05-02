@@ -87,10 +87,15 @@ impl AuthProvider for GoogleAuthProvider {
     }
 
     async fn verify(&self, c: &AuthChallenge) -> kei_runtime_core::Result<AuthSession> {
-        let (code, state, expected_state) = match c {
+        let (code, state, expected_state, code_verifier) = match c {
             AuthChallenge::OAuthCode {
-                provider, code, state, expected_state,
-            } if provider == "google" => (code.as_str(), state.as_str(), expected_state.as_str()),
+                provider, code, state, expected_state, code_verifier,
+            } if provider == "google" => (
+                code.as_str(),
+                state.as_str(),
+                expected_state.as_str(),
+                code_verifier.as_deref(),
+            ),
             AuthChallenge::OAuthCode { provider, .. } => {
                 return Err(kei_runtime_core::Error::Auth(format!(
                     "wrong provider for google: {provider}"
@@ -99,7 +104,7 @@ impl AuthProvider for GoogleAuthProvider {
             _ => return Err(kei_runtime_core::Error::from(Error::MissingState)),
         };
         check_state(state, expected_state)?;
-        let token = self.client.exchange_code(code, None).await
+        let token = self.client.exchange_code(code, code_verifier).await
             .map_err(kei_runtime_core::Error::from)?;
         let info = self.client.userinfo(&token.access_token).await
             .map_err(kei_runtime_core::Error::from)?;
