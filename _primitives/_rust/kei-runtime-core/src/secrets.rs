@@ -10,12 +10,15 @@
 //! The value is exposed only via [`SecretString::expose`], forcing callers
 //! to be explicit about accessing the secret.
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use std::fmt;
 
 /// A string whose `Debug` impl is redacted and whose `Drop` zeroes memory.
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(transparent)]
+///
+/// `Serialize` emits the literal `"<redacted>"` so that parent structs
+/// that derive `Serialize` never accidentally leak the secret value.
+/// Use [`SecretString::expose`] to access the real value explicitly.
+#[derive(Clone, Deserialize)]
 pub struct SecretString(String);
 
 impl SecretString {
@@ -27,6 +30,16 @@ impl SecretString {
     /// Expose the raw value. Name is intentionally verbose.
     pub fn expose(&self) -> &str {
         &self.0
+    }
+}
+
+/// Serializes as the literal `"<redacted>"` — never the secret value.
+///
+/// This prevents accidental secret leaks when a parent struct that holds a
+/// `SecretString` field also derives `Serialize`.
+impl Serialize for SecretString {
+    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
+        serializer.serialize_str("<redacted>")
     }
 }
 
@@ -77,5 +90,12 @@ mod tests {
         let a = SecretString::new("abc");
         let b = a.clone();
         assert_eq!(a.expose(), b.expose());
+    }
+
+    #[test]
+    fn serialize_emits_redacted_literal() {
+        let s = SecretString::new("secret123");
+        let json = serde_json::to_string(&s).expect("serialize must not fail");
+        assert_eq!(json, "\"<redacted>\"");
     }
 }
