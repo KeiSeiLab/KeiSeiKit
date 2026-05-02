@@ -5,6 +5,12 @@ description: Generates AI images using the nano-banana CLI (Gemini 3.1 Flash def
 
 # nano-banana
 
+## When to use
+
+- Generating AI images for UI mockups, game sprites, marketing assets, or video content via the `nano-banana` CLI.
+- Any task asking to "generate an image", "create a sprite", "make an asset", or produce artwork at specific resolutions.
+- Style-transfer from a reference image, green-screen transparent assets, or multi-resolution output (512–4K).
+
 AI image generation CLI. Default model: Gemini 3.1 Flash Image Preview (Nano Banana 2).
 Installed at: `~/tools/nano-banana-2/`
 Binary: `~/.bun/bin/nano-banana`

@@ -434,3 +434,17 @@ Blockers / next: <list>
 - `{path::user-memory}/fal-ai-models.md  (canonical model + price reference)`
 - `{path::user-memory}/website-creation-playbook.md  (end-to-end web asset recipe)`
 - `https://fal.ai/pricing  (live pricing — WebFetch)`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```

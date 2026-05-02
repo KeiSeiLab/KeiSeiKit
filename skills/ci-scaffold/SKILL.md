@@ -6,6 +6,12 @@ argument-hint: <one-line repo description, e.g. "Rust axum service, deploys to A
 
 # CI-Scaffold — CI/CD Pipeline Generator (index)
 
+## When to use
+
+- Setting up CI/CD for a new or existing repo (GitHub Actions or Forgejo Actions).
+- Choosing a release automation strategy, security gate, and OIDC vs token secrets posture.
+- Scaffolding `.github/workflows/*.yml` or `.forgejo/workflows/*.yml` from scratch.
+
 > See `_blocks/pipeline-5phase-template.md` for the 5-phase wizard contract
 > and `_blocks/rule-pure-click-contract.md` for the AskUserQuestion rule.
 > Skill-specific phase tables are inline below.

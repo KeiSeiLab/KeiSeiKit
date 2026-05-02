@@ -7,7 +7,7 @@ argument-hint: <design angle or site archetype, e.g. "SaaS landing dark-tech">
 # /design-inspiration — Deprecated Alias
 
 > **[DEPRECATED — v0.17+]** Available as a preset: `/research --angle=design-refs`.
-> This standalone skill remains for backwards compatibility.
+> This standalone skill remains for backwards compatibility. `removed-after: v0.20.0 (~2026-08-01)`
 
 ## What this routes to
 

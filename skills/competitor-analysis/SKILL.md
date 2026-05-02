@@ -7,7 +7,7 @@ argument-hint: <topic or market, e.g. "Rust web frameworks">
 # /competitor-analysis — Deprecated Alias
 
 > **[DEPRECATED — v0.17+]** Available as a preset: `/research --angle=competitors`.
-> This standalone skill remains for backwards compatibility.
+> This standalone skill remains for backwards compatibility. `removed-after: v0.20.0 (~2026-08-01)`
 
 ## What this routes to
 

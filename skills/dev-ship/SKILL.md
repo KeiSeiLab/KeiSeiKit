@@ -5,6 +5,12 @@ description: Pre-merge/pre-deploy parallel gate — 4 backend agents (security, 
 
 # /dev-ship — Pre-Merge Quality Gate
 
+## When to use
+
+- Running a final quality gate before merging a feature branch into main.
+- Verifying security, tests, deps, and regression checks accumulated across the whole branch.
+- After `/dev-guard` approvals: `/dev-ship go` merges into main after parallel checks pass.
+
 > Последний барьер перед main. Если dev-start предотвращает, dev-guard ловит на лету,
 > то dev-ship — финальная проверка всего что накопилось в ветке.
 

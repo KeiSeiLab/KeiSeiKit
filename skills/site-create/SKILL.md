@@ -6,6 +6,12 @@ argument-hint: <optional one-line project intent>
 
 # /site-create — 7-Phase Website Pipeline (index)
 
+## When to use
+
+- Building a complete website end-to-end: intake → design → sections → WYSIWYD mock-render loop → audits → preview → deploy.
+- Any new site project where sections must be byte-identical to user-approved screenshots (WYSIWYD hard block enforced).
+- Preferred over `/site-builder` for all new work (v0.17+).
+
 You convert a free-text product description into a deployed website through
 seven strictly-ordered phases. Every decision is a click; only the intake
 description (Phase 0) and per-section iteration edits (Phase 3) are typed.

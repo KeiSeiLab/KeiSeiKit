@@ -6,6 +6,12 @@ argument-hint: <one-line app description, e.g. "multi-tenant B2B SaaS, 6-8 entit
 
 # Schema-Design — Relational Schema & Migration Pipeline (index)
 
+## When to use
+
+- Designing a relational database schema for a new or evolving app (Postgres, SQLite).
+- Generating SQL DDL, migrations directory, and optional seed/fixture data from a click-driven design session.
+- Choosing the right ORM, migration tool, and indexing strategy before writing any code.
+
 > See `_blocks/pipeline-5phase-template.md` for the 5-phase wizard contract
 > and `_blocks/rule-pure-click-contract.md` for the AskUserQuestion rule.
 > Skill-specific phase tables are inline below.

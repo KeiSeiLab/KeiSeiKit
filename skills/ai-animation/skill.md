@@ -1,3 +1,4 @@
+<!-- migrated from skills/ai-animation/skill.md (lowercase legacy filename) on 2026-05-02 -->
 ---
 name: ai-animation
 description: Use when creating AI-powered animations and videos — nano-banana keyframes → Kling/Luma/Veo video generation via fal.ai → web-ready output. Full pipeline from concept to scroll-driven animation or video embed. Triggers on "AI animation", "animate image", "AI video", "Kling", "image to video", "анимируй", "сделай видео из картинки".

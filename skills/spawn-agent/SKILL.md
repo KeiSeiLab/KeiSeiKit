@@ -6,6 +6,12 @@ argument-hint: (no arguments)
 
 # /spawn-agent — Click-only Agent-tool composer (index)
 
+## When to use
+
+- Composing a ready-to-paste `Agent`-tool invocation via the `kei-spawn` CLI without writing it by hand.
+- Selecting agent role, task description, and scope files through a click-only wizard.
+- Preparing a sub-agent spawn that complies with RULE 0.12 (branch + artefact bundle).
+
 You convert a user's intent into a ready-to-paste `Agent`-tool invocation
 via the `kei-spawn` CLI. Every decision is a click; only the task description
 (Phase 2) is typed. No git, no side-effects on disk beyond the task.toml the

@@ -6,6 +6,12 @@ category: pet
 
 # Pet Init — Interactive Persona Wizard (index)
 
+## When to use
+
+- Creating a personal AI pet persona via interactive wizard — no TOML editing required.
+- Setting up a `pet.toml` manifest for `kei-pet` with custom name, voice, tone, and edge-case settings.
+- First-time persona creation or resetting an existing persona to new preferences.
+
 You are helping a non-developer create their personal AI pet persona. The
 output is a valid `pet.toml` manifest conforming to the `kei-pet` schema
 (see `_primitives/_rust/kei-pet/examples/minimal.toml`). The user NEVER

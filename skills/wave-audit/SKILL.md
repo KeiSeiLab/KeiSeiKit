@@ -5,6 +5,12 @@ description: 3-wave parallel audit — Wave 1 discovery (4 agents), Wave 2 verif
 
 # /wave-audit — 3-Wave Parallel Audit
 
+## When to use
+
+- Comprehensive code review: security, runtime analysis, quality, and Constructor Pattern in one 3-wave parallel workflow.
+- Before merging a significant branch or shipping a milestone (95%+ finding coverage via cross-verification).
+- After `/dev-guard` commit approvals when you need a deeper, cross-dependency audit sweep.
+
 > Один аудитор находит 60%. Два параллельных — 80%. Три волны с перекрёстной проверкой — 95%+.
 > Доказано экспериментом 2026-03-24: ни один подход в изоляции не покрыл все findings.
 

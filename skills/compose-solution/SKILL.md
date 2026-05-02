@@ -6,6 +6,12 @@ argument-hint: <free-text task description>
 
 # Compose-Solution — Meta-Orchestrator (index)
 
+## When to use
+
+- Converting a free-text task description into the right durable KeiSeiKit artefact (agent, skill, hook, rule, or block).
+- You are unsure which existing skill covers your task and want the kit to choose for you.
+- Enriching `_blocks/` with a reusable fragment that emerged from a new task pattern.
+
 You are converting an arbitrary user task ("I want to solve X") into the
 right durable KeiSeiKit artefact — an agent manifest, a skill, a hook, a
 rule, or a new behavioural block. You decompose, grep prior art,

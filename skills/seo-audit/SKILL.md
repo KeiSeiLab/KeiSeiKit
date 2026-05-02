@@ -9,6 +9,12 @@ arguments:
 
 # SEO Audit Workflow
 
+## When to use
+
+- Auditing a live URL or project codebase for technical SEO issues (meta tags, canonical, sitemap, Core Web Vitals).
+- Before launching a site or page to ensure discoverability and ranking fundamentals are in place.
+- Generating a prioritised fix list covering both technical and content SEO signals.
+
 ## Step 1: Technical SEO
 Fetch and analyze the page:
 - **Meta tags:** title (<60 chars), description (<155 chars), viewport, robots

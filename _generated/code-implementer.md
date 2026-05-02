@@ -449,4 +449,18 @@ Blockers / next: <list>
 - `{path::user-rules}/dev-workflow.md`
 - `{path::user-rules}/debugging.md`
 - `{path::user-rules}/karpathy-behavioral.md`
+
+## Output Footer (RULE 0.16)
+
+After your final report, append:
+
+```
+=== STATUS-TRUTH MARKER ===
+shipped: functional | partial | scaffolding
+stubs: <count> with file:line if any
+cargo-check: PASS | FAIL | NOT-RUN
+behaviour-verified: yes | no | not-applicable
+follow-up-required:
+  - <bullet list>
+```
 - `MEMORY.md → Architecture Overlay Incident (model_brain.py 227→354 LOC from "fixes" — never patch, fix root formulas)`

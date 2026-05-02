@@ -6,6 +6,12 @@ user-invocable: false
 
 # Architecture Rules Engine
 
+## When to use
+
+- Validating an architectural decision against Constructor Pattern rules, duplication limits, or stack compatibility.
+- Loaded automatically by `architecture`, `debug-deep`, and code-review skills — not normally invoked directly.
+- Running a pre-implementation checklist before writing a new module or dependency.
+
 This skill provides the rules database for architectural validation.
 It is loaded by other skills (architecture, debug-deep, code-review) when they need to validate decisions.
 

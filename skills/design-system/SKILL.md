@@ -12,6 +12,12 @@ arguments:
 
 # Design System Workflow
 
+## When to use
+
+- Building a design system from scratch — tokens, base components, Tailwind config, dark mode, and docs.
+- Establishing a shared visual language across a product or set of related apps.
+- Auditing or extending an existing design system to add missing tokens or components.
+
 ## Step 1: Define Tokens
 Design tokens (adapt to existing project if any):
 

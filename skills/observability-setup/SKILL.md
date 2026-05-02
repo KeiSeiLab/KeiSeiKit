@@ -6,6 +6,12 @@ argument-hint: <service-or-repo-name>
 
 # Observability-Setup — 5-Phase Pipeline (index)
 
+## When to use
+
+- Installing the logs + metrics + traces triad on an existing service for the first time.
+- Wiring Prometheus scraping, OpenTelemetry traces, and Grafana dashboards in one pipeline.
+- Adding alert rules to an already-instrumented service that lacks alerting.
+
 > See `_blocks/pipeline-5phase-template.md` for the 5-phase wizard contract
 > and `_blocks/rule-pure-click-contract.md` for the AskUserQuestion rule.
 > Skill-specific phase tables are inline below.

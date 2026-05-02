@@ -6,6 +6,12 @@ argument-hint: <optional one-line intent, e.g. "staging api hetzner eu">
 
 # /vm-provision — 6-Phase VPS Pipeline (index)
 
+## When to use
+
+- Provisioning a new VPS from scratch: select provider → plan → provision → harden → verify → handoff.
+- Setting up a hardened production or staging server with firewall verification as a hard gate.
+- Any new VM where the security posture (fail2ban, UFW, non-root SSH) must be verified before handoff.
+
 You turn a short intent ("staging API in EU") into a **hardened, verified
 VPS** ready to host an app. Six phases. Every provider choice, plan detail,
 and fix is surfaced as an `AskUserQuestion` click — no silent defaults.

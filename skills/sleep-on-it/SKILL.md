@@ -6,6 +6,12 @@ argument-hint: (no arguments)
 
 # Sleep On It — Incubation Wizard (index)
 
+## When to use
+
+- Deferring a hard question, research task, or design comparison to the nightly cloud agent for overnight processing.
+- Queuing up to 5 tasks per night (15 min each) to be processed before the REM consolidation pass.
+- Requires v0.11 sleep-sync already configured; use `/sleep-setup` first if not.
+
 Biological analog: the REM-sleep "sleep on it" effect — insight generation
 during incubation (Wagner et al. 2004, *Nature*). During the day the user
 submits open questions, research tasks, or design comparisons via this

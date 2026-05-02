@@ -6,6 +6,12 @@ argument-hint: <one-line app description, e.g. "B2C SaaS, Next.js + Postgres, ne
 
 # Auth-Setup — Identity, Session & Authorization Pipeline (index)
 
+## When to use
+
+- Setting up user authentication for a new or existing app (social login, passkeys, magic link).
+- Choosing and configuring an identity provider, session strategy, or authorization model.
+- Auditing an app's auth/IAM posture and generating a threat mitigation checklist.
+
 > See `_blocks/pipeline-5phase-template.md` for the 5-phase wizard contract
 > and `_blocks/rule-pure-click-contract.md` for the AskUserQuestion rule.
 > Skill-specific phase tables are inline below.

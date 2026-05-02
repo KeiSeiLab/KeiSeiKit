@@ -6,6 +6,12 @@ argument-hint: <project name or one-line goal>
 
 # New-Project — 4-Phase Pipeline (index)
 
+## When to use
+
+- Bootstrapping a new multi-agent project with full git-model compliance (branch + 6-file artefact bundle + ledger row + merge ceremony).
+- Kicking off a research, code, or hybrid project that will run as a main agent plus N parallel sub-agents.
+- Implementing RULE 0.12 (agent git-model) at project scale with fork, execute, and merge ceremony.
+
 You are bootstrapping a **new project** — research, code, theoretical, or
 hybrid — that will run as a **main agent plus N parallel sub-agents** with
 full git-model compliance (branch + 6-file artefact bundle + ledger row +

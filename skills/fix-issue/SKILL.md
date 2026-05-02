@@ -10,6 +10,12 @@ arguments:
 
 # Fix Issue Workflow
 
+## When to use
+
+- Fixing a tracked GitHub issue: reproduce → trace root cause → fix → add regression test.
+- Any bug fix that needs a failing test written first (TDD approach).
+- Investigating an issue report where the reproduction steps or root cause are unclear.
+
 ## Step 1: Load Issue Context
 - Fetch issue details: `gh issue view $issue --json title,body,labels,comments`
 - Read all comments for additional context

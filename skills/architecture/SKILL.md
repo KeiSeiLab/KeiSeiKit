@@ -6,6 +6,12 @@ argument-hint: <system or feature description>
 
 # Holographic Architecture Analysis
 
+## When to use
+
+- Designing the architecture for a new system or feature ("архитектура", "план", "спроектируй").
+- Analysing an existing codebase structure for patterns, antipatterns, and dependency issues.
+- Making a cross-cutting architectural decision that spans multiple modules or services.
+
 Task: $ARGUMENTS
 
 ## Phase 0: Load Architecture Rules
