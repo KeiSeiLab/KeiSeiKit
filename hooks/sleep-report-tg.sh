@@ -65,8 +65,8 @@ else
     PROMPT_BODY=$(jq -n --arg r "$REPORT_BODY" '
 {
   "model": "claude-sonnet-4-6",
-  "max_tokens": 1500,
-  "system": "You are the KeiSei sleep-report distiller. The user wakes up and reads ONE Telegram message summarizing what happened in their dev environment overnight. Be ruthlessly concise.\n\nMandatory output structure (max 3500 chars total, plain text suitable for Telegram, no markdown beyond *bold* and `code`):\n\n1. ONE-LINE TL;DR — what is the single most important thing the user should know.\n2. NUMBERS — agent outcomes (functional/partial/scaffolding/fail counts), cost burned, top tool-call categories. Cite raw values from the digests, no interpretation.\n3. ACTIONABLE FINDINGS — 3-5 bullet points. Each must be: a concrete observation FROM THE DATA + suggested action. Examples: \"Opus burned $X with 0 functional outcomes — investigate or accept as legacy noise\", \"Skill X has Y% success rate over N runs — candidate for archive\". DO NOT invent findings without data backing.\n4. RULE-CANDIDATES — if any cross-session pattern in the analyze section appeared >=3 times, name it + suggest a /escalate-recurrence command. Skip section if nothing qualifies.\n\nNO emoji except a single 💤 prefix. NO chat-style preamble (\"Доброе утро!\"). NO closing pleasantries. Direct technical brief.",
+  "max_tokens": 600,
+  "system": "Distil the input report into a Telegram brief. Be ruthlessly compressed. Token budget is hard.\n\nFormat (≤900 chars TOTAL — fail closed at the budget, do not exceed):\n  Line 1: 💤 <ONE sentence — the single fact that matters>\n  Then 3 bullets max, each ≤120 chars: <data point + action>\n  Optional final line `escalate: <pattern>` ONLY if a cross-session pattern appeared ≥5×.\n\nRules:\n- No headers, no section labels, no separators (---), no preamble, no greetings, no closing line.\n- Every claim must reference data from the report. No invented findings.\n- If two findings overlap, merge — never repeat the same metric in two bullets.\n- Numbers go bare with units. Do NOT explain what the metric means.\n- No Markdown beyond *bold* and `code`. No emoji beyond the 💤 prefix.",
   "messages": [{"role":"user","content":[{"type":"text","text":$r}]}]
 }')
 
@@ -91,9 +91,9 @@ fi
 # Telegram message limit is 4096 chars. We cap at 3900 to leave room for
 # the prefix + headers. If the cloud agent went over budget, hard-truncate
 # rather than splitting (one cohesive message > two fragmented).
-HEADER="💤 *Sleep report* — ${TODAY}"$'\n\n'
-BODY="${HEADER}${SUMMARY}"
-BODY=$(printf '%s' "$BODY" | head -c 3900)
+# No external header — the agent emits its own 💤 line. Cap at 950 chars
+# to enforce the budget; if the agent went over, hard-truncate.
+BODY=$(printf '%s' "$SUMMARY" | head -c 950)
 
 # Use --data-urlencode for safe transport of newlines / specials.
 HTTP_RESP=$(curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
