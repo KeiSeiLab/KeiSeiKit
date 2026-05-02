@@ -31,8 +31,9 @@ case "$EVENT" in
     if [[ -f "$START_FILE" ]]; then
       START="$(cat "$START_FILE")"
       DURATION=$((NOW_EPOCH - START))
-      printf '{"kind":"session","id":"%s","start_epoch":%s,"end_epoch":%s,"duration_s":%s,"ts":"%s"}\n' \
-        "$SESSION_ID" "$START" "$NOW_EPOCH" "$DURATION" "$NOW_ISO" \
+      jq -nc --arg id "$SESSION_ID" --arg ts "$NOW_ISO" \
+        --argjson start "$START" --argjson end "$NOW_EPOCH" --argjson dur "$DURATION" \
+        '{"kind":"session","id":$id,"start_epoch":$start,"end_epoch":$end,"duration_s":$dur,"ts":$ts}' \
         >> "$JOURNAL_DIR/sessions.jsonl"
       rm -f "$START_FILE"
     fi
@@ -49,8 +50,10 @@ case "$EVENT" in
       AGENT_TYPE="$(printf '%s' "$INPUT" | jq -r '.tool_input.subagent_type // "fork"' 2>/dev/null)"
       if [[ -n "$AGENT_ID" ]]; then
         TASK_START="$JOURNAL_DIR/.task-${AGENT_ID}.start"
-        printf '{"id":"%s","desc":"%s","type":"%s","start_epoch":%s}' \
-          "$AGENT_ID" "$DESC" "$AGENT_TYPE" "$NOW_EPOCH" > "$TASK_START"
+        jq -nc --arg id "$AGENT_ID" --arg desc "$DESC" --arg type "$AGENT_TYPE" \
+          --argjson start "$NOW_EPOCH" \
+          '{"id":$id,"desc":$desc,"type":$type,"start_epoch":$start}' \
+          > "$TASK_START"
       fi
     fi
     ;;
@@ -66,8 +69,10 @@ case "$EVENT" in
         DESC="$(echo "$START_RAW" | jq -r '.desc')"
         AGENT_TYPE="$(echo "$START_RAW" | jq -r '.type')"
         DURATION=$((NOW_EPOCH - START_EPOCH))
-        printf '{"kind":"task","id":"%s","desc":"%s","type":"%s","start_epoch":%s,"end_epoch":%s,"duration_s":%s,"ts":"%s"}\n' \
-          "$AGENT_ID" "$DESC" "$AGENT_TYPE" "$START_EPOCH" "$NOW_EPOCH" "$DURATION" "$NOW_ISO" \
+        jq -nc --arg id "$AGENT_ID" --arg desc "$DESC" --arg type "$AGENT_TYPE" \
+          --arg ts "$NOW_ISO" \
+          --argjson start "$START_EPOCH" --argjson end "$NOW_EPOCH" --argjson dur "$DURATION" \
+          '{"kind":"task","id":$id,"desc":$desc,"type":$type,"start_epoch":$start,"end_epoch":$end,"duration_s":$dur,"ts":$ts}' \
           >> "$JOURNAL_DIR/tasks.jsonl"
         rm -f "$TASK_START"
       fi

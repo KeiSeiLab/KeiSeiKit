@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# RULE 0.17 enforcement — block Edit/Write of numeric claims without
-# evidence marker. Bypass: RULE_017_BYPASS=1 prefix.
+# RULE 0.18 — Numeric claim enforcement — block Edit/Write of numeric claims
+# without evidence marker. Bypass: RULE_017_BYPASS=1 prefix (kept for compat).
 #
 # Reads tool-call JSON on stdin (Claude Code hook protocol).
 
@@ -46,7 +46,7 @@ MATCHED="$(echo "$NEW_CONTENT" | grep -iEo "$NUMERIC_PATTERN" | head -3 | tr '\n
 
 cat >&2 <<EOF
 ═══════════════════════════════════════════════════════════════════
-  RULE 0.17 — Numeric claim without evidence marker.
+  RULE 0.18 — Numeric claim without evidence marker.
 ═══════════════════════════════════════════════════════════════════
 
 Found in Edit/Write content:
@@ -70,4 +70,4 @@ See: ~/.claude/rules/numeric-claims-evidence.md
 ═══════════════════════════════════════════════════════════════════
 EOF
 
-exit 1
+exit 2

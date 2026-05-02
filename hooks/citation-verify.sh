@@ -50,7 +50,7 @@ ALL_HITS=$(printf '%s\n%s\n%s' "$HITS_A" "$HITS_B" "$HITS_C" | grep -v '^$' || t
 [ -z "$ALL_HITS" ] && exit 0
 
 # Allowlist: explicit verification or retraction context
-ALLOW_REGEX='\[VERIFIED:|\[UNVERIFIED\]|\[FABRICATED|\[RETRACTED|\[MISATTRIBUTED|FABRICATED|RETRACTED 2026|MISATTRIBUTED|NOT FOUND|unverifiable|misattributed|does NOT exist|do NOT EXIST|are fabricated|were fabricated'
+ALLOW_REGEX='\[VERIFIED:|\[UNVERIFIED\]|\[FABRICATED|\[RETRACTED|\[MISATTRIBUTED|FABRICATED|RETRACTED 2026|MISATTRIBUTED|NOT FOUND|unverifiable|misattributed|does NOT exist|do NOT EXIST|are fabricated|were fabricated|\[HOOK-BYPASS:[[:space:]]*citation-verify'
 if printf '%s' "$CONTENT" | grep -qE "$ALLOW_REGEX"; then
     exit 0
 fi

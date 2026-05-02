@@ -48,6 +48,11 @@
             "type": "command",
             "command": "~/.claude/hooks/agent-fork-done.sh",
             "statusMessage": "agent-fork-done — close ledger lifecycle..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-stub-scan.sh",
+            "statusMessage": "STATUS-TRUTH marker scan (RULE 0.16)..."
           }
         ]
       },
@@ -58,11 +63,6 @@
             "type": "command",
             "command": "~/.claude/hooks/error-spike-detector.sh",
             "statusMessage": "error-spike rolling window (RULE 0.14)..."
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/check-error-patterns.sh",
-            "statusMessage": "error-pattern check..."
           },
           {
             "type": "command",
@@ -108,6 +108,11 @@
             "type": "command",
             "command": "~/.claude/hooks/no-python-without-approval.sh",
             "statusMessage": "rust-first python gate (RULE 0.2)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/no-github-push.sh",
+            "statusMessage": "no-github-push guard (RULE 0.1)..."
           }
         ]
       },
@@ -132,6 +137,11 @@
             "type": "command",
             "command": "~/.claude/hooks/citation-verify.sh",
             "statusMessage": "citation-verify (RULE 0.4)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/secrets-pre-guard.sh",
+            "statusMessage": "secrets-pre-guard (RULE 0.8)..."
           }
         ]
       },
@@ -165,11 +175,6 @@
           },
           {
             "type": "command",
-            "command": "~/.claude/hooks/agent-stub-scan.sh",
-            "statusMessage": "STATUS-TRUTH marker scan (RULE 0.16)..."
-          },
-          {
-            "type": "command",
             "command": "~/.claude/hooks/task-timer.sh"
           }
         ]
@@ -197,6 +202,11 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/alignment-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/chat-numeric-prewarn.sh",
+            "statusMessage": "chat-numeric-prewarn (RULE 0.18)..."
           }
         ]
       }
@@ -223,6 +233,11 @@
             "type": "command",
             "command": "~/.claude/hooks/extract-task-durations.sh",
             "statusMessage": "extract-task-durations — pull async durations from notifications..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/chat-numeric-postflag.sh",
+            "statusMessage": "chat-numeric-postflag (RULE 0.18)..."
           }
         ]
       }

@@ -36,11 +36,11 @@ esac
 
 # Downgrade triggers (case-insensitive, word-boundary where possible)
 # derived: incident catalog from 2026-04-14 chatlogs + 2026-04-24 live session
-TRIGGERS='(?i)\b(failed|refuted|doesn.?t work|downgrade|accept as limitation|не работает|не сработало|провалился|не удалось|tautolog(y|ical)|rejected?|dismiss|give up|отказываемся|отступаем|неудача|провал|это (всё\s+)?что мы)\b'
+TRIGGERS='\b(failed|refuted|doesn.?t work|downgrade|accept as limitation|не работает|не сработало|провалился|не удалось|tautolog(y|ical)|rejected?|dismiss|give up|отказываемся|отступаем|неудача|провал|это (всё\s+)?что мы)\b'
 
 # Constructive rescue markers — if ANY of these present, downgrade is OK
 # because the agent provided solution paths (RULE -1 compliance).
-RESCUE='(?i)(three paths|3 paths|variant A|option A|вариант[аы]?\s+решения|solution paths?|constructive|recommend [AB]|три пути|можем попробовать|proposed fix|root cause.*fix|альтернативный путь|next step|решения\s*:)'
+RESCUE='(three paths|3 paths|variant A|option A|вариант[аы]?\s+решения|solution paths?|constructive|recommend [AB]|три пути|можем попробовать|proposed fix|root cause.*fix|альтернативный путь|next step|решения\s*:)'
 
 HAS_TRIGGER=$(echo "$CONTENT" | grep -ciE "$TRIGGERS" || true)
 HAS_RESCUE=$(echo "$CONTENT" | grep -ciE "$RESCUE" || true)

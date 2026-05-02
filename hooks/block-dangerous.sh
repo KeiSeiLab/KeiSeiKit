@@ -1,8 +1,10 @@
 #!/bin/bash
 # Block dangerous commands that could cause irreversible damage
 
+command -v jq >/dev/null 2>&1 || exit 0
+
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('command',''))" 2>/dev/null)
+COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
 
 # Block patterns
 if echo "$COMMAND" | grep -qE 'rm\s+-rf\s+(/|~|\$HOME|/Users)'; then

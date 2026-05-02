@@ -4,7 +4,7 @@
 # THREE-TIME REPEAT BUG: exp6, exp24-28, basecaller — all forgot alignment.
 
 INPUT=$(cat)
-PROMPT=$(printf '%s' "$INPUT" | jq -r '.user_prompt // empty' 2>/dev/null)
+PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // empty' 2>/dev/null)
 [ -z "$PROMPT" ] && exit 0
 
 # Detect comparison/experiment keywords

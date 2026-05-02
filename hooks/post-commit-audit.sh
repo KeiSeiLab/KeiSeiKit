@@ -13,3 +13,5 @@ if echo "$CMD" | grep -qE 'git\s+commit'; then
   echo "═══════════════════════════════════════════════════"
   echo ""
 fi
+
+exit 0
