@@ -5,6 +5,7 @@
 //! multi-block content (`text` + `tool_use`) into `Vec<ContentBlock>`.
 
 use crate::anthropic::{default_model, endpoint, API_VERSION};
+use crate::http_helpers::{read_capped, HTTP_CLIENT};
 use crate::tool::loop_driver::{
     ContentBlock, ConversationMessage, ModelInvoker, ModelTurn, TokenUsage,
 };
@@ -42,9 +43,11 @@ async fn invoke(
         Ok(Err(e)) => return Err(format!("anthropic request: {e}")),
         Err(_) => return Err("anthropic request: timeout".into()),
     };
-    let raw: Value = resp
-        .json()
+    const SUCCESS_CAP: usize = 64 * 1024 * 1024; // 64 MiB
+    let bytes = read_capped(resp, SUCCESS_CAP)
         .await
+        .map_err(|e| format!("anthropic body read: {e}"))?;
+    let raw: Value = serde_json::from_slice(&bytes)
         .map_err(|e| format!("anthropic body json: {e}"))?;
     parse_turn(&raw)
 }
@@ -103,7 +106,7 @@ fn render_assistant_blocks(blocks: &[ContentBlock]) -> Vec<Value> {
 
 /// Fire the POST request and surface 4xx/5xx as a string error.
 async fn send(api_key: &str, body: &Value) -> Result<reqwest::Response, reqwest::Error> {
-    let resp = reqwest::Client::new()
+    let resp = HTTP_CLIENT
         .post(endpoint().as_ref())
         .header("x-api-key", api_key)
         .header("anthropic-version", API_VERSION)

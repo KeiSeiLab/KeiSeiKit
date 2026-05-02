@@ -97,9 +97,19 @@ fn validate_provider(state: &AppState, name: &str) -> Result<(), AppError> {
     }
 }
 
+/// Character ceiling for chat messages. Prevents runaway prompt injection
+/// and upstream token cost abuse.
+const MAX_MESSAGE_CHARS: usize = 50_000;
+
 fn validate_body(req: &ChatRequest) -> Result<(), AppError> {
     if req.message.is_empty() {
         return Err(AppError::BadRequest("message is empty".into()));
+    }
+    let chars = req.message.chars().count();
+    if chars > MAX_MESSAGE_CHARS {
+        return Err(AppError::PayloadTooLarge(format!(
+            "{chars} chars > {MAX_MESSAGE_CHARS}"
+        )));
     }
     Ok(())
 }

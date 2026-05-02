@@ -10,6 +10,7 @@
 //! reference, never hardcoded). We never log the full text; only its length
 //! and the response status / byte count.
 
+use crate::http_helpers::{read_capped, HTTP_CLIENT};
 use std::time::Duration;
 
 /// Errors surfaced to the caller; handlers map them onto HTTP codes.
@@ -29,12 +30,15 @@ const TTS_BASE: &str = "https://api.elevenlabs.io/v1/text-to-speech";
 const BUDGET: Duration = Duration::from_secs(60);
 const BODY_PREVIEW_CAP: usize = 512;
 const MODEL_ID: &str = "eleven_turbo_v2_5";
+/// Cap on successful audio response bodies (64 MiB).
+const AUDIO_BODY_CAP: usize = 64 * 1024 * 1024;
+/// Cap on error response bodies (16 KiB).
+const ERROR_BODY_CAP: usize = 16 * 1024;
 
 /// Synthesize speech for `text` using the given `voice_id`. Returns mp3 bytes.
 pub async fn synthesize(voice_id: &str, text: &str) -> Result<Vec<u8>, Error> {
     let key = std::env::var("ELEVENLABS_API_KEY").map_err(|_| Error::NoApiKey)?;
-    let client = reqwest::Client::new();
-    let fut = call_tts(&client, &key, voice_id, text);
+    let fut = call_tts(&key, voice_id, text);
     match tokio::time::timeout(BUDGET, fut).await {
         Ok(r) => r,
         Err(_) => Err(Error::Timeout),
@@ -44,14 +48,13 @@ pub async fn synthesize(voice_id: &str, text: &str) -> Result<Vec<u8>, Error> {
 /// POST the JSON body and collect the audio bytes. Split from `synthesize`
 /// so the timeout wrapper stays a thin shell.
 async fn call_tts(
-    client: &reqwest::Client,
     key: &str,
     voice_id: &str,
     text: &str,
 ) -> Result<Vec<u8>, Error> {
     let url = format!("{TTS_BASE}/{voice_id}");
     let body = build_body(text);
-    let resp = client
+    let resp = HTTP_CLIENT
         .post(&url)
         .header("xi-api-key", key)
         .header("Content-Type", "application/json")
@@ -77,13 +80,20 @@ fn build_body(text: &str) -> serde_json::Value {
 
 /// Turn an ElevenLabs response into raw mp3 bytes; map non-2xx to `Upstream`.
 async fn decode_audio(resp: reqwest::Response) -> Result<Vec<u8>, Error> {
+    use crate::http_helpers::CappedReadError;
     let status = resp.status();
     if !status.is_success() {
-        let body = resp.text().await.unwrap_or_default();
-        let truncated = truncate(&body, BODY_PREVIEW_CAP);
-        return Err(Error::Upstream(status.as_u16(), truncated));
+        let raw = read_capped(resp, ERROR_BODY_CAP).await.unwrap_or_default();
+        let body = String::from_utf8_lossy(&raw).into_owned();
+        return Err(Error::Upstream(status.as_u16(), truncate(&body, BODY_PREVIEW_CAP)));
     }
-    Ok(resp.bytes().await?.to_vec())
+    match read_capped(resp, AUDIO_BODY_CAP).await {
+        Ok(bytes) => Ok(bytes),
+        Err(CappedReadError::TooLarge) => {
+            Err(Error::Upstream(502, "audio body exceeded 64 MiB cap".into()))
+        }
+        Err(CappedReadError::Http(e)) => Err(Error::Http(e)),
+    }
 }
 
 /// Cap a string at `max` bytes on a char boundary. Used for error previews

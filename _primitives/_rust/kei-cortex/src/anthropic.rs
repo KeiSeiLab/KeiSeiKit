@@ -12,6 +12,7 @@
 //!     an SSE error event rather than hanging the client.
 
 use crate::anthropic_sse::SseParser;
+use crate::http_helpers::{read_capped, HTTP_CLIENT};
 use async_stream::try_stream;
 use futures::stream::Stream;
 use futures::StreamExt;
@@ -34,6 +35,9 @@ pub const IDLE: Duration = Duration::from_secs(30);
 /// Cap on upstream error bodies we propagate. Prevents Anthropic echoing a
 /// large error page into our logs or client.
 const BODY_PREVIEW_CAP: usize = 512;
+
+/// Cap on upstream error body reads via `read_capped` (16 KiB).
+const ERROR_BODY_CAP: usize = 16 * 1024;
 
 /// A single turn in the conversation.
 #[derive(Debug, Clone, Serialize)]
@@ -91,7 +95,10 @@ fn body_to_text_stream(
             };
             let Some(chunk) = chunk_opt else { break };
             let chunk = chunk.map_err(Error::Http)?;
-            for text in parser.push(&chunk) {
+            let texts = parser.push(&chunk).map_err(|_| {
+                Error::Upstream { status: 502, body: "SSE frame exceeds 1MB cap".into() }
+            })?;
+            for text in texts {
                 yield text;
             }
         }
@@ -114,8 +121,7 @@ async fn send_request(
     api_key: &str,
     body: &serde_json::Value,
 ) -> Result<reqwest::Response, Error> {
-    let client = reqwest::Client::new();
-    let resp = client
+    let resp = HTTP_CLIENT
         .post(endpoint().as_ref())
         .header("x-api-key", api_key)
         .header("anthropic-version", API_VERSION)
@@ -142,7 +148,8 @@ async fn check_status(resp: reqwest::Response) -> Result<reqwest::Response, Erro
     if code == 503 || code == 529 {
         return Err(Error::ServiceUnavailable);
     }
-    let body = resp.text().await.unwrap_or_default();
+    let raw = read_capped(resp, ERROR_BODY_CAP).await.unwrap_or_default();
+    let body = String::from_utf8_lossy(&raw).into_owned();
     Err(Error::Upstream {
         status: code,
         body: truncate(&body, BODY_PREVIEW_CAP),

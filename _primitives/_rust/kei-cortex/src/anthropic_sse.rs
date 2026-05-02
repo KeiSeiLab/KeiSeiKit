@@ -23,6 +23,14 @@ struct Delta {
     text: Option<String>,
 }
 
+/// Maximum buffer size per SSE frame — guards against a runaway upstream
+/// that never emits a `\n\n` frame boundary.
+const MAX_BUF: usize = 1 * 1024 * 1024; // 1 MiB
+
+/// Error returned by `SseParser::push` when the buffer cap is exceeded.
+#[derive(Debug)]
+pub(crate) struct SseBufOverflow;
+
 /// Incremental SSE parser — SSE frames are separated by `\n\n`.
 ///
 /// We buffer partial chunks across `push` calls and return every extracted
@@ -37,8 +45,14 @@ impl SseParser {
     }
 
     /// Consume a byte chunk, return every text delta completed in this push.
-    pub fn push(&mut self, chunk: &Bytes) -> Vec<String> {
+    /// Returns `Err(SseBufOverflow)` if the internal buffer exceeds `MAX_BUF`
+    /// before a complete frame arrives; caller should abort the stream.
+    pub fn push(&mut self, chunk: &Bytes) -> Result<Vec<String>, SseBufOverflow> {
         self.buf.push_str(&String::from_utf8_lossy(chunk));
+        if self.buf.len() > MAX_BUF {
+            self.buf.clear();
+            return Err(SseBufOverflow);
+        }
         let mut out = Vec::new();
         while let Some(idx) = self.buf.find("\n\n") {
             let frame: String = self.buf.drain(..idx + 2).collect();
@@ -46,7 +60,7 @@ impl SseParser {
                 out.push(text);
             }
         }
-        out
+        Ok(out)
     }
 }
 
@@ -89,7 +103,17 @@ mod tests {
             "event: content_block_delta\ndata: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"ab\"}",
         );
         let part2 = Bytes::from("}\n\n");
-        assert!(p.push(&part1).is_empty());
-        assert_eq!(p.push(&part2), vec!["ab".to_string()]);
+        assert!(p.push(&part1).unwrap().is_empty());
+        assert_eq!(p.push(&part2).unwrap(), vec!["ab".to_string()]);
+    }
+
+    #[test]
+    fn parser_rejects_oversized_buf() {
+        let mut p = SseParser::new();
+        // Push just over MAX_BUF bytes without a frame boundary.
+        let big = Bytes::from(vec![b'x'; MAX_BUF + 1]);
+        assert!(p.push(&big).is_err());
+        // Buffer must be cleared so subsequent calls don't accumulate.
+        assert!(p.push(&Bytes::from("\n\n")).unwrap().is_empty());
     }
 }

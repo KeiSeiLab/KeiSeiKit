@@ -103,30 +103,51 @@ pub fn tokens_match(expected: &str, got: &str) -> bool {
     diff == 0
 }
 
+/// Build a unique temp path next to `path`: `<path>.<nanos>.tmp`.
+fn tmp_path(path: &Path) -> std::path::PathBuf {
+    let ts = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let name = path.file_name().map(|n| {
+        let mut s = n.to_os_string();
+        s.push(format!(".{ts}.tmp"));
+        s
+    });
+    match (path.parent(), name) {
+        (Some(p), Some(n)) => p.join(n),
+        _ => path.with_extension("tmp"),
+    }
+}
+
 #[cfg(unix)]
 fn write_mode_600(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
     use std::os::unix::fs::OpenOptionsExt;
+    let tmp = tmp_path(path);
     let mut f = fs::OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
         .mode(0o600)
-        .open(path)?;
+        .open(&tmp)?;
     f.write_all(bytes)?;
     f.sync_all()?;
-    Ok(())
+    drop(f);
+    fs::rename(&tmp, path)
 }
 
 #[cfg(not(unix))]
 fn write_mode_600(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    let tmp = tmp_path(path);
     let mut f = fs::OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
-        .open(path)?;
+        .open(&tmp)?;
     f.write_all(bytes)?;
     f.sync_all()?;
-    Ok(())
+    drop(f);
+    fs::rename(&tmp, path)
 }
 
 #[cfg(test)]
