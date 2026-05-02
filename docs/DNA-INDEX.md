@@ -1,19 +1,19 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-01T19:42:09Z.
-> Total blocks: 515. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-02T05:07:21Z.
+> Total blocks: 518. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 121 |
-| hook | 43 |
-| primitive | 109 |
+| hook | 45 |
+| primitive | 110 |
 | rule | 174 |
 | skill | 68 |
 
 ---
 
-## Primitive (109)
+## Primitive (110)
 
 Sorted alphabetically by name.
 
@@ -63,6 +63,7 @@ Sorted alphabetically by name.
 | kei-git-gitea | primitive::md,networ… | _primitives/_rust/kei-git-gitea/Cargo.toml | 0de210a2 |
 | kei-git-gitlab | primitive::md,networ… | _primitives/_rust/kei-git-gitlab/Cargo.toml | 59a5271b |
 | kei-graph-check | primitive::cli,fs,md… | _primitives/_rust/kei-graph-check/Cargo.toml | 2c0e38d8 |
+| kei-graph-export | primitive::cli,md,sq… | _primitives/_rust/kei-graph-export/Cargo.toml | de93b403 |
 | kei-hibernate | primitive::cli,hash,… | _primitives/_rust/kei-hibernate/Cargo.toml | 1ea136f5 |
 | kei-import-project | primitive::cli,fs,ha… | _primitives/_rust/kei-import-project/Cargo.toml | 2de0fd64 |
 | kei-leak-matrix | primitive::cli,fs,md… | _primitives/_rust/kei-leak-matrix/Cargo.toml | a3803ef9 |
@@ -838,7 +839,7 @@ Sorted alphabetically by name.
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
 
-## Hook (43)
+## Hook (45)
 
 Sorted alphabetically by name.
 
@@ -867,6 +868,7 @@ Sorted alphabetically by name.
 | disk-reclaim | shell | hook::shell::47b7bf4… | hooks/disk-reclaim.sh |
 | error-spike-detector | shell | hook::shell::90dd8c6… | hooks/error-spike-detector.sh |
 | extract-task-durations | shell | hook::shell::6b3a57f… | hooks/extract-task-durations.sh |
+| graph-export-watcher | shell | hook::shell::8d87d02… | hooks/graph-export-watcher.sh |
 | milestone-commit-hook | shell | hook::shell::18347ff… | hooks/milestone-commit-hook.sh |
 | no-downgrade | shell | hook::shell::db31e58… | hooks/no-downgrade.sh |
 | no-hand-edit-agents | shell | hook::shell::ed728f1… | hooks/no-hand-edit-agents.sh |
@@ -884,6 +886,7 @@ Sorted alphabetically by name.
 | session-end-dump | shell | hook::shell::7c3e2d9… | hooks/session-end-dump.sh |
 | site-wysiwyd-check | shell | hook::shell::0683fa8… | hooks/site-wysiwyd-check.sh |
 | skill-record | shell | hook::shell::954ccee… | hooks/skill-record.sh |
+| sleep-report-tg | shell | hook::shell::2e5b134… | hooks/sleep-report-tg.sh |
 | stop-verify | shell | hook::shell::adedcfe… | hooks/stop-verify.sh |
 | task-timer | shell | hook::shell::dda5e94… | hooks/task-timer.sh |
 | tomd-preread | shell | hook::shell::8a95b76… | hooks/tomd-preread.sh |
@@ -1079,6 +1082,7 @@ Sorted alphabetically by name.
 - `kei-git-gitea` — 2 versions: ea30f0cc → 0de210a2
 - `kei-git-gitlab` — 2 versions: 744859c4 → 59a5271b
 - `kei-graph-check` — 2 versions: e08f240e → 2c0e38d8
+- `kei-graph-export::kei-graph-export` — 26 versions: 2e9d962a → b0f840b1 → 4a42d5f4 → a9d35468 → 1f0c066f → 6f5cd1a9 → 89ae1693 → fbebe21d → 63b761f6 → 643d3f08 → 7ba05286 → ca606a00 → c1f97c41 → 237d050b → 094ddc72 → 006b0f7d → c3d7c243 → a67fc02f → 33beda01 → 615a6cfb → 6dbfd254 → bb6ca1bb → 48cb9c62 → 5529822c → 1b597838 → f17c1aeb
 - `kei-hibernate` — 2 versions: 25f6d5bc → 1ea136f5
 - `kei-import-project` — 2 versions: aa3750a0 → 2de0fd64
 - `kei-leak-matrix` — 2 versions: 06a89af2 → a3803ef9
@@ -1146,9 +1150,11 @@ Sorted alphabetically by name.
 - `no-python-without-approval` — 2 versions: 45d3e0ab → 48fdb89e
 - `numeric-claims-guard` — 2 versions: 90f697e6 → d5ed33c8
 - `numeric-claims-record` — 2 versions: 59a9990f → 342361a3
+- `phase-b-rem` — 4 versions: 69fdc9bc → df6af06f → 223c0c99 → 8545aba8
 - `post-write-check` — 2 versions: 6ceb2237 → 4aaf1c5e
 - `safety-guard` — 2 versions: 32b889cf → 665e7cd1
 - `site-wysiwyd-check` — 2 versions: a0d38a22 → 416c0648
+- `sleep-report-tg` — 3 versions: acc3ebfb → ef101ab6 → 9529ec50
 - `ssh-check` — 2 versions: f419e2b0 → ebd97541
 - `task-timer` — 2 versions: 202823f9 → 16e4f0a3
 - `tokens-sync` — 2 versions: 54c149ab → 69857925

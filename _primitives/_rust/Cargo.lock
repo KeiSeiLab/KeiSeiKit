@@ -3664,6 +3664,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "kei-graph-export"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
 name = "kei-hibernate"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>io.keisei.graph-export</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>HOOKS_DIR/graph-export-watcher.sh</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>HOME_DIR/.claude/memory/graph-export.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>HOME_DIR/.claude/memory/graph-export.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:HOME_DIR/.cargo/bin</string>
+        <key>HOME</key>
+        <string>HOME_DIR</string>
+    </dict>
+</dict>
+</plist>
