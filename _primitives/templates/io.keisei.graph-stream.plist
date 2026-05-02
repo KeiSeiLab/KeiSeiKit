@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>io.keisei.graph-stream</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>HOME_DIR/.cargo/bin/kei-graph-stream</string>
+        <string>--bind</string>
+        <string>127.0.0.1:8201</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>HOME_DIR/.claude/memory/graph-stream.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>HOME_DIR/.claude/memory/graph-stream.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:HOME_DIR/.cargo/bin</string>
+        <key>HOME</key>
+        <string>HOME_DIR</string>
+    </dict>
+</dict>
+</plist>

@@ -1,19 +1,19 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-02T05:07:21Z.
-> Total blocks: 518. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-02T05:30:23Z.
+> Total blocks: 522. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 121 |
-| hook | 45 |
-| primitive | 110 |
+| hook | 48 |
+| primitive | 111 |
 | rule | 174 |
 | skill | 68 |
 
 ---
 
-## Primitive (110)
+## Primitive (111)
 
 Sorted alphabetically by name.
 
@@ -64,6 +64,7 @@ Sorted alphabetically by name.
 | kei-git-gitlab | primitive::md,networ… | _primitives/_rust/kei-git-gitlab/Cargo.toml | 59a5271b |
 | kei-graph-check | primitive::cli,fs,md… | _primitives/_rust/kei-graph-check/Cargo.toml | 2c0e38d8 |
 | kei-graph-export | primitive::cli,md,sq… | _primitives/_rust/kei-graph-export/Cargo.toml | de93b403 |
+| kei-graph-stream | primitive::cli,md,ne… | _primitives/_rust/kei-graph-stream/Cargo.toml | 04ef818f |
 | kei-hibernate | primitive::cli,hash,… | _primitives/_rust/kei-hibernate/Cargo.toml | 1ea136f5 |
 | kei-import-project | primitive::cli,fs,ha… | _primitives/_rust/kei-import-project/Cargo.toml | 2de0fd64 |
 | kei-leak-matrix | primitive::cli,fs,md… | _primitives/_rust/kei-leak-matrix/Cargo.toml | a3803ef9 |
@@ -839,7 +840,7 @@ Sorted alphabetically by name.
 | sleep-layer::the-rule | rule::_::576bbb7f::d… | d0e03a0d |
 
 
-## Hook (45)
+## Hook (48)
 
 Sorted alphabetically by name.
 
@@ -848,6 +849,8 @@ Sorted alphabetically by name.
 | affect-live-scan | shell | hook::shell::b7f9b36… | hooks/affect-live-scan.sh |
 | agent-capability-check | shell | hook::shell::eab55b0… | hooks/agent-capability-check.sh |
 | agent-capability-verify | shell | hook::shell::86c19ba… | hooks/agent-capability-verify.sh |
+| agent-event-done | shell | hook::shell::a05c64f… | hooks/agent-event-done.sh |
+| agent-event-spawn | shell | hook::shell::7137192… | hooks/agent-event-spawn.sh |
 | agent-fork-done | shell | hook::shell::eeaa011… | hooks/agent-fork-done.sh |
 | agent-fork-logger | shell | hook::shell::1b43957… | hooks/agent-fork-logger.sh |
 | agent-heartbeat-tick | shell | hook::shell::29d6dbe… | hooks/agent-heartbeat-tick.sh |
@@ -890,6 +893,7 @@ Sorted alphabetically by name.
 | stop-verify | shell | hook::shell::adedcfe… | hooks/stop-verify.sh |
 | task-timer | shell | hook::shell::dda5e94… | hooks/task-timer.sh |
 | tomd-preread | shell | hook::shell::8a95b76… | hooks/tomd-preread.sh |
+| tool-use-event | shell | hook::shell::34bb788… | hooks/tool-use-event.sh |
 
 ## Atom (121)
 
@@ -1032,6 +1036,8 @@ Sorted alphabetically by name.
 - `New Agent — Project-Specialist Wizard` — 2 versions: dfdaea5c → bcf5a0d9
 - `STACK — Python ML (PyTorch / JAX)` — 2 versions: ceb1fc98 → 4afd934a
 - `Self-Audit — Session Retrospective Triage (index)` — 2 versions: 339cb507 → 38fd80b7
+- `agent-event-done` — 2 versions: ef70393c → 598bc917
+- `agent-event-spawn` — 2 versions: b4573a30 → fb3603c7
 - `agent-heartbeat-tick` — 2 versions: 5eb00dc3 → 560fa0f8
 - `agent-outcome-backfill` — 2 versions: 0e00d9ca → c901aaf2
 - `alignment-check` — 2 versions: 4e7389b1 → b1e18549
@@ -1083,6 +1089,7 @@ Sorted alphabetically by name.
 - `kei-git-gitlab` — 2 versions: 744859c4 → 59a5271b
 - `kei-graph-check` — 2 versions: e08f240e → 2c0e38d8
 - `kei-graph-export::kei-graph-export` — 26 versions: 2e9d962a → b0f840b1 → 4a42d5f4 → a9d35468 → 1f0c066f → 6f5cd1a9 → 89ae1693 → fbebe21d → 63b761f6 → 643d3f08 → 7ba05286 → ca606a00 → c1f97c41 → 237d050b → 094ddc72 → 006b0f7d → c3d7c243 → a67fc02f → 33beda01 → 615a6cfb → 6dbfd254 → bb6ca1bb → 48cb9c62 → 5529822c → 1b597838 → f17c1aeb
+- `kei-graph-stream::kei-graph-stream` — 8 versions: 2e9d962a → d3087d32 → eefe8fc1 → 021bb6f8 → 96a32fa0 → 9ca6470e → d527efb1 → 28e6d9b6
 - `kei-hibernate` — 2 versions: 25f6d5bc → 1ea136f5
 - `kei-import-project` — 2 versions: aa3750a0 → 2de0fd64
 - `kei-leak-matrix` — 2 versions: 06a89af2 → a3803ef9
@@ -1154,6 +1161,7 @@ Sorted alphabetically by name.
 - `post-write-check` — 2 versions: 6ceb2237 → 4aaf1c5e
 - `safety-guard` — 2 versions: 32b889cf → 665e7cd1
 - `site-wysiwyd-check` — 2 versions: a0d38a22 → 416c0648
+- `skill-record` — 3 versions: cdf67741 → e2444805 → 44e464fe
 - `sleep-report-tg` — 3 versions: acc3ebfb → ef101ab6 → 9529ec50
 - `ssh-check` — 2 versions: f419e2b0 → ebd97541
 - `task-timer` — 2 versions: 202823f9 → 16e4f0a3
