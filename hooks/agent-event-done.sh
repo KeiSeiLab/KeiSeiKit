@@ -56,4 +56,13 @@ jq -cn \
       duration_ms:$duration_ms,tool_use_count:$tool_use_count,cost_usd:$cost_usd}' \
     >> "$EVENTS_FILE" 2>/dev/null || true
 
+# Remove this spawn from active-children ledger (mirror of spawn hook).
+# `grep -v` returns exit 1 when the file becomes empty, so the `mv` runs
+# UNCONDITIONALLY (not gated on grep's exit status).
+ACTIVE_FILE="${KEI_ACTIVE_SPAWNS_FILE:-/tmp/kei-active-children.tsv}"
+if [ -n "$TOOL_USE_ID" ] && [ -f "$ACTIVE_FILE" ]; then
+    grep -v "	$TOOL_USE_ID\$" "$ACTIVE_FILE" > "$ACTIVE_FILE.tmp" 2>/dev/null
+    mv "$ACTIVE_FILE.tmp" "$ACTIVE_FILE" 2>/dev/null || true
+fi
+
 exit 0
