@@ -11,6 +11,23 @@
 use crate::error::{Error, Result};
 use tokio::process::Command;
 
+/// Validate SSH username: alphanumeric + `-_.`, not starting with `-`, max 64 chars.
+pub fn is_safe_user(user: &str) -> bool {
+    if user.is_empty() || user.len() > 64 || user.starts_with('-') {
+        return false;
+    }
+    user.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_' || b == b'.')
+}
+
+/// Validate SSH hostname: alphanumeric + `-_.`, not starting with `-`, max 64 chars.
+/// IPv4 dot-notation is covered by the alphanumeric+dot rule.
+pub fn is_safe_host(host: &str) -> bool {
+    if host.is_empty() || host.len() > 64 || host.starts_with('-') {
+        return false;
+    }
+    host.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_' || b == b'.')
+}
+
 /// SSH endpoint. `port` is optional; default is 22 when None.
 #[derive(Debug, Clone)]
 pub struct SshTarget {
@@ -51,20 +68,26 @@ impl SshTarget {
     }
 
     fn build_cmd(&self, remote: &str) -> Command {
+        let strict = if std::env::var("KEI_BAREMETAL_ACCEPT_NEW").as_deref() == Ok("1") {
+            "accept-new"
+        } else {
+            "yes"
+        };
         let mut cmd = Command::new(&self.binary);
         cmd.arg("-o")
             .arg("BatchMode=yes")
             .arg("-o")
             .arg("ConnectTimeout=5")
             .arg("-o")
-            .arg("StrictHostKeyChecking=accept-new");
+            .arg(format!("StrictHostKeyChecking={strict}"));
         if let Some(p) = self.port {
             cmd.arg("-p").arg(p.to_string());
         }
         if let Some(k) = &self.key_path {
             cmd.arg("-i").arg(k);
         }
-        cmd.arg(format!("{}@{}", self.user, self.host));
+        // `--` stops flag parsing; guards against user/host that look like flags (CVE-2023-51385).
+        cmd.arg("--").arg(format!("{}@{}", self.user, self.host));
         cmd.arg(remote);
         cmd
     }
@@ -117,9 +140,6 @@ pub async fn run_remote(t: &SshTarget, cmd: &str) -> Result<String> {
 mod tests {
     use super::*;
 
-    /// Substitutes `echo` for `ssh` so the test never opens a socket.
-    /// `echo` ignores all SSH-flag args and prints the trailing argument
-    /// (the remote command string), so success exit code is what we check.
     #[tokio::test]
     async fn ping_succeeds_with_echo_binary() {
         let mut t = SshTarget::new("root", "127.0.0.1");
@@ -131,11 +151,7 @@ mod tests {
     async fn run_remote_returns_stdout_with_echo_binary() {
         let mut t = SshTarget::new("root", "127.0.0.1");
         t.binary = "echo".into();
-        let out = run_remote(&t, "hello-from-remote")
-            .await
-            .expect("echo exit 0");
-        // `echo` reflects all its argv joined by spaces; the trailing
-        // remote-cmd is the last token, so it MUST appear in output.
+        let out = run_remote(&t, "hello-from-remote").await.expect("echo exit 0");
         assert!(out.contains("hello-from-remote"), "stdout was: {out:?}");
     }
 
@@ -149,5 +165,36 @@ mod tests {
     fn external_id_omits_port_when_default() {
         let t = SshTarget::new("alice", "box.example.com");
         assert_eq!(t.external_id(), "ssh://alice@box.example.com");
+    }
+
+    #[test]
+    fn safe_user_accepts_valid() {
+        assert!(is_safe_user("root"));
+        assert!(is_safe_user("alice-b"));
+        assert!(is_safe_user("user_123"));
+    }
+
+    #[test]
+    fn safe_user_rejects_injection() {
+        assert!(!is_safe_user("-ProxyCommand=evil"));
+        assert!(!is_safe_user("a@b"));
+        assert!(!is_safe_user("a/b"));
+        assert!(!is_safe_user(""));
+        assert!(!is_safe_user(&"a".repeat(65)));
+    }
+
+    #[test]
+    fn safe_host_accepts_valid() {
+        assert!(is_safe_host("box.example.com"));
+        assert!(is_safe_host("10.0.0.1"));
+        assert!(is_safe_host("my-server"));
+    }
+
+    #[test]
+    fn safe_host_rejects_injection() {
+        assert!(!is_safe_host("-evil"));
+        assert!(!is_safe_host("host name"));
+        assert!(!is_safe_host("host:22"));
+        assert!(!is_safe_host(""));
     }
 }

@@ -1,8 +1,8 @@
 [package]
 name = "kei-runtime"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Atom invocation runtime + schema linter"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -15,21 +15,21 @@ name = "kei_runtime"
 path = "src/lib.rs"
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 # SSRF + IMDS hardening: disable default features (resolve-http, cli) so the
 # validator has no HTTP resolver by default. We configure a file-only
 # resolver explicitly in `validate.rs`.
 jsonschema = { version = "0.18", default-features = false, features = ["resolve-file"] }
-anyhow = "1"
-walkdir = "2"
-serde_yaml_ng = "0.10"
+anyhow = { workspace = true }
+walkdir = { workspace = true }
+serde_yaml_ng = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
-url = "2"
+url = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }
 
 [package.metadata.keisei]
 backend = "none"

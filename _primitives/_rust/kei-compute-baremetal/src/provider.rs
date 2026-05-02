@@ -11,7 +11,7 @@
 //! * `cost_per_hour_microcents()` is always 0 (user-owned).
 
 use crate::error::{Error as BmError, Result as BmResult};
-use crate::ssh::{ping, run_remote, SshTarget};
+use crate::ssh::{is_safe_host, is_safe_user, ping, run_remote, SshTarget};
 use kei_runtime_core::traits::compute::{ComputeProvider, VmHandle, VmSpec, VmStatus};
 use kei_runtime_core::{Dna, DnaBuilder, HasDna};
 
@@ -63,6 +63,12 @@ impl BaremetalCompute {
             ),
             None => (host_port.to_string(), None),
         };
+        if !is_safe_user(user) {
+            return Err(BmError::InvalidRegion(format!("user '{user}' fails sanity check")));
+        }
+        if !is_safe_host(&host) {
+            return Err(BmError::InvalidRegion(format!("host '{host}' fails sanity check")));
+        }
         let mut t = SshTarget::new(user, host);
         if let Some(p) = port {
             t = t.with_port(p);
@@ -92,6 +98,12 @@ impl BaremetalCompute {
             ),
             None => (host_port.to_string(), None),
         };
+        if !is_safe_user(user) {
+            return Err(BmError::InvalidRegion(format!("user '{user}' fails sanity check")));
+        }
+        if !is_safe_host(&host) {
+            return Err(BmError::InvalidRegion(format!("host '{host}' fails sanity check")));
+        }
         let mut t = SshTarget::new(user, host);
         if let Some(p) = port {
             t = t.with_port(p);
@@ -264,5 +276,25 @@ mod tests {
         assert_eq!(t.user, "root");
         assert_eq!(t.host, "box.example.com");
         assert_eq!(t.port, Some(2222));
+    }
+
+    #[test]
+    fn target_rejects_injection_in_region() {
+        let c = BaremetalCompute::new(None, None).unwrap();
+        for bad in &[
+            "-ProxyCommand=evil@host",
+            "root@-evil-host",
+            "root@host:name",
+        ] {
+            let spec = VmSpec {
+                user_dna: user_dna(),
+                region: bad.to_string(),
+                tier: "host-1c-1gb".into(),
+                ssh_pubkey: String::new(),
+                cloud_init: String::new(),
+                labels: vec![],
+            };
+            assert!(c.target_for_spec(&spec).is_err(), "should reject: {bad}");
+        }
     }
 }

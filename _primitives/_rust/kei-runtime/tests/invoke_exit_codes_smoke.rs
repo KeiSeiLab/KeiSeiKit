@@ -96,3 +96,41 @@ fn invoke_binary_not_found_exits_127() {
     assert!(stderr.contains("not found"),
         "expected 'not found' in stderr: {stderr}");
 }
+
+/// An atom whose `crate_name` is not in the `kei-*` allowlist should exit 2
+/// (InvalidAtom is mapped to the same "atom rejected" exit code).
+#[test]
+fn invoke_unsafe_crate_name_exits_2() {
+    let tmp = tempfile::tempdir().unwrap();
+    // Write a well-structured atom dir but with a crate_name that would be
+    // dangerous (e.g. "rm") — this must be rejected before any binary lookup.
+    let crate_name = "rm";
+    let verb = "all";
+    let atoms = tmp.path().join(crate_name).join("atoms");
+    let schemas = atoms.join("schemas");
+    std::fs::create_dir_all(&schemas).unwrap();
+    let input_schema = r#"{"$schema":"http://json-schema.org/draft-07/schema#","type":"object"}"#;
+    let output_schema = r#"{"$schema":"http://json-schema.org/draft-07/schema#","type":"object"}"#;
+    std::fs::write(schemas.join("all-input.json"), input_schema).unwrap();
+    std::fs::write(schemas.join("all-output.json"), output_schema).unwrap();
+    let md = format!(
+        "---\natom: {crate_name}::{verb}\nkind: command\nversion: \"0.1.0\"\n\
+         input:\n  schema: schemas/all-input.json\n\
+         output:\n  schema: schemas/all-output.json\n\
+         side_effects: []\nidempotent: true\nstability: stable\n---\n"
+    );
+    std::fs::write(atoms.join(format!("{verb}.md")), md).unwrap();
+    let out = std::process::Command::new(BIN)
+        .arg("invoke")
+        .arg(format!("{crate_name}::{verb}"))
+        .arg("--input").arg("{}")
+        .arg("--root").arg(tmp.path())
+        .output()
+        .expect("spawn kei-runtime");
+    assert_eq!(out.status.code(), Some(2),
+        "expected exit 2 for unsafe crate_name; stderr: {}",
+        String::from_utf8_lossy(&out.stderr));
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(stderr.contains("allowlist") || stderr.contains("invalid"),
+        "expected allowlist error in stderr: {stderr}");
+}

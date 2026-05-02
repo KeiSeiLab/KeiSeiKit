@@ -3,22 +3,47 @@ use axum::{
         State,
         ws::{Message, WebSocket, WebSocketUpgrade},
     },
-    response::Response,
+    http::{HeaderMap, StatusCode, header},
+    response::{IntoResponse, Response},
 };
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use tokio::time::{Duration, interval};
 
+use crate::auth::{extract_bearer, load_expected_token, tokens_match, validate_origin};
 use crate::state::AliveState;
 
 pub type AppState = (Arc<broadcast::Sender<String>>, Arc<AliveState>);
 
-/// Axum extractor handler: upgrade HTTP → WebSocket.
+/// Axum handler: validates Origin + bearer before upgrading to WebSocket.
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
+    headers: HeaderMap,
     State((tx, alive)): State<AppState>,
 ) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, tx, alive))
+    let origin = headers.get(header::ORIGIN).and_then(|v| v.to_str().ok());
+    if let Err(e) = validate_origin(origin) {
+        eprintln!("[kei-graph-stream] ws origin rejected: {e}");
+        return (StatusCode::FORBIDDEN, "forbidden\n").into_response();
+    }
+    let proto = headers
+        .get("sec-websocket-protocol")
+        .and_then(|v| v.to_str().ok());
+    if let Err(e) = check_bearer(proto) {
+        eprintln!("[kei-graph-stream] ws auth rejected: {e}");
+        return (StatusCode::UNAUTHORIZED, "unauthorized\n").into_response();
+    }
+    ws.protocols(["bearer"])
+        .on_upgrade(move |socket| handle_socket(socket, tx, alive))
+}
+
+fn check_bearer(protocol: Option<&str>) -> Result<(), crate::auth::AuthError> {
+    let expected = load_expected_token()?;
+    let got = extract_bearer(protocol)?;
+    if !tokens_match(&expected, got) {
+        return Err(crate::auth::AuthError::BearerInvalid);
+    }
+    Ok(())
 }
 
 async fn handle_socket(

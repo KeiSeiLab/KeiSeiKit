@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use axum::{Router, routing::get};
 use clap::Parser;
 use std::net::SocketAddr;
@@ -16,6 +16,12 @@ struct Cli {
 
     #[arg(long, env = "KEI_EVENTS_FILE")]
     events_file: Option<PathBuf>,
+
+    /// Allow binding to a non-loopback address. Without this flag,
+    /// kei-graph-stream refuses to start on a non-loopback bind address
+    /// to prevent accidental exposure of the WebSocket endpoint.
+    #[arg(long)]
+    public_bind_i_accept_the_leak: bool,
 }
 
 fn default_events_file() -> PathBuf {
@@ -31,6 +37,15 @@ async fn main() -> Result<()> {
     }
 
     let cli = Cli::parse();
+
+    if !cli.bind.ip().is_loopback() && !cli.public_bind_i_accept_the_leak {
+        bail!(
+            "kei-graph-stream: refusing to bind {}: non-loopback bind requires \
+             explicit --public-bind-i-accept-the-leak flag",
+            cli.bind
+        );
+    }
+
     let events_file = cli.events_file.unwrap_or_else(default_events_file);
 
     if let Some(parent) = events_file.parent() {

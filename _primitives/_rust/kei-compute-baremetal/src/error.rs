@@ -22,6 +22,9 @@ pub enum Error {
 
     #[error("invalid external_id (expected ssh://user@host[:port]): {0}")]
     InvalidExternalId(String),
+
+    #[error("invalid region — user or host failed safety check: {0}")]
+    InvalidRegion(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -42,6 +45,9 @@ impl From<Error> for kei_runtime_core::Error {
             }
             Error::InvalidExternalId(s) => {
                 kei_runtime_core::Error::Provider(format!("baremetal invalid id: {s}"))
+            }
+            Error::InvalidRegion(s) => {
+                kei_runtime_core::Error::Provider(format!("baremetal invalid region: {s}"))
             }
             Error::Io(e) => kei_runtime_core::Error::Provider(format!("baremetal io: {e}")),
         }

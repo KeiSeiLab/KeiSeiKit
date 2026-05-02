@@ -1,5 +1,8 @@
 /// Integration smoke test: spins up a real kei-graph-stream server on a random port,
 /// appends events to a temp JSONL file, and verifies WS snapshot + event frames.
+///
+/// Auth: writes a known token to a temp file and sets HOME so `load_expected_token`
+/// reads it. Connects with the correct `Origin` and `Sec-WebSocket-Protocol` headers.
 use std::io::Write;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -8,8 +11,25 @@ use std::time::Duration;
 use serde_json::Value;
 use tempfile::NamedTempFile;
 use tokio::sync::broadcast;
-use tokio_tungstenite::{connect_async, tungstenite::Message};
+use tokio_tungstenite::{
+    connect_async_with_config,
+    tungstenite::{
+        client::IntoClientRequest,
+        http::header::{HeaderValue, ORIGIN},
+        Message,
+    },
+};
 use futures::StreamExt;
+
+const TEST_TOKEN: &str = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
+
+/// Write the test token to `<home>/.keisei/cortex.token` and set HOME.
+fn setup_token(home: &std::path::Path) {
+    let dir = home.join(".keisei");
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("cortex.token"), TEST_TOKEN).unwrap();
+    std::env::set_var("HOME", home.to_str().unwrap());
+}
 
 async fn start_server(events_path: std::path::PathBuf) -> SocketAddr {
     use axum::Router;
@@ -32,10 +52,23 @@ async fn start_server(events_path: std::path::PathBuf) -> SocketAddr {
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let addr = listener.local_addr().unwrap();
-    // axum::serve returns IntoFuture; use `into_future()` to spawn.
     use std::future::IntoFuture;
     tokio::spawn(axum::serve(listener, app).into_future());
     addr
+}
+
+/// Build an authenticated WS request.
+fn auth_request(url: &str) -> impl IntoClientRequest {
+    let mut req = url.into_client_request().unwrap();
+    req.headers_mut().insert(
+        ORIGIN,
+        HeaderValue::from_static("http://localhost:3000"),
+    );
+    req.headers_mut().insert(
+        "sec-websocket-protocol",
+        HeaderValue::from_str(&format!("bearer,{TEST_TOKEN}")).unwrap(),
+    );
+    req
 }
 
 async fn recv_text(
@@ -52,30 +85,30 @@ async fn recv_text(
 
 #[tokio::test]
 async fn smoke_snapshot_and_event() {
+    let home_dir = tempfile::tempdir().unwrap();
+    setup_token(home_dir.path());
+
     let mut tmp = NamedTempFile::new().unwrap();
     let path = std::path::PathBuf::from(tmp.path());
 
     let addr = start_server(path.clone()).await;
 
-    // Health check.
+    // Health check (no auth needed).
     let body = reqwest::get(format!("http://{addr}/health"))
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
+        .await.unwrap().text().await.unwrap();
     assert_eq!(body, "kei-graph-stream alive\n");
 
     // Connect WS before any events — expect empty snapshot.
-    let (mut ws1, _) = connect_async(format!("ws://{addr}/stream")).await.unwrap();
+    let (mut ws1, _) =
+        connect_async_with_config(auth_request(&format!("ws://{addr}/stream")), None, true)
+            .await
+            .unwrap();
     let snap: Value = recv_text(&mut ws1).await;
     assert_eq!(snap["type"], "snapshot");
     assert!(snap["alive"].as_array().unwrap().is_empty());
 
     // Append a spawn event.
     writeln!(tmp, r#"{{"ts":"2026-05-02T13:00:00.000Z","event":"agent_spawn","id":"smoke1","subagent_type":"researcher","model":"sonnet","prompt_preview":"test"}}"#).unwrap();
-
-    // Allow tail poll (200ms) + margin.
     tokio::time::sleep(Duration::from_millis(500)).await;
 
     // Should receive an event frame on the existing connection.
@@ -85,7 +118,10 @@ async fn smoke_snapshot_and_event() {
     assert_eq!(frame["data"]["id"], "smoke1");
 
     // New client snapshot should contain smoke1.
-    let (mut ws2, _) = connect_async(format!("ws://{addr}/stream")).await.unwrap();
+    let (mut ws2, _) =
+        connect_async_with_config(auth_request(&format!("ws://{addr}/stream")), None, true)
+            .await
+            .unwrap();
     let snap2: Value = recv_text(&mut ws2).await;
     assert_eq!(snap2["type"], "snapshot");
     let alive2 = snap2["alive"].as_array().unwrap();
@@ -97,7 +133,10 @@ async fn smoke_snapshot_and_event() {
     tokio::time::sleep(Duration::from_millis(500)).await;
 
     // Third client: snapshot should now be empty.
-    let (mut ws3, _) = connect_async(format!("ws://{addr}/stream")).await.unwrap();
+    let (mut ws3, _) =
+        connect_async_with_config(auth_request(&format!("ws://{addr}/stream")), None, true)
+            .await
+            .unwrap();
     let snap3: Value = recv_text(&mut ws3).await;
     assert_eq!(snap3["type"], "snapshot");
     assert!(snap3["alive"].as_array().unwrap().is_empty());

@@ -19,12 +19,17 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+/// Max bytes we read from subprocess stdout/stderr to guard against runaway output.
+const OUTPUT_CAP: usize = 16 * 1024 * 1024; // 16 MiB
+
 #[derive(Debug)]
 pub enum InvokeError {
     AtomNotFound(String),
     InputParse(String),
     InputInvalid(String),
     MissingInputSchema(String),
+    /// `crate_name` in atom YAML failed the `kei-*` allowlist check.
+    InvalidAtom(String),
     /// Crate binary is missing from both `KEI_RUNTIME_BIN_DIR` and `PATH`.
     BinaryNotFound { crate_name: String },
     /// Subprocess exited non-zero — propagate the atom's own exit code.
@@ -44,6 +49,7 @@ impl std::fmt::Display for InvokeError {
             Self::InputParse(e) => write!(f, "input rejected: {e}"),
             Self::InputInvalid(e) => write!(f, "input rejected: {e}"),
             Self::MissingInputSchema(id) => write!(f, "atom `{id}` declares no input schema"),
+            Self::InvalidAtom(msg) => write!(f, "invalid atom crate_name: {msg}"),
             Self::BinaryNotFound { crate_name } => write!(
                 f,
                 "binary `{crate_name}` not found on PATH or KEI_RUNTIME_BIN_DIR"
@@ -93,7 +99,36 @@ fn find_atom(root: &Path, atom_id: &str) -> Result<AtomMeta, InvokeError> {
         .ok_or_else(|| InvokeError::AtomNotFound(atom_id.to_string()))
 }
 
+/// Validate `name` matches `^kei-[a-z][a-z0-9-]+$`; rejects path traversal and injection chars.
+fn is_safe_crate_name(name: &str) -> bool {
+    if name.is_empty() || name.len() > 128 {
+        return false;
+    }
+    // Forbidden substrings — absolute path indicators, separators, injection chars.
+    for bad in &["/", "\\", "..", ":", "@", " "] {
+        if name.contains(bad) {
+            return false;
+        }
+    }
+    // Must match kei-[a-z][a-z0-9-]+
+    let bytes = name.as_bytes();
+    if !name.starts_with("kei-") || bytes.len() < 5 {
+        return false;
+    }
+    let after_prefix = &bytes[4..];
+    if !after_prefix[0].is_ascii_lowercase() {
+        return false;
+    }
+    after_prefix[1..].iter().all(|&b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
 fn exec_atom(meta: &AtomMeta, input_json: &str) -> Result<Output, InvokeError> {
+    if !is_safe_crate_name(&meta.crate_name) {
+        return Err(InvokeError::InvalidAtom(format!(
+            "crate_name '{}' fails kei-* allowlist",
+            meta.crate_name
+        )));
+    }
     let bin = resolve_binary(&meta.crate_name)
         .ok_or_else(|| InvokeError::BinaryNotFound { crate_name: meta.crate_name.clone() })?;
     let mut child = Command::new(&bin)
@@ -115,10 +150,23 @@ fn exec_atom(meta: &AtomMeta, input_json: &str) -> Result<Output, InvokeError> {
     handle_subprocess_output(meta, out)
 }
 
+fn cap_bytes(data: Vec<u8>, label: &str) -> Vec<u8> {
+    if data.len() > OUTPUT_CAP {
+        let mut v = data;
+        v.truncate(OUTPUT_CAP);
+        eprintln!("[kei-runtime] {label} truncated at {OUTPUT_CAP} bytes");
+        v
+    } else {
+        data
+    }
+}
+
 fn handle_subprocess_output(
     meta: &AtomMeta,
-    out: std::process::Output,
+    mut out: std::process::Output,
 ) -> Result<Output, InvokeError> {
+    out.stdout = cap_bytes(out.stdout, "stdout");
+    out.stderr = cap_bytes(out.stderr, "stderr");
     let code = out.status.code().unwrap_or(-1);
     if !out.status.success() {
         let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
@@ -130,9 +178,7 @@ fn handle_subprocess_output(
     Ok(Output { atom: meta.full_id.clone(), result })
 }
 
-/// Resolve `<crate_name>` as an executable:
-///   1. `$KEI_RUNTIME_BIN_DIR/<crate_name>` if env is set and file exists
-///   2. Walk `$PATH`, return first `<dir>/<crate_name>` that exists
+/// Resolve `<crate_name>` as binary: first `$KEI_RUNTIME_BIN_DIR/<name>`, then `$PATH`.
 fn resolve_binary(crate_name: &str) -> Option<PathBuf> {
     if let Ok(bin_dir) = std::env::var("KEI_RUNTIME_BIN_DIR") {
         let candidate = PathBuf::from(bin_dir).join(crate_name);

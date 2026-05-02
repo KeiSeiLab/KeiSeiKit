@@ -114,17 +114,18 @@ fn run_invoke(root: PathBuf, atom_id: String, input_arg: String) -> ExitCode {
 
 /// Map typed invoke errors to exit codes per locked §Runtime schema.
 ///
-/// - `AtomNotFound | InputParse | InputInvalid | MissingInputSchema` → 2  (atom error)
-/// - `AtomFailed { code, .. }`                                       → passthrough child exit code
-/// - `SubprocessError | OutputParse`                                 → 1  (IO / malformed output)
-/// - `BinaryNotFound`                                                → 127 (POSIX command-not-found)
-/// - `NotImplemented`                                                → 64 (legacy escape)
+/// - `AtomNotFound|InputParse|InputInvalid|MissingInputSchema|InvalidAtom` → 2 (atom error)
+/// - `AtomFailed { code, .. }`  → passthrough child exit code
+/// - `SubprocessError|OutputParse` → 1 (IO / malformed output)
+/// - `BinaryNotFound` → 127 (POSIX command-not-found)
+/// - `NotImplemented` → 64 (legacy escape)
 fn invoke_exit_code(err: &InvokeError) -> u8 {
     match err {
         InvokeError::AtomNotFound(_)
         | InvokeError::InputParse(_)
         | InvokeError::InputInvalid(_)
-        | InvokeError::MissingInputSchema(_) => 2,
+        | InvokeError::MissingInputSchema(_)
+        | InvokeError::InvalidAtom(_) => 2,
         InvokeError::AtomFailed { code, .. } => {
             let c = *code;
             if (0..=255).contains(&c) { c as u8 } else { 1 }
