@@ -30,5 +30,6 @@ stability = "stable"
 language = "rust"
 
 [lineage]
+parents = []
 creator = "ag-orchestrator-human"
 created = "2026-04-23"

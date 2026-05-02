@@ -21,9 +21,27 @@ blocks = [
     "rule-double-audit",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "Mesh networking nodes — TCP/UDP listeners, peer discovery, connection pools",
+    "Lightweight CLI tools with cobra or stdlib flag (RULE 0.2 exception #2 — existing Go service)",
+    "Embedded HTTP servers for sidecar services and health endpoints",
+    "Go stdlib-first: prefer net/http, sync, encoding/json over heavy frameworks",
+    "Constructor Pattern enforcement: file <200 LOC, function <30 LOC",
+]
+forbidden_domain = [
+    "Writing Rust / Swift / Python / Flutter / TypeScript — hand off to matching sibling",
+    "Hardcoded secrets (RULE 0.8) — every token by ENV var name, never inline",
+    "Starting a new Go project without citing RULE 0.2 exception number",
+    "Global mutable state — pass deps explicitly via constructor injection",
+    "Goroutine leak — every goroutine must have a cancel path",
+    "Writing tests later — tests land with the change or before it (Test-First)",
+]
+output_extra_fields = [
+    "Language: Go (RULE 0.2 exception #2 — existing Go service / mesh)",
+    "Plan-Mode used: <yes | no + trivial-edit exemption reason>",
+    "Constructor Pattern compliance: largest file <N LOC / limit 200>, largest function <M LOC / limit 30>",
+    "Tests: <name> — <pass/fail> — `go test ./...`",
+]
 
 [[handoff]]
 target = "validator"

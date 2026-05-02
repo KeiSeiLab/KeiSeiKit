@@ -28,7 +28,7 @@ Your steps in order, each emitting a section of the final report:
 
 6. **A11y quick** — if `package.json` has `a11y-check` script, invoke. Else skip. Severity: WARN.
 
-6. **Verdict block** — summary table: each check, status (PASS / WARN / FAIL), brief evidence pointer.
+7. **Verdict block** — summary table: each check, status (PASS / WARN / FAIL), brief evidence pointer.
 
 You do NOT autofix. You do NOT spawn other agents. You do NOT commit. You report.
 """

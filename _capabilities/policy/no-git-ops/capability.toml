@@ -30,6 +30,7 @@ kingdom = "capability"
 mechanism = "gate"
 domain = "policy"
 layer = "agent-substrate"
+stage = "runtime"
 stability = "stable"
 language = "rust"
 

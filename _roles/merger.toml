@@ -26,3 +26,17 @@ language = "toml"
 
 [pipeline]
 handoff = []
+
+[taxonomy]
+kingdom = "role"
+mechanism = "merge"
+domain = "agent"
+layer = "agent-substrate"
+stage = "runtime"
+stability = "stable"
+language = "toml"
+
+[lineage]
+parents = []
+creator = "ag-orchestrator-human"
+created = "2026-04-23"

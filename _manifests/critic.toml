@@ -31,7 +31,7 @@ domain_in = [
     "Performance — N+1 queries, missing indexes, memory leaks, blocking I/O, hot-path allocations",
     "Tech debt — duplicated logic, inconsistent naming, missing tests, outdated deps",
     "Constructor-Pattern violations — files >200 LOC, functions >30 LOC, mixed responsibilities",
-    "Cross-ref rules DB: `~/.claude/skills/architecture-rules/references/antipatterns.md`, `duplication.md`, `stack-compat.md`",
+    "Cross-ref rules DB: `path:user-skills/architecture-rules/references/antipatterns.md`, `duplication.md`, `stack-compat.md`",
 ]
 
 forbidden_domain = [
@@ -71,13 +71,14 @@ target = "architect"
 trigger = "anti-pattern is structural (new family, needs design review)"
 
 # References (extra files beyond auto-included baseline/memory/project)
+# ~/.claude/ absolute paths stripped — not portable across installs. See audit 2026-05-02.
 [references]
 extra = [
     "path:user-rules/debugging.md",
     "path:user-rules/code-style.md",
-    "~/.claude/skills/architecture-rules/references/antipatterns.md",
-    "~/.claude/skills/architecture-rules/references/duplication.md",
-    "~/.claude/skills/architecture-rules/references/stack-compat.md",
+    "path:user-skills/architecture-rules/references/antipatterns.md",
+    "path:user-skills/architecture-rules/references/duplication.md",
+    "path:user-skills/architecture-rules/references/stack-compat.md",
 ]
 
 [taxonomy]

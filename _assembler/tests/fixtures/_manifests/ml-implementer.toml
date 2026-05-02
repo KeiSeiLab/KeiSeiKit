@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "ml-implementer"
+description = "ML training stub."
+tools = ["Read", "Write", "Bash"]
+model = "opus"
+substrate_role = "edit-local"
+role = "Stub ml-implementer."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["ML training"]
+forbidden_domain = ["theory writing"]
+
+[[handoff]]
+target = "code-implementer"
+trigger = "inference path needs Rust"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"

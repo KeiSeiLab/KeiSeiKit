@@ -25,6 +25,7 @@ kingdom = "capability"
 mechanism = "verify"
 domain = "quality"
 layer = "agent-substrate"
+stage = "runtime"
 stability = "stable"
 language = "rust"
 

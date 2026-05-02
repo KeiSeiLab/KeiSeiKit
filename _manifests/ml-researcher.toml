@@ -73,9 +73,7 @@ output_extra_fields = [
 target = "ml-implementer"
 trigger = "hypothesis is formulated and experiment must be run (train, benchmark, ablate, Monte Carlo)"
 
-[[handoff]]
-target = "physics-deriver"
-trigger = "literature finding feeds a theorem / derivation in `~/your-project/theory/`"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
 [[handoff]]
 target = "validator"
@@ -84,10 +82,6 @@ trigger = "citation sanity before commit (RULE 0.4 gate) or reproducibility clai
 [[handoff]]
 target = "researcher"
 trigger = "non-ML sub-question surfaces (general library / API / pricing / doc lookup)"
-
-[[handoff]]
-target = "patent-researcher"
-trigger = "ML finding is patent-relevant (prior art, FTO, novelty for a filable claim)"
 
 [[handoff]]
 target = "architect"
@@ -101,7 +95,7 @@ extra = [
     "path:user-rules/observable-classification.md",
     "path:user-rules/api-cost-guard.md",
     "path:user-rules/no-downgrade-constructive.md",
-    "path:user-memory/wrong-paths-specialized-ml.md",
+    "path:user-memory/wrong-paths-specialized-ml.md",  # TODO verify path:user-memory exists in assembler resolver
 ]
 
 [taxonomy]

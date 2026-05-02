@@ -56,18 +56,12 @@ output_extra_fields = [
     "Overall verdict: ALL VERIFIED | PARTIAL (fix list) | BLOCK (FALSE findings present)",
 ]
 
-# Handoffs MUST come after all top-level keys (TOML array-of-tables scope rule)
-[[handoff]]
-target = "physics-deriver"
-trigger = "theory doc has FALSE or UNVERIFIED citation — rewrite before commit"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
+# Handoffs MUST come after all top-level keys (TOML array-of-tables scope rule)
 [[handoff]]
 target = "ml-researcher"
 trigger = "claim needs literature/arXiv deep-search to resolve (returns `[VERIFIED: url]`)"
-
-[[handoff]]
-target = "patent-compliance"
-trigger = "FALSE claim is in patent draft — pre-filing block"
 
 [[handoff]]
 target = "code-implementer"

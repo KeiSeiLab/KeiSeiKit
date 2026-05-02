@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "architect"
+description = "Architect stub."
+tools = ["Read", "Glob", "Grep"]
+model = "opus"
+substrate_role = "read-only"
+role = "Stub architect."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["architecture review"]
+forbidden_domain = ["writing code"]
+
+[[handoff]]
+target = "code-implementer"
+trigger = "structural finding implies refactor"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"

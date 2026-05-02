@@ -74,9 +74,7 @@ trigger = "task involves ML training / inference / Modal / experiment runners / 
 target = "infra-implementer"
 trigger = "task involves deploy / CI/CD / secrets / IaC / credentials / public-surface hosting"
 
-[[handoff]]
-target = "physics-deriver"
-trigger = "task requires math derivation / theorem writing / theorem .md derivation"
+# physics-deriver / patent-compliance / patent-researcher manifests not yet authored — handoffs removed 2026-05-02 per audit
 
 [[handoff]]
 target = "critic"

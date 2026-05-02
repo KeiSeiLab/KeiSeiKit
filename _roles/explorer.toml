@@ -3,6 +3,7 @@ name = "explorer"
 display-name = "explorer + cargo-check (read-only analyst with build probe)"
 description = "Read-only analyst that may run cargo-family commands for build/test introspection. No edits, no git, no non-cargo shell."
 spawnable = true
+# claude-subagent-type values are case-sensitive; "Explore" is the Claude Code built-in
 claude-subagent-type = "Explore"
 
 [capabilities]

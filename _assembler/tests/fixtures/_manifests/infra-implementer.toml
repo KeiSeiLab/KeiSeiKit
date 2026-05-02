@@ -1,0 +1,27 @@
+# Fixture stub for handoff-target resolution tests. Minimal valid manifest.
+name = "infra-implementer"
+description = "Infra/deploy stub."
+tools = ["Read", "Write", "Bash"]
+model = "sonnet"
+substrate_role = "edit-local"
+role = "Stub infra-implementer."
+blocks = ["baseline", "evidence-grading", "memory-protocol"]
+domain_in = ["deploy", "CI/CD"]
+forbidden_domain = ["app code"]
+
+[[handoff]]
+target = "code-implementer"
+trigger = "app code change needed"
+
+[taxonomy]
+kingdom = "manifest"
+mechanism = "compose"
+domain = "agent"
+layer = "agent-substrate"
+stage = "design-time"
+stability = "stable"
+language = "toml"
+
+[lineage]
+creator = "ag-orchestrator-human"
+created = "2026-05-02"

@@ -17,9 +17,24 @@ blocks = [
     "memory-protocol",
 ]
 
-domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
-forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
-output_extra_fields = ["Largest file LOC", "Tests pass count"]
+domain_in = [
+    "Symbol discovery — Grep for function/type/constant definitions across the repo",
+    "Dependency tracing — who imports X, what does X import (caller/callee graph via Grep)",
+    "Ownership mapping — identify the canonical SSoT file for a type or route",
+    "Analogue search — find existing implementations before proposing new code",
+    "Constructor-Pattern audit — identify files >200 LOC or functions >30 LOC",
+]
+forbidden_domain = [
+    "Web research — hand off to researcher-web",
+    "Editing or writing code (read-only agent — no Edit / Write)",
+    "Whole-file dumps when Grep + targeted Read suffices",
+    "Fabricating file paths, function names, or line numbers",
+]
+output_extra_fields = [
+    "Sources cited (≥2 for load-bearing)",
+    "Evidence grade per claim",
+    "Gaps section present",
+]
 
 [[handoff]]
 target = "validator"
