@@ -1,8 +1,8 @@
 [package]
 name = "kei-dna-index"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Read-only adjacency/cluster/precedent index over kei-ledger DNAs"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -15,12 +15,12 @@ name = "kei_dna_index"
 path = "src/lib.rs"
 
 [dependencies]
-rusqlite = { version = "0.31", features = ["bundled"] }
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-thiserror = "1"
+rusqlite = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
 kei-shared = { path = "../kei-shared" }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

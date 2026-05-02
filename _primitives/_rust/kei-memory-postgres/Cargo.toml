@@ -1,8 +1,8 @@
 [package]
 name = "kei-memory-postgres"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "MemoryBackend impl over PostgreSQL (tokio-postgres) for kei-runtime-core"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

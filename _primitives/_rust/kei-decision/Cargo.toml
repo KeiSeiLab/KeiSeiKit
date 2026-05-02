@@ -1,8 +1,8 @@
 [package]
 name = "kei-decision"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Linking layer between research output (MASTER-REPORT.md) and decision execution (kei-spawn task.toml + kei-ledger pre-fork)"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 

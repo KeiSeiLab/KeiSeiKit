@@ -1,8 +1,8 @@
 [package]
 name = "kei-llm-bridge-mlx"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "LlmBackend trait-bridge wrapping kei-llm-mlx (Wave 59, Apple Silicon only). Wave 4 atomar."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ name = "kei_llm_bridge_mlx"
 path = "src/lib.rs"
 
 [dependencies]
-async-trait = "0.1"
+async-trait = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 kei-runtime-core = { path = "../kei-runtime-core" }

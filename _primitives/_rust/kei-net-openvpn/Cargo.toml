@@ -1,8 +1,8 @@
 [package]
 name = "kei-net-openvpn"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "NetworkMode impl for OpenVPN — systemctl start/stop openvpn-server@<name> + management interface UNIX socket status parser. Wave 9 atomar."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

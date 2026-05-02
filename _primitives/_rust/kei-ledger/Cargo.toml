@@ -1,8 +1,8 @@
 [package]
 name = "kei-ledger"
 version = "0.2.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Agent fork / done / fail ledger — SQLite-backed, SSoT for RULE 0.12. v0.2 adds schema v6 cost tracking + library API."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -15,11 +15,11 @@ name = "kei_ledger"
 path = "src/lib.rs"
 
 [dependencies]
-rusqlite = { version = "0.31", features = ["bundled"] }
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+rusqlite = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

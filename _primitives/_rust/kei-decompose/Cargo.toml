@@ -1,8 +1,8 @@
 [package]
 name = "kei-decompose"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Universal decomposition layer — turns ANY MD output (research / audit / sleep / architecture / new-project) into kei-spawn-compatible task.toml + dispatch."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 

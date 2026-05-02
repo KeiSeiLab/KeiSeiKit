@@ -1,8 +1,8 @@
 [package]
 name = "kei-compute-linode"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "ComputeProvider impl for Linode (Akamai Cloud) v4 API. Wave 2 atomar — sibling of kei-compute-hetzner. Honors LINODE_TOKEN env ref per RULE 0.8."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

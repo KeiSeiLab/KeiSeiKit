@@ -1,8 +1,8 @@
 [package]
 name = "kei-gateway"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "P4.1 — Unified messaging gateway: platform adapters, sessions, agent cache, delivery router."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -41,7 +41,7 @@ thiserror = { workspace = true }
 lru = { workspace = true }
 sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "sqlite", "macros", "chrono"] }
 blake3 = "1"
-dashmap = "6"
+dashmap = { workspace = true }
 # Optional — only pulled when the `telegram` feature is enabled.
 teloxide = { version = "0.13", default-features = false, features = ["rustls", "ctrlc_handler"], optional = true }
 futures = { workspace = true, optional = true }

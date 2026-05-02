@@ -1,8 +1,8 @@
 [package]
 name = "kei-task"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Task DAG with deps + milestones (SQLite). Port of LBM internal/task."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -23,12 +23,12 @@ path = "src/lib.rs"
 
 [dependencies]
 kei-entity-store = { path = "../kei-entity-store" }
-rusqlite = { version = "0.31", features = ["bundled"] }
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-anyhow = "1"
-chrono = { version = "0.4", default-features = false, features = ["clock"] }
+rusqlite = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

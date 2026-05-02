@@ -1,8 +1,8 @@
 [package]
 name = "kei-pet"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Pet persona manifest: pet.toml parse, validate, system-prompt overlay. Standard Ed25519 identity. CQRS-compatible; no proprietary math."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -16,19 +16,19 @@ name = "kei_pet"
 path = "src/lib.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
-toml = "0.8"
-thiserror = "1"
-anyhow = "1"
-clap = { version = "4", features = ["derive"] }
-chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+serde = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
 ed25519-dalek = { version = "2", features = ["rand_core", "std"] }
 rand_core = { version = "0.6", features = ["std"] }
 blake3 = "1"
 hex = "0.4"
-rusqlite = { version = "0.31", features = ["bundled"] }
-sha2 = "0.10"
+rusqlite = { workspace = true }
+sha2 = { workspace = true }
 kei-dna-index = { path = "../kei-dna-index" }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

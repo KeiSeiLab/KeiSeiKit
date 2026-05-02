@@ -18,11 +18,11 @@ path = "src/lib.rs"
 clap = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-anyhow = "1"
-thiserror = "1"
+anyhow = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }
 
 [package.metadata.keisei]
 backend = "external-cli"

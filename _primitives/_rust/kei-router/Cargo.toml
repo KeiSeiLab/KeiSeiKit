@@ -1,8 +1,8 @@
 [package]
 name = "kei-router"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Routing primitives: (1) NL query → tool-call (LBM port). (2) Multi-provider LLM abstraction (Anthropic / OpenAI / Kimi)."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -15,12 +15,12 @@ name = "kei_router"
 path = "src/lib.rs"
 
 [dependencies]
-regex = "1"
+regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
-clap = { version = "4", features = ["derive"] }
+clap = { workspace = true }
 # LLM provider abstraction (v0.40 Wave 32)
 reqwest = { workspace = true }
 tokio = { workspace = true }

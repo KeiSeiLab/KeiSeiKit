@@ -1,8 +1,8 @@
 [package]
 name = "kei-net-ipsec"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Wave 9 — IPsec NetworkMode impl for kei-runtime-core via strongSwan / swanctl shell-out. Public-IP path; sibling of kei-net-tailscale (private-only) and kei-net-wireguard (private-only)."
 license = "Apache-2.0"
 authors = ["Denis Parfionovich <info@greendragon.info>"]

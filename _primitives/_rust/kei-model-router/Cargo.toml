@@ -1,7 +1,7 @@
 [package]
 name = "kei-model-router"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
 description = "Model selection (Haiku/Sonnet/Opus) for Claude Code Agent spawns. Empirical-posterior decision rule keyed on task-class DNA + Beta posterior + cost minimization."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -13,9 +13,9 @@ name = "kei-model-router"
 path = "src/main.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-rusqlite = { version = "0.31", features = ["bundled"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+rusqlite = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

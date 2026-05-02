@@ -1,8 +1,8 @@
 [package]
 name = "kei-brain-view"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Read-only TUI/CLI visualizer of kei-ledger taxonomy graph + agent lineage (Wave 14)"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -15,14 +15,11 @@ name = "kei_brain_view"
 path = "src/lib.rs"
 
 [dependencies]
-rusqlite = { version = "0.31", features = ["bundled"] }
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-thiserror = "1"
+rusqlite = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
 kei-dna-index = { path = "../kei-dna-index" }
 
 [dev-dependencies]
-tempfile = "3"
-
-# Empty [workspace] table so the crate stands alone during agent dev.
-# Orchestrator strips this on merge and adds the crate to the parent
+tempfile = { workspace = true }
