@@ -19,12 +19,14 @@ pub mod dna;
 pub mod error;
 pub mod genealogy;
 pub mod registry;
+pub mod secrets;
 pub mod traits;
 
 pub use dna::{Dna, DnaBuilder, HasDna};
 pub use error::{Error, Result};
 pub use genealogy::HasGenealogy;
 pub use registry::{Registry, RegistryEntry};
+pub use secrets::SecretString;
 pub use traits::*;
 
 // Re-export the wire-format SSoT from kei-shared so consumers don't need

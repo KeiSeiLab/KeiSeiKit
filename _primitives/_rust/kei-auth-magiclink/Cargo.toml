@@ -1,8 +1,8 @@
 [package]
 name = "kei-auth-magiclink"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "AuthProvider impl for passwordless email magic-link tokens (HMAC-SHA256, stateless). Wave 7 atomar; sibling of kei-auth (multi-tenant tokens) and kei-auth-{google,github,microsoft,apple}."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

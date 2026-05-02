@@ -6,12 +6,9 @@
 //! Two HTTP calls cover the verify path:
 //! 1. `POST {token_url}` (x-www-form-urlencoded) → access_token + id_token
 //! 2. `GET {userinfo_url}` with `Authorization: Bearer <access_token>`
-//!
-//! URLs are injectable via [`GoogleAuthClient::with_urls`] so wiremock can
-//! point them at a local mock server. [`GoogleAuthClient::from_env`] uses
-//! the production endpoints.
 
 use crate::error::{Error, Result};
+use kei_runtime_core::SecretString;
 use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -49,7 +46,8 @@ pub struct GoogleAuthClient {
     token_url: String,
     userinfo_url: String,
     client_id: String,
-    client_secret: String,
+    /// Wrapped in `SecretString` so it prints as `<redacted>` in logs.
+    client_secret: SecretString,
     redirect_uri: String,
 }
 
@@ -64,11 +62,8 @@ impl GoogleAuthClient {
         let redirect_uri = std::env::var("GOOGLE_OAUTH_REDIRECT_URI")
             .map_err(|_| Error::Config("GOOGLE_OAUTH_REDIRECT_URI unset".into()))?;
         Self::with_urls(
-            DEFAULT_TOKEN_URL,
-            DEFAULT_USERINFO_URL,
-            client_id,
-            client_secret,
-            redirect_uri,
+            DEFAULT_TOKEN_URL, DEFAULT_USERINFO_URL,
+            client_id, client_secret, redirect_uri,
         )
     }
 
@@ -90,21 +85,32 @@ impl GoogleAuthClient {
             token_url: token_url.into(),
             userinfo_url: userinfo_url.into(),
             client_id: client_id.into(),
-            client_secret: client_secret.into(),
+            client_secret: SecretString::new(client_secret),
             redirect_uri: redirect_uri.into(),
         })
     }
 
     /// `POST {token_url}` (x-www-form-urlencoded) →
     /// [`TokenResponse`]. RFC 6749 §4.1.3 authorization-code grant.
-    pub async fn exchange_code(&self, code: &str) -> Result<TokenResponse> {
-        let form = [
+    ///
+    /// If `code_verifier` is `Some`, it is appended as the PKCE
+    /// `code_verifier` parameter per RFC 7636 §4.5.
+    pub async fn exchange_code(
+        &self,
+        code: &str,
+        code_verifier: Option<&str>,
+    ) -> Result<TokenResponse> {
+        let secret = self.client_secret.expose();
+        let mut form: Vec<(&str, &str)> = vec![
             ("client_id", self.client_id.as_str()),
-            ("client_secret", self.client_secret.as_str()),
+            ("client_secret", secret),
             ("code", code),
             ("redirect_uri", self.redirect_uri.as_str()),
             ("grant_type", "authorization_code"),
         ];
+        if let Some(cv) = code_verifier {
+            form.push(("code_verifier", cv));
+        }
         let resp = self
             .http
             .post(&self.token_url)
@@ -144,12 +150,8 @@ impl GoogleAuthClient {
     }
 
     /// Borrow `client_id` (used by `build_auth_url`).
-    pub fn client_id(&self) -> &str {
-        &self.client_id
-    }
+    pub fn client_id(&self) -> &str { &self.client_id }
 
     /// Borrow `redirect_uri` (used by `build_auth_url`).
-    pub fn redirect_uri(&self) -> &str {
-        &self.redirect_uri
-    }
+    pub fn redirect_uri(&self) -> &str { &self.redirect_uri }
 }

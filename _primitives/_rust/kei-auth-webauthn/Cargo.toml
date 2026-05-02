@@ -1,8 +1,8 @@
 [package]
 name = "kei-auth-webauthn"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "WebAuthn passkey AuthProvider impl for kei-runtime-core (Wave 7 atomar). Wraps webauthn-rs 0.5; stateless ceremony APIs (registration + authentication). Sibling of kei-auth-{google,apple,github,microsoft}."
 license = "Apache-2.0"
 authors = ["Denis Parfionovich <info@greendragon.info>"]

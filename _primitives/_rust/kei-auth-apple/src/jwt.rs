@@ -1,43 +1,98 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright 2026 <author org>
 //
-//! Unverified JWT claim decoder.
+//! Apple id_token verification — ES256 signature check against Apple JWKS.
 //!
-//! KNOWN LIMITATION (v0.1):
-//!   This module performs ZERO signature verification. It only splits the
-//!   JWT into three segments and base64-url-decodes the middle (claims)
-//!   segment. Production code that trusts these claims for an
-//!   authentication decision MUST verify the signature against Apple's
-//!   JWKS first. Full verification will live in a future sister crate
-//!   `kei-auth-apple-jwt`.
+//! Production path: [`verify_id_token`] — verifies signature, validates
+//! standard claims (`iss`, `aud`, `exp`, `iat`).
+//!
+//! Test-only path: [`decode_id_token_unverified`] — available only under
+//! `#[cfg(test)]`; never present in production builds.
 
+use crate::claims::IdTokenClaims;
 use crate::error::{Error, Result};
-use base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use base64::Engine as _;
-use serde::{Deserialize, Serialize};
+use jsonwebtoken::{
+    decode, decode_header, jwk::JwkSet, Algorithm, DecodingKey, Validation,
+};
+use std::time::{SystemTime, UNIX_EPOCH};
 
-/// Subset of standard OIDC + Apple-specific claims we read.
+/// Verify an Apple id_token against the provided JWKS JSON, checking:
+/// - ES256 signature against the matching `kid` in `jwks_json`.
+/// - `iss == "https://appleid.apple.com"`.
+/// - `aud` contains `client_id`.
+/// - `exp > now` (not expired).
+/// - `iat <= now` (not in the future).
 ///
-/// Apple's id_token always carries `sub` (the stable Apple user id) and
-/// `iss` (`https://appleid.apple.com`). `email` is present on first
-/// authorization but may be absent on subsequent ones; it may also be a
-/// private-relay address (`@privaterelay.appleid.com`).
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct IdTokenClaims {
-    pub sub: String,
-    #[serde(default)]
-    pub email: Option<String>,
-    #[serde(default)]
-    pub exp: i64,
-    #[serde(default)]
-    pub iss: String,
+/// `jwks_json` is the raw JSON body of Apple's public JWKS endpoint
+/// (`https://appleid.apple.com/auth/keys`). The caller is responsible for
+/// fetching and caching it.
+pub fn verify_id_token(
+    token: &str,
+    jwks_json: &str,
+    client_id: &str,
+) -> Result<IdTokenClaims> {
+    let header = decode_header(token)
+        .map_err(|e| Error::JwtVerify(format!("header: {e}")))?;
+    let kid = header
+        .kid
+        .ok_or_else(|| Error::JwtVerify("missing kid in JWT header".into()))?;
+    let jwks: JwkSet = serde_json::from_str(jwks_json)
+        .map_err(|e| Error::JwtVerify(format!("jwks json: {e}")))?;
+    let jwk = jwks
+        .find(&kid)
+        .ok_or_else(|| Error::JwtVerify(format!("kid {kid} not found in JWKS")))?;
+    let decoding_key = DecodingKey::from_jwk(jwk)
+        .map_err(|e| Error::JwtVerify(format!("decoding key: {e}")))?;
+    let mut validation = Validation::new(Algorithm::ES256);
+    validation.validate_exp = true;
+    validation.validate_aud = false; // we validate aud manually below
+    let data = decode::<IdTokenClaims>(token, &decoding_key, &validation)
+        .map_err(|e| Error::JwtVerify(format!("verify: {e}")))?;
+    validate_claims(&data.claims, client_id)?;
+    Ok(data.claims)
+}
+
+fn validate_claims(c: &IdTokenClaims, client_id: &str) -> Result<()> {
+    const APPLE_ISS: &str = "https://appleid.apple.com";
+    if c.iss != APPLE_ISS {
+        return Err(Error::JwtVerify(format!(
+            "iss mismatch: expected {APPLE_ISS}, got {}", c.iss
+        )));
+    }
+    if !c.aud.contains(client_id) {
+        return Err(Error::JwtVerify(format!(
+            "aud does not contain client_id {client_id}"
+        )));
+    }
+    let now = now_unix_secs();
+    if c.exp <= now {
+        return Err(Error::JwtVerify("token expired".into()));
+    }
+    if c.iat > now + 300 {
+        // 5-minute clock-skew tolerance
+        return Err(Error::JwtVerify("iat is in the future".into()));
+    }
+    if c.sub.is_empty() {
+        return Err(Error::MissingClaim("sub".into()));
+    }
+    Ok(())
+}
+
+fn now_unix_secs() -> i64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0)
 }
 
 /// Decode the claims segment of a JWT WITHOUT verifying the signature.
 ///
-/// Splits on `.`, expects exactly three segments (`header.payload.sig`),
-/// base64-url-decodes the middle segment, then `serde_json`-parses it.
+/// ONLY available under `#[cfg(test)]`. Production code MUST use
+/// [`verify_id_token`] which validates the ES256 signature.
+#[cfg(test)]
 pub fn decode_id_token_unverified(jwt: &str) -> Result<IdTokenClaims> {
+    use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+    use base64::Engine as _;
     let mut parts = jwt.split('.');
     let _header = parts
         .next()
@@ -65,21 +120,19 @@ pub fn decode_id_token_unverified(jwt: &str) -> Result<IdTokenClaims> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    /// Build a JWT-shaped string with arbitrary header / payload / sig
-    /// segments. Each segment is base64-url-encoded (no padding) where
-    /// applicable; non-encoded raw inputs are passed through (used for
-    /// negative tests).
-    fn make_jwt(header_b64: &str, payload_b64: &str, sig_b64: &str) -> String {
-        format!("{header_b64}.{payload_b64}.{sig_b64}")
-    }
+    use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+    use base64::Engine as _;
 
     fn b64(input: &str) -> String {
         URL_SAFE_NO_PAD.encode(input.as_bytes())
     }
 
+    fn make_jwt(header_b64: &str, payload_b64: &str, sig_b64: &str) -> String {
+        format!("{header_b64}.{payload_b64}.{sig_b64}")
+    }
+
     #[test]
-    fn decode_valid() {
+    fn decode_unverified_valid() {
         let header = b64("{\"alg\":\"ES256\"}");
         let payload = b64(
             "{\"sub\":\"001234.aabbcc\",\"email\":\"x@y.example\",\"exp\":9999999999,\"iss\":\"https://appleid.apple.com\"}",
@@ -94,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    fn reject_two_segments() {
+    fn decode_unverified_reject_two_segments() {
         let header = b64("{\"alg\":\"ES256\"}");
         let payload = b64("{\"sub\":\"x\"}");
         let jwt = format!("{header}.{payload}");
@@ -103,8 +156,7 @@ mod tests {
     }
 
     #[test]
-    fn reject_invalid_base64() {
-        // Middle segment contains characters illegal in base64-url.
+    fn decode_unverified_reject_invalid_base64() {
         let jwt = "abc.!!!not-base64!!!.zzz";
         let err = decode_id_token_unverified(jwt).unwrap_err();
         assert!(matches!(err, Error::JwtDecode(_)));

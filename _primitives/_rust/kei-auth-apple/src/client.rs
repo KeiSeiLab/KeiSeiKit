@@ -6,10 +6,10 @@
 //! Implements only the `POST /auth/token` step (RFC 6749 §4.1.3
 //! Authorization Code grant) against the Apple ID endpoint. Apple's
 //! `client_secret` is itself an ES256-signed JWT — this cube does NOT
-//! sign it; the caller MUST supply a pre-built JWT (see crate-level docs
-//! in `lib.rs`).
+//! sign it; the caller MUST supply a pre-built JWT.
 
 use crate::error::{Error, Result};
+use kei_runtime_core::SecretString;
 use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -22,10 +22,6 @@ pub const DEFAULT_TOKEN_URL: &str = "https://appleid.apple.com/auth/token";
 pub const DEFAULT_TIMEOUT_SECS: u64 = 30;
 
 /// Apple `/auth/token` response shape (RFC 6749 + Apple-specific fields).
-///
-/// `id_token` is a JWT that — once verified against Apple's JWKS — yields
-/// the `sub` (Apple user id) and optionally `email`. v0.1 of this cube
-/// decodes the claims segment unverified via [`crate::jwt`].
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TokenResponse {
     pub access_token: String,
@@ -43,7 +39,8 @@ pub struct AppleAuthClient {
     http: Client,
     token_url: String,
     client_id: String,
-    client_secret_jwt: String,
+    /// Wrapped in `SecretString` so logs never reveal the JWT.
+    client_secret_jwt: SecretString,
     redirect_uri: String,
 }
 
@@ -62,7 +59,7 @@ impl AppleAuthClient {
             http,
             token_url: token_url.into(),
             client_id: client_id.into(),
-            client_secret_jwt: client_secret_jwt.into(),
+            client_secret_jwt: SecretString::new(client_secret_jwt),
             redirect_uri: redirect_uri.into(),
         })
     }
@@ -86,19 +83,36 @@ impl AppleAuthClient {
         Self::with_url(DEFAULT_TOKEN_URL, client_id, client_secret_jwt, redirect_uri)
     }
 
+    /// Borrow `client_id` (used by `build_auth_url`).
+    pub fn client_id(&self) -> &str {
+        &self.client_id
+    }
+
+    /// Borrow `redirect_uri` (used by `build_auth_url`).
+    pub fn redirect_uri(&self) -> &str {
+        &self.redirect_uri
+    }
+
     /// POST application/x-www-form-urlencoded body to `/auth/token`.
     ///
-    /// Form fields (per Apple docs):
-    ///   client_id, client_secret (the JWT), code, redirect_uri,
-    ///   grant_type=authorization_code.
-    pub async fn exchange_code(&self, code: &str) -> Result<TokenResponse> {
-        let form = [
+    /// If `code_verifier` is `Some`, it is included as the PKCE
+    /// `code_verifier` parameter per RFC 7636 §4.5.
+    pub async fn exchange_code(
+        &self,
+        code: &str,
+        code_verifier: Option<&str>,
+    ) -> Result<TokenResponse> {
+        let secret = self.client_secret_jwt.expose();
+        let mut form: Vec<(&str, &str)> = vec![
             ("client_id", self.client_id.as_str()),
-            ("client_secret", self.client_secret_jwt.as_str()),
+            ("client_secret", secret),
             ("code", code),
             ("redirect_uri", self.redirect_uri.as_str()),
             ("grant_type", "authorization_code"),
         ];
+        if let Some(cv) = code_verifier {
+            form.push(("code_verifier", cv));
+        }
         let resp = self
             .http
             .post(&self.token_url)

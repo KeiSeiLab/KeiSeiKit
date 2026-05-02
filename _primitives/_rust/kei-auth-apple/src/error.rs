@@ -25,8 +25,14 @@ pub enum Error {
     Api(String),
 
     /// id_token shape / base64 / utf8 / json failure during unverified decode.
+    /// Only used in `#[cfg(test)]` paths; production uses [`Error::JwtVerify`].
     #[error("jwt decode: {0}")]
     JwtDecode(String),
+
+    /// ES256 signature verification against Apple JWKS failed, or a required
+    /// claim (`iss`, `aud`, `exp`, `iat`) was invalid.
+    #[error("jwt verify: {0}")]
+    JwtVerify(String),
 
     /// id_token decoded but a required claim (e.g. `sub`) was missing.
     #[error("missing claim: {0}")]
@@ -52,6 +58,9 @@ impl From<Error> for kei_runtime_core::Error {
             Error::Api(msg) => kei_runtime_core::Error::Provider(msg),
             Error::JwtDecode(msg) => {
                 kei_runtime_core::Error::Provider(format!("jwt decode: {msg}"))
+            }
+            Error::JwtVerify(msg) => {
+                kei_runtime_core::Error::Auth(format!("jwt verify: {msg}"))
             }
             Error::MissingClaim(c) => {
                 kei_runtime_core::Error::Provider(format!("missing claim: {c}"))

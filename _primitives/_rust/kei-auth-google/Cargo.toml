@@ -1,8 +1,8 @@
 [package]
 name = "kei-auth-google"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "AuthProvider impl for Google OAuth 2.0 + OIDC. Wave 7 atomar; sibling of kei-auth (multi-tenant tokens) and forthcoming kei-auth-{github,microsoft,apple}."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -18,6 +18,9 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
 reqwest = { workspace = true }
+sha2 = { workspace = true }
+subtle = "2"
+base64 = "0.22"
 kei-runtime-core = { path = "../kei-runtime-core" }
 
 [dev-dependencies]

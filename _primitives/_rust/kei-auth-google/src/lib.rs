@@ -28,7 +28,8 @@
 //! let challenge = AuthChallenge::OAuthCode {
 //!     provider: "google".into(),
 //!     code: "<code from redirect>".into(),
-//!     state: "<csrf state>".into(),
+//!     state: "<csrf state from callback>".into(),
+//!     expected_state: "<csrf state you generated>".into(),
 //! };
 //! let session = provider.verify(&challenge).await?;
 //! # let _ = session;
@@ -38,8 +39,10 @@
 
 pub mod client;
 pub mod error;
+pub mod pkce;
 pub mod provider;
 
 pub use client::{GoogleAuthClient, TokenResponse, UserInfo};
 pub use error::{Error, Result};
+pub use pkce::pkce_challenge;
 pub use provider::GoogleAuthProvider;

@@ -28,12 +28,14 @@
 //!   decodes the claims segment WITHOUT signature verification. Full JWKS
 //!   validation also lives in the future `kei-auth-apple-jwt` cube.
 
+pub mod claims;
 pub mod client;
 pub mod error;
 pub mod jwt;
 pub mod provider;
 
+pub use claims::IdTokenClaims;
 pub use client::{AppleAuthClient, TokenResponse};
 pub use error::{Error, Result};
-pub use jwt::{decode_id_token_unverified, IdTokenClaims};
+pub use jwt::verify_id_token;
 pub use provider::AppleAuthProvider;
