@@ -25,11 +25,18 @@ pub enum AuthChallenge {
     /// `expected_state` — the nonce generated when the auth URL was built;
     /// must equal `state` (verified via constant-time comparison in each
     /// provider's `verify()` impl).
+    ///
+    /// `code_verifier` — the plain PKCE verifier (RFC 7636) originally passed
+    /// to `build_auth_url`. Store this alongside `state` in the session-store
+    /// when building the auth URL; pass it back here at callback time so
+    /// `verify()` can thread it through to the token exchange endpoint.
+    /// `None` retains legacy "no PKCE" behavior.
     OAuthCode {
         provider: String,
         code: String,
         state: String,
         expected_state: String,
+        code_verifier: Option<String>,
     },
     SshKeySig { key_id: String, signature: String },
 }

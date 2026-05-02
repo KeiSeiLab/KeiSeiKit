@@ -30,6 +30,7 @@
 //!     code: "<code from redirect>".into(),
 //!     state: "<csrf state from callback>".into(),
 //!     expected_state: "<csrf state you generated>".into(),
+//!     code_verifier: Some("<pkce verifier stored in session>".into()),
 //! };
 //! let session = provider.verify(&challenge).await?;
 //! # let _ = session;
