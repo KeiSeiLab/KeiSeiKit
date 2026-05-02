@@ -224,6 +224,10 @@ lru = "0.12"
 nix = { version = "0.29", default-features = false, features = ["fs"] }
 # A2.1 — kei-import-project trait pattern matcher (syn AST parsing)
 syn = { version = "2", features = ["full"] }
+# Fix 2: hoisted from member crates for SSoT
+dashmap = "6"
+tower = { version = "0.5", features = ["limit", "buffer", "util"] }
+notify = "8"
 
 [profile.release]
 opt-level = "z"

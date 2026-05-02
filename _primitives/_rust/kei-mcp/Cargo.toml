@@ -1,8 +1,8 @@
 [package]
 name = "kei-mcp"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Model Context Protocol (MCP) server — exposes atom registry over stdio JSON-RPC"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -17,14 +17,14 @@ path = "src/lib.rs"
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-tokio = { version = "1", features = ["rt", "macros", "io-util", "io-std", "process", "time"] }
+tokio = { workspace = true }
 anyhow = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 kei-skills = { path = "../kei-skills" }
 
 [dev-dependencies]
 tempfile = { workspace = true }
-tokio = { version = "1", features = ["rt", "macros", "io-util", "io-std", "process", "time", "test-util"] }
+tokio = { workspace = true }
 
 [package.metadata.keisei]
 backend = "none"

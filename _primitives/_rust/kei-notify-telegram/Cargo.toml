@@ -1,8 +1,8 @@
 [package]
 name = "kei-notify-telegram"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "NotifyChannel impl for Telegram Bot API (sendMessage with HTML parse_mode + severity emoji prefix). Wave 8 atomar."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

@@ -1,8 +1,8 @@
 [package]
 name = "kei-svc-systemd"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "ServiceManager impl: systemd unit + timer generator. Wave 1 atomar #7."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -16,7 +16,7 @@ name = "kei-svc-systemd"
 path = "src/main.rs"
 
 [dependencies]
-async-trait = "0.1"
+async-trait = { workspace = true }
 clap = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

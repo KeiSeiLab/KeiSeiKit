@@ -1,7 +1,7 @@
 [package]
 name = "kei-skills"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
 description = "SKILL.md format — parser, validator, fuzzy patcher, loader, hot-reload registry."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -10,13 +10,13 @@ name = "kei_skills"
 path = "src/lib.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
-serde_yaml = "0.9"
+serde = { workspace = true }
+serde_yaml = { workspace = true }
 similar = "2"
-notify = "8"
-anyhow = "1"
-regex = "1"
-walkdir = "2"
+notify = { workspace = true }
+anyhow = { workspace = true }
+regex = { workspace = true }
+walkdir = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

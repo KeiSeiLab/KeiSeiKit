@@ -1,8 +1,8 @@
 [package]
 name = "kei-skill-importer"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Universal parser/canonicalizer/emitter for external AI-coding-tool skill formats (OpenClaw, Cline, Cursor, Claude Code, Kimi)."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -17,18 +17,18 @@ path = "src/lib.rs"
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-serde_yaml_ng = "0.10"
+serde_yaml_ng = { workspace = true }
 toml = { workspace = true }
 regex = { workspace = true }
 clap = { workspace = true }
-anyhow = "1"
+anyhow = { workspace = true }
 chrono = { workspace = true }
 walkdir = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 
 [dev-dependencies]
 tempfile = { workspace = true }
-pretty_assertions = "1"
+pretty_assertions = { workspace = true }
 
 [package.metadata.keisei]
 backend = "none"

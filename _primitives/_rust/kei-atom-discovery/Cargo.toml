@@ -1,8 +1,8 @@
 [package]
 name = "kei-atom-discovery"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Shared atom discovery + frontmatter parsing + safe path join"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -11,13 +11,13 @@ name = "kei_atom_discovery"
 path = "src/lib.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
-serde_yaml_ng = "0.10"
-walkdir = "2"
-thiserror = "1"
+serde = { workspace = true }
+serde_yaml_ng = { workspace = true }
+walkdir = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }
 
 [package.metadata.keisei]
 backend = "none"

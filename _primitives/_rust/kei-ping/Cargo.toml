@@ -1,8 +1,8 @@
 [package]
 name = "kei-ping"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Cross-window agent presence (heartbeat / list / watch). Auto-selects backend: Redis if redis-cli ping == PONG on localhost, else SQLite."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"

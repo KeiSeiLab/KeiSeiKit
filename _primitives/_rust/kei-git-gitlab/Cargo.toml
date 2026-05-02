@@ -1,8 +1,8 @@
 [package]
 name = "kei-git-gitlab"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "GitBackend impl for GitLab.com SaaS (and self-hosted via GITLAB_URL). REST API v4 + PRIVATE-TOKEN auth + git CLI shell-out for clone/push. Wave 5 atomar."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ name = "kei_git_gitlab"
 path = "src/lib.rs"
 
 [dependencies]
-async-trait = "0.1"
+async-trait = { workspace = true }
 thiserror = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

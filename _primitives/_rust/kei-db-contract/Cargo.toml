@@ -25,4 +25,4 @@ anyhow = { workspace = true }
 sqlparser = "0.51"
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

@@ -1,8 +1,8 @@
 [package]
 name = "kei-memory-redis"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "MemoryBackend trait-impl backed by Redis 7+ (async). Wave 6 atomar."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ name = "kei_memory_redis"
 path = "src/lib.rs"
 
 [dependencies]
-async-trait = "0.1"
+async-trait = { workspace = true }
 thiserror = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

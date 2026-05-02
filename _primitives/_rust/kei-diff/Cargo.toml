@@ -1,8 +1,8 @@
 [package]
 name = "kei-diff"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Structural JSON diff (RFC 6902 subset: add/remove/replace). Pure computation primitive for drift detection in kei-replay and invalidation in kei-cache."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 

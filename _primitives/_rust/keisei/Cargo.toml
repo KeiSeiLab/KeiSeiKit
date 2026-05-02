@@ -1,8 +1,8 @@
 [package]
 name = "keisei"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Exobrain attach/status CLI — mounts a portable brain (memory + manifests + artifacts + MCP bin) into an AI client (MVP: Claude Code)"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
@@ -11,17 +11,17 @@ name = "keisei"
 path = "src/main.rs"
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-serde_yaml = "0.9"
-toml = "0.8"
-thiserror = "2"
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
 regex = { workspace = true }
-tempfile = "3"
+tempfile = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
 
 [dev-dependencies]
-tempfile = "3"
+tempfile = { workspace = true }

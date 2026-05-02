@@ -1,8 +1,8 @@
 [package]
 name = "kei-backend-daytona"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "Daytona serverless backend with hibernation (HERMES-MIGRATION P1.2). Resume-or-create sandboxes via REST."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 

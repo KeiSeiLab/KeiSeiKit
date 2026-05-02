@@ -1,8 +1,8 @@
 [package]
 name = "kei-cron-scheduler"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+edition.workspace = true
+rust-version.workspace = true
 description = "P4.2 — Hermes-equivalent cron/at/interval scheduler with JSON persistence."
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 
