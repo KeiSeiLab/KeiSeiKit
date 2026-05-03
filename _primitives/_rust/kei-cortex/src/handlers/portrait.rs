@@ -168,7 +168,7 @@ async fn install_rig(
         .config()
         .live2d_samples_dir
         .join(format!("custom-{user_id}"));
-    let lock = state.user_lock(user_id);
+    let lock = state.user_lock(user_id).await;
     let _guard = lock.lock().await;
     let stylized_owned = stylized.to_vec();
     let base_owned = base_dir.clone();
