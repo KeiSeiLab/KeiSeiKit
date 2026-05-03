@@ -3,7 +3,7 @@ name = "kei-auth-magiclink"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "AuthProvider impl for passwordless email magic-link tokens (HMAC-SHA256, stateless). Wave 7 atomar; sibling of kei-auth (multi-tenant tokens) and kei-auth-{google,github,microsoft,apple}."
+description = "AuthProvider impl for passwordless email magic-link tokens (HMAC-SHA256, stateless). Wave 7 atomar; sibling of kei-auth (multi-tenant tokens) and kei-auth-{google,apple,webauthn}."
 authors.workspace = true
 license.workspace = true
 

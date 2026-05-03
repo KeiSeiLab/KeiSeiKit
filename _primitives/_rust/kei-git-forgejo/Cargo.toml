@@ -3,7 +3,7 @@ name = "kei-git-forgejo"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "GitBackend impl for public Forgejo (Gitea-compatible /api/v1). Wave 5 atomar; sibling of kei-git-keigit (private)."
+description = "GitBackend impl for public Forgejo (Gitea-compatible /api/v1). Wave 5 atomar; sibling of kei-git-{gitea,gitlab,bitbucket}."
 authors.workspace = true
 license.workspace = true
 

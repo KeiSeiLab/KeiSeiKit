@@ -3,7 +3,7 @@ name = "kei-compute-linode"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "ComputeProvider impl for Linode (Akamai Cloud) v4 API. Wave 2 atomar — sibling of kei-compute-hetzner. Honors LINODE_TOKEN env ref per RULE 0.8."
+description = "ComputeProvider impl for Linode (Akamai Cloud) v4 API. Wave 2 atomar — sibling of kei-compute-{vultr,digitalocean,baremetal}. Honors LINODE_TOKEN env ref per RULE 0.8."
 authors.workspace = true
 license.workspace = true
 

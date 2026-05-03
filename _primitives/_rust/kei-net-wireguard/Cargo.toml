@@ -3,7 +3,7 @@ name = "kei-net-wireguard"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Wave 9 — WireGuard NetworkMode adapter via wg-quick + wg shell-out (private mesh, is_public=false). Sibling of kei-net-tailscale; glued by kei-runtime-core::traits::network."
+description = "Wave 9 — WireGuard NetworkMode adapter via wg-quick + wg shell-out (private mesh, is_public=false). Sibling of kei-net-{openvpn,ipsec}; glued by kei-runtime-core::traits::network."
 authors.workspace = true
 license.workspace = true
 

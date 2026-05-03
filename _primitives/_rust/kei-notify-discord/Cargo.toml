@@ -3,7 +3,7 @@ name = "kei-notify-discord"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "NotifyChannel impl for Discord webhooks. Wave 8 atomar; sibling of kei-notify-email and kei-notify-slack."
+description = "NotifyChannel impl for Discord webhooks. Wave 8 atomar; sibling of kei-notify-{telegram,slack,sms}."
 authors.workspace = true
 license.workspace = true
 

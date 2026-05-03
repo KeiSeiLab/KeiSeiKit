@@ -3,7 +3,7 @@ name = "kei-provision"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Unified VPS provisioner — one CLI for Hetzner / Vultr / (future) AWS / DO / Linode. Supersedes provision-hetzner.sh + provision-vultr.sh."
+description = "Unified VPS provisioner — one CLI for Vultr / Linode / DigitalOcean / baremetal. Supersedes provision-vultr.sh."
 authors.workspace = true
 license.workspace = true
 
@@ -27,6 +27,6 @@ tempfile = { workspace = true }
 
 [package.metadata.keisei]
 backend = "external-cli"
-description = "Shells out to `hcloud` (Hetzner) or `vultr-cli` (Vultr). Parses JSON output. Honors HCLOUD_TOKEN / VULTR_API_KEY env refs per RULE 0.8."
+description = "Shells out to `vultr-cli` (Vultr) / `linode-cli` (Linode) / `doctl` (DigitalOcean). Parses JSON output. Honors VULTR_API_KEY / LINODE_TOKEN / DIGITALOCEAN_TOKEN env refs per RULE 0.8."
 authors = ["Denis Parfionovich <parfionovich@keilab.io>"]
-supersedes = ["provision-hetzner.sh", "provision-vultr.sh"]
+supersedes = ["provision-vultr.sh"]

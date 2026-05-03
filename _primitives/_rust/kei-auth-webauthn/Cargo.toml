@@ -3,7 +3,7 @@ name = "kei-auth-webauthn"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "WebAuthn passkey AuthProvider impl for kei-runtime-core (Wave 7 atomar). Wraps webauthn-rs 0.5; stateless ceremony APIs (registration + authentication). Sibling of kei-auth-{google,apple,github,microsoft}."
+description = "WebAuthn passkey AuthProvider impl for kei-runtime-core (Wave 7 atomar). Wraps webauthn-rs 0.5; stateless ceremony APIs (registration + authentication). Sibling of kei-auth-{google,apple,magiclink}."
 license.workspace = true
 authors.workspace = true
 
