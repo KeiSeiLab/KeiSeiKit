@@ -28,9 +28,14 @@ jobs:
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             experimental: false
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            experimental: false
+          # v0.14.2 fix (2026-05-03 first-publish run): macos-latest is now
+          # Apple Silicon (M1+); cross-compile x86_64-apple-darwin needs an
+          # OpenSSL sysroot that GitHub's macos-arm64 runners don't ship.
+          # Apple Silicon mandatory for new Macs since 2020; x86 Mac is
+          # legacy. Drop x86_64-apple-darwin per Wave 3 audit recommendation.
+          # If a future need arises, re-add with `experimental: true` and
+          # `OPENSSL_VENDORED=1` env, or use `openssl-sys` features=["vendored"]
+          # in a target-specific [target.'cfg(...)'.dependencies] block.
           - os: macos-latest
             target: aarch64-apple-darwin
             experimental: false
@@ -291,7 +296,13 @@ jobs:
 
   npm-publish:
     name: Publish npm packages to keigit.com
-    needs: release
+    # v0.14.2 fix (Wave 3 finding): npm publish only needs the TS workspace
+    # to build, NOT the Rust release tarballs. Decoupled from `release` so
+    # a single Rust matrix failure (e.g. cross-compile sysroot, transient
+    # apt-get) cannot block the npm publish chain. The job runs in parallel
+    # with build-release and is independent of build-mcp-binary too — it
+    # builds its own `dist/` from `_ts_packages/`.
+    needs: []
     runs-on: ubuntu-latest
     # Graceful skip: if KEIGIT_TOKEN secret is not configured, the first
     # step reports "skipped" and exits 0 — Rust-binary release above still
