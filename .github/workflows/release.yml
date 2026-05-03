@@ -342,13 +342,21 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
+          # v0.14.3 fix: path-scoped _authToken per Forgejo docs
+          # (https://forgejo.org/docs/latest/user/packages/npm/). The prior
+          # host-scoped form (`//keigit.com/:_authToken=...`) was silently
+          # ignored by npm 10 → ENEEDAUTH. Path-scoped exactly matches the
+          # @keisei:registry URL, so npm reliably resolves the token.
+          # Also write to $HOME/.npmrc so it's found regardless of cwd
+          # (the publish loop cd's into packages/<pkg>/).
           {
             echo "@keisei:registry=https://keigit.com/api/packages/keisei/npm/"
-            echo "//keigit.com/:_authToken=${KEIGIT_TOKEN}"
+            echo "//keigit.com/api/packages/keisei/npm/:_authToken=${KEIGIT_TOKEN}"
+            echo "always-auth=true"
             if [ -n "${NPM_TOKEN:-}" ]; then
               echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
             fi
-          } > .npmrc
+          } | tee "$HOME/.npmrc" > .npmrc
           # Sanity (no secrets in log — print only registry lines):
           grep -v _authToken .npmrc
 
@@ -367,21 +375,34 @@ jobs:
         working-directory: _ts_packages
         run: |
           set -euo pipefail
-          # publishConfig.registry in each package.json decides destination.
-          # Currently only @keisei/mcp-server has a publishConfig — the other
-          # adapters skip publish (no registry pin → npm.org default → no
-          # token in .npmrc → publish fails → ::warning emitted, job continues).
+          # v0.14.3 fix (W1+W3 finding F3): hard-fail on a package WITH a
+          # publishConfig.registry whose publish errored. Adapters without
+          # publishConfig still skip gracefully (no registry pin → npm.org
+          # default → ENEEDAUTH → counted as "skipped" not "failed").
+          gated_failed=0
           for pkg in packages/*/; do
-            if [ -f "$pkg/package.json" ]; then
-              name=$(node -p "require('./$pkg/package.json').name")
-              echo "::group::publish $name"
-              ( cd "$pkg" && npm publish --access public ) \
-                || echo "::warning::publish failed for $name (no registry pin, missing token, version conflict, or registry error — see log)"
-              echo "::endgroup::"
+            [ -f "$pkg/package.json" ] || continue
+            name=$(node -p "require('./$pkg/package.json').name")
+            has_pub=$(node -p "require('./$pkg/package.json').publishConfig ? '1' : '0'")
+            echo "::group::publish $name"
+            if ( cd "$pkg" && npm publish --access public ); then
+              echo "::notice::published $name"
+            else
+              if [ "$has_pub" = "1" ]; then
+                gated_failed=1
+                echo "::error::publish FAILED for $name (has publishConfig — this is a real error, see log above)"
+              else
+                echo "::notice::publish skipped for $name (no publishConfig — npm.org default reached, ENEEDAUTH expected without NPM_TOKEN)"
+              fi
             fi
+            echo "::endgroup::"
           done
+          if [ "$gated_failed" -ne 0 ]; then
+            echo "::error::one or more packages with publishConfig failed to publish"
+            exit 1
+          fi
 
       - name: Cleanup .npmrc
         if: always()
         working-directory: _ts_packages
-        run: rm -f .npmrc
+        run: rm -f .npmrc "$HOME/.npmrc"
