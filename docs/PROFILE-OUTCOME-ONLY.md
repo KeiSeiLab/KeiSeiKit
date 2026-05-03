@@ -42,11 +42,14 @@ is preserved verbatim — both paths share `~/.claude/hooks/` and
 
 The router is a posterior decision rule keyed on per-task-class DNA
 plus a Beta posterior over `(success, total)` in `agents.outcome`.
-Until you accumulate ~100 outcome rows, the router falls back to
-"behaviour unchanged" — every spawn keeps whatever model the agent
-manifest declares.
+The router uses a Wilson-style lower confidence bound (`δ=0.10`,
+`q*=0.70`) — it falls back to "behaviour unchanged" (manifest-declared
+model) UNTIL the per-(task-class, model) lower-bound clears the
+quality bar. Typically that's tens of successful observations per
+pair, not a discrete 100-row threshold (see
+`_primitives/_rust/kei-model-router/src/select.rs:74-124`).
 
-After ~100 rows the posterior dominates the prior and the router
+Once the posterior dominates the uniform `Beta(1,1)` prior the router
 starts producing concrete recommendations. You opt in by adding
 `kei-model-router` to a `PreToolUse:Agent` hook later — that step is
 **not** done by this profile. You stay in observe-only mode by default.
@@ -72,6 +75,11 @@ sqlite3 ~/.claude/agents/ledger.sqlite \
    ORDER BY started_ts DESC LIMIT 20;"
 ```
 
+A sidecar JSONL at `~/.claude/memory/time-metrics/agent-toolstats.jsonl`
+accumulates per-agent token counts, tool-use stats, and durations —
+local-only, append-only, no network egress. Same privacy guarantees as
+the ledger; the uninstall recipe below removes it.
+
 Uncomfortable with the file? `rm` it; the next install or agent run
 recreates an empty schema, no other side effects.
 
@@ -89,6 +97,10 @@ rm -f ~/.claude/memory/time-metrics/agent-toolstats.jsonl
 awk 'BEGIN{skip=0} /<!-- outcome-only profile \(KeiSeiKit\) -->/ {skip=2; next} skip>0 {skip--; next} {print}' \
     ~/.claude/CLAUDE.md > ~/.claude/CLAUDE.md.tmp \
     && mv ~/.claude/CLAUDE.md.tmp ~/.claude/CLAUDE.md
+# Clean .bak-<epoch> files left by backup_file during install
+rm -f ~/.claude/hooks/*.bak-* \
+      ~/.claude/CLAUDE.md.bak-* \
+      ~/.claude/settings.json.bak-*
 ```
 
 Both hooks exit 0 immediately when their target script is missing, so

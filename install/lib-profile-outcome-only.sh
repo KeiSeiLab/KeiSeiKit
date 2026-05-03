@@ -53,11 +53,7 @@ _outcome_install_ledger() {
   local db="$AGENTS_DIR/ledger.sqlite"
   mkdir -p "$AGENTS_DIR"
   local kl="$KIT_DIR/_primitives/_rust/kei-ledger/target/release/kei-ledger"
-  # Cross-version downgrade guard (audit fix 2026-05-03 W3): if an
-  # existing DB is at a NEWER schema (user_version > 9, e.g. user
-  # later upgrades to a full kit that adds a v10 migration), do NOT
-  # re-run any init path — the SQL fallback would otherwise reset
-  # user_version and the binary path may replay incompatible v9 ALTERs.
+  # Downgrade guard: skip init if DB is at a newer schema (user_version > 9).
   if [ -f "$db" ] && command -v sqlite3 >/dev/null 2>&1; then
     local current_v
     current_v=$(sqlite3 "$db" "PRAGMA user_version;" 2>/dev/null || echo 0)
@@ -83,16 +79,12 @@ _outcome_install_ledger() {
   return 1
 }
 
-# Append STATUS-TRUTH MARKER instruction to CLAUDE.md (idempotent: skip
-# if our specific marker comment is already present).
+# Append STATUS-TRUTH MARKER instruction to CLAUDE.md (idempotent).
 _outcome_install_claude_md() {
   local cm="$HOME_DIR/.claude/CLAUDE.md"
   mkdir -p "$HOME_DIR/.claude"
-  # Audit fix 2026-05-03 (W3): match the literal HTML comment marker we
-  # wrote, NOT the broad phrase "STATUS-TRUTH MARKER" — the broad phrase
-  # is also used in RULE 0.16 documentation that many users already have
-  # in their CLAUDE.md, which would cause a false-positive skip and the
-  # outcome-only instruction would never land.
+  # Match HTML comment marker (not generic "STATUS-TRUTH MARKER" text) to avoid
+  # false-positive skip when user already has RULE 0.16 docs in CLAUDE.md.
   if [ -f "$cm" ] && grep -qF '<!-- outcome-only profile (KeiSeiKit) -->' "$cm"; then
     say "CLAUDE.md already contains outcome-only marker; skipping"
     return 0
@@ -119,9 +111,65 @@ _outcome_install_router_if_cargo() {
     || warn "cargo build failed; router not installed (rerun manually if desired)"
 }
 
+# Confirm gate (Fix 1): show plan + prompt; skip for dry-run or --yes.
+_outcome_confirm_if_needed() {
+  [ "${OUTCOME_DRY_RUN:-0}" = "1" ] && return 0
+  [ "${ASSUME_YES:-0}" = "1" ]      && return 0
+  say "Outcome-only profile will install:"
+  say "  - 2 hooks (~/.claude/hooks/agent-outcome-backfill.sh, error-spike-detector.sh)"
+  say "  - SQLite ledger (~/.claude/agents/ledger.sqlite)"
+  say "  - 1 line in ~/.claude/CLAUDE.md (STATUS-TRUTH MARKER instruction)"
+  say "  - jq-merge of 2 hook entries into ~/.claude/settings.json"
+  say "  - kei-model-router binary (deferred if cargo missing)"
+  printf "Continue? [y/N] "
+  read -r _oc_ans
+  case "$_oc_ans" in
+    [Yy]*) ;;
+    *) say "Aborted."; exit 0 ;;
+  esac
+}
+
+# Copy the 2 hook files to HOOKS_DIR.
+_outcome_install_hooks() {
+  local hook_src hook_dst
+  mkdir -p "$HOOKS_DIR"
+  for hook_src in \
+      "$KIT_DIR/hooks/agent-outcome-backfill.sh" \
+      "$KIT_DIR/hooks/error-spike-detector.sh" ; do
+    [ -f "$hook_src" ] || { err "missing source hook: $hook_src"; return 2; }
+    hook_dst="$HOOKS_DIR/$(basename "$hook_src")"
+    backup_file "$hook_dst" 2>/dev/null || true
+    cp -f "$hook_src" "$hook_dst" && chmod +x "$hook_dst"
+    say "installed hook -> $hook_dst"
+  done
+}
+
+# Write or jq-merge the minimal settings-snippet into settings.json.
+_outcome_merge_settings() {
+  local snippet
+  snippet="$(mktemp -t outcome-snippet.XXXXXX)"
+  _outcome_write_snippet "$snippet"
+  if [ ! -f "$HOME_DIR/.claude/settings.json" ]; then
+    cp -f "$snippet" "$HOME_DIR/.claude/settings.json" \
+      && say "created settings.json from outcome-only snippet"
+  else
+    # cp -p aside (not backup_file which MOVES) + register in BACKUP_PAIRS for rollback.
+    local _ts _bak
+    _ts=$(date +%s)
+    _bak="$HOME_DIR/.claude/settings.json.bak-$_ts"
+    cp -p "$HOME_DIR/.claude/settings.json" "$_bak"
+    BACKUP_PAIRS+=("$HOME_DIR/.claude/settings.json|$_bak")
+    if ! _jq_merge_hooks "$snippet" "$HOME_DIR/.claude/settings.json"; then
+      err "settings.json merge failed; rollback trap will restore from $_bak"
+      rm -f "$snippet"; return 1
+    fi
+    rm -f "$_bak"
+  fi
+  rm -f "$snippet"
+}
+
 # Public entry — called from install.sh when --profile=outcome-only.
 install_profile_outcome_only() {
-  local hook_src hook_dst snippet
   if [ "${OUTCOME_DRY_RUN:-0}" = "1" ]; then
     _outcome_dr_add "$HOOKS_DIR/agent-outcome-backfill.sh"
     _outcome_dr_add "$HOOKS_DIR/error-spike-detector.sh"
@@ -132,46 +180,21 @@ install_profile_outcome_only() {
     printf '%s' "$OUTCOME_DRY_RUN_FILES" | sed '/^$/d' | nl -ba
     return 0
   fi
-  mkdir -p "$HOOKS_DIR" "$AGENTS_DIR"
-  for hook_src in \
-      "$KIT_DIR/hooks/agent-outcome-backfill.sh" \
-      "$KIT_DIR/hooks/error-spike-detector.sh" ; do
-    [ -f "$hook_src" ] || { err "missing source hook: $hook_src"; return 2; }
-    hook_dst="$HOOKS_DIR/$(basename "$hook_src")"
-    backup_file "$hook_dst" 2>/dev/null || true
-    cp -f "$hook_src" "$hook_dst" && chmod +x "$hook_dst"
-    say "installed hook -> $hook_dst"
-  done
-  _outcome_install_ledger
+  mkdir -p "$AGENTS_DIR"
+  _outcome_install_hooks || return $?
+  # Fix 2: track ledger install result so summary reflects reality
+  local ledger_ok=1
+  _outcome_install_ledger || ledger_ok=0
   _outcome_install_claude_md
   _outcome_install_router_if_cargo
-  snippet="$(mktemp -t outcome-snippet.XXXXXX)"
-  _outcome_write_snippet "$snippet"
-  if [ ! -f "$HOME_DIR/.claude/settings.json" ]; then
-    cp -f "$snippet" "$HOME_DIR/.claude/settings.json" \
-      && say "created settings.json from outcome-only snippet"
-  else
-    # Audit fix 2026-05-03 (W3): backup_file MOVES the target which would
-    # leave _jq_merge_hooks with no file to read. Use cp -p to copy aside
-    # AND register the pair in BACKUP_PAIRS so the rollback trap restores
-    # it on later failure (was orphan-bak-not-in-rollback-contract).
-    local _ts
-    _ts=$(date +%s)
-    local _bak="$HOME_DIR/.claude/settings.json.bak-$_ts"
-    cp -p "$HOME_DIR/.claude/settings.json" "$_bak"
-    BACKUP_PAIRS+=("$HOME_DIR/.claude/settings.json|$_bak")
-    if ! _jq_merge_hooks "$snippet" "$HOME_DIR/.claude/settings.json"; then
-      err "settings.json merge failed; rollback trap will restore from $_bak"
-      rm -f "$snippet"
-      return 1
-    fi
-    # Success: remove our backup (rollback contract released)
-    rm -f "$_bak"
-  fi
-  rm -f "$snippet"
+  _outcome_merge_settings || return $?
   say "outcome-only profile installed."
   say "  hooks:    agent-outcome-backfill.sh, error-spike-detector.sh"
-  say "  ledger:   $AGENTS_DIR/ledger.sqlite"
+  if [ "$ledger_ok" = "1" ]; then
+    say "  ledger:   $AGENTS_DIR/ledger.sqlite"
+  else
+    warn "  ledger:   NOT INSTALLED — backfill hook will be silent no-op until sqlite3/kei-ledger is available"
+  fi
   say "  CLAUDE.md updated (1 line appended)"
   say "  router:   built (if cargo present), else deferred — see docs/PROFILE-OUTCOME-ONLY.md"
 }

@@ -342,23 +342,28 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          # v0.14.3 fix: path-scoped _authToken per Forgejo docs
-          # (https://forgejo.org/docs/latest/user/packages/npm/). The prior
-          # host-scoped form (`//keigit.com/:_authToken=...`) was silently
-          # ignored by npm 10 → ENEEDAUTH. Path-scoped exactly matches the
-          # @keisei:registry URL, so npm reliably resolves the token.
-          # Also write to $HOME/.npmrc so it's found regardless of cwd
-          # (the publish loop cd's into packages/<pkg>/).
+          # v0.14.4 fix: drop deprecated `always-auth=true` (npm 10+ ignores +
+          # warns) — likely interfered with token resolution silently.
+          # Add Forgejo-friendly legacy Basic-auth fallback (username/_password)
+          # since direct curl probe confirmed Basic + Bearer both authenticate
+          # against keigit.com but npm publish in CI hit 401 with _authToken
+          # alone — could be path-prefix walk vs canonicalization quirk.
+          # Username `Parfionovich` is OWNER of org `keisei` on keigit.
           {
             echo "@keisei:registry=https://keigit.com/api/packages/keisei/npm/"
+            # path-scoped _authToken (npm 10 canonical)
             echo "//keigit.com/api/packages/keisei/npm/:_authToken=${KEIGIT_TOKEN}"
-            echo "always-auth=true"
+            # legacy Basic fallback — Forgejo accepts both forms
+            echo "//keigit.com/api/packages/keisei/npm/:username=Parfionovich"
+            echo "//keigit.com/api/packages/keisei/npm/:_password=$(printf '%s' "${KEIGIT_TOKEN}" | base64 | tr -d '\n')"
+            echo "//keigit.com/api/packages/keisei/npm/:email=2206745@gmail.com"
             if [ -n "${NPM_TOKEN:-}" ]; then
               echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
             fi
           } | tee "$HOME/.npmrc" > .npmrc
+          chmod 600 "$HOME/.npmrc" .npmrc
           # Sanity (no secrets in log — print only registry lines):
-          grep -v _authToken .npmrc
+          grep -vE "_authToken|_password|username|email" .npmrc || true
 
       - name: Install deps
         if: steps.have_token.outputs.present == '1'
