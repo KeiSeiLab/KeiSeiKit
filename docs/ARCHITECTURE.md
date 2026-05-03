@@ -315,4 +315,4 @@ Cross-references to the rules that govern git state:
 - **RULE 0.12** — agent-fork lifecycle (6-file bundle + ledger row + merge ceremony).
 - **RULE 0.13** — orchestrator owns branch + commits + pushes; agents write files only.
 
-The `checkpoint:`, `feat:`, `refactor:`, `audit:`, and `fix:` commit prefixes are SSoT'd in [`~/.claude/rules/git-conventions.md`](https://example.invalid/git-conventions). `kei-changelog` walks Conventional Commits to regenerate `CHANGELOG.md` blocks; `kei-fork validate` checks the 6-file bundle on every merge.
+The `checkpoint:`, `feat:`, `refactor:`, `audit:`, and `fix:` commit prefixes are SSoT'd in `~/.claude/rules/git-conventions.md` (a per-user rule file installed outside this public repo; see `_blocks/` for the in-repo block-format SSoT). `kei-changelog` walks Conventional Commits to regenerate `CHANGELOG.md` blocks; `kei-fork validate` checks the 6-file bundle on every merge.

@@ -1,6 +1,6 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-03T07:06:44Z.
+> Auto-generated from kei-registry. Last regenerated: 2026-05-03T10:59:45Z.
 > Total blocks: 565. Per-type breakdown:
 
 | Type | Count |
@@ -113,7 +113,7 @@ Sorted alphabetically by name.
 | kei-replay::kei-replay | primitive::_::e59b33… | _primitives/_rust/kei-replay/Cargo.toml | 4e8b77cb |
 | kei-router::kei-router | primitive::_::1e654e… | _primitives/_rust/kei-router/Cargo.toml | 98ab93cd |
 | kei-runtime-core::kei-runtime-core | primitive::_::3cf11b… | _primitives/_rust/kei-runtime-core/Cargo.toml | 10186e32 |
-| kei-runtime::kei-runtime | primitive::_::4d8427… | _primitives/_rust/kei-runtime/Cargo.toml | 4b3abe12 |
+| kei-runtime::kei-runtime | primitive::_::4d8427… | _primitives/_rust/kei-runtime/Cargo.toml | 5fcf7642 |
 | kei-sage::kei-sage | primitive::_::176fa2… | _primitives/_rust/kei-sage/Cargo.toml | df35dc55 |
 | kei-scheduler::kei-scheduler | primitive::_::2b15c6… | _primitives/_rust/kei-scheduler/Cargo.toml | ef89066d |
 | kei-search-core::kei-search-core | primitive::_::bd14ad… | _primitives/_rust/kei-search-core/Cargo.toml | ff60e666 |
@@ -1117,13 +1117,13 @@ Sorted alphabetically by name.
 - `STACK — Python ML (PyTorch / JAX)` — 2 versions: ceb1fc98 → 4afd934a
 - `Schema-Design — Relational Schema & Migration Pipeline (index)` — 2 versions: 06a0f2c0 → 8d662c40
 - `Self-Audit — Session Retrospective Triage (index)` — 3 versions: 339cb507 → 38fd80b7 → 44427a22
-- `Sleep On It — Incubation Wizard (index)` — 2 versions: c62ae34a → e1553680
+- `Sleep On It — Incubation Wizard (index)` — 3 versions: c62ae34a → e1553680 → 5fc186c9
 - `Sleep Setup — Cloud REM Sync Wizard (index)` — 2 versions: 470f7902 → d9877f2a
 - `Test Generation Workflow` — 2 versions: a3a67707 → 6c187beb
 - `agent-event-done` — 3 versions: ef70393c → 598bc917 → aa05dec9
 - `agent-event-spawn` — 3 versions: b4573a30 → fb3603c7 → 1f32efc5
 - `agent-heartbeat-tick` — 2 versions: 5eb00dc3 → 560fa0f8
-- `agent-outcome-backfill` — 2 versions: 0e00d9ca → c901aaf2
+- `agent-outcome-backfill` — 3 versions: 0e00d9ca → c901aaf2 → a11281aa
 - `agent-stub-scan` — 2 versions: 8a9fc155 → 4098a307
 - `alignment-check` — 3 versions: 4e7389b1 → b1e18549 → 31600957
 - `auditor` — 2 versions: 7eb6ab3a → 74d9689e
@@ -1281,7 +1281,7 @@ Sorted alphabetically by name.
 - `kei-runtime` — 3 versions: 44b695ea → c19f68cf → b372ab7c
 - `kei-runtime-core` — 3 versions: 100eec0c → dedb3de0 → b9a37dea
 - `kei-runtime-core::kei-runtime-core` — 9 versions: 7980a704 → d64f3fbc → 9822303c → 80ad147f → ee80f871 → 663b5308 → 143c08b7 → ecfcc56c → 10186e32
-- `kei-runtime::kei-runtime` — 14 versions: e23e203b → 45e2bb3a → 93b703b3 → bd5a94ce → 15d85045 → 2aa2f1e3 → 2aa2f1e3 → 23f2ee6a → 37dc01f8 → bb9a2e8d → e013e322 → 70fd5389 → 67644265 → 4b3abe12
+- `kei-runtime::kei-runtime` — 15 versions: e23e203b → 45e2bb3a → 93b703b3 → bd5a94ce → 15d85045 → 2aa2f1e3 → 2aa2f1e3 → 23f2ee6a → 37dc01f8 → bb9a2e8d → e013e322 → 70fd5389 → 67644265 → 4b3abe12 → 5fcf7642
 - `kei-sage` — 3 versions: 773af2fd → e7617e42 → 70873353
 - `kei-sage::kei-sage` — 2 versions: df35dc55 → df35dc55
 - `kei-scheduler` — 3 versions: 589d4c96 → b20fdba2 → f1f1ebf8

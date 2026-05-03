@@ -66,4 +66,10 @@ CREATE INDEX IF NOT EXISTS idx_skill_invocations_name_ts
 CREATE INDEX IF NOT EXISTS idx_skill_invocations_success
     ON skill_invocations(skill_name, success);
 
+-- Audit fix 2026-05-03: bump user_version to 9 so a later `kei-ledger init`
+-- short-circuits via the `current >= 9` gate instead of replaying v1..v9
+-- migrations whose ALTER TABLE ADD COLUMN steps would error with "duplicate
+-- column" against the already-flat schema this file installed.
+PRAGMA user_version = 9;
+
 COMMIT;

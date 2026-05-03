@@ -187,11 +187,11 @@ KeiSeiKit is a **multi-tier agent composition substrate** built on four mutually
 | Package | Version | Purpose | Key Dependencies | Build Target |
 |---------|---------|---------|------------------|--------------|
 | **@keisei/mcp-server** | 0.14.0 | MCP server exposing KeiSeiKit Rust primitives as tools | @modelcontextprotocol/sdk ^1.0.0, execa ^9.0.0, zod ^3.23.0 | Node.js ≥18.0.0; native binaries via bun compile (darwin/linux/windows) |
-| **@keisei/gmail-adapter** | 0.5.2 | Gmail API integration for email-based task intake | @google-cloud/gmail ^1.3.0, nodemailer-mock ^2.0.0 | Node.js ≥18.0.0 |
-| **@keisei/grok-adapter** | 0.3.1 | Grok (xAI) LLM provider bridge | openai-compatible ^1.0.0 | Node.js ≥18.0.0 |
-| **@keisei/telegram-adapter** | 0.6.0 | Telegram Bot API integration for notifications + input | telegram-typings ^4.10.0, node-telegram-bot-api ^0.65.0 | Node.js ≥18.0.0 |
-| **@keisei/recall-adapter** | 0.2.1 | Recall.ai (browser automation) integration | recall-ai-sdk ^1.0.0 | Node.js ≥18.0.0; browser environment recommended |
-| **@keisei/youtube-adapter** | 0.1.8 | YouTube API integration for video transcript + metadata | googleapis ^118.0.0 | Node.js ≥18.0.0 |
+| **@keisei/gmail-adapter** | 0.14.0 | Gmail API integration for email-based task intake | googleapis ^144.0.0, zod ^3.23.0 | Node.js ≥18.0.0 |
+| **@keisei/grok-adapter** | 0.14.0 | Grok (xAI) LLM provider bridge | zod ^3.23.0 (uses fetch directly, no SDK) | Node.js ≥18.0.0 |
+| **@keisei/telegram-adapter** | 0.14.0 | Telegram Bot API integration for notifications + input | grammy ^1.28.0, zod ^3.23.0 | Node.js ≥18.0.0 |
+| **@keisei/recall-adapter** | 0.14.0 | Recall.ai (browser automation) integration | zod ^3.23.0 (uses fetch directly, no SDK) | Node.js ≥18.0.0 |
+| **@keisei/youtube-adapter** | 0.14.0 | YouTube API integration for video transcript + metadata | googleapis ^144.0.0, youtube-transcript ^1.2.1, zod ^3.23.0 | Node.js ≥18.0.0 |
 
 **Notes:**
 - All packages scoped under `@keisei/` on npm (published to keigit.com npm registry)

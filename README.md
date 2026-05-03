@@ -6,12 +6,13 @@ Works first-class with Claude Code; MCP-compatible bridges generate
 context for Cursor / Continue / Zed / Aider / Windsurf / Cline /
 OpenClaw / Kimi from the same source-of-truth.
 
-**Apache 2.0** — explicit patent grant + retaliation clause. 102 Rust
-crates (~132K LOC), 67 skills, 35 hooks, 37 agent manifests, 82
-substrate blocks, 18 capability bundles, 7 substrate roles. Self-
-indexing via kei-registry SQLite (currently 495 active DNAs across the
-public substrate). Three-phase nightly consolidation. Foreign-project
-ingestion runtime (`kei-import <repo-url>`).
+**Apache 2.0** — explicit patent grant + retaliation clause. 105 Rust
+crates (workspace member count via `grep -E '^\s*"[a-z-]+",' _primitives/_rust/Cargo.toml | wc -l`),
+68 skills, 38 hooks, 38 agent manifests, 85 substrate blocks, 18
+capability atoms, 7 substrate roles. Self-indexing via kei-registry
+SQLite (565 active DNAs as of 2026-05-03 per `docs/DNA-INDEX.md`
+header). Three-phase nightly consolidation. Foreign-project ingestion
+runtime (`kei-import <repo-url>`).
 
 ## Maturity matrix
 
@@ -33,7 +34,7 @@ production work.
 | | |
 |---|---|
 | **Persistent memory** | SQLite ledger + content-addressable memory store, session-spanning context, cross-machine sync via memory-repo |
-| **Agent DNA** | Deterministic 80-char identity per invocation: `<role>::<caps>::<scope-sha8>::<body-sha8>-<nonce>`. Same task → same prefix → "did this run before?" via SQL, no embeddings |
+| **Agent DNA** | Deterministic variable-length identity per invocation: `<role>::<caps>::<scope-sha8>::<body-sha8>-<nonce8>` (≥33 chars; role + caps slugs are variable). Same task → same prefix → "did this run before?" via SQL, no embeddings. See [`docs/DNA-FORMAT.md`](./docs/DNA-FORMAT.md) for the wire spec. |
 | **Constructor Pattern for prompts** | Agent `.md` files composed from manifests + blocks + capability bundles + rule fragments. Edit a block → all agents using it recompose. Single source of truth |
 | **kei-fork** | Atomic git triplet (branch + worktree + ledger row) for parallel agent runs. Atomic rollback. No main-branch collisions across 4-8 simultaneous Claude sessions |
 | **Three-phase sleep** | Phase A incubation (queued tasks) → Phase B REM consolidation (analyzes last 30 sessions, writes morning markdown report) → Phase C NREM deep-sleep (every 7 days, conflict scan + refactor proposals). No feedback loop — outputs are markdown, you decide what to keep |
@@ -67,10 +68,15 @@ cd KeiSeiKit-1.0
 ./install.sh --profile=minimal
 ```
 
-37 agents + 67 skills + 35 hooks + nightly consolidation wired in
-60 seconds. Eleven install profiles (`minimal` → `core` → `full` +
-MCP-only / Cortex / Cursor / Continue / Zed / Aider / Docker / Nix)
-documented in [`docs/INSTALL.md`](./docs/INSTALL.md).
+38 agents + 68 skills + 38 hooks + nightly consolidation wired in
+~60 seconds. Twelve install profiles (`outcome-only`, `minimal`,
+`core`, `frontend`, `ops`, `dev`, `mcp`, `cortex`, `local-mirror`,
+`dashboard`, `full-hub`, `full`) defined in
+`_primitives/MANIFEST.toml` and documented in
+[`docs/INSTALL.md`](./docs/INSTALL.md). For non-Claude-Code clients
+(Cursor / Continue / Zed / Aider) the bridges format the same source
+into client-native config — those are bridge targets, not separate
+profiles.
 
 ### Outcome-only — try just the outcome loop (5 files, ~200 LOC)
 

@@ -36,7 +36,7 @@ The rest of this document maps each property to the shipped code.
 
 ## 1. Identity — DNA
 
-Every agent invocation resolves to a deterministic 80-character string:
+Every agent invocation resolves to a deterministic variable-length string (≥33 chars; role + caps slugs are variable):
 
 ```
 <role>::<caps-bitmap>::<scope-hash>::<body-hash>-<nonce>

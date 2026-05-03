@@ -8,7 +8,7 @@
   },
   "homepage": "https://github.com/KeiSei84/KeiSeiKit",
   "repository": "https://github.com/KeiSei84/KeiSeiKit",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "constructor-pattern",
     "agents",

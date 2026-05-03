@@ -210,7 +210,7 @@ flate2 = "1"
 walkdir = "2"
 pretty_assertions = "1"
 # Shared async + HTTP deps (Waves 31/32/33/35/36 etc — kei-tty / kei-router / etc)
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "sync"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "io-std", "sync"] }
 tokio-stream = "0.1"
 futures = "0.3"
 reqwest = { version = "0.12", features = ["json", "stream", "multipart", "rustls-tls"], default-features = false }

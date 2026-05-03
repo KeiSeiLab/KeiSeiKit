@@ -25,7 +25,8 @@ kei-skills = { path = "../kei-skills" }
 
 [dev-dependencies]
 tempfile = { workspace = true }
-tokio = { workspace = true }
+# test-util: needed by tests/tools_call_timeout.rs for tokio::time::advance + Builder::start_paused
+tokio = { workspace = true, features = ["test-util"] }
 
 [package.metadata.keisei]
 backend = "none"

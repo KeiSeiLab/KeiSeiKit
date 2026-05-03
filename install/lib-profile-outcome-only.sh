@@ -133,8 +133,17 @@ install_profile_outcome_only() {
     cp -f "$snippet" "$HOME_DIR/.claude/settings.json" \
       && say "created settings.json from outcome-only snippet"
   else
-    backup_file "$HOME_DIR/.claude/settings.json"
-    _jq_merge_hooks "$snippet" "$HOME_DIR/.claude/settings.json" || true
+    # Audit fix 2026-05-03: backup_file MOVES the target. We need the file
+    # still in place for jq to read during merge — copy aside instead so
+    # _jq_merge_hooks reads the original. The trap-pair entry registered
+    # by backup_file restores on rollback if the merge fails.
+    cp -p "$HOME_DIR/.claude/settings.json" \
+          "$HOME_DIR/.claude/settings.json.bak-$(date +%s)"
+    if ! _jq_merge_hooks "$snippet" "$HOME_DIR/.claude/settings.json"; then
+      err "settings.json merge failed; the .bak file remains as recovery"
+      rm -f "$snippet"
+      return 1
+    fi
   fi
   rm -f "$snippet"
   say "outcome-only profile installed."

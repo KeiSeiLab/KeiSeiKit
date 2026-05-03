@@ -106,8 +106,17 @@ STUBS=$(printf '%s' "$RESPONSE" \
 
 # Idempotent UPDATE. Failure (locked DB, no row, etc.) → advisory only,
 # never blocks the originating tool call.
+#
+# Audit fix 2026-05-03 (RULE 0.4 / SQLi): TOOL_USE_ID is unsanitised JSON
+# input (potential `'` injection); SHIPPED is allowlist-validated above
+# but defensive escape costs nothing. Replace single-quote with two
+# single-quotes (SQL-standard escape) for ALL string-context variables.
+# STUBS is integer-validated by `grep -oE '[0-9]+'` — already safe.
+_sql_esc() { printf "%s" "$1" | sed "s/'/''/g"; }
+SHIPPED_ESC=$(_sql_esc "$SHIPPED")
+TOOL_USE_ID_ESC=$(_sql_esc "$TOOL_USE_ID")
 sqlite3 "$DB" \
-    "UPDATE agents SET outcome='$SHIPPED', stubs_count=$STUBS WHERE id='$TOOL_USE_ID';" \
+    "UPDATE agents SET outcome='$SHIPPED_ESC', stubs_count=$STUBS WHERE id='$TOOL_USE_ID_ESC';" \
     2>/dev/null || {
         printf '[agent-outcome-backfill] UPDATE failed for id=%s\n' "$TOOL_USE_ID" >&2
         exit 0

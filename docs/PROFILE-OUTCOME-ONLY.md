@@ -81,13 +81,24 @@ recreates an empty schema, no other side effects.
 rm -f ~/.claude/hooks/agent-outcome-backfill.sh
 rm -f ~/.claude/hooks/error-spike-detector.sh
 rm -f ~/.claude/agents/ledger.sqlite
-sed -i.bak '/outcome-only profile (KeiSeiKit)/,+1 d' ~/.claude/CLAUDE.md
+rm -f ~/.claude/memory/time-metrics/agent-toolstats.jsonl
+# CLAUDE.md cleanup — portable across BSD (macOS) and GNU sed via awk.
+# The original line `sed -i.bak '/.../,+1 d'` used the GNU `,+N` address
+# extension which BSD sed does NOT support; on macOS it silently no-ops,
+# leaving an orphan instruction. The awk recipe below works on both.
+awk 'BEGIN{skip=0} /<!-- outcome-only profile \(KeiSeiKit\) -->/ {skip=2; next} skip>0 {skip--; next} {print}' \
+    ~/.claude/CLAUDE.md > ~/.claude/CLAUDE.md.tmp \
+    && mv ~/.claude/CLAUDE.md.tmp ~/.claude/CLAUDE.md
 ```
 
 Both hooks exit 0 immediately when their target script is missing, so
 the `~/.claude/settings.json` jq-merge entries are harmless after
 `rm`. To scrub those too, drop `agent-outcome-backfill.sh` /
 `error-spike-detector.sh` lines from `settings.json` by hand.
+
+The 5th `rm` removes the sidecar telemetry JSONL the backfill hook
+writes (per-agent token counts + tool stats; local-only, no network
+egress, but worth deleting if you uninstalled for privacy reasons).
 
 ## Why this profile exists
 

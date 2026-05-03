@@ -12,8 +12,11 @@ argument-hint: (no arguments)
 - Queuing up to 5 tasks per night (15 min each) to be processed before the REM consolidation pass.
 - Requires v0.11 sleep-sync already configured; use `/sleep-setup` first if not.
 
-Biological analog: the REM-sleep "sleep on it" effect — insight generation
-during incubation (Wagner et al. 2004, *Nature*). During the day the user
+Biological analog: the "sleep on it" insight effect documented by
+Wagner et al. 2004, *Nature* 427:352–355
+[VERIFIED: doi:10.1038/nature02223] (the original paper showed insight
+gain after a sleep period that included slow-wave sleep, not strictly
+REM; our metaphor is a loose mapping). During the day the user
 submits open questions, research tasks, or design comparisons via this
 wizard; the nightly cloud agent processes the queue before its existing
 REM consolidation pass and writes results to `sync-repo/sleep-results/`.
