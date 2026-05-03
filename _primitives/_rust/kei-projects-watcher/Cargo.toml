@@ -26,7 +26,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-dirs = "5"
+dirs = "6"
 kei-projects-index = { path = "../kei-projects-index" }
 
 [dev-dependencies]
