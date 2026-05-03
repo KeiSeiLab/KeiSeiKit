@@ -179,6 +179,8 @@ members = [
     "kei-db-contract",
     # Live runtime-graph exporter (registry + ledger → D3 space fragment)
     "kei-graph-export",
+    # SSoT validator: claims declared in arch/PLAN.toml, verified against repo state
+    "kei-arch-map",
 ]
 
 [workspace.package]

@@ -1,0 +1,106 @@
+# Architecture SSoT for KeiSeiKit-public.
+#
+# Each [[module]] is a logical unit (file/dir). Each [[module.claim]] is
+# a Boolean assertion verified by evidence. Run `kei-arch-map verify` to
+# check; the binary EXITS NONZERO on any FAIL — a hook can block commits.
+#
+# Edit this file to add/remove claims. Do NOT edit arch/ARCH.md or
+# arch/CLAIMS.md by hand — they regenerate from this.
+
+[meta]
+schema_version = 1
+repo_root = "."
+github_blob_base = "https://github.com/KeiSei84/KeiSeiKit-1.0/blob/main/"
+
+# ============================================================
+# Module: cargo-workspace — workspace root manifest
+# ============================================================
+[[module]]
+id = "cargo-workspace"
+path = "_primitives/_rust/Cargo.toml"
+description = "Rust workspace manifest. Inherits authors/license/etc to ~104 member crates."
+
+[[module.claim]]
+id = "workspace-package-has-authors"
+description = "[workspace.package] declares authors (100+ crates inherit via authors.workspace=true)"
+evidence = { kind = "regex_match", file = "_primitives/_rust/Cargo.toml", pattern = "(?m)^authors\\s*=\\s*\\[" }
+
+[[module.claim]]
+id = "cargo-check-workspace-passes"
+description = "cargo check --workspace exits 0 (no missing deps, no broken inheritance)"
+evidence = { kind = "exit_code", cmd = "cd _primitives/_rust && cargo check --workspace --offline 2>&1 | grep -cE '^error' | grep -q '^0$'", expected = 0 }
+
+# ============================================================
+# Module: release-yml — GitHub Actions release pipeline
+# ============================================================
+[[module]]
+id = "release-yml"
+path = ".github/workflows/release.yml"
+description = "Tag-driven release: 4-target Rust build + 5-target mcp-server build + npm publish."
+
+[[module.claim]]
+id = "release-yml-references-keigit-token"
+description = "npm-publish job uses KEIGIT_TOKEN secret (intent: publish to keigit, per MEMORY.md)"
+evidence = { kind = "regex_match", file = ".github/workflows/release.yml", pattern = "secrets\\.KEIGIT_TOKEN" }
+
+# ============================================================
+# Module: mcp-server — TypeScript MCP server, scope @keisei/
+# ============================================================
+[[module]]
+id = "mcp-server"
+path = "_ts_packages/packages/mcp-server"
+description = "MCP server for Cortex daemon. stdio + HTTP transports."
+
+[[module.claim]]
+id = "mcp-server-stdio-buffers-partial-frames"
+description = "stdio dispatcher accumulates partial-line chunks (no frame loss on >8KiB payloads)"
+evidence = { kind = "regex_match", file = "_ts_packages/packages/mcp-server/src/index.ts", pattern = "let pending" }
+
+[[module.claim]]
+id = "mcp-server-http-body-cap-handler-wrapped"
+description = "HTTP body-cap path wraps for-await loop in try/catch to prevent crash on req.destroy() race"
+evidence = { kind = "regex_match", file = "_ts_packages/packages/mcp-server/src/index.ts", pattern = "try\\s*\\{[\\s\\S]{0,200}for\\s+await" }
+
+# ============================================================
+# Module: docs-claims — numeric claims in docs that drift
+# ============================================================
+[[module]]
+id = "docs-claims"
+path = "docs"
+description = "Numeric claims in README/ARCHITECTURE that historically drifted (RULE 0.18)."
+
+[[module.claim]]
+id = "readme-crate-count-matches"
+description = "README/ARCHITECTURE crate count matches actual workspace member count"
+evidence = { kind = "exit_code", cmd = "actual=$(grep -cE '^\\s*\"[a-z][a-z0-9_-]*\",' _primitives/_rust/Cargo.toml); claimed=$(grep -hoE '[0-9]+ Rust' README.md docs/ARCHITECTURE.md 2>/dev/null | grep -oE '^[0-9]+' | head -1); [ \"$actual\" = \"$claimed\" ]", expected = 0 }
+
+# ============================================================
+# Module: ts-versions — TypeScript package version coherence
+# ============================================================
+[[module]]
+id = "ts-versions"
+path = "_ts_packages"
+description = "TypeScript workspace version coherence (root vs child packages)."
+
+[[module.claim]]
+id = "ts-root-version-matches-mcp-server"
+description = "_ts_packages/package.json version matches _ts_packages/packages/mcp-server/package.json"
+evidence = { kind = "exit_code", cmd = "v_root=$(grep -oE '\"version\":\\s*\"[^\"]+\"' _ts_packages/package.json | head -1 | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+'); v_child=$(grep -oE '\"version\":\\s*\"[^\"]+\"' _ts_packages/packages/mcp-server/package.json | head -1 | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+'); [ \"$v_root\" = \"$v_child\" ]", expected = 0 }
+
+# ============================================================
+# Module: keigit-org-presence — keigit user keisei must exist
+# ============================================================
+[[module]]
+id = "keigit-org-presence"
+path = "MEMORY.md"
+description = "Live probe: keigit org/user `keisei` exists (verified Wave 2 audit 2026-05-04)."
+
+[[module.claim]]
+id = "keigit-user-keisei-200"
+description = "GET https://keigit.com/api/v1/users/keisei returns 200"
+evidence = { kind = "http_status", url = "https://keigit.com/api/v1/users/keisei", expected = [200] }
+
+# NOTE: rules-presence module deferred to Phase 2 — claims need
+# `~/`-expansion in file_exists evidence kind (currently file_exists
+# stores literal paths). Bonus claims removed pre-commit because
+# absolute home paths fail the username-leak gate.

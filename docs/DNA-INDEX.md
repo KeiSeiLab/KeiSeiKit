@@ -1,19 +1,19 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-03T10:59:45Z.
-> Total blocks: 565. Per-type breakdown:
+> Auto-generated from kei-registry. Last regenerated: 2026-05-03T18:27:00Z.
+> Total blocks: 566. Per-type breakdown:
 
 | Type | Count |
 |---|---:|
 | atom | 149 |
 | hook | 53 |
-| primitive | 115 |
+| primitive | 116 |
 | rule | 180 |
 | skill | 68 |
 
 ---
 
-## Primitive (115)
+## Primitive (116)
 
 Sorted alphabetically by name.
 
@@ -22,6 +22,7 @@ Sorted alphabetically by name.
 | firewall-diff::firewall-diff | primitive::_::cfe51e… | _primitives/_rust/firewall-diff/Cargo.toml | 07f0e46a |
 | frustration-matrix::frustration-matrix | primitive::_::b6ee34… | _primitives/_rust/frustration-matrix/Cargo.toml | db99150c |
 | kei-agent-runtime::kei-agent-runtime | primitive::_::18437e… | _primitives/_rust/kei-agent-runtime/Cargo.toml | 76e04f24 |
+| kei-arch-map::kei-arch-map | primitive::_::93d979… | _primitives/_rust/kei-arch-map/Cargo.toml | 489c0d17 |
 | kei-artifact::kei-artifact | primitive::_::111b67… | _primitives/_rust/kei-artifact/Cargo.toml | 8742aade |
 | kei-atom-discovery::kei-atom-discovery | primitive::_::85ce60… | _primitives/_rust/kei-atom-discovery/Cargo.toml | bb5db6ab |
 | kei-auth-apple::kei-auth-apple | primitive::_::95b0b0… | _primitives/_rust/kei-auth-apple/Cargo.toml | 42f38a75 |
@@ -1140,6 +1141,7 @@ Sorted alphabetically by name.
 - `frustration-matrix::frustration-matrix` — 2 versions: db99150c → db99150c
 - `kei-agent-runtime` — 3 versions: 708830d4 → 33b44d6c → 841ac805
 - `kei-agent-runtime::kei-agent-runtime` — 2 versions: 76e04f24 → 76e04f24
+- `kei-arch-map::kei-arch-map` — 6 versions: 2e9d962a → 8f857390 → 31c4476e → a5a88192 → 56108075 → 489c0d17
 - `kei-artifact` — 3 versions: 2c55b84a → a33abf97 → 50e8c9cd
 - `kei-artifact::kei-artifact` — 2 versions: 8742aade → 8742aade
 - `kei-atom-discovery` — 3 versions: 0d532c9f → ca9202b5 → e1fde01b
@@ -1349,6 +1351,6 @@ Sorted alphabetically by name.
 
 ## Schema notes
 
-- `dna` wire format: `<block_type>::<caps>::<scope_sha8>::<body_sha8>-<nonce8>` (≥33 chars; role + caps slugs are variable — see docs/DNA-FORMAT.md).
+- `dna` wire format: `<block_type>::<caps>::<scope_sha8>::<body_sha8>-<nonce8>` (80 chars).
 - Active vs superseded: rows where `superseded_by IS NULL` are active.
 - See `_primitives/_rust/kei-shared/src/dna.rs` for canonical DNA spec.
