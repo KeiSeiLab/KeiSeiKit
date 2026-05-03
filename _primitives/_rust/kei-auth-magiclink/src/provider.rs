@@ -132,9 +132,20 @@ impl AuthProvider for MagicLinkProvider {
     }
 
     async fn revoke(&self, _session: &Dna) -> kei_runtime_core::Result<()> {
-        // v0.1: stateless tokens have no server-side revocation.
-        // Callers maintain a deny-list externally if needed.
-        Ok(())
+        // SECURITY: do NOT silently return Ok here. Stateless HMAC tokens
+        // cannot be server-side revoked, and a silent Ok() would lie to
+        // every caller that thought it had killed a session. Surface the
+        // truth so callers can either rotate the HMAC key (kills ALL live
+        // tokens) or maintain an external deny-list keyed on the token's
+        // first two parts (email + expiry).
+        Err(Error::Unsupported(
+            "magiclink: stateless tokens cannot be server-side revoked. \
+             Rotate KEI_MAGICLINK_HMAC_KEY to invalidate all live tokens, \
+             OR maintain a deny-list at the caller layer keyed on the \
+             token's first two parts."
+                .into(),
+        )
+        .into())
     }
 
     fn is_passwordless(&self) -> bool {

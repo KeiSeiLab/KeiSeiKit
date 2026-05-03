@@ -152,3 +152,23 @@ fn provider_build_magic_url_shape() {
     // Trailing slash on base_url MUST be stripped.
     assert!(!url.contains("//auth/magic"));
 }
+
+#[test]
+fn provider_revoke_returns_unsupported_error() {
+    // RULE 0.16 / security review: stateless tokens cannot be server-side
+    // revoked. Returning Ok() silently would lie to every caller. The
+    // provider MUST surface an Unsupported error so the caller can choose
+    // to rotate the HMAC key or maintain a deny-list.
+    let parent = parent_dna();
+    let provider = MagicLinkProvider::new(parent.clone(), KEY.to_vec(), 900)
+        .expect("provider new ok");
+    let rt = tokio::runtime::Runtime::new().expect("runtime");
+    let err = rt
+        .block_on(provider.revoke(&parent))
+        .expect_err("revoke must error, not silently succeed");
+    let msg = err.to_string().to_lowercase();
+    assert!(
+        msg.contains("unsupported") || msg.contains("cannot be server-side revoked"),
+        "expected unsupported error mentioning revocation, got: {msg}"
+    );
+}

@@ -76,6 +76,7 @@ pub fn spawn_pty(
     let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".into());
     let mut cmd = CommandBuilder::new(&shell);
     cmd.cwd(cwd);
+    apply_safe_env(&mut cmd);
     let child = pair.slave.spawn_command(cmd).map_err(|e| e.to_string())?;
     let reader = pair.master.try_clone_reader().map_err(|e| e.to_string())?;
     let writer = pair.master.take_writer().map_err(|e| e.to_string())?;
@@ -87,6 +88,24 @@ pub fn spawn_pty(
         cancel,
         reader_handle: Some(reader_handle),
     })
+}
+
+/// SECURITY: drop ALL inherited env so daemon secrets (KEI_AUTH_KEY,
+/// ANTHROPIC_API_KEY, MAGICLINK_HMAC_KEY, etc.) cannot leak into the PTY
+/// shell. A stored XSS on the cors_origin domain would otherwise pivot
+/// directly to a local shell holding every daemon secret. After clearing,
+/// re-set ONLY the minimal env a shell legitimately needs.
+fn apply_safe_env(cmd: &mut CommandBuilder) {
+    cmd.env_clear();
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/".into());
+    let path = std::env::var("PATH")
+        .unwrap_or_else(|_| "/usr/local/bin:/usr/bin:/bin".into());
+    let user = std::env::var("USER").unwrap_or_else(|_| "user".into());
+    cmd.env("HOME", &home);
+    cmd.env("PATH", &path);
+    cmd.env("USER", &user);
+    cmd.env("LANG", "en_US.UTF-8");
+    cmd.env("TERM", "xterm-256color");
 }
 
 /// Forward PTY stdout bytes to the WS sender via a bounded channel. Reads

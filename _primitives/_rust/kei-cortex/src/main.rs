@@ -79,7 +79,27 @@ async fn main() -> Result<()> {
 }
 
 async fn serve(args: ServeArgs) -> Result<()> {
-    let config = AppConfig::try_new(
+    let config = build_config(args)?;
+    warn_if_live2d_missing(&config.live2d_samples_dir);
+    let bind_ip = IpAddr::V4(Ipv4Addr::LOCALHOST);
+    enforce_loopback_or_local_cors(&bind_ip, &config.cors_origin)?;
+    let token = load_or_bootstrap_token(&config.token_path)?;
+    let state = AppState::new(config.clone(), token);
+    let router = build_router(state);
+    let addr = SocketAddr::new(bind_ip, config.port);
+    let listener = TcpListener::bind(addr)
+        .await
+        .with_context(|| format!("bind {addr}"))?;
+    eprintln!("kei-cortex listening on http://{addr}");
+    axum::serve(listener, router)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .context("axum serve")?;
+    Ok(())
+}
+
+fn build_config(args: ServeArgs) -> Result<AppConfig> {
+    AppConfig::try_new(
         Some(args.port),
         Some(args.cors_origin),
         args.token_path,
@@ -92,20 +112,31 @@ async fn serve(args: ServeArgs) -> Result<()> {
         Some(args.default_provider),
         args.token_tracker_db,
     )
-    .context("assemble config")?;
-    warn_if_live2d_missing(&config.live2d_samples_dir);
-    let token = load_or_bootstrap_token(&config.token_path)?;
-    let state = AppState::new(config.clone(), token);
-    let router = build_router(state);
-    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), config.port);
-    let listener = TcpListener::bind(addr)
-        .await
-        .with_context(|| format!("bind {addr}"))?;
-    eprintln!("kei-cortex listening on http://{addr}");
-    axum::serve(listener, router)
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .context("axum serve")?;
+    .context("assemble config")
+}
+
+/// SECURITY: refuse to start when bound to a non-loopback address with a
+/// public cors_origin. The combination is an XSS-to-local-shell pivot:
+/// any stored XSS on the public origin can talk to the daemon and reach
+/// `/term`, gaining a PTY shell on the local machine. The bind path stays
+/// hardcoded to LOCALHOST today, but this guard future-proofs the code if
+/// a `--bind` flag is ever added (and protects against a misconfigured
+/// reverse proxy that proxies the daemon publicly).
+fn enforce_loopback_or_local_cors(bind: &IpAddr, cors_origin: &str) -> Result<()> {
+    if bind.is_loopback() {
+        return Ok(());
+    }
+    let lower = cors_origin.to_ascii_lowercase();
+    let public = !(lower.contains("localhost")
+        || lower.contains("127.0.0.1")
+        || lower.contains("[::1]"));
+    if public {
+        anyhow::bail!(
+            "refusing to bind to non-loopback address {bind} with public \
+             cors_origin {cors_origin:?} (XSS-to-shell risk); set \
+             --cors-origin to localhost-only or use --bind 127.0.0.1"
+        );
+    }
     Ok(())
 }
 

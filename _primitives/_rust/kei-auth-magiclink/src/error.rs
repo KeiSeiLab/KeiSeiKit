@@ -34,6 +34,12 @@ pub enum Error {
     /// DNA build / parse error from `kei_runtime_core::dna`.
     #[error("magiclink dna error: {0}")]
     Dna(String),
+
+    /// Operation is not supported by this provider — surfaced when a caller
+    /// asks for behaviour that the underlying primitive cannot deliver
+    /// (e.g. server-side revocation of a stateless HMAC token).
+    #[error("magiclink unsupported: {0}")]
+    Unsupported(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
