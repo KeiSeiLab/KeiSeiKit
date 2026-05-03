@@ -21,14 +21,17 @@ domain_in = ["task scope (verbatim user prompt)", "target paths / files"]
 forbidden_domain = ["hardcoded secrets (RULE 0.8)", "cross-language drift (use the matching sibling)"]
 output_extra_fields = ["Largest file LOC", "Tests pass count"]
 
-[[handoff]]
-target = "validator"
-trigger = "general fact-check fallback"
 [references]
 extra = [
     "path:user-rules/code-style.md",
     "path:user-rules/karpathy-behavioral.md",
 ]
+
+# IMPORTANT (TOML spec): all [table] sections must precede [[array]] sections.
+# Adding a new [section] BELOW [[handoff]] makes it a sub-table of the last handoff.
+[[handoff]]
+target = "validator"
+trigger = "general fact-check fallback"
 
 [taxonomy]
 kingdom = "manifest"
