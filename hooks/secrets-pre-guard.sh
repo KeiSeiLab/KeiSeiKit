@@ -40,64 +40,65 @@ CONTENT=$(printf '%s' "$INPUT" | jq -r \
 
 [ -z "$CONTENT" ] && exit 0
 
-# --- Allowlist: placeholder or documentation patterns ----------------------
-# If the content indicates example/placeholder values, skip.
-if printf '%s' "$CONTENT" | grep -qiE \
-  'YOUR_TOKEN_HERE|<redacted>|\[VERIFY:|placeholder|xxx+|_TOKEN_NAME_HERE|_KEY_HERE|_SECRET_HERE|example[_-]?(key|token|secret)'; then
-  exit 0
-fi
+# --- Per-line allowlist + secret detection ---------------------------------
+# Evaluate placeholder allowlist PER LINE (not globally) so a "placeholder"
+# marker elsewhere in the file does not disable secret scanning on lines
+# that contain real tokens.
+#
+# A line is allowed iff it contains BOTH a secret-shaped pattern AND a
+# placeholder marker on the SAME LINE. Otherwise, the secret pattern on
+# that line is treated as a real hit.
 
-# --- Secret detection patterns -------------------------------------------
-# Each pattern is checked individually so we can name the type in the error.
+ALLOWLIST_RE='YOUR_TOKEN_HERE|<redacted>|\[VERIFY:|placeholder|xxx+|_TOKEN_NAME_HERE|_KEY_HERE|_SECRET_HERE|example[_-]?(key|token|secret)|dummy[_-]?(key|token|secret)'
 
 DETECTED=""
 
+# Helper: scan content line-by-line for a given regex; for each match,
+# allow only if the SAME LINE matches ALLOWLIST_RE. Sets DETECTED to label
+# on first non-allowlisted hit.
+scan_pattern() {
+  pattern="$1"
+  label="$2"
+  [ -n "$DETECTED" ] && return 0
+  hit=$(printf '%s' "$CONTENT" | awk -v pat="$pattern" -v allow="$ALLOWLIST_RE" '
+    {
+      if (match($0, pat)) {
+        if (match($0, allow)) {
+          next
+        }
+        print "HIT"
+        exit
+      }
+    }
+  ')
+  if [ "$hit" = "HIT" ]; then
+    DETECTED="$label"
+  fi
+}
+
 # Anthropic/OpenAI legacy key
-if printf '%s' "$CONTENT" | grep -qE 'sk-[A-Za-z0-9]{20,}'; then
-  DETECTED="Anthropic/OpenAI legacy key (sk-...)"
-fi
+scan_pattern 'sk-[A-Za-z0-9]{20,}' "Anthropic/OpenAI legacy key (sk-...)"
 
 # Anthropic current key
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE 'sk-ant-[A-Za-z0-9_-]{40,}'; then
-  DETECTED="Anthropic current key (sk-ant-...)"
-fi
+scan_pattern 'sk-ant-[A-Za-z0-9_-]{40,}' "Anthropic current key (sk-ant-...)"
 
 # GitHub classic PAT
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE 'ghp_[A-Za-z0-9]{36}'; then
-  DETECTED="GitHub classic PAT (ghp_...)"
-fi
+scan_pattern 'ghp_[A-Za-z0-9]{36}' "GitHub classic PAT (ghp_...)"
 
 # GitHub fine-grained PAT
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE 'github_pat_[A-Za-z0-9_]{82}'; then
-  DETECTED="GitHub fine-grained PAT (github_pat_...)"
-fi
+scan_pattern 'github_pat_[A-Za-z0-9_]{82}' "GitHub fine-grained PAT (github_pat_...)"
 
 # Slack bot token
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE 'xoxb-[0-9]+-[0-9]+-[A-Za-z0-9]+'; then
-  DETECTED="Slack bot token (xoxb-...)"
-fi
+scan_pattern 'xoxb-[0-9]+-[0-9]+-[A-Za-z0-9]+' "Slack bot token (xoxb-...)"
 
 # Telegram bot token
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE '[0-9]{8,10}:[A-Za-z0-9_-]{35}'; then
-  DETECTED="Telegram bot token (NNNNNNNNN:...)"
-fi
+scan_pattern '[0-9]{8,10}:[A-Za-z0-9_-]{35}' "Telegram bot token (NNNNNNNNN:...)"
 
 # AWS access key
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE 'AKIA[A-Z0-9]{16}'; then
-  DETECTED="AWS access key (AKIA...)"
-fi
+scan_pattern 'AKIA[A-Z0-9]{16}' "AWS access key (AKIA...)"
 
 # PEM private key block
-if [ -z "$DETECTED" ] && \
-   printf '%s' "$CONTENT" | grep -qE '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'; then
-  DETECTED="PEM private key (-----BEGIN ... PRIVATE KEY-----)"
-fi
+scan_pattern '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' "PEM private key (-----BEGIN ... PRIVATE KEY-----)"
 
 [ -z "$DETECTED" ] && exit 0
 
