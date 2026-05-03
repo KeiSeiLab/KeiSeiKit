@@ -76,7 +76,15 @@ download_release_tarball() {
     (cd "$tmp" && shasum -a 256 -c "${tarball}.sha256" >/dev/null 2>&1) \
       || { say "  sha256 mismatch on ${tarball} — refusing to install"; rm -rf "$tmp"; return 1; }
   else
-    say "  WARNING: no sha256 available for ${tarball}, proceeding without verification"
+    say "  ERROR: no sha256 sidecar found at ${url}.sha256"
+    say "  Refusing to install unverified tarball (RULE 0.1 supply-chain hardening)."
+    say "  Override with KEI_ALLOW_UNVERIFIED_TARBALL=1 (visible per-call)."
+    if [ "${KEI_ALLOW_UNVERIFIED_TARBALL:-0}" = "1" ]; then
+      say "  KEI_ALLOW_UNVERIFIED_TARBALL=1 set — proceeding without verification (DANGEROUS)."
+    else
+      rm -rf "$tmp"
+      return 1
+    fi
   fi
   local dst="$KIT_DIR/_primitives/_rust/target/release"
   mkdir -p "$dst" || { rm -rf "$tmp"; return 1; }

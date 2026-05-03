@@ -85,11 +85,18 @@ for proj_git in "$PROJECTS_ROOT"/*/.claude/worktrees "$PROJECTS_ROOT"/*/*/.claud
       continue
     fi
 
-    # Guard 3: unpushed
-    unpushed=$(cd "$wt" && git log @{u}.. 2>/dev/null | wc -l | tr -d ' ')
-    if [ -n "$unpushed" ] && [ "$unpushed" != "0" ]; then
+    # Guard 3: unpushed (fail-safe — skip on missing upstream)
+    if cd "$wt" 2>/dev/null && git rev-parse --abbrev-ref @{u} >/dev/null 2>&1; then
+      unpushed=$(git log @{u}.. 2>/dev/null | wc -l | tr -d ' ')
+      if [ -n "$unpushed" ] && [ "$unpushed" != "0" ]; then
+        worktrees_skip_unpushed=$((worktrees_skip_unpushed + 1))
+        log "  SKIP[unpushed=$unpushed] $wt"
+        continue
+      fi
+    else
+      # No upstream tracking — treat as "may have unpushed work", skip conservatively
       worktrees_skip_unpushed=$((worktrees_skip_unpushed + 1))
-      log "  SKIP[unpushed=$unpushed] $wt"
+      log "  SKIP[no-upstream]  $wt"
       continue
     fi
 
