@@ -56,6 +56,31 @@ Run a nightly "sleep" cycle on Anthropic's cloud — no laptop, no infra, no Dev
 - 03:00 local time: a remote Claude Code agent clones the repo, analyzes the last 24h of traces, writes `reports/sleep-YYYY-MM-DD.md`, and commits back
 - Next morning: `git pull` and read the consolidated findings
 
+**Current state (2026-05-03) — what Phase B does and does not do:**
+
+Phase B currently writes a markdown report at
+`~/Projects/KeiSeiKit-public/reports/sleep-YYYY-MM-DD.md` (or the
+equivalent path inside your sync-repo). The report is intended to be
+**read by a human**.
+
+**Auto-codification of rules from sleep insights is not yet
+implemented.** The ContractDoc designates `/escalate-recurrence` as
+the manual codification path — when you read the morning report and
+spot a pattern worth turning into a rule, you invoke that skill by
+hand.
+
+When auto-codification lands, the loop will be:
+
+```
+Phase B detects pattern → opens AskUserQuestion →
+  on user-confirm → writes rule + hook stub
+```
+
+This is tracked as a separate atomar; until then, Phase B is
+report-only and codification is human-in-the-loop. This matches the
+sleep-layer rule's "no feedback loop into agent state" invariant —
+nothing the cloud agent writes is auto-injected into a session.
+
 **Setup (one-time, ~5 min):**
 
 1. Create an empty private repo on GitHub / GitLab / Bitbucket / self-hosted Forgejo

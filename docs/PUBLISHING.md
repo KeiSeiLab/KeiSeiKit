@@ -1,23 +1,30 @@
-# Publishing to keigit.com
+# Publishing via keigit.com (author-operated mirror)
 
 > Publish KeiSeiKit agents, skills, and primitives as scoped npm packages
-> on the community registry at <https://keigit.com>. OAuth-only login,
-> per-user PAT for `npm publish`, no email/password registration.
+> against `keigit.com` — an **author-operated mirror (KeiSei84 / private
+> Forgejo + npm registry)**, OAuth-only, per-user PAT for `npm publish`.
+> This is **not a neutral community registry** — it is a single-operator
+> opt-in instance the author runs. The substrate is remote-agnostic; you
+> can point it at any git remote and any npm-compatible registry.
 
 ## Overview
 
-`keigit.com` is the community-facing companion to KeiSeiKit: a public
-Forgejo instance plus an npm-compatible package registry, run by the
-project. Anyone with a GitHub or Google account can sign up in one
-click, publish scoped packages under their own namespace, and share
-agents / skills / hooks the same way they would on
-`registry.npmjs.org` — but inside the KeiSeiKit ecosystem so package
-DNAs cross-reference your existing substrate. Free, no quotas at
-launch; quotas may be introduced if traffic justifies it.
+`keigit.com` is one git+npm host the substrate happens to know how to
+publish to — a public Forgejo instance plus an npm-compatible package
+registry, both run by the author of KeiSeiKit. Anyone with a GitHub or
+Google account can sign up in one click, publish scoped packages under
+their own namespace, and share agents / skills / hooks the same way
+they would on `registry.npmjs.org`. Free, no quotas at launch; the
+operator (the author) reserves the right to introduce quotas, suspend
+accounts, or shut the instance down — same as any single-operator
+mirror.
 
 Use it when you want others to `npm install @you/your-skill` against
-your published bundle without depending on the public npm registry
-or on private GitHub Packages.
+your published bundle without standing up your own registry. If you
+need vendor-neutrality, point your `~/.npmrc` at any other
+npm-compatible registry (Verdaccio, Gitea, GitLab Package Registry,
+public npm) — the substrate's publishing tooling does not require
+keigit.com.
 
 ## Sign up
 

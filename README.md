@@ -13,6 +13,21 @@ indexing via kei-registry SQLite (currently 495 active DNAs across the
 public substrate). Three-phase nightly consolidation. Foreign-project
 ingestion runtime (`kei-import <repo-url>`).
 
+## Maturity matrix
+
+The substrate ships as a layered set of components at different
+maturity levels. Read this before relying on any single piece for
+production work.
+
+| Component | Status | Notes |
+|---|---|---|
+| 24+ Rust primitives | varies (alpha → beta → concept) | Inspect each crate's `Cargo.toml` `package.metadata.keisei.maturity` if declared; otherwise treat as **alpha** unless you've personally exercised it. Most primitives are alpha — they build, type-check, and have unit tests, but have not been hardened against adversarial input or run at scale. |
+| Cortex daemon (`kei-cortex` HTTP + WS) | alpha | CLI-driven daemon works in author's daily use; HTTP REST + WS endpoints + 8-tool `/chat` agentic loop build clean. **Browser app (`cortex-ui`) and VSCode extension (`@keisei/vscode-cortex`) are concept-level** — scaffolds present, not production paths. |
+| MCP server (`@keisei/mcp-server`) | alpha (unpublished) | **Not yet on npm.** Install via local dist build (see Quick start below). |
+| Sleep layer (Phase A / B / C) | alpha | Phase A queue (`/sleep-on-it` → cloud agent) + Phase B markdown morning report work. **Auto-codification of rules from sleep insights is not yet wired** — codification path is manual via `/escalate-recurrence`. Phase C deep-sleep refactor proposals run on a 7-day cadence and write plan-only markdown by default. |
+| Hooks (35 shipped) | beta | Tested in author's daily use (4–8 parallel Claude Code terminals). Pipeline hooks (`assemble-agents`, `no-hand-edit-agents`) are load-bearing; advisory hooks (RULE 0.12 / 0.13 / 0.14) are non-blocking. |
+| Skills + manifests + assembler | beta | Structured + `assembler-validate` gate runs on every `git commit` inside `~/.claude`. Schema is locked (see [`docs/AGENT-SCHEMA-LOCKED.md`](./docs/AGENT-SCHEMA-LOCKED.md)). |
+
 ## What it does
 
 | | |
@@ -25,7 +40,7 @@ ingestion runtime (`kei-import <repo-url>`).
 | **Auto self-indexing** | Every substrate file edit triggers registry update + agent regeneration + DNA-INDEX.md refresh + keimd graph reindex |
 | **Foreign-project ingestion** | `kei-import <repo>` walks → matches against 12 runtime traits → extracts skills from README/docs → generates migration plan → produces per-phase agent prompts |
 | **Cross-tool bridges** | One rule-set, 11 target formats (`.cursorrules`, `.windsurf/rules/main.md`, `.github/copilot-instructions.md`, `AGENTS.md`, `GEMINI.md`, etc) |
-| **Community npm registry** | Publish your agents / skills / hooks as scoped packages on [`keigit.com`](https://keigit.com) (public Forgejo + npm registry, OAuth login, per-user PAT). `npm publish` to your own scope, `npm install` from anyone else's. See [`docs/PUBLISHING.md`](./docs/PUBLISHING.md) |
+| **npm-style publishing path** | Publish your agents / skills / hooks as scoped packages. The author runs an opt-in mirror at [`keigit.com`](https://keigit.com) (public Forgejo + npm registry, OAuth, per-user PAT) — this is an **author-operated mirror (KeiSei84 / private Forgejo)**, not a neutral community service. The substrate is remote-agnostic; use any git remote and any npm registry you trust. See [`docs/PUBLISHING.md`](./docs/PUBLISHING.md) |
 
 ## Why it exists
 
@@ -56,6 +71,14 @@ cd KeiSeiKit-1.0
 60 seconds. Eleven install profiles (`minimal` → `core` → `full` +
 MCP-only / Cortex / Cursor / Continue / Zed / Aider / Docker / Nix)
 documented in [`docs/INSTALL.md`](./docs/INSTALL.md).
+
+### Outcome-only — try just the outcome loop (5 files, ~200 LOC)
+
+If you want to try only the outcome-tracking primitive without
+committing to the full kit (no daemon, no Forgejo, no launchd, no 100
+crates), run `./install.sh --profile=outcome-only`. Installs 2 hooks +
+a SQLite ledger + one line in `~/.claude/CLAUDE.md`; uninstalls in
+four lines. See [`docs/PROFILE-OUTCOME-ONLY.md`](./docs/PROFILE-OUTCOME-ONLY.md).
 
 ## Self-maintaining
 
@@ -93,10 +116,26 @@ outputs are human-readable markdown. You read, you decide what merges.
   outcome rows accumulate (currently 3). Until then, routing happens
   via orchestrator discipline plus advisor-hook stderr nudges.
 - **Cortex stack** (`kei-cortex` / `kei-tty` / `kei-mcp`) ships as
-  **beta**. Local HTTP daemon + ratatui TUI + MCP stdio JSON-RPC
-  build clean. Browser app and VSCode-extension frontends are concept.
-- **`@keisei/mcp-server` npm package** — local `dist/` builds work;
-  not yet published to npm registry.
+  **alpha** (CLI/daemon track) — downgraded from "beta" because two
+  of the three intended frontends are not yet shipping. Local HTTP
+  daemon + ratatui TUI + MCP stdio JSON-RPC build clean and run in
+  the author's daily use. **Browser app (`cortex-ui`) and VSCode
+  extension (`@keisei/vscode-cortex`) are concept-level only** —
+  scaffolds exist, no production wiring. Treat the daemon + CLI as
+  the supported surface; treat the GUI frontends as roadmap.
+- **`@keisei/mcp-server` npm package** — **not yet published to npm.**
+  Install via the local dist build:
+  ```bash
+  cd _ts_packages
+  bun install            # or: npm install
+  bun run -r build       # or: npm run -r build
+  # mcp-server output lands in _ts_packages/packages/mcp-server/dist/
+  ```
+  Then point your MCP-aware client at the local `dist/` entry point.
+  Single-binary builds via `bun build --compile` are documented in
+  [`_ts_packages/packages/mcp-server/BUILD.md`](./_ts_packages/packages/mcp-server/BUILD.md)
+  (5-target matrix, ~85–95 MB per binary). Do not assume npm-registry
+  install will work until v1.0.
 - **Non-Claude clients** integrate via MCP + bridges, not native hooks.
   PreToolUse / PostToolUse / UserPromptSubmit / Stop semantics are
   Claude Code primitives. Other clients get capability exposure but
