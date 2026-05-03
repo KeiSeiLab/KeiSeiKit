@@ -19,6 +19,7 @@ ASSUME_YES=0
 NO_EXECUTE=0
 REBUILD_RUST_LIST=""
 REBUILD_RUST_FLAG=0
+OUTCOME_DRY_RUN=0
 
 print_help() {
   cat <<EOF
@@ -38,6 +39,11 @@ Usage: ./install.sh [flags]
                             ~5s, no Rust compile.
 
   --profile=<name>          add primitive bundles on top of substrate baseline:
+                            Outcome-tracking only (no substrate, no daemon):
+                              outcome-only — 2 hooks + ledger.sqlite + 1 line
+                                             in CLAUDE.md + (deferred) router.
+                                             ~5 files, ~200 LOC. See
+                                             docs/PROFILE-OUTCOME-ONLY.md
                             Standard:
                               minimal      — 0 primitives (~5s)
                               core         — 2 prims (tomd, kei-doctor)
@@ -90,6 +96,10 @@ Usage: ./install.sh [flags]
                             resolved plan, then exit before copying/building
                             anything. Useful for dry-run / testing.
 
+  --dry-run                 with --profile=outcome-only: print the list of
+                            files that WOULD be touched in \$HOME, then exit
+                            0 without writing. No-op for other profiles.
+
   --rebuild-rust            (dev-only) rebuild full Rust workspace + mirror
                             fresh binaries to ~/.claude/agents/_primitives/
                             _rust/target/release/. Closes the drift gap
@@ -122,6 +132,7 @@ parse_args() {
       --no-execute)      NO_EXECUTE=1 ;;
       --rebuild-rust)    REBUILD_RUST_FLAG=1 ;;
       --rebuild-rust=*)  REBUILD_RUST_FLAG=1; REBUILD_RUST_LIST="${arg#--rebuild-rust=}" ;;
+      --dry-run)         OUTCOME_DRY_RUN=1 ;;
       --help|-h)         print_help; exit 0 ;;
     esac
   done

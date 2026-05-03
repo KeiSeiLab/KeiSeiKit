@@ -73,6 +73,8 @@ source "$LIB_DIR/lib-pathway.sh"
 source "$LIB_DIR/lib-bin.sh"
 # shellcheck source=install/lib-summary.sh
 source "$LIB_DIR/lib-summary.sh"
+# shellcheck source=install/lib-profile-outcome-only.sh
+source "$LIB_DIR/lib-profile-outcome-only.sh"
 
 # --- parse flags + install rollback trap ---------------------------------
 parse_args "$@"
@@ -108,6 +110,17 @@ if [ -n "$ADD_LIST" ] || [ -n "$REMOVE_NAME" ]; then
   exit 0
 fi
 
+# --- outcome-only profile short-circuit ----------------------------------
+# Bypasses every heavy phase (substrate copy, primitives, manifests,
+# assembler, generation, bridges, skills) and installs only:
+#   2 hooks + ledger.sqlite + 1 line in CLAUDE.md + (optional) router.
+# See docs/PROFILE-OUTCOME-ONLY.md.
+if [ "${PROFILE:-}" = "outcome-only" ]; then
+  export OUTCOME_DRY_RUN
+  install_profile_outcome_only
+  exit 0
+fi
+
 # --- interactive menu (option C hybrid) ----------------------------------
 # Runs ONLY when: no selection flag passed AND stdin+stdout are TTY AND
 # --list / --add / --remove short-circuits above did NOT fire.
@@ -116,9 +129,9 @@ run_menu_if_needed || exit 1
 # --- resolve profile (default=minimal) -----------------------------------
 PROFILE="${PROFILE:-minimal}"
 case "$PROFILE" in
-  minimal|core|frontend|ops|dev|mcp|cortex|full|custom|local-mirror|dashboard|full-hub) ;;
+  minimal|core|frontend|ops|dev|mcp|cortex|full|custom|local-mirror|dashboard|full-hub|outcome-only) ;;
   *)
-    err "unknown profile: $PROFILE. Valid: minimal | core | frontend | ops | dev | mcp | cortex | local-mirror | dashboard | full-hub | full"
+    err "unknown profile: $PROFILE. Valid: outcome-only | minimal | core | frontend | ops | dev | mcp | cortex | local-mirror | dashboard | full-hub | full"
     exit 1
     ;;
 esac
