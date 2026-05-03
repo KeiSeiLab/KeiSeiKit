@@ -229,9 +229,9 @@ Orchestrator skill `landing-page` composes 11 skills across 6 recipes
 
 ## Architecture
 
-Stack: **Rust core** (102 crates, ≤2 MB each, 12-trait runtime + plugin
-registry) + **TypeScript glue** (6 adapters: gmail / grok / recall /
-telegram / youtube / mcp-server). Backend impls cover:
+Stack: **Rust core** (105 workspace crates, ≤2 MB each, 12-trait runtime
++ plugin registry) + **TypeScript glue** (6 adapters: gmail / grok /
+recall / telegram / youtube / mcp-server). Backend impls cover:
 
 | Trait | Impls |
 |---|---|

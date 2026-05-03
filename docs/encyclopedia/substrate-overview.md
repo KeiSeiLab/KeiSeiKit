@@ -210,11 +210,11 @@ KeiSeiKit is a **multi-tier agent composition substrate** built on four mutually
 | **ARCHITECTURE.md** | Stack overview + trait impl matrix | Compute/Git/Memory/Auth/Notify/Network/LLM/ServiceManager impls per backend |
 | **AGENT-ROLES.md** | Generated role matrix (human-readable) | 7 roles × capabilities × tools × escalation (auto-generated from _roles/*.toml) |
 | **PHILOSOPHY.md** | Substrate philosophy + design principles | Single-source-of-truth, Constructor Pattern, no overlays, decomposability |
-| **DNA-INDEX.md** | Agent DNA (deterministic identity) format | 80-char DNA breakdown: role::caps::scope-sha8::body-sha8-nonce |
+| **DNA-INDEX.md** | Agent DNA (deterministic identity) format | ≥33-char variable-length DNA breakdown: role::caps::scope-sha8::body-sha8-nonce |
 | **IMPORT-RUNTIME.md** | Foreign-project ingestion pipeline | Decompose → match → extract skills → plan → execute (Hermes proof-of-concept) |
 | **PUBLISHING.md** | Community npm registry + scoped package publishing | keigit.com npm, OAuth, per-user PAT, `npm publish` / `npm install` flow |
 | **RULES-AS-BLOCKS.md** | How user ~/.claude/rules/*.md become prompt blocks | Rule fragment extraction, RULE re-composition, link-tracking |
-| **QUICKSTART.md** | 60-second install guide | 11 install profiles (minimal/core/full + MCP/Cortex/Cursor/Continue/etc) |
+| **QUICKSTART.md** | 60-second install guide | 12 install profiles (outcome-only/minimal/core/frontend/ops/dev/mcp/cortex/local-mirror/dashboard/full-hub/full) |
 | **INSTALL.md** | Full installation docs | Prereqs, profiles, lib-*.sh breakdown, troubleshooting |
 | **CONVERGENCE-PLAN.md** | Multi-stream parallel work roadmap | UI / Atoms refactor / Graph / Runtime phases (2026-06 closure target) |
 | **REFERENCE.md** | Command-line reference for kei-* binaries | kei-runtime, kei-sage, kei-registry, kei-import, kei-capability, kei-forge |
@@ -361,7 +361,7 @@ These are concatenated in role-declared order, with `\n\n---\n\n` separators bet
 | Capabilities exist + have both toml + text.md | assembler `validate-capability` + CI | compose fails; missing fragments |
 | JSON Schemas are valid draft-07 | `kei-schema-lint` + CI | atom discovery skips malformed schema |
 | Gates/verifies registered in kei-agent-runtime | `cargo test --all` | gate lookup fails; aborting capability |
-| Agent DNA is 80 chars unique per invocation | kei-ledger fork + DNA-INDEX.md | collision risk; query ambiguity |
+| Agent DNA is variable-length (≥33 chars) unique per invocation | kei-ledger fork + DNA-INDEX.md | collision risk; query ambiguity |
 | No file edits outside files-whitelist | scope::files-whitelist gate | merge blocked; scope violation |
 | Files ≤ 200 LOC, functions ≤ 30 LOC | quality::constructor-pattern verify | merge blocked; pattern violation |
 | cargo check + tests green | quality::cargo-check-green + tests-green | merge blocked; integration failure |
@@ -381,7 +381,7 @@ These are concatenated in role-declared order, with `\n\n---\n\n` separators bet
 | **Role** | Bundle of capabilities + tool allowlist + escalation policy | `edit-local`, `read-only`, `git-ops` |
 | **Gate** | PreToolUse Rust impl blocking tool calls (deny) | `policy::no-git-ops` blocks `^git` |
 | **Verify** | On-return Rust impl validating agent output + integration | `quality::cargo-check-green` runs `cargo check --workspace` |
-| **DNA** | 80-char deterministic agent identity; "did this run before?" without embeddings | `code-impl::edit-local::7f1a2c3d::5e9b4f2a-nonce` |
+| **DNA** | ≥33-char variable-length deterministic agent identity; "did this run before?" without embeddings | `code-impl::edit-local::7f1a2c3d::5e9b4f2a-nonce` |
 | **Simulated merge** | Orchestrator creates test branch, applies agent diff, runs checks from there | catches integration regressions pre-merge |
 | **Hands off** | Agent delegates work to another agent via manifest `[[handoff]]` table | `code-implementer` hands off to `ml-implementer` |
 
@@ -402,7 +402,7 @@ These are concatenated in role-declared order, with `\n\n---\n\n` separators bet
 | Bridges | stable | 11 cross-tool format generators (.cursorrules, .windsurf/rules, GEMINI.md, etc.) |
 | Sleep Layer (Phase A/B/C) | stable | Incubation (tasks), REM consolidation (reports), NREM deep-sleep (conflicts) |
 | Foreign-project ingestion | stable | kei-import <repo> proof-of-concept via Hermes validation |
-| Nightly consolidation | active | Running 2026-05-02; Phase A + B + C observed; reports 495 DNA indices |
+| Nightly consolidation | active | Running 2026-05-02; Phase A + B + C observed; reports 565 DNA indices (per docs/DNA-INDEX.md header 2026-05-03) |
 
 **Roadmap:**
 - Model router (Bayesian posterior, currently manual routing)

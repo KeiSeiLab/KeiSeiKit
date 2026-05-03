@@ -1,7 +1,7 @@
 {
   "name": "keisei",
   "version": "0.16.0",
-  "description": "Constructor-Pattern agent kit for Claude Code: composable behavioral blocks, 23 Rust primitives, 39 portable skills, 9 pre-wired hooks, typed artifact handoff, sleep-sync cloud consolidation, MCP server layer.",
+  "description": "Constructor-Pattern agent kit for Claude Code: 38 agent manifests, 68 portable skills, 38 hooks, 105 Rust workspace crates (47 installable primitives + 14 shell primitives via MANIFEST.toml `full` profile), typed artifact handoff, sleep-sync cloud consolidation, MCP server layer.",
   "author": {
     "name": "KeiSei",
     "url": "https://github.com/KeiSei84"

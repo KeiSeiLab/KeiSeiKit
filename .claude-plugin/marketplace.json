@@ -15,7 +15,7 @@
         "source": "github",
         "repo": "KeiSei84/KeiSeiKit"
       },
-      "description": "Full KeiSeiKit — 12-agent fleet, 39 skills, 9 hooks, 23 Rust primitives, sleep-sync cloud consolidation, MCP server layer"
+      "description": "Full KeiSeiKit — 38 agent manifests, 68 skills, 38 hooks, 105 Rust workspace crates (47 installable primitives via MANIFEST.toml `full` profile + 14 shell primitives), sleep-sync cloud consolidation, MCP server layer"
     }
   ]
 }

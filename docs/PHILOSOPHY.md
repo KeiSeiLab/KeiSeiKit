@@ -122,10 +122,13 @@ Claude Code agent on Anthropic's cloud picks up the queue (up to 480
 minutes total across ≤ 5 tasks, packed greedily in FIFO order) and
 works until the budget or checkpoint fires.
 
-Biological analog: the overnight consolidation of un-finished intentions
-(Wagner et al. 2004, *Nature*). Things unsolved when you fell asleep are
-often solved by morning not because the brain ran harder, but because
-it ran offline.
+Biological analog: the post-sleep insight gain documented by
+Wagner et al. 2004, *Nature* 427:352–355
+[VERIFIED: doi:10.1038/nature02223]. The original paper showed that
+problems unsolved when you went to bed are sometimes solved on waking
+not because the brain ran harder but because it ran offline; the study
+did not isolate a specific sleep stage, and our metaphor is a loose
+mapping of that observation onto the kit's offline consolidation.
 
 ### Phase B — REM consolidation
 

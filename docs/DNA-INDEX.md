@@ -1349,6 +1349,6 @@ Sorted alphabetically by name.
 
 ## Schema notes
 
-- `dna` wire format: `<block_type>::<caps>::<scope_sha8>::<body_sha8>-<nonce8>` (80 chars).
+- `dna` wire format: `<block_type>::<caps>::<scope_sha8>::<body_sha8>-<nonce8>` (≥33 chars; role + caps slugs are variable — see docs/DNA-FORMAT.md).
 - Active vs superseded: rows where `superseded_by IS NULL` are active.
 - See `_primitives/_rust/kei-shared/src/dna.rs` for canonical DNA spec.

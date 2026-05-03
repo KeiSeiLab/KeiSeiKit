@@ -25,8 +25,8 @@ list and exits 0 without writing.
 
 ## What does NOT get installed
 
-- 102 Rust crates (cortex, frustration-loop, sleep-layer, …)
-- 67 skills, 37 agent manifests, 82 substrate blocks
+- 105 Rust workspace crates (cortex, frustration-loop, sleep-layer, …)
+- 68 skills, 38 agent manifests, 85 substrate blocks
 - `kei-cortex` HTTP / WS daemon
 - Forgejo, dev hub, Datasette, restic, mdbook, gdrive-import
 - launchd plists (`disk-reclaim`, sleep-layer cron)

@@ -154,7 +154,7 @@ The substrate is layered. Each layer has a single contract; layers below are sta
 │   @keisei/vscode-cortex · MCP clients (Cline, OpenClaw, Cursor MCP)      │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ Layer 3 — Skills (markdown wizards)                                      │
-│   45 `/commands` under skills/<name>/SKILL.md                            │
+│   68 `/commands` under skills/<name>/SKILL.md                            │
 │   Each is an AskUserQuestion-driven phase-pipeline (5-9 phases typical)  │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ Layer 2 — Recipes (TOML DAGs)                                            │
@@ -162,8 +162,8 @@ The substrate is layered. Each layer has a single contract; layers below are sta
 │   Runtime: kei-pipe                                                      │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ Layer 1 — Primitives (cubes)                                             │
-│   53 Rust crates + 13 shell primitives                                   │
-│   Each ≤ 200 LOC per file, ≤ 30 LOC per function (Constructor Pattern)   │
+│   105 Rust workspace crates (47 declared in MANIFEST.toml `full` profile)│
+│   + 14 shell primitives. Each ≤ 200 LOC / file, ≤ 30 LOC / function.     │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ Layer 0 — Atoms (locked vocabulary)                                      │
 │   13 verbs: INGEST PARSE TRANSFORM ENRICH VALIDATE DECIDE DISPATCH       │

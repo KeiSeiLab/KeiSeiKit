@@ -53,6 +53,19 @@ _outcome_install_ledger() {
   local db="$AGENTS_DIR/ledger.sqlite"
   mkdir -p "$AGENTS_DIR"
   local kl="$KIT_DIR/_primitives/_rust/kei-ledger/target/release/kei-ledger"
+  # Cross-version downgrade guard (audit fix 2026-05-03 W3): if an
+  # existing DB is at a NEWER schema (user_version > 9, e.g. user
+  # later upgrades to a full kit that adds a v10 migration), do NOT
+  # re-run any init path — the SQL fallback would otherwise reset
+  # user_version and the binary path may replay incompatible v9 ALTERs.
+  if [ -f "$db" ] && command -v sqlite3 >/dev/null 2>&1; then
+    local current_v
+    current_v=$(sqlite3 "$db" "PRAGMA user_version;" 2>/dev/null || echo 0)
+    if [ "${current_v:-0}" -gt 9 ] 2>/dev/null; then
+      say "ledger already at schema v$current_v (>9); skipping init to preserve newer schema"
+      return 0
+    fi
+  fi
   if command -v kei-ledger >/dev/null 2>&1; then
     kei-ledger --db "$db" init >/dev/null 2>&1 \
       && say "ledger initialised via kei-ledger CLI" && return 0
@@ -67,16 +80,21 @@ _outcome_install_ledger() {
   fi
   warn "no kei-ledger or sqlite3 found; ledger NOT initialised."
   warn "  install one of: brew install sqlite, or rerun after a full kit install."
-  return 0
+  return 1
 }
 
 # Append STATUS-TRUTH MARKER instruction to CLAUDE.md (idempotent: skip
-# if marker phrase is already present).
+# if our specific marker comment is already present).
 _outcome_install_claude_md() {
   local cm="$HOME_DIR/.claude/CLAUDE.md"
   mkdir -p "$HOME_DIR/.claude"
-  if [ -f "$cm" ] && grep -q "STATUS-TRUTH MARKER" "$cm" 2>/dev/null; then
-    say "CLAUDE.md already contains STATUS-TRUTH MARKER instruction; skipping"
+  # Audit fix 2026-05-03 (W3): match the literal HTML comment marker we
+  # wrote, NOT the broad phrase "STATUS-TRUTH MARKER" — the broad phrase
+  # is also used in RULE 0.16 documentation that many users already have
+  # in their CLAUDE.md, which would cause a false-positive skip and the
+  # outcome-only instruction would never land.
+  if [ -f "$cm" ] && grep -qF '<!-- outcome-only profile (KeiSeiKit) -->' "$cm"; then
+    say "CLAUDE.md already contains outcome-only marker; skipping"
     return 0
   fi
   backup_file "$cm" 2>/dev/null || true
@@ -133,17 +151,22 @@ install_profile_outcome_only() {
     cp -f "$snippet" "$HOME_DIR/.claude/settings.json" \
       && say "created settings.json from outcome-only snippet"
   else
-    # Audit fix 2026-05-03: backup_file MOVES the target. We need the file
-    # still in place for jq to read during merge — copy aside instead so
-    # _jq_merge_hooks reads the original. The trap-pair entry registered
-    # by backup_file restores on rollback if the merge fails.
-    cp -p "$HOME_DIR/.claude/settings.json" \
-          "$HOME_DIR/.claude/settings.json.bak-$(date +%s)"
+    # Audit fix 2026-05-03 (W3): backup_file MOVES the target which would
+    # leave _jq_merge_hooks with no file to read. Use cp -p to copy aside
+    # AND register the pair in BACKUP_PAIRS so the rollback trap restores
+    # it on later failure (was orphan-bak-not-in-rollback-contract).
+    local _ts
+    _ts=$(date +%s)
+    local _bak="$HOME_DIR/.claude/settings.json.bak-$_ts"
+    cp -p "$HOME_DIR/.claude/settings.json" "$_bak"
+    BACKUP_PAIRS+=("$HOME_DIR/.claude/settings.json|$_bak")
     if ! _jq_merge_hooks "$snippet" "$HOME_DIR/.claude/settings.json"; then
-      err "settings.json merge failed; the .bak file remains as recovery"
+      err "settings.json merge failed; rollback trap will restore from $_bak"
       rm -f "$snippet"
       return 1
     fi
+    # Success: remove our backup (rollback contract released)
+    rm -f "$_bak"
   fi
   rm -f "$snippet"
   say "outcome-only profile installed."

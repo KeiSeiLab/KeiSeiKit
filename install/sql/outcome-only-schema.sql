@@ -1,10 +1,17 @@
 -- outcome-only-schema.sql — minimal SQLite schema for the outcome-only
 -- profile. Mirrors `_primitives/_rust/kei-ledger/src/migrations_list.rs`
 -- but flattened: a single transaction that creates the v9-equivalent
--- shape of `agents` + `skill_invocations`. No PRAGMA user_version bump
--- is performed (the Rust runner expects to own that); if/when the user
--- later upgrades to a full kit install, `kei-ledger init` is idempotent
--- — IF NOT EXISTS guards keep both paths compatible.
+-- shape of `agents` + `skill_invocations`, plus the v3 BEFORE-INSERT/
+-- UPDATE triggers that enforce branch length ≤256.
+--
+-- PRAGMA user_version = 9 is set OUTSIDE the transaction (after COMMIT)
+-- so it lands atomically and is portable across SQLite versions
+-- (transaction-aware PRAGMA writes are documented-undefined on
+-- pre-3.37 builds). The shell installer (`_outcome_install_ledger`
+-- in `lib-profile-outcome-only.sh`) guards re-runs against an
+-- already-upgraded DB by reading user_version BEFORE invoking this
+-- file; that prevents silent downgrade if the user later runs full
+-- kit which bumps schema past v9.
 --
 -- Two tables:
 --   agents              → outcome rows (kei-model-router posterior)
@@ -66,10 +73,30 @@ CREATE INDEX IF NOT EXISTS idx_skill_invocations_name_ts
 CREATE INDEX IF NOT EXISTS idx_skill_invocations_success
     ON skill_invocations(skill_name, success);
 
--- Audit fix 2026-05-03: bump user_version to 9 so a later `kei-ledger init`
--- short-circuits via the `current >= 9` gate instead of replaying v1..v9
--- migrations whose ALTER TABLE ADD COLUMN steps would error with "duplicate
--- column" against the already-flat schema this file installed.
-PRAGMA user_version = 9;
+-- v3 triggers — enforce branch length ≤256 chars (mirrors
+-- `migrations_list.rs:30-44` v3 migration). Without these, the flat
+-- schema would silently accept rows that the Rust kei-ledger flow
+-- rejects, creating cross-version drift.
+CREATE TRIGGER IF NOT EXISTS trg_agents_branch_len_ins
+    BEFORE INSERT ON agents
+    BEGIN
+        SELECT RAISE(ABORT, 'branch length exceeds 256')
+            WHERE length(NEW.branch) > 256;
+        SELECT RAISE(ABORT, 'parent_branch length exceeds 256')
+            WHERE NEW.parent_branch IS NOT NULL AND length(NEW.parent_branch) > 256;
+    END;
+CREATE TRIGGER IF NOT EXISTS trg_agents_branch_len_upd
+    BEFORE UPDATE OF branch, parent_branch ON agents
+    BEGIN
+        SELECT RAISE(ABORT, 'branch length exceeds 256')
+            WHERE length(NEW.branch) > 256;
+        SELECT RAISE(ABORT, 'parent_branch length exceeds 256')
+            WHERE NEW.parent_branch IS NOT NULL AND length(NEW.parent_branch) > 256;
+    END;
 
 COMMIT;
+
+-- PRAGMA user_version is set OUTSIDE the transaction so the write is
+-- portable across SQLite versions. The shell installer guards against
+-- silent downgrade by checking user_version BEFORE invoking this file.
+PRAGMA user_version = 9;

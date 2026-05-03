@@ -23,7 +23,7 @@ Day →→→ │  Phase A            Phase B            Phase C       │ →�
          <uuid>.md          (always)            (every N days)
 ```
 
-**Biological analog.** Your Mac is the hippocampus (fast, stateful, volatile — captures raw episodes). The memory-repo is the transport layer. The cloud agent is the neocortex (slow, stateless, generalising). The morning `git pull` is the recall. Phase A mirrors the "sleep on it" effect (Wagner et al. 2004, *Nature*), Phase B mirrors REM dream-state pattern extraction, Phase C mirrors NREM slow-wave system consolidation.
+**Biological analog.** Your Mac is the hippocampus (fast, stateful, volatile — captures raw episodes). The memory-repo is the transport layer. The cloud agent is the neocortex (slow, stateless, generalising). The morning `git pull` is the recall. Phase A mirrors the "sleep on it" insight effect (Wagner et al. 2004, *Nature* 427:352–355 [VERIFIED: doi:10.1038/nature02223]; the original study did not isolate a specific stage — secondary literature attributes the effect primarily to slow-wave sleep, our mapping is loose). Phase B mirrors REM dream-state pattern extraction. Phase C mirrors NREM slow-wave system consolidation.
 
 **Phase interaction rules (important):**
 
