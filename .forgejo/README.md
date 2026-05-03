@@ -1,6 +1,6 @@
 # Forgejo Actions — self-hosted CI
 
-Parallel CI on the private Forgejo (Tailscale `100.91.246.53:3000`)
+Parallel CI on the private Forgejo (Tailscale `<private-forgejo>:3000`)
 that doesn't depend on github.com — keeps private code on
 self-hosted infrastructure while still getting per-commit
 verification.
@@ -38,7 +38,7 @@ sudo mkdir -p /var/lib/forgejo-runner
 sudo chown forgejo-runner: /var/lib/forgejo-runner
 cd /var/lib/forgejo-runner
 sudo -u forgejo-runner forgejo-runner register --no-interactive \
-    --instance http://100.91.246.53:3000 \
+    --instance http://<private-forgejo>:3000 \
     --token <REGISTRATION_TOKEN_FROM_WEB_UI> \
     --name "$(hostname)-runner" \
     --labels self-hosted,docker,linux,amd64
@@ -72,7 +72,7 @@ sudo systemctl enable --now forgejo-runner
 
 ```bash
 # Via API
-curl -X PATCH http://100.91.246.53:3000/api/v1/repos/denis/KeiSeiKit \
+curl -X PATCH http://<private-forgejo>:3000/api/v1/repos/denis/KeiSeiKit \
     -u "denis:$FORGEJO_TOKEN" \
     -H 'Content-Type: application/json' \
     -d '{"has_actions": true}'
@@ -84,7 +84,7 @@ curl -X PATCH http://100.91.246.53:3000/api/v1/repos/denis/KeiSeiKit \
 ## Trigger
 
 Push to `main` triggers the workflow automatically. Watch progress:
-http://100.91.246.53:3000/denis/KeiSeiKit/actions
+http://<private-forgejo>:3000/denis/KeiSeiKit/actions
 
 ## Differences from GHA workflow
 

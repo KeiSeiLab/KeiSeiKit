@@ -3,7 +3,7 @@
 > Альтернативные дизайны, не выбранные в финальный merge — сохранены
 > на случай если основной выбор покажет проблемы и придётся откатиться.
 >
-> Все три тэга на forgejo (`origin`, `100.91.246.53:3000/denis/KeiSeiKit`).
+> Все три тэга на forgejo (`origin`, `<private-forgejo>/<user>/<repo>`).
 > Author keeps the kit on a private remote.
 
 ---
@@ -14,7 +14,7 @@
 |---|---|
 | Merge commit | `e8481b9` на `main` → запушен в forgejo origin/main (`b6a36ac` HEAD) |
 | Integration branch | `integration/2026-04-29-merge-3way` (forgejo) |
-| PR-URL | http://100.91.246.53:3000/denis/KeiSeiKit/compare/main...integration/2026-04-29-merge-3way |
+| PR-URL | `<private-forgejo>/<user>/<repo>/compare/<base>...<head>` |
 
 ## Backup tags (forgejo origin)
 
