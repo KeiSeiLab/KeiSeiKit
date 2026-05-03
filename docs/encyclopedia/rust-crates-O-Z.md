@@ -1,0 +1,59 @@
+# KeiSeiKit Rust Crates (O–Z)
+
+Catalogue of 31 Rust crates in `_primitives/_rust/` with names starting O–Z. Compiled 2026-05-02.
+
+| Crate | One-line purpose | Key API exports | When to use | Depends on (notable) |
+|-------|-----------------|-----------------|------------|----------------------|
+| **kei-pet** | Persona manifest TOML parse / validate / overlay with Ed25519 identity | `PetManifest`, `validate()`, `system_prompt()`, `Keypair`, `compose_prompt_with_pet()` | Persona-aware agent spawning; system-prompt injection; identity signing | `ed25519-dalek`, `blake3`, `kei-dna-index` |
+| **kei-ping** | Cross-window agent heartbeat tracker — auto-selects Redis or SQLite backend | `PingStore` trait, `Heartbeat`, `auto_select()`, `BackendKind` | Multi-window presence detection; agent liveness polling; cluster coordination | `redis`, `tokio`, `async-trait`, `rusqlite` |
+| **kei-pipe** | Atom DAG runtime — topo-sorts steps, pipes JSON between atoms | `DagSpec`, `Step`, `topo_sort()`, `resolve_input()`, `run_atom()`, `DagReport` | Orchestrate multi-step atom workflows; DAG-based pipelines with step dependencies | `kei-cache`, `kei-watch`, `kei-scheduler` |
+| **kei-projects-index** | SQLite index of git-repo state under `~/Projects/` for dashboard | `ProjectRow`, `rebuild_index()`, `list_all()`, `get_one()`, `GitState`, `DocsState` | Feed dev-hub dashboard; track repo metadata; detect git state changes | `git2`, `rusqlite`, `walkdir` |
+| **kei-projects-watcher** | fsevents daemon watches `~/Projects/`, debounces 2s, calls reindex per project | `Watcher`, `Debouncer`, `cmd_run()`, `cmd_status()` | Keep project index fresh; react to file-system changes; background repo discovery | `notify` v6, `tokio`, `kei-projects-index` |
+| **kei-provision** | Unified VPS provisioner — one CLI for Hetzner / Vultr / (future) AWS / DO / Linode | `Backend` trait, `CreateOpts`, `ServerInfo`, `resolve()` backends | Provision servers across multiple providers; avoid CLI wrapper duplication | Shells to `hcloud` / `vultr-cli`; reads `HCLOUD_TOKEN` / `VULTR_API_KEY` env (RULE 0.8) |
+| **kei-prune** | Mark unused ledger agents as retired (biological pruning analog); metadata-only | `PruneCandidate`, `PruneStats`, `candidates()`, `mark_retired()`, `stats()` | Retire stale agents from registry; lifecycle management without deletion | `rusqlite` |
+| **kei-refactor-engine** | Deep-sleep refactor-plan generator — consumes conflict-scan JSON, produces markdown + optional auto-resolve | `Conflict`, `Plan`, `PlanItem`, `Resolution` | Generate refactor plans for Phase C deep-sleep; consolidate rule/hook conflicts | `similar` crate for diffing |
+| **kei-registry** | Universal block identity layer — agent DNA generalized to any kit block (primitive / skill / rule / hook / atom) | `Block`, `dna_block::compose_for_block()`, `scan_orchestrator()`, `related()`, `encyclopedia_render()` | Register & query DNA across all block types; cross-reference primitives; encyclopedia generation | `kei-shared` (DNA SSoT), `regex`, `sha2`, `walkdir` |
+| **kei-replay** | Reconstruct agent spawn from DNA string — reads ledger row, re-composes, detects drift | `replay()`, `diff()`, `ledger_lookup()` | Verify agent spawn fidelity; detect schema drift post-filing | `kei-agent-runtime`, `rusqlite` |
+| **kei-router** | (1) NL query → tool-call dispatch (LBM port). (2) Multi-provider LLM abstraction (Anthropic / OpenAI / Kimi) | `Router`, `Method`, `RouteResult`, `LlmRouter`, `Provider` trait, `AnthropicProvider`, `OpenAiProvider`, `KimiProvider` | Route user intent to tools; abstract over multiple LLM providers; unified model selection | `reqwest`, `tokio`, `futures`, `kei-model` (v0.40 Wave 32+) |
+| **kei-runtime** | Atom invocation runtime + schema linter — discovers `.md` atoms, validates JSON Schema, invokes | `discover::discover()`, `validate::validate()`, `lint::lint_atoms()`, `invoke::invoke()` | Discover atoms in a repo; validate input/output schemas; lint atom frontmatter; substrate invocation contract | `jsonschema` (file-only resolver, no SSRF), `kei-atom-discovery`, `serde_yaml_ng` |
+| **kei-runtime-core** | Hosted Sleep runtime substrate — 12 traits + DNA + plugin registry; no impls | `Dna`, `DnaBuilder`, `HasDna`, `HasGenealogy`, `Registry`, `SecretString`, `compose_dna()`, `parse_dna()` | Define hosted-sleep traits for compute / LLM / git / memory / notify / scheduler services; plugin registration | `kei-shared` (re-exports DNA), `async-trait`, `tokio` |
+| **kei-sage** | SQLite knowledge-vault with FTS5 + typed edges + BFS + PageRank (port of LBM internal/sage) | `Store`, `Edge`, `Related`, `Unit`, `atoms::Atom`, `bfs::bfs()`, `pagerank::rank()`, `search::search_fts()` | Build Obsidian-style knowledge graph; semantic search; graph traversal; PageRank ranking | `rusqlite`, `kei-atom-discovery`, `kei-entity-store` |
+| **kei-scheduler** | Durable task scheduler primitive (cron / at / interval triggers) — metadata only; caller owns execution | `open()`, `schedule()`, `cancel()`, `list_due()`, `mark_run()`, `Task`, `Trigger` | Schedule durable tasks; manage cron / at / interval triggers; pump via kei-pipe or external cadence | `kei-entity-store`, `rusqlite`, `cron` v0.15 |
+| **kei-search-core** | 3-wave deep research scaffolding with budget cap (port of LBM internal/search; fetch stubbed) | `run_research()`, `ResearchStore`, `Claim`, `Research`, `Source`, `SourceFetcher` trait | Scaffold deep-research pipelines; budget cap on waves; claim extraction → source hunting → consensus | `rusqlite` |
+| **kei-shared** | Shared substrate types — single source of truth for DNA format + small utility types | `compose_dna()`, `parse_dna()`, `is_hex8()`, `ParsedDna`, `DnaError` | Depend on this for DNA wire-format consistency; one-file formula ensures no two-crate drift | (zero cross-crate deps) |
+| **kei-skill-importer** | Universal parser/canonicalizer/emitter for external AI-coding-tool skill formats (OpenClaw / Cline / Cursor / Claude Code / Kimi) | `import()`, `ImportedSkill`, `AtomCall`, `decide_emit_path()`, `EmitPath` | Ingest skills from external tools; normalize to KeiSeiKit shapes; emit atoms / recipes / proposed primitives | `kei-atom-discovery`, `regex`, `walkdir`, `serde_yaml_ng` |
+| **kei-skills** | SKILL.md format — parser, validator, fuzzy patcher, loader, hot-reload registry (Hermes interop) | `Skill`, `SkillFrontmatter`, `load_all()`, `SkillRegistry`, `validate()`, `patch_skill()` | Parse Hermes SKILL.md files; validate frontmatter; hot-reload registry; fuzzy-patch skills | `serde_yaml`, `similar`, `notify`, `regex`, `walkdir` |
+| **kei-social-store** | People + organizations + interactions CRM (lite) (port of LBM internal/social) | `Store`, `Person`, `Organization`, `graph::*`, `search::search_social()` | Track contacts; record interactions; query social graph; lite CRM | `kei-entity-store`, `rusqlite` |
+| **kei-spawn** | Agent substrate v1 — automation envelope around prepare + ledger fork + verify; RULE 0.13 compliant | `spawn()`, `verify()`, `Driver` trait, `ManualDriver`, `HttpDriver` (feature-gated) | Wrap kei-agent-runtime + kei-ledger spawn/verify steps; automate orchestrator's repetitive operations | `kei-agent-runtime`, `reqwest` (optional via `http-driver` feature) |
+| **kei-store** | Memory-repo backend abstraction — GitHub / Forgejo / Gitea / Filesystem / S3 (v0.21.0) | `MemoryStore` trait, `Config`, `build_store()`, `GitHubStore`, `ForgejoStore`, `GiteaStore`, `FilesystemStore`, `S3Store`, `S3CloudStore` (feature-gated) | Abstract over storage backends for memory-repo; unified config; optional cloud S3 via feature | `git2`, `aws-sdk-s3` (behind `s3` feature; v0.21+) |
+| **kei-svc-systemd** | ServiceManager impl: systemd unit + timer generator (Wave 1 atomar #7) | `SystemdManager`, `render_service()`, `render_timer()`, `Error` | Generate systemd `.service` + `.timer` unit files; manage services on Linux | `kei-runtime-core`, `tokio`, `async-trait` |
+| **kei-task** | Task DAG with deps + milestones (SQLite); port of LBM internal/task | `Store`, `Task`, `Milestone`, `graph::*`, `deps::check_cycles()`, `search::search_tasks()` | Build task DAG with typed dependencies; track milestones; detect cycles; search with FTS | `kei-entity-store`, `rusqlite` |
+| **kei-tlog** | Atomar time-logger (RULE 0.17 enforcement) — emit JSONL lines to `~/.claude/memory/time-metrics/tasks.jsonl` | Binary only: `start <name>`, `stop <name>`, `wrap <name> -- cmd` | Wall-clock any pipeline / agent; track duration in JSON journal; no deps beyond `serde_json` | (zero Cargo deps beyond serde_json) |
+| **kei-token-tracker** | Per-LLM-call token + cost observability store; SQLite-backed `TokenEvent` log + Phase D sleep-report markdown emitter | `Store`, `TokenEvent`, `ModelAggregate`, `aggregate()`, `sleep_report()` | Track token usage per LLM call; aggregate by model + day; emit nightly cost reports | `rusqlite`, `chrono` |
+| **kei-tty** | Ratatui-based terminal UI client for kei-cortex daemon | `App`, `client::chat_stream()`, `ui::render()`, `keys::handle_key()`, `types::ChatEvent` | Terminal UI for cortex chat; SSE client for async messages; interactive TUI state machine | `ratatui`, `crossterm`, `tokio`, `reqwest` |
+| **kei-watch** | Filesystem watcher primitive — thin canonical wrapper around `notify` | `Watcher`, `Event`, `EventKind` (`Created`, `Modified`, `Deleted`, `Renamed`), `WatchError` | Watch filesystem with stable canonical event format; hot-reload triggers; dev-loop cache invalidation | `notify` (workspace) |
+| **mock-render** | Enforces WYSIWYD (What You See Is What's Deployed) for site-builder — screenshot ↔ lock ↔ verify | `cmd_screenshot()`, `cmd_lock()`, `cmd_verify()`, `cmd_status()` | Lock site-builder section screenshots; detect drift post-deployment; verify WYSIWYD invariant | (no cross-crate deps) |
+| **ssh-check** | Pre-deploy sshd_config linter for KeiSeiKit; reads `/etc/ssh/sshd_config` + drop-ins, reports hardened-baseline violations | Merges directives (last-wins); reports violations by rule matrix; JSON output for CI | Lint SSH config before deployment; verify hardened baseline; CI gate for server hardening | (no cross-crate deps) |
+| **tokens-sync** | Emit Tailwind config + CSS custom properties from single design-tokens JSON file; one SSoT, no drift | `emit::emit_tailwind()`, `emit::emit_css()` | Generate synchronized Tailwind + CSS vars from unified token source; prevent JS/CSS design drift | (no cross-crate deps) |
+| **visual-diff** | Pixel-level PNG comparator for WYSIWYD drift detection; outputs red-overlay diff image | `diff::diff_images()` | Compare screenshots pixel-by-pixel; detect WYSIWYD drift; measure mismatched-pixel percentage | `image` crate |
+
+---
+
+## Notes
+
+- **Constructor Pattern:** Every crate respects <200 LOC per file, <30 LOC per function (except bins/main.rs).
+- **DNA SSoT:** `kei-shared` is the single source of truth for agent DNA wire format; all consumers import from here.
+- **Traits for abstraction:** `kei-runtime-core` defines 12 host-Sleep traits (compute, LLM, git, memory, notify, scheduler, etc.); impls in sibling crates.
+- **Metadata primitives:** `kei-ping`, `kei-prune`, `kei-scheduler`, `kei-task`, `kei-token-tracker` are metadata-only; execution/scheduling owned by callers.
+- **SQLite default:** `rusqlite` is the default for persistence across most crates; `kei-store` abstracts git backends; `kei-memory-*` siblings provide Redis/Sled/Postgres options.
+- **RULE 0.8 compliance:** `kei-provision`, `kei-store` read credentials from env vars only, never hardcoded.
+- **RULE 0.13 compliance:** `kei-spawn` never creates branches or commits; orchestrator owns git state.
+
+---
+
+=== STATUS-TRUTH MARKER ===
+shipped: functional
+stubs: 0
+cargo-check: NOT-RUN (read-only cataloguing task)
+behaviour-verified: not-applicable (documentation artefact)
+follow-up-required: []
