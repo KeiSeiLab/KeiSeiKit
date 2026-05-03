@@ -26,7 +26,7 @@ _ts_packages/
 ├── package.json              npm workspace root
 ├── tsconfig.base.json        strict TS 5.x
 └── packages/
-    ├── mcp-server/           @keisei/mcp-server
+    ├── mcp-server/           @keisei84/mcp-server
     ├── telegram-adapter/     @keisei/telegram-adapter
     ├── recall-adapter/       @keisei/recall-adapter  (Zoom via Recall.ai)
     ├── grok-adapter/         @keisei/grok-adapter    (xAI)
@@ -77,20 +77,20 @@ All are read via `process.env`. Hardcoding tokens is **forbidden** (RULE 0.8).
 
 ## MCP server integration
 
-The `@keisei/mcp-server` exposes the Rust primitive CLIs as MCP tools. The
+The `@keisei84/mcp-server` exposes the Rust primitive CLIs as MCP tools. The
 pattern is one Rust binary = one MCP tool, with the `kei` meta-tool on
 top that routes natural-language queries via `kei-router`.
 
 Stdio mode (for Claude Code native integration):
 
 ```bash
-npx @keisei/mcp-server --stdio
+npx @keisei84/mcp-server --stdio
 ```
 
 HTTP mode:
 
 ```bash
-npx @keisei/mcp-server --port 3000 --auth-token-file ~/.claude/mcp-token
+npx @keisei84/mcp-server --port 3000 --auth-token-file ~/.claude/mcp-token
 ```
 
 ## Verification

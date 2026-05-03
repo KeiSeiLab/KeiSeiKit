@@ -93,7 +93,7 @@ Profile resolution lives in `_primitives/MANIFEST.toml` — one `[primitive.<nam
 
 ## MCP server binary (zero-install path, v0.18)
 
-From v0.18 each GitHub release ships a **single static binary** of the `@keisei/mcp-server` package for five platforms — no Node, no `npm install`. Drop the binary anywhere (USB stick, S3 bucket, Downloads folder) and run it. This is Phase 1 of the "exobrain" distribution goal: any MCP-capable client can mount KeiSeiKit from read-only media.
+From v0.18 each GitHub release ships a **single static binary** of the `@keisei84/mcp-server` package for five platforms — no Node, no `npm install`. Drop the binary anywhere (USB stick, S3 bucket, Downloads folder) and run it. This is Phase 1 of the "exobrain" distribution goal: any MCP-capable client can mount KeiSeiKit from read-only media.
 
 | Platform | Asset name |
 |---|---|

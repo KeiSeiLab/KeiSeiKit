@@ -62,3 +62,7 @@ build/
 __pycache__/
 *.pyc
 var/
+
+# RULE 0.8 — auth tokens; CI temp-creates _ts_packages/.npmrc per-job
+_ts_packages/.npmrc
+.npmrc

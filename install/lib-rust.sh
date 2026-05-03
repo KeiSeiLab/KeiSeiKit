@@ -125,7 +125,7 @@ regenerate_rust_workspace() {
 }
 
 # --- mcp-server single-binary detection (v0.18 Phase 1 / exobrain) ----------
-# Analog of have_prebuilt_binaries for the TS @keisei/mcp-server package,
+# Analog of have_prebuilt_binaries for the TS @keisei84/mcp-server package,
 # which is distributable as a `bun build --compile` single binary.
 #
 # Contract: returns 0 iff a matching pre-built binary is present at
