@@ -365,6 +365,41 @@ jobs:
           # Sanity (no secrets in log — print only registry lines):
           grep -vE "_authToken|_password|username|email" .npmrc || true
 
+      # v0.14.5 diagnostic: verify the .npmrc-resolved auth actually works
+      # AGAINST keigit from the runner network. Local probes confirmed Bearer
+      # and Basic both auth-OK, but CI publish gets 401 — narrow root cause.
+      - name: Diagnose keigit auth from runner
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        env:
+          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
+        run: |
+          set +e
+          echo "::group::npm whoami probe"
+          npm whoami --registry=https://keigit.com/api/packages/keisei/npm/ 2>&1 | head -10
+          echo "::endgroup::"
+          echo "::group::curl Bearer probe (read endpoint)"
+          curl -sS -m 10 -H "Authorization: Bearer ${KEIGIT_TOKEN}" \
+            -o /dev/null -w "HTTP %{http_code}\n" \
+            https://keigit.com/api/v1/user
+          echo "::endgroup::"
+          echo "::group::curl PUT probe (publish endpoint with empty body)"
+          curl -sS -m 10 -X PUT \
+            -H "Authorization: Bearer ${KEIGIT_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -o /tmp/probe-resp -w "HTTP %{http_code}\n" \
+            "https://keigit.com/api/packages/keisei/npm/@keisei%2Fci-probe-noop" \
+            -d '{}'
+          echo "Response (first 200 chars):"
+          head -c 200 /tmp/probe-resp 2>/dev/null
+          echo "::endgroup::"
+          echo "::group::npm config debug"
+          npm config get registry --workspaces=false
+          npm config get @keisei:registry --workspaces=false
+          npm config get -L user 2>&1 | head -20
+          echo "::endgroup::"
+          set -e
+
       - name: Install deps
         if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
