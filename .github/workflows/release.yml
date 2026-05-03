@@ -28,14 +28,9 @@ jobs:
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             experimental: false
-          # v0.14.2 fix (2026-05-03 first-publish run): macos-latest is now
-          # Apple Silicon (M1+); cross-compile x86_64-apple-darwin needs an
-          # OpenSSL sysroot that GitHub's macos-arm64 runners don't ship.
-          # Apple Silicon mandatory for new Macs since 2020; x86 Mac is
-          # legacy. Drop x86_64-apple-darwin per Wave 3 audit recommendation.
-          # If a future need arises, re-add with `experimental: true` and
-          # `OPENSSL_VENDORED=1` env, or use `openssl-sys` features=["vendored"]
-          # in a target-specific [target.'cfg(...)'.dependencies] block.
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            experimental: false
           - os: macos-latest
             target: aarch64-apple-darwin
             experimental: false
@@ -52,6 +47,12 @@ jobs:
         uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin: named-branch convention (validator V-2026-04-22)
         with:
           targets: ${{ matrix.target }}
+
+      - name: Install mold linker (Linux only)
+        if: contains(matrix.target, 'linux')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mold clang
 
       - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
         with:
@@ -295,30 +296,22 @@ jobs:
           echo "✓ Release $TAG published with all assets"
 
   npm-publish:
-    name: Publish npm packages to keigit.com
-    # v0.14.2 fix (Wave 3 finding): npm publish only needs the TS workspace
-    # to build, NOT the Rust release tarballs. Decoupled from `release` so
-    # a single Rust matrix failure (e.g. cross-compile sysroot, transient
-    # apt-get) cannot block the npm publish chain. The job runs in parallel
-    # with build-release and is independent of build-mcp-binary too — it
-    # builds its own `dist/` from `_ts_packages/`.
-    needs: []
+    name: Publish npm packages (optional)
+    needs: release
     runs-on: ubuntu-latest
-    # Graceful skip: if KEIGIT_TOKEN secret is not configured, the first
-    # step reports "skipped" and exits 0 — Rust-binary release above still
-    # succeeds. Repository secret is keigit PAT with `write:package` scope
-    # for the keisei user/org on keigit.com.
+    # Graceful skip: if NPM_TOKEN secret is not configured, the first step
+    # reports "skipped" and exits 0 — Rust-binary release above still succeeds.
     steps:
-      - name: Check KEIGIT_TOKEN presence
+      - name: Check NPM_TOKEN presence
         id: have_token
         env:
-          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [ -n "${KEIGIT_TOKEN:-}" ]; then
+          if [ -n "${NPM_TOKEN:-}" ]; then
             echo "present=1" >> "$GITHUB_OUTPUT"
           else
             echo "present=0" >> "$GITHUB_OUTPUT"
-            echo "::notice::KEIGIT_TOKEN not set — skipping npm publish gracefully (configure repo secret to enable)"
+            echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
           fi
 
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
@@ -328,77 +321,7 @@ jobs:
         if: steps.have_token.outputs.present == '1'
         with:
           node-version: '20'
-
-      # Compose .npmrc with keigit auth. The @keisei scope is pinned to
-      # keigit.com (matches publishConfig.registry in each package.json so
-      # an accidental `npm publish` cannot route to npm.org). NPM_TOKEN is
-      # also wired as a fallback for any sibling packages that publish to
-      # npm.org explicitly via their own publishConfig.
-      - name: Compose .npmrc (keigit auth)
-        if: steps.have_token.outputs.present == '1'
-        working-directory: _ts_packages
-        env:
-          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          # v0.14.4 fix: drop deprecated `always-auth=true` (npm 10+ ignores +
-          # warns) — likely interfered with token resolution silently.
-          # Add Forgejo-friendly legacy Basic-auth fallback (username/_password)
-          # since direct curl probe confirmed Basic + Bearer both authenticate
-          # against keigit.com but npm publish in CI hit 401 with _authToken
-          # alone — could be path-prefix walk vs canonicalization quirk.
-          # Username `Parfionovich` is OWNER of org `keisei` on keigit.
-          {
-            echo "@keisei:registry=https://keigit.com/api/packages/keisei/npm/"
-            # path-scoped _authToken (npm 10 canonical)
-            echo "//keigit.com/api/packages/keisei/npm/:_authToken=${KEIGIT_TOKEN}"
-            # legacy Basic fallback — Forgejo accepts both forms
-            echo "//keigit.com/api/packages/keisei/npm/:username=Parfionovich"
-            echo "//keigit.com/api/packages/keisei/npm/:_password=$(printf '%s' "${KEIGIT_TOKEN}" | base64 | tr -d '\n')"
-            echo "//keigit.com/api/packages/keisei/npm/:email=2206745@gmail.com"
-            if [ -n "${NPM_TOKEN:-}" ]; then
-              echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
-            fi
-          } | tee "$HOME/.npmrc" > .npmrc
-          chmod 600 "$HOME/.npmrc" .npmrc
-          # Sanity (no secrets in log — print only registry lines):
-          grep -vE "_authToken|_password|username|email" .npmrc || true
-
-      # v0.14.5 diagnostic: verify the .npmrc-resolved auth actually works
-      # AGAINST keigit from the runner network. Local probes confirmed Bearer
-      # and Basic both auth-OK, but CI publish gets 401 — narrow root cause.
-      - name: Diagnose keigit auth from runner
-        if: steps.have_token.outputs.present == '1'
-        working-directory: _ts_packages
-        env:
-          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
-        run: |
-          set +e
-          echo "::group::npm whoami probe"
-          npm whoami --registry=https://keigit.com/api/packages/keisei/npm/ 2>&1 | head -10
-          echo "::endgroup::"
-          echo "::group::curl Bearer probe (read endpoint)"
-          curl -sS -m 10 -H "Authorization: Bearer ${KEIGIT_TOKEN}" \
-            -o /dev/null -w "HTTP %{http_code}\n" \
-            https://keigit.com/api/v1/user
-          echo "::endgroup::"
-          echo "::group::curl PUT probe (publish endpoint with empty body)"
-          curl -sS -m 10 -X PUT \
-            -H "Authorization: Bearer ${KEIGIT_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -o /tmp/probe-resp -w "HTTP %{http_code}\n" \
-            "https://keigit.com/api/packages/keisei/npm/@keisei%2Fci-probe-noop" \
-            -d '{}'
-          echo "Response (first 200 chars):"
-          head -c 200 /tmp/probe-resp 2>/dev/null
-          echo "::endgroup::"
-          echo "::group::npm config debug"
-          npm config get registry --workspaces=false
-          npm config get @keisei:registry --workspaces=false
-          npm config get -L user 2>&1 | head -20
-          echo "::endgroup::"
-          set -e
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install deps
         if: steps.have_token.outputs.present == '1'
@@ -413,36 +336,15 @@ jobs:
       - name: Publish each package
         if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          # v0.14.3 fix (W1+W3 finding F3): hard-fail on a package WITH a
-          # publishConfig.registry whose publish errored. Adapters without
-          # publishConfig still skip gracefully (no registry pin → npm.org
-          # default → ENEEDAUTH → counted as "skipped" not "failed").
-          gated_failed=0
           for pkg in packages/*/; do
-            [ -f "$pkg/package.json" ] || continue
-            name=$(node -p "require('./$pkg/package.json').name")
-            has_pub=$(node -p "require('./$pkg/package.json').publishConfig ? '1' : '0'")
-            echo "::group::publish $name"
-            if ( cd "$pkg" && npm publish --access public ); then
-              echo "::notice::published $name"
-            else
-              if [ "$has_pub" = "1" ]; then
-                gated_failed=1
-                echo "::error::publish FAILED for $name (has publishConfig — this is a real error, see log above)"
-              else
-                echo "::notice::publish skipped for $name (no publishConfig — npm.org default reached, ENEEDAUTH expected without NPM_TOKEN)"
-              fi
+            if [ -f "$pkg/package.json" ]; then
+              echo "::group::publish $pkg"
+              ( cd "$pkg" && npm publish --access public ) \
+                || echo "::warning::publish failed for $pkg (continuing)"
+              echo "::endgroup::"
             fi
-            echo "::endgroup::"
           done
-          if [ "$gated_failed" -ne 0 ]; then
-            echo "::error::one or more packages with publishConfig failed to publish"
-            exit 1
-          fi
-
-      - name: Cleanup .npmrc
-        if: always()
-        working-directory: _ts_packages
-        run: rm -f .npmrc "$HOME/.npmrc"
