@@ -290,22 +290,24 @@ jobs:
           echo "✓ Release $TAG published with all assets"
 
   npm-publish:
-    name: Publish npm packages (optional)
+    name: Publish npm packages to keigit.com
     needs: release
     runs-on: ubuntu-latest
-    # Graceful skip: if NPM_TOKEN secret is not configured, the first step
-    # reports "skipped" and exits 0 — Rust-binary release above still succeeds.
+    # Graceful skip: if KEIGIT_TOKEN secret is not configured, the first
+    # step reports "skipped" and exits 0 — Rust-binary release above still
+    # succeeds. Repository secret is keigit PAT with `write:package` scope
+    # for the keisei user/org on keigit.com.
     steps:
-      - name: Check NPM_TOKEN presence
+      - name: Check KEIGIT_TOKEN presence
         id: have_token
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
         run: |
-          if [ -n "${NPM_TOKEN:-}" ]; then
+          if [ -n "${KEIGIT_TOKEN:-}" ]; then
             echo "present=1" >> "$GITHUB_OUTPUT"
           else
             echo "present=0" >> "$GITHUB_OUTPUT"
-            echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
+            echo "::notice::KEIGIT_TOKEN not set — skipping npm publish gracefully (configure repo secret to enable)"
           fi
 
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
@@ -315,7 +317,29 @@ jobs:
         if: steps.have_token.outputs.present == '1'
         with:
           node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+
+      # Compose .npmrc with keigit auth. The @keisei scope is pinned to
+      # keigit.com (matches publishConfig.registry in each package.json so
+      # an accidental `npm publish` cannot route to npm.org). NPM_TOKEN is
+      # also wired as a fallback for any sibling packages that publish to
+      # npm.org explicitly via their own publishConfig.
+      - name: Compose .npmrc (keigit auth)
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        env:
+          KEIGIT_TOKEN: ${{ secrets.KEIGIT_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          {
+            echo "@keisei:registry=https://keigit.com/api/packages/keisei/npm/"
+            echo "//keigit.com/:_authToken=${KEIGIT_TOKEN}"
+            if [ -n "${NPM_TOKEN:-}" ]; then
+              echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
+            fi
+          } > .npmrc
+          # Sanity (no secrets in log — print only registry lines):
+          grep -v _authToken .npmrc
 
       - name: Install deps
         if: steps.have_token.outputs.present == '1'
@@ -330,15 +354,23 @@ jobs:
       - name: Publish each package
         if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
+          # publishConfig.registry in each package.json decides destination.
+          # Currently only @keisei/mcp-server has a publishConfig — the other
+          # adapters skip publish (no registry pin → npm.org default → no
+          # token in .npmrc → publish fails → ::warning emitted, job continues).
           for pkg in packages/*/; do
             if [ -f "$pkg/package.json" ]; then
-              echo "::group::publish $pkg"
+              name=$(node -p "require('./$pkg/package.json').name")
+              echo "::group::publish $name"
               ( cd "$pkg" && npm publish --access public ) \
-                || echo "::warning::publish failed for $pkg (continuing)"
+                || echo "::warning::publish failed for $name (no registry pin, missing token, version conflict, or registry error — see log)"
               echo "::endgroup::"
             fi
           done
+
+      - name: Cleanup .npmrc
+        if: always()
+        working-directory: _ts_packages
+        run: rm -f .npmrc

@@ -398,7 +398,7 @@ These are concatenated in role-declared order, with `\n\n---\n\n` separators bet
 | Roles (7 roles) | stable | edit-local / read-only / git-ops / etc. locked; no churn |
 | Assembler (compose logic) | stable | Generates .md from TOML + blocks; keimd integration active |
 | Cortex stack | beta | kei-cortex (HTTP) + kei-tty (TUI) build clean; browser/VSCode frontends concept |
-| MCP Server (@keisei/mcp-server) | stable | Exports Rust atoms as MCP tools; published to keigit.com npm |
+| MCP Server (@keisei/mcp-server) | alpha | Exports Rust primitive CLIs as MCP tools; published to keigit.com (Forgejo npm registry, public DNS) under @keisei scope |
 | Bridges | stable | 11 cross-tool format generators (.cursorrules, .windsurf/rules, GEMINI.md, etc.) |
 | Sleep Layer (Phase A/B/C) | stable | Incubation (tasks), REM consolidation (reports), NREM deep-sleep (conflicts) |
 | Foreign-project ingestion | stable | kei-import <repo> proof-of-concept via Hermes validation |

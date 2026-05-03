@@ -1,5 +1,5 @@
 {
-  "_comment": "Template for .mcp.json. Copy to repo root as .mcp.json to register the KeiSei MCP server. Requires @keisei/mcp-server published to npm (status: not yet published — see PLUGIN.md).",
+  "_comment": "Template for .mcp.json. Copy to repo root as .mcp.json to register the KeiSei MCP server. The @keisei/mcp-server package is published to keigit.com (Forgejo npm registry) — one-time ~/.npmrc setup required: '@keisei:registry=https://keigit.com/api/packages/keisei/npm/' + '//keigit.com/:_authToken=<keigit PAT with read:package>'. See PLUGIN.md.",
   "mcpServers": {
     "keisei": {
       "command": "npx",
