@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Longitudinal user-frustration matrix — regex-based chatlog scan (no ML)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "frustration_matrix"

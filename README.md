@@ -209,7 +209,7 @@ terms (irrevocable). See [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
 ## Author & collaboration
 
-Built by Denis Parfionovich (`info@greendragon.info`) running
+Built by Denis Parfionovich (`parfionovich@keilab.io`) running
 4–8 parallel Claude Code terminals per day. Solo-maintained.
 Apache 2.0 makes the bus factor manageable: any AI-assisted
 developer (you, your Claude, your Cursor, your Aider) can read

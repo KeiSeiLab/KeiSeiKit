@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "DigitalOcean ComputeProvider impl for kei-runtime-core (Wave 2 redo). REST v2 + bearer-token auth, mocked tests via wiremock."
-license = "Apache-2.0"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+license.workspace = true
+authors.workspace = true
 
 [lib]
 name = "kei_compute_digitalocean"

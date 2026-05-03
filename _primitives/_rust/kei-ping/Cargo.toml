@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Cross-window agent presence (heartbeat / list / watch). Auto-selects backend: Redis if redis-cli ping == PONG on localhost, else SQLite."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-ping"
@@ -27,4 +27,4 @@ async-trait = { workspace = true }
 [package.metadata.keisei]
 trait = "PingStore"
 description = "Atomar — cross-window agent heartbeat. Two engines (SQLite default, Redis auto if running)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

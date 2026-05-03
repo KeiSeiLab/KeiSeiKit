@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Pet persona manifest: pet.toml parse, validate, system-prompt overlay. Standard Ed25519 identity. CQRS-compatible; no proprietary math."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-pet"

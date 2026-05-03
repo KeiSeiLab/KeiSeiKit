@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Asset + prompt + campaign registry. Port of LBM internal/content."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-content-store"

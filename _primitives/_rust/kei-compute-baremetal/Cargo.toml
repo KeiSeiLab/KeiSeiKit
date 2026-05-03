@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "ComputeProvider impl for user-owned bare-metal boxes — registers SSH connection, runs cloud-init equivalent, status-pings via SSH. No cloud API. Wave 2 atomar."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_compute_baremetal"
@@ -32,4 +32,4 @@ tokio = { workspace = true }
 backend = "ssh-baremetal"
 trait = "ComputeProvider"
 description = "Register-only ComputeProvider for user-owned hardware: SSH ping + remote shell exec + cloud-init dispatch; no provision/destroy of hardware"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

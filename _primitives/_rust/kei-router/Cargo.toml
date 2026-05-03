@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Routing primitives: (1) NL query → tool-call (LBM port). (2) Multi-provider LLM abstraction (Anthropic / OpenAI / Kimi)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-router"

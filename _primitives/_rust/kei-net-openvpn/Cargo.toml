@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "NetworkMode impl for OpenVPN — systemctl start/stop openvpn-server@<name> + management interface UNIX socket status parser. Wave 9 atomar."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_net_openvpn"
@@ -26,4 +26,4 @@ tokio = { workspace = true }
 backend = "openvpn"
 trait = "NetworkMode"
 description = "OpenVPN NetworkMode (systemctl-managed openvpn-server@ unit + management UNIX socket peers)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

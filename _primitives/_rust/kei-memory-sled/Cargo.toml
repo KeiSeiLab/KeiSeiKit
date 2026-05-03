@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "MemoryBackend impl over sled (embedded key-value store) for kei-runtime-core"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_memory_sled"
@@ -26,4 +26,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "sled"
 description = "Embedded sled-backed MemoryBackend; offline-first, single-process"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

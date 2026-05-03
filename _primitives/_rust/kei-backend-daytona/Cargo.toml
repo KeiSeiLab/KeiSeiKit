@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Daytona serverless backend with hibernation (HERMES-MIGRATION P1.2). Resume-or-create sandboxes via REST."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_backend_daytona"

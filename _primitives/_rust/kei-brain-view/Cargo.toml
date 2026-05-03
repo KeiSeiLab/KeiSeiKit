@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Read-only TUI/CLI visualizer of kei-ledger taxonomy graph + agent lineage (Wave 14)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-brain-view"

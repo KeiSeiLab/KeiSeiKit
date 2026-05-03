@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Model Context Protocol (MCP) server — exposes atom registry over stdio JSON-RPC"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-mcp"
@@ -29,4 +30,4 @@ tokio = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "MCP server exposing atoms as tools, skills as resources, over stdio JSON-RPC"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

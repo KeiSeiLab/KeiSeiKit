@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Universal decomposition layer — turns ANY MD output (research / audit / sleep / architecture / new-project) into kei-spawn-compatible task.toml + dispatch."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-decompose"
@@ -32,4 +33,4 @@ rusqlite = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Detects MD format (research / wave-audit / sleep / architecture / new-project), parses via registered FormatParser, normalizes to unified Action struct, emits kei-spawn task.toml, and dispatches via kei-spawn (with optional kei-ledger pre-fork). Closes Wave 50 META: kit had 6+ ad-hoc MD formats but only research had a path to action."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

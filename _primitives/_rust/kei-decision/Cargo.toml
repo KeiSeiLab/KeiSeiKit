@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Linking layer between research output (MASTER-REPORT.md) and decision execution (kei-spawn task.toml + kei-ledger pre-fork)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-decision"
@@ -29,4 +30,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Parses /research MASTER-REPORT.md actionable plans, classifies + ranks actions, emits kei-spawn-compatible task.toml, optionally drives kei-spawn + kei-ledger pre-fork. Bootstraps day-research → action pipeline so /research output flows into kei-spawn without manual orchestrator intervention."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

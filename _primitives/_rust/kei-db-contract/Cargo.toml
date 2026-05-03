@@ -2,9 +2,9 @@
 name = "kei-db-contract"
 version = "0.1.0"
 edition.workspace = true
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
 rust-version.workspace = true
-license = "Apache-2.0"
+license.workspace = true
 description = "Diff SQL migration schemas against TypeScript type declarations to catch frontend ↔ DB drift."
 
 [lib]

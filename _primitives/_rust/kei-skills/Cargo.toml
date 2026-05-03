@@ -3,7 +3,8 @@ name = "kei-skills"
 version = "0.1.0"
 edition.workspace = true
 description = "SKILL.md format — parser, validator, fuzzy patcher, loader, hot-reload registry."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_skills"

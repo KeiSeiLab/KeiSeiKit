@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "LlmBackend trait-bridge wrapping kei-llm-mlx (Wave 59, Apple Silicon only). Wave 4 atomar."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_llm_bridge_mlx"
@@ -27,4 +27,4 @@ anyhow = { workspace = true }
 backend = "mlx-bridge"
 trait = "LlmBackend"
 description = "Bridges kei-llm-mlx (Wave 59 Apple Silicon shell-out) to LlmBackend trait"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

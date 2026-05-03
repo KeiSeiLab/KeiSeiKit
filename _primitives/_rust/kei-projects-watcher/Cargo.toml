@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Long-running fsevents daemon — watches ~/Projects/, debounces 2 s, calls kei_projects_index::reindex_one per touched project."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-projects-watcher"

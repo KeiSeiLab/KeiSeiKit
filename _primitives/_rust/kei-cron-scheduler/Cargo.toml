@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "P4.2 — Hermes-equivalent cron/at/interval scheduler with JSON persistence."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 # NOTE: a separate crate `kei-scheduler` already exists in the workspace using
 # SQLite-backed metadata. This crate is the Hermes-port surface (JSON-on-disk,

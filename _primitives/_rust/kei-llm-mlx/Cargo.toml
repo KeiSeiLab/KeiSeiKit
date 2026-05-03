@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Wave 59 — Apple MLX adapter (mlx_lm shell-out, macOS Apple Silicon only). Parallel sibling of kei-llm-ollama (W57) and kei-llm-llamacpp (W58). Glued by kei-llm-router (W60)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-llm-mlx"

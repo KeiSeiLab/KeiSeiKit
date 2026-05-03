@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "WebAuthn passkey AuthProvider impl for kei-runtime-core (Wave 7 atomar). Wraps webauthn-rs 0.5; stateless ceremony APIs (registration + authentication). Sibling of kei-auth-{google,apple,github,microsoft}."
-license = "Apache-2.0"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+license.workspace = true
+authors.workspace = true
 
 [lib]
 name = "kei_auth_webauthn"

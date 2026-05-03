@@ -1,11 +1,11 @@
 [package]
 name = "kei-notify-discord"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.77"
+edition.workspace = true
+rust-version.workspace = true
 description = "NotifyChannel impl for Discord webhooks. Wave 8 atomar; sibling of kei-notify-email and kei-notify-slack."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_notify_discord"
@@ -28,4 +28,4 @@ tokio = { workspace = true }
 backend = "discord"
 trait = "NotifyChannel"
 description = "Discord webhook NotifyChannel"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "AuthProvider impl for passwordless email magic-link tokens (HMAC-SHA256, stateless). Wave 7 atomar; sibling of kei-auth (multi-tenant tokens) and kei-auth-{google,github,microsoft,apple}."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_auth_magiclink"
@@ -30,4 +30,4 @@ tokio = { workspace = true }
 backend = "magiclink"
 trait = "AuthProvider"
 description = "Email magic-link AuthProvider (HMAC-SHA256 stateless tokens, passwordless)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

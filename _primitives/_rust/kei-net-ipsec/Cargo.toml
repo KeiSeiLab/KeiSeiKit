@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Wave 9 — IPsec NetworkMode impl for kei-runtime-core via strongSwan / swanctl shell-out. Public-IP path; sibling of kei-net-tailscale (private-only) and kei-net-wireguard (private-only)."
-license = "Apache-2.0"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+license.workspace = true
+authors.workspace = true
 
 [lib]
 name = "kei_net_ipsec"

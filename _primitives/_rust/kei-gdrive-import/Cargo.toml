@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Project-folder classifier for one-shot Google Drive → Forgejo import. Detects build manifests (Cargo.toml, package.json, pyproject.toml, go.mod, pom.xml, build.gradle, Gemfile, composer.json) and emits PROJECT/AMBIGUOUS/NOT-A-PROJECT/ALREADY-REPO verdicts."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_gdrive_import"

@@ -4,6 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Tail agent-events.jsonl and stream to browser clients via WebSocket"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_graph_stream"

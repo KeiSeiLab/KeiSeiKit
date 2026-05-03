@@ -4,7 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Wave 60 — UNIVERSAL local-LLM backend selector. Glues W55-W59 (kei-model + kei-machine-probe + kei-llm-{ollama,llamacpp,mlx}) into a single route(machine, model_id, opts) decision."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-llm-router"

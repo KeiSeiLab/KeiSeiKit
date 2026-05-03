@@ -4,7 +4,8 @@ version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Agent fork / done / fail ledger — SQLite-backed, SSoT for RULE 0.12. v0.2 adds schema v6 cost tracking + library API."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-ledger"

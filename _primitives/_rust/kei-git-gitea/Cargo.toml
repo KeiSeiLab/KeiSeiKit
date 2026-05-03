@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "GitBackend impl for Gitea (gitea.com / self-hosted) over /api/v1. Wave 5 atomar."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_git_gitea"
@@ -29,4 +29,4 @@ wiremock = { workspace = true }
 backend = "gitea"
 trait = "GitBackend"
 description = "Gitea HTTP API client + GitBackend impl (mirror, ensure_repo, clone, push)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

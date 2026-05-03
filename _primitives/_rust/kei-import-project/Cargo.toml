@@ -1,9 +1,11 @@
 [package]
 name = "kei-import-project"
 version = "0.1.0"
-edition = "2021"
+edition.workspace = true
+rust-version.workspace = true
 description = "Foreign project ingestion runtime: clone repo, walk tree, identify language modules, register in kei-registry. Composes existing primitives (kei-shared, kei-registry, kei-decompose, kei-skill-importer)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors.workspace = true
+license.workspace = true
 
 [lib]
 path = "src/lib.rs"

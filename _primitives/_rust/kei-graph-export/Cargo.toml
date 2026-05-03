@@ -4,6 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Export KeiSei registry + ledger as D3 graph space fragment"
+authors.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "kei-graph-export"

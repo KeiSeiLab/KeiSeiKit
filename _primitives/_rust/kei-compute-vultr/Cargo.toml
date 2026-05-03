@@ -4,8 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 description = "Vultr Cloud (v2 API) implementation of the kei-runtime-core ComputeProvider trait"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
-license = "Apache-2.0"
+authors.workspace = true
+license.workspace = true
 
 [lib]
 name = "kei_compute_vultr"
@@ -33,4 +33,4 @@ wiremock = { workspace = true }
 backend = "vultr-cloud-v2"
 trait = "ComputeProvider"
 description = "Vultr Cloud Compute v2 API impl of ComputeProvider — instance create/destroy/halt/start/resize, base64 cloud-init, vc2/vhf tier validation"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]
