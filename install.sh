@@ -80,6 +80,12 @@ source "$LIB_DIR/lib-profile-outcome-only.sh"
 parse_args "$@"
 setup_backup_trap
 
+# Fix 3: --dry-run is only meaningful with --profile=outcome-only.
+# Warn early so the user doesn't assume other profiles respect it.
+if [ "${OUTCOME_DRY_RUN:-0}" = "1" ] && [ "$PROFILE" != "outcome-only" ] && [ -n "$PROFILE" ]; then
+  warn "--dry-run is only effective with --profile=outcome-only; for other profiles use --no-execute"
+fi
+
 # --- --list short-circuit -------------------------------------------------
 if [ "$LIST_MODE" = "1" ]; then
   [ -f "$MANIFEST" ] || { err "MANIFEST.toml missing: $MANIFEST"; exit 2; }
@@ -110,12 +116,9 @@ if [ -n "$ADD_LIST" ] || [ -n "$REMOVE_NAME" ]; then
   exit 0
 fi
 
-# --- outcome-only profile short-circuit ----------------------------------
-# Bypasses every heavy phase (substrate copy, primitives, manifests,
-# assembler, generation, bridges, skills) and installs only:
-#   2 hooks + ledger.sqlite + 1 line in CLAUDE.md + (optional) router.
-# See docs/PROFILE-OUTCOME-ONLY.md.
+# --- outcome-only profile short-circuit (see docs/PROFILE-OUTCOME-ONLY.md) ---
 if [ "${PROFILE:-}" = "outcome-only" ]; then
+  _outcome_confirm_if_needed
   export OUTCOME_DRY_RUN
   install_profile_outcome_only
   exit 0

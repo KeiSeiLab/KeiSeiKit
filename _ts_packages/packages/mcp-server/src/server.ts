@@ -83,7 +83,11 @@ export class McpServer {
 function safeEqual(a: string, b: string): boolean {
   const ba = Buffer.from(a);
   const bb = Buffer.from(b);
-  if (ba.length !== bb.length) return false;
+  if (ba.length !== bb.length) {
+    // constant-time dummy compare to mask timing
+    crypto.timingSafeEqual(ba, ba);
+    return false;
+  }
   return crypto.timingSafeEqual(ba, bb);
 }
 

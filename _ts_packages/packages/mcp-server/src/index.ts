@@ -8,6 +8,7 @@ import { McpServer } from "./server.js";
 interface CliArgs {
   stdio: boolean;
   port?: number;
+  bind: string;
   authTokenFile?: string;
   rustBinDir: string;
 }
@@ -15,13 +16,17 @@ interface CliArgs {
 function parseArgv(argv: readonly string[]): CliArgs {
   const out: CliArgs = {
     stdio: false,
+    bind: "127.0.0.1",
     rustBinDir: process.env["KEI_RUST_BIN_DIR"] ?? defaultBinDir(),
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--stdio") out.stdio = true;
     else if (a === "--port") out.port = Number(argv[++i] ?? "");
-    else if (a === "--auth-token-file") {
+    else if (a === "--bind") {
+      const v = argv[++i];
+      if (v !== undefined) out.bind = v;
+    } else if (a === "--auth-token-file") {
       const v = argv[++i];
       if (v !== undefined) out.authTokenFile = v;
     } else if (a === "--rust-bin-dir") {
@@ -52,7 +57,7 @@ async function main(): Promise<void> {
   });
   await server.loadAdapters((m) => process.stderr.write(`[adapters] ${m}\n`));
   if (args.stdio) await runStdio(server);
-  else await runHttp(server, args.port ?? 3000);
+  else await runHttp(server, args.port ?? 3000, args.bind);
 }
 
 async function runStdio(server: McpServer): Promise<void> {
@@ -81,11 +86,12 @@ async function dispatchStdioLine(server: McpServer, line: string): Promise<strin
   }
 }
 
-async function runHttp(server: McpServer, port: number): Promise<void> {
+async function runHttp(server: McpServer, port: number, bindAddr: string): Promise<void> {
   const http = await import("node:http");
   const srv = http.createServer((req, res) => void handleHttp(server, req, res));
-  srv.listen(port, () =>
-    process.stderr.write(`[keisei-mcp] http :${port}; ${server.listTools().length} tools\n`),
+  // Bind to 127.0.0.1 by default; pass --bind 0.0.0.0 to expose on all interfaces.
+  srv.listen(port, bindAddr, () =>
+    process.stderr.write(`[keisei-mcp] http ${bindAddr}:${port}; ${server.listTools().length} tools\n`),
   );
 }
 
@@ -95,8 +101,19 @@ async function handleHttp(server: McpServer, req: import("node:http").IncomingMe
     res.end();
     return;
   }
+  const MAX_BODY = 1 * 1024 * 1024; // 1 MiB
+  let total = 0;
   const chunks: Buffer[] = [];
-  for await (const c of req) chunks.push(c as Buffer);
+  for await (const c of req) {
+    total += (c as Buffer).length;
+    if (total > MAX_BODY) {
+      res.writeHead(413, { "content-type": "application/json" });
+      res.end(JSON.stringify({ ok: false, error: { code: -32600, message: "request body exceeds 1 MiB" } }));
+      req.destroy();
+      return;
+    }
+    chunks.push(c as Buffer);
+  }
   try {
     const body = JSON.parse(Buffer.concat(chunks).toString("utf8")) as {
       tool: string;

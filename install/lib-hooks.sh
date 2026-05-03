@@ -51,16 +51,33 @@ _jq_merge_hooks() {
   local snippet="$1" target="$2" tmp
   tmp="$(mktemp "$target.XXXXXX")"
   jq --slurpfile snip "$snippet" '
+    # Normalize a command path: expand leading ~/ to $HOME so tilde and
+    # absolute forms compare equal (prevents duplicate hook registration).
+    def norm: if startswith("~/") then env.HOME + .[1:] else . end;
+
     . as $orig
     | ($snip[0] | del(._comment)) as $add
     | reduce ($add.hooks | keys[]) as $phase ($orig;
         .hooks[$phase] = (
           ((.hooks[$phase] // []) + ($add.hooks[$phase] // []))
           | group_by(.matcher)
-          | map({
-              matcher: .[0].matcher,
-              hooks: (map(.hooks // []) | add | unique_by(.command))
-            })
+          | map(
+              .[0].matcher as $m
+              | {
+                  matcher: $m,
+                  hooks: (
+                    map(.hooks // []) | add
+                    # Reduce into object keyed by normalised command.
+                    # Last entry wins → snippet (appended last) overrides
+                    # existing on collision, preserving all extra fields.
+                    | reduce .[] as $h (
+                        {};
+                        . + { (($h.command // "") | norm): $h }
+                      )
+                    | [.[]]
+                  )
+                }
+            )
         )
       )
   ' "$target" > "$tmp"

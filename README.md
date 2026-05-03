@@ -7,12 +7,17 @@ context for Cursor / Continue / Zed / Aider / Windsurf / Cline /
 OpenClaw / Kimi from the same source-of-truth.
 
 **Apache 2.0** — explicit patent grant + retaliation clause. 105 Rust
-crates (workspace member count via `grep -E '^\s*"[a-z-]+",' _primitives/_rust/Cargo.toml | wc -l`),
-68 skills, 38 hooks, 38 agent manifests, 85 substrate blocks, 18
-capability atoms, 7 substrate roles. Self-indexing via kei-registry
-SQLite (565 active DNAs as of 2026-05-03 per `docs/DNA-INDEX.md`
-header). Three-phase nightly consolidation. Foreign-project ingestion
-runtime (`kei-import <repo-url>`).
+crates [REAL: `grep -E '^\s*"[a-z-]+",' _primitives/_rust/Cargo.toml | wc -l`],
+68 skills [REAL: `ls skills/ | wc -l`], 38 hooks
+[REAL: `grep -c '"command":' settings-snippet.json`], 38 agent manifests
+[REAL: `ls _manifests/*.toml | wc -l`], 85 substrate blocks
+[REAL: `find _blocks/ -name '*.md' | wc -l`], 18 capability atoms
+[REAL: `find _capabilities/ -mindepth 2 -maxdepth 2 -type d | wc -l`],
+7 substrate roles [REAL: `ls _roles/*.toml | wc -l`]. Self-indexing
+via kei-registry SQLite (565 active DNAs
+[REAL: `head -3 docs/DNA-INDEX.md | grep "Total blocks:"`] as of
+2026-05-03). Three-phase nightly consolidation. Foreign-project
+ingestion runtime (`kei-import <repo-url>`).
 
 ## Maturity matrix
 
@@ -59,7 +64,7 @@ fork it.
 
 ```bash
 # Claude Code (primary target — full hook + agent integration)
-/plugin marketplace add KeiSei84/KeiSeiKit
+/plugin marketplace add KeiSei84/KeiSeiKit-1.0
 /plugin install keisei@keisei-marketplace
 
 # Any MCP-compatible client (Cursor / Continue / Zed / Aider / etc)
@@ -118,9 +123,13 @@ outputs are human-readable markdown. You read, you decide what merges.
   is future work.
 - **Phase 9 Path A (model-router assembler-time rebake)** —
   37 agent manifests currently declare `model: opus` in frontmatter.
-  Bayesian posterior router activates per-task-class when ≥100
-  outcome rows accumulate (currently 3). Until then, routing happens
-  via orchestrator discipline plus advisor-hook stderr nudges.
+  The router uses a Beta posterior with Wilson-style lower confidence
+  bound (`δ=0.10`, `q*=0.70`); it falls back to the manifest-declared
+  default until the per-(task-class, model) lower-bound clears the
+  quality bar — typically tens of successful observations per pair,
+  not a discrete 100-row threshold (see
+  `_primitives/_rust/kei-model-router/src/select.rs:74-124`). 3 outcome
+  rows total today, posterior dominated by uniform prior `Beta(1,1)`.
 - **Cortex stack** (`kei-cortex` / `kei-tty` / `kei-mcp`) ships as
   **alpha** (CLI/daemon track) — downgraded from "beta" because two
   of the three intended frontends are not yet shipping. Local HTTP

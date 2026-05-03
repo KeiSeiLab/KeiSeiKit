@@ -63,6 +63,12 @@ After the profile is chosen, an **Install Plan** screen summarizes what will be 
 
 By default `./install.sh` is **minimal** — agents + hooks + skills + bridges, no primitives. Fastest (~5s) and zero Rust compile for primitives. You opt into primitives via `--profile=<name>` or one-at-a-time via `--add=<name>`.
 
+> **Numeric estimates:** all `~5s` / `~60s` / `~90s` / `~6 min` install
+> times and `~2 MB` / `~80 MB` / `~55 MB` / `~60 MB` / `~220 MB` disk
+> sizes in this table carry `[ESTIMATE-HTC: based on author's
+> 2026-04-30 install on M1 Mac, varies by network and disk speed]`.
+> Re-measured against your machine if precise numbers matter.
+
 | Profile | Primitives added | Install time | Disk (approx) |
 |---|---|---|---|
 | `minimal` (default) | none | ~5s | ~2 MB |
