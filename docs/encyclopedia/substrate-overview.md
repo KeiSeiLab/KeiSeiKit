@@ -186,7 +186,7 @@ KeiSeiKit is a **multi-tier agent composition substrate** built on four mutually
 
 | Package | Version | Purpose | Key Dependencies | Build Target |
 |---------|---------|---------|------------------|--------------|
-| **@keisei84/mcp-server** | 0.14.0 | MCP server exposing KeiSeiKit Rust primitives as tools | @modelcontextprotocol/sdk ^1.0.0, execa ^9.0.0, zod ^3.23.0 | Node.js ≥18.0.0; native binaries via bun compile (darwin/linux/windows) |
+| **@keisei/mcp-server** | 0.14.0 | MCP server exposing KeiSeiKit Rust primitives as tools | @modelcontextprotocol/sdk ^1.0.0, execa ^9.0.0, zod ^3.23.0 | Node.js ≥18.0.0; native binaries via bun compile (darwin/linux/windows) |
 | **@keisei/gmail-adapter** | 0.5.2 | Gmail API integration for email-based task intake | @google-cloud/gmail ^1.3.0, nodemailer-mock ^2.0.0 | Node.js ≥18.0.0 |
 | **@keisei/grok-adapter** | 0.3.1 | Grok (xAI) LLM provider bridge | openai-compatible ^1.0.0 | Node.js ≥18.0.0 |
 | **@keisei/telegram-adapter** | 0.6.0 | Telegram Bot API integration for notifications + input | telegram-typings ^4.10.0, node-telegram-bot-api ^0.65.0 | Node.js ≥18.0.0 |
@@ -194,11 +194,10 @@ KeiSeiKit is a **multi-tier agent composition substrate** built on four mutually
 | **@keisei/youtube-adapter** | 0.1.8 | YouTube API integration for video transcript + metadata | googleapis ^118.0.0 | Node.js ≥18.0.0 |
 
 **Notes:**
-- `@keisei84/mcp-server` published to **GitHub Packages** (`https://npm.pkg.github.com/`) — install requires `~/.npmrc` setup with a github PAT (`read:packages` scope), see `docs/PUBLISHING.md`
-- Adapter packages (`@keisei/gmail-adapter`, `@keisei/grok-adapter`, `@keisei/telegram-adapter`, `@keisei/recall-adapter`, `@keisei/youtube-adapter`) — destination registry to be configured per-package via `publishConfig`; npm.org publish remains optional and gated on `NPM_TOKEN` repository secret
+- All packages scoped under `@keisei/` on npm (published to keigit.com npm registry)
 - All use TypeScript 5.5+ with strict mode; zod for runtime validation
 - Build output lives in `dist/` (generated from `src/` via `tsc -b`)
-- MCP server also ships as multi-target native binaries (darwin/linux/windows arm64 + x64) attached to each GitHub release
+- MCP server ships as multi-target native binaries (darwin/linux/windows arm64 + x64)
 
 ---
 
@@ -399,7 +398,7 @@ These are concatenated in role-declared order, with `\n\n---\n\n` separators bet
 | Roles (7 roles) | stable | edit-local / read-only / git-ops / etc. locked; no churn |
 | Assembler (compose logic) | stable | Generates .md from TOML + blocks; keimd integration active |
 | Cortex stack | beta | kei-cortex (HTTP) + kei-tty (TUI) build clean; browser/VSCode frontends concept |
-| MCP Server (@keisei84/mcp-server) | alpha | Exports Rust primitive CLIs as MCP tools; published to GitHub Packages (npm.pkg.github.com) under @keisei84 scope |
+| MCP Server (@keisei/mcp-server) | stable | Exports Rust atoms as MCP tools; published to keigit.com npm |
 | Bridges | stable | 11 cross-tool format generators (.cursorrules, .windsurf/rules, GEMINI.md, etc.) |
 | Sleep Layer (Phase A/B/C) | stable | Incubation (tasks), REM consolidation (reports), NREM deep-sleep (conflicts) |
 | Foreign-project ingestion | stable | kei-import <repo> proof-of-concept via Hermes validation |

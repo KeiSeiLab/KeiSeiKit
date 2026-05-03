@@ -290,70 +290,55 @@ jobs:
           echo "✓ Release $TAG published with all assets"
 
   npm-publish:
-    name: Publish npm packages
+    name: Publish npm packages (optional)
     needs: release
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write   # required for github packages publish (GITHUB_TOKEN)
+    # Graceful skip: if NPM_TOKEN secret is not configured, the first step
+    # reports "skipped" and exits 0 — Rust-binary release above still succeeds.
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
-
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
-        with:
-          node-version: '20'
-
-      # Two-scope .npmrc: @keisei84/* → GitHub Packages (always available
-      # via GITHUB_TOKEN), @keisei/* → npm.org (only if NPM_TOKEN secret
-      # set; line is omitted otherwise so that publish gracefully skips
-      # those packages instead of failing the whole job).
-      - name: Compose .npmrc (multi-scope auth)
-        working-directory: _ts_packages
+      - name: Check NPM_TOKEN presence
+        id: have_token
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          set -euo pipefail
-          {
-            echo "@keisei84:registry=https://npm.pkg.github.com/"
-            echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}"
-            if [ -n "${NPM_TOKEN:-}" ]; then
-              echo "@keisei:registry=https://registry.npmjs.org/"
-              echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}"
-            fi
-          } > .npmrc
-          # Sanity (no secrets in log — print only registry lines):
-          grep -v _authToken .npmrc
+          if [ -n "${NPM_TOKEN:-}" ]; then
+            echo "present=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=0" >> "$GITHUB_OUTPUT"
+            echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
+          fi
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        if: steps.have_token.outputs.present == '1'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        if: steps.have_token.outputs.present == '1'
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install deps
+        if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
         run: npm ci
 
       - name: Build workspaces
+        if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
         run: npm run build --workspaces --if-present
 
       - name: Publish each package
+        if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
-          # Each package's publishConfig.registry decides the destination
-          # (GitHub Packages for @keisei84/*, npm.org for @keisei/*).
-          # Packages without an active token in .npmrc will fail and we
-          # emit a ::warning so the job stays green for the ones that do.
           for pkg in packages/*/; do
             if [ -f "$pkg/package.json" ]; then
-              name=$(node -p "require('./$pkg/package.json').name")
-              echo "::group::publish $name"
+              echo "::group::publish $pkg"
               ( cd "$pkg" && npm publish --access public ) \
-                || echo "::warning::publish failed for $name (missing token, version conflict, or registry error — see log)"
+                || echo "::warning::publish failed for $pkg (continuing)"
               echo "::endgroup::"
             fi
           done
-
-      - name: Cleanup .npmrc
-        if: always()
-        working-directory: _ts_packages
-        run: rm -f .npmrc
