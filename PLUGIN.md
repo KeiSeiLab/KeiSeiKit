@@ -37,7 +37,7 @@ Paths inside `hooks/hooks.json` use `${CLAUDE_PLUGIN_ROOT}` (expanded by Claude 
 | Agents registered | yes, automatic | yes, copied to `~/.claude/agents/` |
 | Skills registered | yes, automatic | yes, copied to `~/.claude/skills/` |
 | Hooks wired | yes, via `hooks/hooks.json` | requires `--activate-hooks` (jq-merge of `settings-snippet.json`) |
-| MCP server | yes, via `.mcp.json` (once `@keisei/mcp-server` is published) | same |
+| MCP server | yes, via `.mcp.json` (uses `@keisei84/mcp-server` from GitHub Packages — requires `~/.npmrc` setup, see below) | same |
 | 47 Rust primitives | **no** — plugin ships manifest sources only; no cargo build | yes, `--profile=<name>` builds the selected set |
 | 13 shell primitives | **no** | yes, copied to `~/.claude/agents/_primitives/` |
 | Disk footprint | ~2 MB (plugin cache) | ~2 MB minimal up to ~200 MB full |
@@ -53,7 +53,15 @@ Paths inside `hooks/hooks.json` use `${CLAUDE_PLUGIN_ROOT}` (expanded by Claude 
 - Network access to `github.com/KeiSei84/KeiSeiKit` on `/plugin marketplace add`
 
 **For the MCP server subset:**
-- `@keisei/mcp-server` published to npm — **STATUS: not yet published as of v0.16.0.** The `.mcp.json` entry is structurally correct and will activate automatically once the package is published. Until then, the `keisei` MCP server simply won't appear in your tool list — the agents, skills, and hooks all work without it.
+- `@keisei84/mcp-server` available from **GitHub Packages**
+  (`https://npm.pkg.github.com/`). One-time `~/.npmrc` setup:
+  ```
+  @keisei84:registry=https://npm.pkg.github.com/
+  //npm.pkg.github.com/:_authToken=<github PAT with read:packages>
+  ```
+  Without the `~/.npmrc` rows, `npx` cannot resolve the scoped
+  package and the `keisei` MCP server simply won't appear in your
+  tool list — the agents, skills, and hooks all work without it.
 - Node.js 18+ (for `npx` to fetch the server on demand)
 
 **For the Rust primitives (classic install only):**
@@ -62,7 +70,7 @@ Paths inside `hooks/hooks.json` use `${CLAUDE_PLUGIN_ROOT}` (expanded by Claude 
 ## Known limitations
 
 1. **Rust primitives not auto-installed.** The plugin format doesn't currently express "also run `cargo build` at install time". We ship the manifest sources in-repo so that users who want the primitives can run `./install.sh --profile=full` alongside the plugin. A future version may add pre-built release binaries for common platforms (macOS arm64/x86_64, Linux x86_64) into `bin/` so the plugin can ship primitives without a cargo step.
-2. **`@keisei/mcp-server` not yet on npm.** The `.mcp.json` entry is the canonical intent, but the package needs publishing first. See `_ts_packages/packages/mcp-server/README.md` for the publish pipeline.
+2. **`@keisei84/mcp-server` lives on GitHub Packages, not npm.org.** The `.mcp.json` entry uses `npx -y @keisei84/mcp-server` which resolves through the `~/.npmrc` `@keisei84:registry` line above. Without that line, `npx` will hit npm.org by default and 404. See `_ts_packages/packages/mcp-server/README.md` for the publish pipeline.
 3. **Hooks use `${CLAUDE_PLUGIN_ROOT}`.** This is the official Claude Code plugin variable. Older Claude Code versions (<2.1) that predate plugin support will not expand this variable — stick with classic install on those versions.
 4. **No version-pinning yet.** `/plugin install keisei@keisei-marketplace` installs the default branch HEAD. For reproducible team installs, add the `--ref=<tag>` flag once it lands in Claude Code (currently in the spec per the extension schema `ref` field).
 
