@@ -1,9 +1,9 @@
 {
-  "_comment": "Template for .mcp.json. Copy to repo root as .mcp.json to register the KeiSei MCP server. The @keisei84/mcp-server package is published to GitHub Packages (npm.pkg.github.com) — one-time ~/.npmrc setup required: '@keisei84:registry=https://npm.pkg.github.com/' + '//npm.pkg.github.com/:_authToken=<github PAT with read:packages>'. See PLUGIN.md.",
+  "_comment": "Template for .mcp.json. Copy to repo root as .mcp.json to register the KeiSei MCP server. Requires @keisei/mcp-server published to npm (status: not yet published — see PLUGIN.md).",
   "mcpServers": {
     "keisei": {
       "command": "npx",
-      "args": ["-y", "@keisei84/mcp-server", "--stdio"]
+      "args": ["-y", "@keisei/mcp-server", "--stdio"]
     }
   }
 }

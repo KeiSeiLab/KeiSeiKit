@@ -1,7 +1,8 @@
 {
-  "name": "@keisei84/mcp-server",
+  "name": "@keisei/mcp-server",
   "version": "0.14.0",
-  "description": "MCP server exposing KeiSeiKit Rust primitives as Model Context Protocol tools — published to GitHub Packages under @keisei84 scope",
+  "private": true,
+  "description": "MCP server exposing KeiSeiKit Rust primitives as Model Context Protocol tools (not yet published to npm — install via local dist build)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,15 +18,6 @@
   "files": [
     "dist"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/KeiSei84/KeiSeiKit-1.0.git",
-    "directory": "_ts_packages/packages/mcp-server"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/",
-    "access": "public"
-  },
   "scripts": {
     "build": "tsc -b",
     "test": "vitest run",
@@ -50,6 +42,5 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "author": "Denis Parfionovich <info@greendragon.info>",
-  "license": "Apache-2.0"
+  "author": "Denis Parfionovich <info@greendragon.info>"
 }
