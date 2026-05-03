@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "grammy": "^1.28.0",
-    "zod": "^3.23.0"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
