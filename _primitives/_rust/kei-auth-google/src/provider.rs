@@ -3,17 +3,35 @@
 //!
 //! [`GoogleAuthProvider`] — `AuthProvider` impl over Google OAuth 2.0 +
 //! OIDC userinfo. Builds an [`AuthSession`] whose `user_id` is the OIDC
-//! `email` (with `sub` available via the userinfo result if needed).
+//! `sub` claim (Google's stable account-id; emails can change).
+//!
+//! ## Security model
+//!
+//! - **`email_verified` gate.** `verify()` rejects any userinfo response
+//!   with `email_verified == false`. CVE-2023-7028 class: Google
+//!   Workspace tenants can mint accounts with arbitrary unverified
+//!   email aliases. Trusting `email` without the verified flag is
+//!   account-takeover-equivalent.
+//! - **`sub` as user_id.** `info.email` is exposed only as metadata;
+//!   the primary identifier is `info.sub` (Google's `255-byte stable
+//!   account identifier`). Email is mutable; sub is not.
+//! - **`id_token.sub` cross-check.** When the token endpoint returns
+//!   an `id_token`, we decode its claims and verify `sub` matches the
+//!   userinfo response. Defence in depth against a forged userinfo.
+//!   *Note:* JWT signature verification (RS256 against Google's JWKS)
+//!   is a follow-up — the current code parses claims only.
 //!
 //! `provider_name = "google"`. `is_passwordless = true`.
 
 use crate::client::{GoogleAuthClient, DEFAULT_AUTH_URL};
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::pkce::{pkce_challenge, url_encode};
+use crate::verify_helpers::{
+    check_state, cross_check_id_token_sub, enforce_email_verified, unpack_challenge,
+};
 use async_trait::async_trait;
 use kei_runtime_core::traits::auth::{AuthChallenge, AuthProvider, AuthSession};
 use kei_runtime_core::{Dna, DnaBuilder, HasDna};
-use subtle::ConstantTimeEq;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Default scope set: OIDC profile + email.
@@ -87,46 +105,26 @@ impl AuthProvider for GoogleAuthProvider {
     }
 
     async fn verify(&self, c: &AuthChallenge) -> kei_runtime_core::Result<AuthSession> {
-        let (code, state, expected_state, code_verifier) = match c {
-            AuthChallenge::OAuthCode {
-                provider, code, state, expected_state, code_verifier,
-            } if provider == "google" => (
-                code.as_str(),
-                state.as_str(),
-                expected_state.as_str(),
-                code_verifier.as_deref(),
-            ),
-            AuthChallenge::OAuthCode { provider, .. } => {
-                return Err(kei_runtime_core::Error::Auth(format!(
-                    "wrong provider for google: {provider}"
-                )));
-            }
-            _ => return Err(kei_runtime_core::Error::from(Error::MissingState)),
-        };
+        let (code, state, expected_state, code_verifier) = unpack_challenge(c)?;
         check_state(state, expected_state)?;
         let token = self.client.exchange_code(code, code_verifier).await
             .map_err(kei_runtime_core::Error::from)?;
         let info = self.client.userinfo(&token.access_token).await
             .map_err(kei_runtime_core::Error::from)?;
+        enforce_email_verified(&info)?;
+        cross_check_id_token_sub(&token, &info)?;
         let session_dna = build_session_dna(state)?;
-        let now_ms = now_ms();
-        let expires_unix_ms = now_ms.saturating_add(token.expires_in.saturating_mul(1000));
-        let user_id = if !info.email.is_empty() { info.email } else { info.sub };
+        let expires_unix_ms = now_ms().saturating_add(token.expires_in.saturating_mul(1000));
         Ok(AuthSession {
             dna: session_dna,
             parent_dna: self.dna.clone(),
-            user_id,
+            user_id: info.sub,
             expires_unix_ms,
             user_agent: None,
         })
     }
 
     async fn revoke(&self, _session: &Dna) -> kei_runtime_core::Result<()> { Ok(()) }
-}
-
-fn check_state(got: &str, expected: &str) -> kei_runtime_core::Result<()> {
-    let ok: bool = got.as_bytes().ct_eq(expected.as_bytes()).into();
-    if !ok { Err(kei_runtime_core::Error::CsrfStateMismatch) } else { Ok(()) }
 }
 
 fn build_session_dna(state: &str) -> kei_runtime_core::Result<Dna> {

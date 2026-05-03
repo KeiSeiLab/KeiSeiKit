@@ -30,11 +30,23 @@ pub struct TokenResponse {
 }
 
 /// Userinfo response (OIDC core §5.3.2 — only the fields we surface).
+///
+/// `email_verified` is **load-bearing for security**: a Google Workspace
+/// admin can mint accounts with arbitrary unverified email aliases, and
+/// a relying party that trusts `email` without checking the verified
+/// flag is vulnerable to the CVE-2023-7028 class of account-takeover
+/// (Booking.com / Slack / GitLab). Always pair the `email` field with
+/// the verified flag at the call site.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserInfo {
     pub sub: String,
     #[serde(default)]
     pub email: String,
+    /// OIDC `email_verified` boolean. Defaults to `false` when the
+    /// provider omits the claim — that matches the safe interpretation
+    /// (refuse rather than trust).
+    #[serde(default)]
+    pub email_verified: bool,
     #[serde(default)]
     pub name: String,
 }

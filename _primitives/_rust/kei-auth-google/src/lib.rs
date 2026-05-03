@@ -40,10 +40,13 @@
 
 pub mod client;
 pub mod error;
+pub mod id_token;
 pub mod pkce;
 pub mod provider;
+mod verify_helpers;
 
 pub use client::{GoogleAuthClient, TokenResponse, UserInfo};
 pub use error::{Error, Result};
+pub use id_token::{extract_sub as extract_id_token_sub, IdTokenClaims};
 pub use pkce::pkce_challenge;
 pub use provider::GoogleAuthProvider;

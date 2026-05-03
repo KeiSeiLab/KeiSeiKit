@@ -52,6 +52,7 @@ async fn userinfo_200_returns_email_and_sub() {
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({
             "sub": "1234567890",
             "email": "alice@example.com",
+            "email_verified": true,
             "name": "Alice"
         })))
         .expect(1)
@@ -62,7 +63,28 @@ async fn userinfo_200_returns_email_and_sub() {
     let info = client.userinfo("ya29.a0AfH-test").await.unwrap();
     assert_eq!(info.sub, "1234567890");
     assert_eq!(info.email, "alice@example.com");
+    assert!(info.email_verified);
     assert_eq!(info.name, "Alice");
+}
+
+#[tokio::test]
+async fn userinfo_omits_email_verified_defaults_to_false() {
+    let server = MockServer::start().await;
+    Mock::given(method("GET"))
+        .and(path("/userinfo"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
+            "sub": "abc",
+            "email": "x@y.z",
+            "name": "X"
+        })))
+        .expect(1)
+        .mount(&server)
+        .await;
+
+    let client = client_for(&server);
+    let info = client.userinfo("any").await.unwrap();
+    // serde_default safe interpretation: absent ⇒ false ⇒ provider rejects.
+    assert!(!info.email_verified);
 }
 
 #[tokio::test]

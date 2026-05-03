@@ -39,6 +39,24 @@ pub enum Error {
     /// Configuration mismatch (env var unset, both URLs absent, etc.).
     #[error("config: {0}")]
     Config(String),
+
+    /// Google account email is not verified — refusing authentication.
+    /// CVE-2023-7028 class: a Workspace admin can mint accounts with
+    /// arbitrary unverified email aliases. We treat the absence (or
+    /// `false`) of `email_verified` as fail-closed.
+    #[error("Google account email is not verified — refusing authentication")]
+    EmailNotVerified,
+
+    /// `id_token.sub` from the token endpoint disagrees with
+    /// `userinfo.sub`. Fail-closed: we cannot tell which identity
+    /// the user actually consented to.
+    #[error("id_token sub mismatches userinfo sub — refusing authentication")]
+    IdSubMismatch,
+
+    /// `id_token` was syntactically malformed (not three segments,
+    /// base64url-decode failed, or JSON claims unparsable).
+    #[error("id_token malformed: {0}")]
+    IdTokenMalformed(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -65,6 +83,15 @@ impl From<Error> for kei_runtime_core::Error {
             Error::Dna(s) => kei_runtime_core::Error::Provider(format!("dna: {s}")),
             Error::Serde(e) => kei_runtime_core::Error::Serde(e),
             Error::Config(s) => kei_runtime_core::Error::Config(s),
+            Error::EmailNotVerified => kei_runtime_core::Error::Auth(
+                "google email not verified".into(),
+            ),
+            Error::IdSubMismatch => kei_runtime_core::Error::Auth(
+                "google id_token sub mismatch".into(),
+            ),
+            Error::IdTokenMalformed(s) => kei_runtime_core::Error::Auth(
+                format!("google id_token malformed: {s}"),
+            ),
         }
     }
 }
