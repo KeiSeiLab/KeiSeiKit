@@ -1,7 +1,8 @@
 {
   "name": "@keisei/mcp-server",
   "version": "0.14.0",
-  "description": "MCP server exposing KeiSeiKit Rust primitives as Model Context Protocol tools",
+  "private": true,
+  "description": "MCP server exposing KeiSeiKit Rust primitives as Model Context Protocol tools (not yet published to npm — install via local dist build)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

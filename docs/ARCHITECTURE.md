@@ -274,6 +274,40 @@ Per RULE 0.13, the *orchestrator* (parent agent or main session) creates the bra
 
 ---
 
+## Model router — current state (2026-05-03)
+
+The `kei-model-router` crate implements a Bayesian-posterior tier
+selector (Haiku / Sonnet / Opus) keyed on task-class DNA + a Beta
+posterior over per-(task-class, model) success rates. The companion
+`kei-token-tracker` crate logs `TokenEvent` rows per LLM call to
+SQLite.
+
+What this is and is not, today:
+
+- **It is** a long-running learning loop. The active-learning consumer
+  reads outcome rows from `kei-token-tracker` and updates Beta-posterior
+  parameters per (task-class, model) pair. As more outcomes accumulate,
+  the ranking deviates from the manifest-declared default.
+- **It is not** "smart routing on day one". A fresh install has **0**
+  outcome rows. Until at least N≈100 outcomes per task-class accumulate
+  in production, the router falls back to the model declared in the
+  agent manifest's `model:` frontmatter. With 37 agent manifests
+  currently declaring `model: opus`, the practical effect on a fresh
+  install is "always Opus" — the router's posterior has no data to
+  override the default with.
+- **Outcome-row count for a fresh install: 0.** Plan to run for some
+  weeks under realistic load before the router meaningfully reorders
+  tier selection. Until then, route by orchestrator discipline +
+  advisor-hook stderr nudges, exactly as the README's "Honest limits"
+  section calls out.
+
+The Beta-posterior + cost-minimisation math is in
+`_primitives/_rust/kei-model-router/src/`. The aggregation surface
+(per-model cost / day, sleep-report markdown emitter) is in
+`kei-token-tracker`.
+
+---
+
 ## Git model summary
 
 Cross-references to the rules that govern git state:
