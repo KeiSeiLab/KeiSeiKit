@@ -10,5 +10,7 @@
 
 pub mod discover;
 pub mod invoke;
+pub(crate) mod invoke_error;
+pub(crate) mod invoke_io;
 pub mod lint;
 pub mod validate;
