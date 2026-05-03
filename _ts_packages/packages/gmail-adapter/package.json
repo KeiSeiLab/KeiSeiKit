@@ -19,7 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "googleapis": "^144.0.0",
+    "googleapis": "^171.4.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
