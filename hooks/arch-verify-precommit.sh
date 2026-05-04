@@ -37,7 +37,11 @@ if ! printf '%s' "$CMD" | grep -qE '\bgit[[:space:]]+commit\b'; then
 fi
 
 # Bypass via env-prefix visible in the command itself.
-if printf '%s' "$CMD" | grep -qE '(^|[^A-Z_])ARCH_VERIFY_BYPASS=1[[:space:]]'; then
+# Anchor: bypass marker MUST appear at start of command, OR after one of:
+#   whitespace, ';', '&', '|', '('  (i.e. real shell separator).
+# Rejects prefix injection like `xARCH_VERIFY_BYPASS=1 git commit ...`,
+# `0ARCH_VERIFY_BYPASS=1 ...`, `=ARCH_VERIFY_BYPASS=1 ...` etc.
+if printf '%s' "$CMD" | grep -qE '(^|[[:space:];&|(])ARCH_VERIFY_BYPASS=1[[:space:]]'; then
   echo "[arch-verify] bypass: ARCH_VERIFY_BYPASS=1" >&2
   exit 0
 fi
