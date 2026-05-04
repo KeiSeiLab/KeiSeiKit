@@ -13,6 +13,23 @@ interface CliArgs {
   rustBinDir: string;
 }
 
+function cliFail(msg: string): never {
+  process.stderr.write(`[keisei-mcp] error: ${msg}\n`);
+  process.exit(2);
+}
+
+function takeValue(argv: readonly string[], i: number, flag: string): string {
+  const v = argv[i + 1];
+  if (v === undefined || v.startsWith("--")) cliFail(`${flag} requires a value (got ${v ?? "EOF"})`);
+  return v;
+}
+
+function parsePort(raw: string): number {
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1 || n > 65535) cliFail(`--port must be 1..65535 (got ${raw})`);
+  return n;
+}
+
 function parseArgv(argv: readonly string[]): CliArgs {
   const out: CliArgs = {
     stdio: false,
@@ -22,17 +39,11 @@ function parseArgv(argv: readonly string[]): CliArgs {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--stdio") out.stdio = true;
-    else if (a === "--port") out.port = Number(argv[++i] ?? "");
-    else if (a === "--bind") {
-      const v = argv[++i];
-      if (v !== undefined) out.bind = v;
-    } else if (a === "--auth-token-file") {
-      const v = argv[++i];
-      if (v !== undefined) out.authTokenFile = v;
-    } else if (a === "--rust-bin-dir") {
-      const v = argv[++i];
-      if (v !== undefined) out.rustBinDir = v;
-    }
+    else if (a === "--port") { out.port = parsePort(takeValue(argv, i, "--port")); i++; }
+    else if (a === "--bind") { out.bind = takeValue(argv, i, "--bind"); i++; }
+    else if (a === "--auth-token-file") { out.authTokenFile = takeValue(argv, i, "--auth-token-file"); i++; }
+    else if (a === "--rust-bin-dir") { out.rustBinDir = takeValue(argv, i, "--rust-bin-dir"); i++; }
+    else if (a !== undefined && a.startsWith("--")) cliFail(`unknown flag ${a}`);
   }
   return out;
 }
@@ -101,13 +112,23 @@ async function dispatchStdioLine(server: McpServer, line: string): Promise<strin
   }
 }
 
+function bindErrorMessage(err: NodeJS.ErrnoException, port: number, bindAddr: string): string {
+  if (err.code === "EADDRINUSE") return `port ${port} already in use on ${bindAddr}`;
+  if (err.code === "EACCES") return `permission denied to bind ${bindAddr}:${port} (try port >=1024)`;
+  return `bind error: ${String(err)}`;
+}
+
 async function runHttp(server: McpServer, port: number, bindAddr: string): Promise<void> {
   const http = await import("node:http");
   const srv = http.createServer((req, res) => void handleHttp(server, req, res));
   // Bind to 127.0.0.1 by default; pass --bind 0.0.0.0 to expose on all interfaces.
-  srv.listen(port, bindAddr, () =>
-    process.stderr.write(`[keisei-mcp] http ${bindAddr}:${port}; ${server.listTools().length} tools\n`),
-  );
+  await new Promise<void>((resolve, reject) => {
+    srv.once("error", (err: NodeJS.ErrnoException) => reject(new Error(bindErrorMessage(err, port, bindAddr))));
+    srv.listen(port, bindAddr, () => {
+      process.stderr.write(`[keisei-mcp] http ${bindAddr}:${port}; ${server.listTools().length} tools\n`);
+      resolve();
+    });
+  });
 }
 
 async function handleHttp(server: McpServer, req: import("node:http").IncomingMessage, res: import("node:http").ServerResponse): Promise<void> {
