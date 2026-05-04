@@ -31,12 +31,43 @@ CREATE INDEX IF NOT EXISTS idx_blocks_type ON blocks(block_type);
 CREATE INDEX IF NOT EXISTS idx_blocks_path ON blocks(path);
 CREATE INDEX IF NOT EXISTS idx_blocks_body ON blocks(body_sha);";
 
+/// v2 — formula 4-tuple columns on `blocks`. Nullable; no row rewrite needed
+/// for existing v1 data. Populated later by `register_formula` (Phase 2 PR-2).
+/// `execute_batch` runs multi-statement DDL in one shot, so all four ALTERs
+/// land atomically inside the migration's transaction.
+pub const SCHEMA_V2: &str = "ALTER TABLE blocks ADD COLUMN type_sig_json TEXT;
+ALTER TABLE blocks ADD COLUMN effects_json TEXT;
+ALTER TABLE blocks ADD COLUMN formula_source TEXT;
+ALTER TABLE blocks ADD COLUMN formula_sha TEXT;";
+
+/// v3 — predicates as separate rows (1:N from blocks). One block carries
+/// 0..N invariant predicates; `seq` orders them deterministically inside a
+/// block. `args_json` holds the predicate-specific payload.
+pub const SCHEMA_V3: &str = "CREATE TABLE block_predicates (
+    block_id  INTEGER NOT NULL REFERENCES blocks(id),
+    seq       INTEGER NOT NULL,
+    kind      TEXT NOT NULL,
+    args_json TEXT NOT NULL,
+    PRIMARY KEY (block_id, seq)
+) STRICT;";
+
+/// v4 — declared deps as separate rows (M:N). `dep_dna` is the wire-format
+/// DNA of the depended-on block; `dep_kind` distinguishes call-site classes
+/// (e.g. \"runtime\", \"build\", \"sidecar\") so the same target can appear
+/// under multiple kinds without collision.
+pub const SCHEMA_V4: &str = "CREATE TABLE block_deps (
+    block_id INTEGER NOT NULL REFERENCES blocks(id),
+    dep_dna  TEXT NOT NULL,
+    dep_kind TEXT NOT NULL,
+    PRIMARY KEY (block_id, dep_dna, dep_kind)
+) STRICT;";
+
 /// Schema version. Compared against `PRAGMA user_version`. Bumped together
 /// with `MIGRATIONS`. Mismatch (DB is newer than this binary) → exit 3.
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 4;
 
 /// Ordered migrations. Index = target version (1-based). Append only.
-pub const MIGRATIONS: &[&str] = &[SCHEMA_V1];
+pub const MIGRATIONS: &[&str] = &[SCHEMA_V1, SCHEMA_V2, SCHEMA_V3, SCHEMA_V4];
 
 /// Open or create the SQLite store at `path`. Runs all pending migrations
 /// transactionally. Returns the connection ready for CRUD use. Schema
