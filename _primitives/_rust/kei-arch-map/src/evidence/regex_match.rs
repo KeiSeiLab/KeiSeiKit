@@ -27,7 +27,10 @@ pub(super) fn build(pattern: &str) -> Result<regex::Regex, String> {
 }
 
 pub fn check(file: &Path, pattern: &str, root: &Path) -> (bool, String) {
-    let resolved = path_resolve::resolve(file, root);
+    let resolved = match path_resolve::resolve_confined(file, root) {
+        Ok(p) => p,
+        Err(e) => return (false, e),
+    };
     let contents = match read_capped(&resolved) {
         Ok(s) => s,
         Err(e) => return (false, e),

@@ -102,7 +102,9 @@ fn json_field_fails_on_mismatch() {
     write(td.path(), "p.json", r#"{"version": "0.14.5"}"#);
     let (ok, reason) = json_field("p.json", "version", "9.9.9", td.path());
     assert!(!ok);
-    assert!(reason.contains("0.14.5"));
+    // Track A security fix E: actual value redacted, only len + sha256[:8] in FAIL message
+    assert!(!reason.contains("0.14.5"), "secret leaked into FAIL message: {}", reason);
+    assert!(reason.contains("len=") || reason.contains("sha256"), "expected redacted form: {}", reason);
 }
 
 #[test]

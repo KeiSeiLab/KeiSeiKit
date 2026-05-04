@@ -6,6 +6,7 @@ use std::path::PathBuf;
 // and pulls evidence checkers + schema from the library facade. This avoids
 // double-compilation of `evidence/` and `schema.rs`.
 mod plan;
+mod plan_io;
 mod render;
 mod runner;
 

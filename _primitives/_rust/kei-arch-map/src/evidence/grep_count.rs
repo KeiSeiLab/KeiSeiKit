@@ -2,7 +2,10 @@ use super::{path_resolve, regex_match};
 use std::path::Path;
 
 pub fn check(file: &Path, pattern: &str, expected: u64, root: &Path) -> (bool, String) {
-    let resolved = path_resolve::resolve(file, root);
+    let resolved = match path_resolve::resolve_confined(file, root) {
+        Ok(p) => p,
+        Err(e) => return (false, e),
+    };
     let contents = match regex_match::read_capped(&resolved) {
         Ok(s) => s,
         Err(e) => return (false, e),

@@ -1,9 +1,10 @@
+use crate::plan_io::{atomic_write, combine, inline_evidence, md_escape, quote};
 use crate::runner;
 use anyhow::{anyhow, Result};
 use fs2::FileExt;
 use kei_arch_map::schema::{self, Evidence, Plan};
 use std::fmt::Write as _;
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
 use std::path::Path;
 use toml_edit::DocumentMut;
 
@@ -53,9 +54,12 @@ fn render_rows(out: &mut String, plan: &Plan, root: &Path) -> (usize, usize, usi
     (total, pass, fail)
 }
 
-/// Append a claim to PLAN.toml with exclusive lock + format-preserving
-/// re-parse + atomic rename. Format-preservation is best-effort: existing
-/// content stays byte-for-byte; the new block is appended.
+/// Append a claim to PLAN.toml. Holds an exclusive advisory file lock on a
+/// dedicated `<plan>.lock` companion file for the entire read→parse→write
+/// →rename transaction (security fix F: lock-across-transaction). Two
+/// concurrent `add_claim` calls cannot both pass `ensure_unique` and both
+/// write — the second blocks on lock acquisition until the first's atomic
+/// rename has landed.
 pub fn add_claim(
     plan_path: &Path,
     module_id: &str,
@@ -65,18 +69,20 @@ pub fn add_claim(
 ) -> Result<()> {
     let evidence: Evidence = serde_json::from_str(evidence_json)
         .map_err(|e| anyhow!("parse evidence_json: {}", e))?;
-    let original = locked_read(plan_path)?;
+    let lock = acquire_lock(plan_path)?;
+    let original = std::fs::read_to_string(plan_path)
+        .map_err(|e| anyhow!("read {}: {}", plan_path.display(), e))?;
     let doc: DocumentMut = original
         .parse()
         .map_err(|e| anyhow!("parse {}: {}", plan_path.display(), e))?;
     ensure_unique(&doc, module_id, claim_id)?;
     let block = render_claim_block(claim_id, description, &evidence)?;
     let combined = combine(&original, &block);
-    // Validate the combined output round-trips.
     let _verify: DocumentMut = combined
         .parse()
         .map_err(|e| anyhow!("re-parse after append: {}", e))?;
     atomic_write(plan_path, &combined)?;
+    drop(lock);
     println!(
         "appended {}::{} to {}",
         module_id, claim_id, plan_path.display()
@@ -84,18 +90,26 @@ pub fn add_claim(
     Ok(())
 }
 
-/// Acquire exclusive lock and read entire file.
-fn locked_read(plan_path: &Path) -> Result<String> {
+/// Open companion `<plan>.lock` and acquire exclusive advisory lock.
+/// Lock is released when the returned File handle is dropped.
+fn acquire_lock(plan_path: &Path) -> Result<File> {
+    let mut lock_path = plan_path.to_path_buf();
+    let mut new_name = lock_path
+        .file_name()
+        .ok_or_else(|| anyhow!("plan path has no file name"))?
+        .to_os_string();
+    new_name.push(".lock");
+    lock_path.set_file_name(new_name);
     let f = OpenOptions::new()
+        .create(true)
         .read(true)
-        .open(plan_path)
-        .map_err(|e| anyhow!("open {}: {}", plan_path.display(), e))?;
+        .write(true)
+        .truncate(false)
+        .open(&lock_path)
+        .map_err(|e| anyhow!("open lock {}: {}", lock_path.display(), e))?;
     FileExt::lock_exclusive(&f)
-        .map_err(|e| anyhow!("lock {}: {}", plan_path.display(), e))?;
-    let s = std::fs::read_to_string(plan_path)
-        .map_err(|e| anyhow!("read {}: {}", plan_path.display(), e))?;
-    let _ = FileExt::unlock(&f);
-    Ok(s)
+        .map_err(|e| anyhow!("lock {}: {}", lock_path.display(), e))?;
+    Ok(f)
 }
 
 /// Verify (module_id, claim_id) is not already declared.
@@ -143,51 +157,4 @@ fn render_claim_block(
     let _ = writeln!(block, "description = {}", quote(description));
     let _ = writeln!(block, "{}", inline_evidence(&evidence_toml));
     Ok(block)
-}
-
-fn combine(original: &str, block: &str) -> String {
-    let mut s = original.to_string();
-    if !s.ends_with('\n') {
-        s.push('\n');
-    }
-    s.push_str(block);
-    s
-}
-
-fn quote(s: &str) -> String {
-    let escaped = s.replace('\\', "\\\\").replace('"', "\\\"");
-    format!("\"{}\"", escaped)
-}
-
-/// Convert serialized evidence (multi-line `key = value`) into a single
-/// inline-table line: `evidence = { kind = "x", file = "y" }`.
-fn inline_evidence(serialized: &str) -> String {
-    let parts: Vec<String> = serialized
-        .lines()
-        .filter(|l| !l.trim().is_empty())
-        .map(|l| l.trim().to_string())
-        .collect();
-    format!("evidence = {{ {} }}", parts.join(", "))
-}
-
-fn md_escape(s: &str) -> String {
-    s.replace('|', "\\|").replace('\n', " ")
-}
-
-fn atomic_write(target: &Path, contents: &str) -> Result<()> {
-    let parent = target
-        .parent()
-        .ok_or_else(|| anyhow!("target {} has no parent", target.display()))?;
-    let fname = target
-        .file_name()
-        .ok_or_else(|| anyhow!("target {} has no file name", target.display()))?;
-    let mut tmp_name = std::ffi::OsString::from(".");
-    tmp_name.push(fname);
-    tmp_name.push(".tmp");
-    let tmp = parent.join(tmp_name);
-    std::fs::write(&tmp, contents)
-        .map_err(|e| anyhow!("write tmp {}: {}", tmp.display(), e))?;
-    std::fs::rename(&tmp, target)
-        .map_err(|e| anyhow!("rename {} -> {}: {}", tmp.display(), target.display(), e))?;
-    Ok(())
 }

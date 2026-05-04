@@ -16,12 +16,43 @@ pub fn repo_root(plan_path: &Path) -> Result<PathBuf> {
 }
 
 /// Resolve a claim-relative path against `root`. Absolute paths pass through.
+/// Note: does NOT enforce containment — callers that touch the filesystem
+/// should use `resolve_confined` instead. Kept for `confine_out` compat.
 pub fn resolve(input: &Path, root: &Path) -> PathBuf {
     if input.is_absolute() {
         input.to_path_buf()
     } else {
         root.join(input)
     }
+}
+
+/// Resolve `input` relative to `root` AND verify it stays within the
+/// canonicalized `root` after symlink resolution. Caller-controlled
+/// claim paths cannot use `..` segments or symlinks to escape the repo.
+/// Returns the canonical path on success.
+///
+/// Security fix D: every evidence-kind that touches the filesystem MUST
+/// route through this function. Plain `resolve()` permits `..` traversal.
+pub fn resolve_confined(input: &Path, root: &Path) -> Result<PathBuf, String> {
+    let resolved = if input.is_absolute() {
+        input.to_path_buf()
+    } else {
+        root.join(input)
+    };
+    let canonical = resolved
+        .canonicalize()
+        .map_err(|e| format!("canonicalize {}: {}", resolved.display(), e))?;
+    let root_canonical = root
+        .canonicalize()
+        .map_err(|e| format!("canonicalize root {}: {}", root.display(), e))?;
+    if !canonical.starts_with(&root_canonical) {
+        return Err(format!(
+            "path escapes repo root: {} (root: {})",
+            canonical.display(),
+            root_canonical.display()
+        ));
+    }
+    Ok(canonical)
 }
 
 /// Confine `out` such that its canonicalized parent stays within `root`.

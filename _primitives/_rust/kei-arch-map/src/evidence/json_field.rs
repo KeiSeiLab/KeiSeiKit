@@ -1,5 +1,6 @@
 use super::{path_resolve, regex_match};
 use serde_json::Value;
+use sha2::{Digest, Sha256};
 use std::path::Path;
 
 /// Walk dotted path (no wildcards) into JSON value.
@@ -26,8 +27,30 @@ fn stringify_leaf(v: &Value) -> Option<String> {
     }
 }
 
+/// Security fix E: when an actual JSON value mismatches the expected scalar,
+/// the original implementation echoed the actual value verbatim into the
+/// FAIL message. For sensitive fields (tokens, hashed passwords, keys) this
+/// leaks the value into CI logs / stderr. Replace the echo with a non-
+/// reversible fingerprint: byte length + first 4 bytes of sha256.
+fn redact(value: &str) -> String {
+    let mut h = Sha256::new();
+    h.update(value.as_bytes());
+    let digest = h.finalize();
+    format!(
+        "len={} sha256[:8]={:02x}{:02x}{:02x}{:02x}",
+        value.len(),
+        digest[0],
+        digest[1],
+        digest[2],
+        digest[3]
+    )
+}
+
 pub fn check(file: &Path, dotted: &str, expected: &str, root: &Path) -> (bool, String) {
-    let resolved = path_resolve::resolve(file, root);
+    let resolved = match path_resolve::resolve_confined(file, root) {
+        Ok(p) => p,
+        Err(e) => return (false, e),
+    };
     let contents = match regex_match::read_capped(&resolved) {
         Ok(s) => s,
         Err(e) => return (false, e),
@@ -47,9 +70,10 @@ pub fn check(file: &Path, dotted: &str, expected: &str, root: &Path) -> (bool, S
     if actual == expected {
         (true, String::new())
     } else {
-        (
-            false,
-            format!("json `{}`.{} = `{}` (expected `{}`)", resolved.display(), dotted, actual, expected),
-        )
+        (false, mismatch_msg(&resolved, dotted, &actual))
     }
+}
+
+fn mismatch_msg(file: &Path, dotted: &str, actual: &str) -> String {
+    format!("json `{}`.{} mismatch (got {})", file.display(), dotted, redact(actual))
 }
