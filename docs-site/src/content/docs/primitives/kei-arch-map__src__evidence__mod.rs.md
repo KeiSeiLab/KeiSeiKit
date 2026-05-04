@@ -1,9 +1,9 @@
 ---
 title: mod.rs
 path: kei-arch-map/src/evidence/mod.rs
-dna_hash: sha256:8648ccef2b43d1c8
+dna_hash: sha256:a6f9f7e2f8a10bc8
 language: rust
-size_loc: 12
+size_loc: 13
 generated: by-keidocs
 ---
 
@@ -19,18 +19,5 @@ Public surface: each `check(...)` returns `(passed, reason_if_failed)`.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

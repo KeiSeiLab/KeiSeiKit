@@ -46,18 +46,5 @@ No I/O beyond `std::fs::read_to_string` for role lookup and
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

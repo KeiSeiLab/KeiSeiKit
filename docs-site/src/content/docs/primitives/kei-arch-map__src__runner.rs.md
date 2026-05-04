@@ -1,9 +1,9 @@
 ---
 title: runner.rs
 path: kei-arch-map/src/runner.rs
-dna_hash: sha256:b315c1681268fb74
+dna_hash: sha256:2538615ea254b4ad
 language: rust
-size_loc: 68
+size_loc: 72
 generated: by-keidocs
 ---
 
@@ -25,18 +25,5 @@ and returns Err on any FAIL.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

@@ -1,9 +1,9 @@
 ---
 title: routes.rs
 path: kei-cortex/src/routes.rs
-dna_hash: sha256:04841a726bd69175
+dna_hash: sha256:ad76fb9b7f827f3c
 language: rust
-size_loc: 126
+size_loc: 127
 generated: by-keidocs
 ---
 
@@ -33,18 +33,5 @@ routes (`/tts`, `/stt`, `/chat`) get matching caps tuned to their bottleneck.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

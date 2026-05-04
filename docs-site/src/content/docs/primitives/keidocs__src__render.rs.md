@@ -1,9 +1,9 @@
 ---
 title: render.rs
 path: keidocs/src/render.rs
-dna_hash: sha256:fd3ffbb8c6a46763
+dna_hash: sha256:260813167366fbc0
 language: rust
-size_loc: 109
+size_loc: 101
 generated: by-keidocs
 ---
 
@@ -14,7 +14,7 @@ Markdown rendering — frontmatter + sections + backlinks.
 ## Public API
 
 - `pub fn render_markdown` — Build the full markdown document for one source file.
-- Append Giscus comments widget — GitHub Discussions backend.
+- Append KeiComments mount point — sovereign comment system backed by
 
 ## Related
 
@@ -23,18 +23,5 @@ Markdown rendering — frontmatter + sections + backlinks.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

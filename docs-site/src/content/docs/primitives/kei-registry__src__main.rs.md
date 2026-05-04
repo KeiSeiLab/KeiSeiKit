@@ -1,9 +1,9 @@
 ---
 title: main.rs
 path: kei-registry/src/main.rs
-dna_hash: sha256:0912beb5e5cf029c
+dna_hash: sha256:27665f45c1002d70
 language: rust
-size_loc: 25
+size_loc: 91
 generated: by-keidocs
 ---
 
@@ -11,29 +11,17 @@ generated: by-keidocs
 
 kei-registry binary entry point.
 
-Constructor Pattern: this file does ONE thing — parse CLI args and
-dispatch to `handlers::dispatch`. All policy lives in the library.
-Exit codes per spec: 0 success, 1 IO error, 2 not-found, 3 schema mismatch.
+Constructor Pattern: parse CLI args; intercept `RegisterStatusTruth`
+locally (Phase 3 Layer 3 pipe — keeps `handlers.rs` untouched);
+delegate everything else to `handlers::dispatch`.
+Exit codes: 0 success, 1 IO error, 2 not-found, 3 schema mismatch.
 
 ## Related
 
 - parent: `kei-registry/Cargo.toml`
-- imports: clap, kei_registry
+- imports: clap, kei_registry, rusqlite, std
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

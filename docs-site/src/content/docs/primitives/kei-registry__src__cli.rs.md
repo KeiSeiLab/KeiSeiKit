@@ -1,9 +1,9 @@
 ---
 title: cli.rs
 path: kei-registry/src/cli.rs
-dna_hash: sha256:10681c0c0c261123
+dna_hash: sha256:e5e38d163518bee0
 language: rust
-size_loc: 187
+size_loc: 198
 generated: by-keidocs
 ---
 
@@ -48,6 +48,7 @@ the path expansion can react to `$HOME`.
 - Env-file paths to scan (default: `~/.claude/secrets/.env` if
 - Root to scan for usages (default: current directory).
 - Output format: `ascii` (default) or `json`.
+- Phase 3 Layer 3 — pipe a RULE 0.16 STATUS-TRUTH MARKER (from
 
 ## Related
 
@@ -56,18 +57,5 @@ the path expansion can react to `$HOME`.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

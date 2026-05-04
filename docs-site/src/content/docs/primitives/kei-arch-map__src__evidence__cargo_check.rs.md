@@ -1,9 +1,9 @@
 ---
 title: cargo_check.rs
 path: kei-arch-map/src/evidence/cargo_check.rs
-dna_hash: sha256:9bccbc6c879e0c7d
+dna_hash: sha256:0af6fb51bbbdd108
 language: rust
-size_loc: 135
+size_loc: 167
 generated: by-keidocs
 ---
 
@@ -11,6 +11,8 @@ generated: by-keidocs
 
 ## Public API
 
+- Cached cargo binary path. `which` is invoked once per process; subsequent
+- `pub fn resolve_cargo` — Resolve the `cargo` binary to an ABSOLUTE path via the `which` crate.
 - Captured cargo output. Mirrors `std::process::Output` but built from
 - Spawn cargo check with fixed argv (NOT through sh).
 - Spawn a thread that reads a pipe to EOF into a Vec<u8>.
@@ -24,18 +26,5 @@ generated: by-keidocs
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>

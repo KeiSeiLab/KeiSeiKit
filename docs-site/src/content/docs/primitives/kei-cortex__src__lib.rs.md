@@ -1,9 +1,9 @@
 ---
 title: lib.rs
 path: kei-cortex/src/lib.rs
-dna_hash: sha256:5891280660da7d62
+dna_hash: sha256:f1a06c244e61951f
 language: rust
-size_loc: 41
+size_loc: 43
 generated: by-keidocs
 ---
 
@@ -26,18 +26,5 @@ locked to a single origin provided at startup.
 
 ## Discussion
 
-<script src="https://giscus.app/client.js"
-        data-repo="KeiSei84/KeiSeiKit-1.0"
-        data-repo-id="PLACEHOLDER_REPO_ID"
-        data-category="wiki-comments"
-        data-category-id="PLACEHOLDER_CATEGORY_ID"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async></script>
+<div id="keicomments-mount" data-page=""></div>
+<script type="module" src="/keicomments.js"></script>
