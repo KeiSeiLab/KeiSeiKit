@@ -191,6 +191,8 @@ members = [
     "keidna-sign",
     # Wave 12: sovereign comments backend (replaces Giscus + GitHub Discussions)
     "kei-comments",
+    # Wave 5 e2e — full-pipeline integration test (cleanup → derive → arch-map verify)
+    "kei-pipeline-test",
 ]
 
 [workspace.package]
