@@ -62,12 +62,28 @@ pub const SCHEMA_V4: &str = "CREATE TABLE block_deps (
     PRIMARY KEY (block_id, dep_dna, dep_kind)
 ) STRICT;";
 
+/// v5 — cleanup_findings table for the `kei-cleanup --emit-predicates`
+/// bridge (Track B). Each row is one finding produced by a cleanup scan;
+/// `severity` ∈ {info, warn, error}, `kind` is a stable scanner-id string,
+/// `finding_json` is the full structured payload. `workspace_sha` lets a
+/// later run reconcile or replace findings from the same workspace state.
+pub const SCHEMA_V5: &str = "CREATE TABLE cleanup_findings (
+    id INTEGER PRIMARY KEY,
+    workspace_sha TEXT NOT NULL,
+    timestamp_unix INTEGER NOT NULL,
+    severity TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    finding_json TEXT NOT NULL
+) STRICT;
+CREATE INDEX idx_cleanup_workspace_sha ON cleanup_findings(workspace_sha);
+CREATE INDEX idx_cleanup_severity ON cleanup_findings(severity);";
+
 /// Schema version. Compared against `PRAGMA user_version`. Bumped together
 /// with `MIGRATIONS`. Mismatch (DB is newer than this binary) → exit 3.
-pub const SCHEMA_VERSION: u32 = 4;
+pub const SCHEMA_VERSION: u32 = 5;
 
 /// Ordered migrations. Index = target version (1-based). Append only.
-pub const MIGRATIONS: &[&str] = &[SCHEMA_V1, SCHEMA_V2, SCHEMA_V3, SCHEMA_V4];
+pub const MIGRATIONS: &[&str] = &[SCHEMA_V1, SCHEMA_V2, SCHEMA_V3, SCHEMA_V4, SCHEMA_V5];
 
 /// Open or create the SQLite store at `path`. Runs all pending migrations
 /// transactionally. Returns the connection ready for CRUD use. Schema
