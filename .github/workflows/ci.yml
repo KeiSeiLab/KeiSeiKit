@@ -157,3 +157,34 @@ jobs:
         run: PATH="${HOME}/.local/bin:${PATH}" bash scripts/lint-workflows.sh
       - name: Validate pinned SHAs
         run: bash scripts/validate-workflow-shas.sh
+
+  arch-verify:
+    # Phase 3 native-deploy layer 4 (release-time). Builds kei-arch-map and
+    # runs `verify` against arch/PLAN.toml. Skipped when arch/PLAN.toml is
+    # absent (project not arch-mapped yet). `needs: rust-primitives` keeps
+    # this off the critical path while reusing the same Rust cache.
+    runs-on: ubuntu-latest
+    needs: [rust-primitives]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - name: Skip if arch/PLAN.toml absent
+        id: precheck
+        run: |
+          if [ ! -f arch/PLAN.toml ]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            echo "[arch-verify] arch/PLAN.toml absent — skipping job"
+          else
+            echo "skip=0" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule (see rust-primitives job)
+        if: steps.precheck.outputs.skip == '0'
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+        if: steps.precheck.outputs.skip == '0'
+        with:
+          workspaces: _primitives/_rust
+      - name: Build kei-arch-map
+        if: steps.precheck.outputs.skip == '0'
+        run: cd _primitives/_rust && cargo build --release -p kei-arch-map
+      - name: Verify arch claims
+        if: steps.precheck.outputs.skip == '0'
+        run: ./_primitives/_rust/target/release/kei-arch-map verify --plan arch/PLAN.toml

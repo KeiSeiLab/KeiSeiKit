@@ -75,6 +75,8 @@ source "$LIB_DIR/lib-bin.sh"
 source "$LIB_DIR/lib-summary.sh"
 # shellcheck source=install/lib-profile-outcome-only.sh
 source "$LIB_DIR/lib-profile-outcome-only.sh"
+# shellcheck source=install/lib-arch-verify.sh
+source "$LIB_DIR/lib-arch-verify.sh"
 
 # --- parse flags + install rollback trap ---------------------------------
 parse_args "$@"
@@ -191,6 +193,15 @@ if [ "$NO_PATHWAY" != "1" ]; then
   if [ "$WITH_PATHWAY" = "1" ] || { [ -t 0 ] && [ -t 1 ]; }; then
     pathway_install
   fi
+fi
+
+# --- arch-verify (Phase 3 layer 1, RULE 0.13 native deploy) --------------
+# Runs `kei-arch-map verify` on substrate state. Advisory by default;
+# INSTALL_ARCH_STRICT=1 promotes FAIL to install-abort. Skips gracefully
+# when arch/PLAN.toml or the kei-arch-map binary is absent.
+if ! _arch_verify_install "$KIT_DIR"; then
+  err "install aborted by arch-verify (INSTALL_ARCH_STRICT=1)"
+  exit 2
 fi
 
 # --- final summary --------------------------------------------------------
