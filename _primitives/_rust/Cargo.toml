@@ -181,6 +181,8 @@ members = [
     "kei-graph-export",
     # SSoT validator: claims declared in arch/PLAN.toml, verified against repo state
     "kei-arch-map",
+    # Code-hygiene scanner: dead code, unused deps, LOC checks, dep drift (CLEANUP-RUNTIME-SPEC.md)
+    "kei-cleanup",
 ]
 
 [workspace.package]

@@ -1,0 +1,29 @@
+[package]
+name = "kei-cleanup"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Workspace-wide code-hygiene scanner: dead code, unused deps, LOC checks, dep drift. v0.1 detection-only library + CLI."
+
+[lib]
+name = "kei_cleanup"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-cleanup"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+walkdir = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+
+[dev-dependencies]
+tempfile = { workspace = true }
