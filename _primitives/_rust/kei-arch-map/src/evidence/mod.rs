@@ -3,6 +3,7 @@
 //! Public surface: each `check(...)` returns `(passed, reason_if_failed)`.
 
 pub mod cargo_check;
+pub mod cargo_check_safe;
 pub mod file_exists;
 pub mod file_size;
 pub mod grep_count;

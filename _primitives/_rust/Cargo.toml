@@ -243,6 +243,8 @@ syn = { version = "2", features = ["full"] }
 toml_edit = "0.22"
 fs2 = "0.4"
 wait-timeout = "0.2"
+# kei-arch-map Wave 4 #50B — PATH-hijack guard: resolve cargo via absolute path
+which = "6"
 
 [profile.release]
 opt-level = "z"

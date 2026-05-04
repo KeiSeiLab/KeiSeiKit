@@ -3082,6 +3082,7 @@ dependencies = [
  "toml_edit",
  "url",
  "wait-timeout",
+ "which",
  "wiremock",
 ]
 

@@ -63,6 +63,10 @@ pub fn check_claim(claim: &Claim, root: &Path) -> (bool, String) {
         Evidence::CargoCheckClean { manifest_dir } => {
             evidence::cargo_check::check(manifest_dir, root)
         }
+        Evidence::CargoCheckSafe {
+            manifest_dir,
+            allowed_paths,
+        } => evidence::cargo_check_safe::check(manifest_dir, allowed_paths, root),
         Evidence::HttpStatus { url, expected } => evidence::http_status::check(url, expected),
     }
 }

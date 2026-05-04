@@ -27,8 +27,8 @@ evidence = { kind = "regex_match", file = "_primitives/_rust/Cargo.toml", patter
 
 [[module.claim]]
 id = "cargo-check-workspace-passes"
-description = "cargo check --workspace produces zero compiler errors (structured JSON parse, NOT shell)"
-evidence = { kind = "cargo_check_clean", manifest_dir = "_primitives/_rust" }
+description = "cargo check --workspace produces zero compiler errors (safe — whitelisted to own workspace)"
+evidence = { kind = "cargo_check_safe", manifest_dir = "_primitives/_rust", allowed_paths = ["_primitives/_rust"] }
 
 # ============================================================
 # Module: release-yml — GitHub Actions release pipeline

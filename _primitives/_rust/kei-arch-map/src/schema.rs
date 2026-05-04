@@ -60,6 +60,19 @@ pub enum Evidence {
     /// `cargo check --workspace --offline --message-format=json` produces
     /// zero compiler-error diagnostics, run from `manifest_dir`.
     CargoCheckClean { manifest_dir: PathBuf },
+    /// `cargo check --workspace --offline --message-format=json` produces zero
+    /// compiler-error messages. SAFETY: caller must whitelist `manifest_dir`;
+    /// this kind runs build.rs of the workspace. Use only on internally-
+    /// controlled workspaces. External / untrusted manifests MUST use
+    /// `CargoCheckClean` (manifest-resolve only via cargo metadata).
+    CargoCheckSafe {
+        manifest_dir: PathBuf,
+        /// Allowlist of paths (relative to repo root) authorised to run
+        /// build.rs. Required: refuse to run if `manifest_dir` does not
+        /// match. Typical: `["_primitives/_rust"]`.
+        #[serde(default)]
+        allowed_paths: Vec<PathBuf>,
+    },
     /// HTTP GET URL returns one of `expected` codes. SSRF-hardened.
     HttpStatus {
         url: String,
@@ -86,6 +99,7 @@ pub fn evidence_kind(ev: &Evidence) -> &'static str {
         Evidence::FileSize { .. } => "file_size",
         Evidence::JsonField { .. } => "json_field",
         Evidence::CargoCheckClean { .. } => "cargo_check_clean",
+        Evidence::CargoCheckSafe { .. } => "cargo_check_safe",
         Evidence::HttpStatus { .. } => "http_status",
     }
 }
@@ -100,6 +114,13 @@ pub fn evidence_repr(ev: &Evidence) -> String {
         Evidence::JsonField { file, path, expected } => repr_json(file, path, expected),
         Evidence::CargoCheckClean { manifest_dir } => {
             format!("cargo_check_clean({})", manifest_dir.display())
+        }
+        Evidence::CargoCheckSafe { manifest_dir, allowed_paths } => {
+            format!(
+                "cargo_check_safe({}, allowed={})",
+                manifest_dir.display(),
+                allowed_paths.len()
+            )
         }
         Evidence::HttpStatus { url, expected } => {
             format!("GET {} -> {:?}", truncate(url, 60), expected)

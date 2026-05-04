@@ -7,7 +7,7 @@
 mod support;
 
 use std::fs;
-use support::{cargo_check, file_exists, http_status, json_field};
+use support::{cargo_check, cargo_check_safe, file_exists, http_status, json_field};
 use tempfile::TempDir;
 
 fn write(dir: &std::path::Path, rel: &str, body: &str) -> std::path::PathBuf {
@@ -98,5 +98,59 @@ fn fix_e_json_field_redacts_actual_value_on_mismatch() {
         reason.contains("len="),
         "expected length marker, got: {}",
         reason
+    );
+}
+
+/// Fix #50C/#53: `CargoCheckSafe` refuses to run on a manifest whose path
+/// is not in the allowlist. Empty allowlist => unconditional refusal.
+#[test]
+fn cargo_check_safe_refuses_external_path() {
+    let td = TempDir::new().unwrap();
+    write(
+        td.path(),
+        "Cargo.toml",
+        "[package]\nname = \"reject_probe\"\nversion = \"0.0.1\"\nedition = \"2021\"\n\n[lib]\npath = \"src/lib.rs\"\n",
+    );
+    write(td.path(), "src/lib.rs", "// empty\n");
+    let (ok, reason) = cargo_check_safe(".", &[], td.path());
+    assert!(!ok, "empty allowlist must refuse; got reason={}", reason);
+    assert!(
+        reason.contains("allowlist") || reason.contains("refused"),
+        "expected refusal reason, got: {}",
+        reason
+    );
+}
+
+/// Fix #50C/#53: when `manifest_dir` matches an allowlist entry, the
+/// safe check actually runs `cargo check` and returns PASS for an empty
+/// crate.
+#[test]
+fn cargo_check_safe_allows_whitelisted() {
+    let td = TempDir::new().unwrap();
+    write(
+        td.path(),
+        "Cargo.toml",
+        "[package]\nname = \"allow_probe\"\nversion = \"0.0.1\"\nedition = \"2021\"\n\n[lib]\npath = \"src/lib.rs\"\n",
+    );
+    write(td.path(), "src/lib.rs", "// empty\n");
+    let (ok, reason) = cargo_check_safe(".", &["."], td.path());
+    assert!(ok, "whitelisted manifest must run; reason={}", reason);
+}
+
+/// Fix #50B: cargo binary is resolved to an ABSOLUTE path via `which`.
+/// Defends against PATH-hijack where a crafted PATH entry shadows cargo.
+#[test]
+fn cargo_resolves_to_absolute_path() {
+    let resolved = kei_arch_map::evidence::cargo_check::resolve_cargo();
+    let path = resolved.expect("cargo must resolve in test environment");
+    assert!(
+        path.is_absolute(),
+        "cargo path must be absolute, got: {}",
+        path.display()
+    );
+    assert!(
+        path.exists(),
+        "cargo path must exist on disk, got: {}",
+        path.display()
     );
 }

@@ -1,51 +1,24 @@
+//! Wave 4 #50C/#53 — whitelisted `cargo check` evidence kind.
+//!
+//! `CargoCheckSafe` runs `cargo check --workspace --offline --message-format=json`
+//! ONLY on workspaces whose `manifest_dir` (relative to repo root) appears in
+//! `allowed_paths`. External / untrusted manifests are refused with FAIL.
+//!
+//! ⚠ build.rs RCE: `cargo check` compiles + runs build scripts. The allowlist
+//! exists so a Plan author can declare "I trust this workspace" explicitly.
+//! For untrusted manifests use `CargoCheckClean` (manifest-validate only).
+
+use super::cargo_check::resolve_cargo;
 use super::path_resolve;
 use serde::Deserialize;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::OnceLock;
 use std::thread;
 use std::time::Duration;
 use wait_timeout::ChildExt;
 
 const TIMEOUT: Duration = Duration::from_secs(300);
-
-/// Cached cargo binary path. `which` is invoked once per process; subsequent
-/// calls reuse the cached `Result`. Cloning is cheap (PathBuf is Arc-free
-/// but the surrounding Result is small).
-static CARGO_PATH: OnceLock<Result<PathBuf, String>> = OnceLock::new();
-
-/// Resolve the `cargo` binary to an ABSOLUTE path via the `which` crate.
-/// #50B PATH-hijack guard: never invoke a bare "cargo" — a malicious
-/// PATH entry could shadow the real binary. Reject relative paths and
-/// non-existent results. Public so integration tests can verify the
-/// guard's invariant (absolute + exists).
-pub fn resolve_cargo() -> Result<PathBuf, String> {
-    CARGO_PATH
-        .get_or_init(|| {
-            which::which("cargo")
-                .map_err(|e| format!("cargo binary not in PATH: {}", e))
-                .and_then(|p| {
-                    if !p.is_absolute() {
-                        return Err(format!("cargo path not absolute: {}", p.display()));
-                    }
-                    if !p.exists() {
-                        return Err(format!("cargo path does not exist: {}", p.display()));
-                    }
-                    Ok(p)
-                })
-        })
-        .clone()
-}
-
-/// Captured cargo output. Mirrors `std::process::Output` but built from
-/// background-drained pipes so the child cannot deadlock on a full
-/// 64 KiB pipe buffer when JSON output exceeds it.
-struct DrainedOutput {
-    status: std::process::ExitStatus,
-    stdout: Vec<u8>,
-    stderr: Vec<u8>,
-}
 
 #[derive(Debug, Deserialize)]
 struct Diag {
@@ -60,9 +33,42 @@ struct DiagMessage {
     level: String,
 }
 
-/// Spawn cargo check with fixed argv (NOT through sh).
-/// #50B: cargo binary is resolved to an absolute path via `which` so a
-/// PATH-hijack cannot redirect to an attacker binary.
+struct DrainedOutput {
+    status: std::process::ExitStatus,
+    stdout: Vec<u8>,
+    stderr: Vec<u8>,
+}
+
+/// Verify `manifest_dir` (relative to root, after canonicalize) appears in
+/// `allowed_paths`. Each allowlist entry is resolved against `root` and
+/// canonicalized so symlink trickery cannot smuggle an external path past
+/// the gate.
+fn verify_allowlist(
+    manifest_canon: &Path,
+    allowed: &[PathBuf],
+    root: &Path,
+) -> Result<(), String> {
+    if allowed.is_empty() {
+        return Err(
+            "cargo_check_safe refused: allowed_paths is empty (explicit whitelist required)"
+                .to_string(),
+        );
+    }
+    for entry in allowed {
+        let resolved = path_resolve::resolve(entry, root);
+        if let Ok(canon) = resolved.canonicalize() {
+            if manifest_canon == canon {
+                return Ok(());
+            }
+        }
+    }
+    Err(format!(
+        "cargo_check_safe refused: {} not in allowlist ({} entries)",
+        manifest_canon.display(),
+        allowed.len()
+    ))
+}
+
 fn spawn(dir: &Path) -> Result<std::process::Child, String> {
     let cargo = resolve_cargo()?;
     Command::new(&cargo)
@@ -79,7 +85,6 @@ fn spawn(dir: &Path) -> Result<std::process::Child, String> {
         .map_err(|e| format!("spawn cargo: {}", e))
 }
 
-/// Spawn a thread that reads a pipe to EOF into a Vec<u8>.
 fn drain<R: Read + Send + 'static>(mut r: R) -> thread::JoinHandle<Vec<u8>> {
     thread::spawn(move || {
         let mut buf = Vec::new();
@@ -88,17 +93,12 @@ fn drain<R: Read + Send + 'static>(mut r: R) -> thread::JoinHandle<Vec<u8>> {
     })
 }
 
-/// Wait with timeout while concurrently draining stdout+stderr in
-/// background threads. Without the drains, cargo's JSON stream fills the
-/// 64 KiB pipe buffer on a large workspace and the child blocks on write,
-/// causing a false timeout.
 fn wait_capped(mut child: std::process::Child) -> Result<DrainedOutput, String> {
     let stdout = child.stdout.take().expect("stdout piped");
     let stderr = child.stderr.take().expect("stderr piped");
     let stdout_h = drain(stdout);
     let stderr_h = drain(stderr);
-    let res = child.wait_timeout(TIMEOUT);
-    match res {
+    match child.wait_timeout(TIMEOUT) {
         Ok(Some(status)) => {
             let out = stdout_h.join().unwrap_or_default();
             let err = stderr_h.join().unwrap_or_default();
@@ -115,7 +115,6 @@ fn wait_capped(mut child: std::process::Child) -> Result<DrainedOutput, String> 
     }
 }
 
-/// Count compiler-error diagnostics in cargo JSON stream.
 fn count_errors(stdout: &[u8]) -> u64 {
     let s = String::from_utf8_lossy(stdout);
     let mut errs = 0u64;
@@ -136,18 +135,7 @@ fn count_errors(stdout: &[u8]) -> u64 {
     errs
 }
 
-pub fn check(manifest_dir: &Path, root: &Path) -> (bool, String) {
-    let resolved = path_resolve::resolve(manifest_dir, root);
-    if !resolved.join("Cargo.toml").exists() {
-        return (
-            false,
-            format!("no Cargo.toml at {}", resolved.display()),
-        );
-    }
-    let child = match spawn(&resolved) {
-        Ok(c) => c,
-        Err(e) => return (false, e),
-    };
+fn run_and_classify(child: std::process::Child) -> (bool, String) {
     let out = match wait_capped(child) {
         Ok(o) => o,
         Err(e) => return (false, e),
@@ -157,11 +145,32 @@ pub fn check(manifest_dir: &Path, root: &Path) -> (bool, String) {
         return (true, String::new());
     }
     if errs == 0 && !out.status.success() {
-        let stderr_tail: String = String::from_utf8_lossy(&out.stderr).chars().take(200).collect();
-        return (
-            false,
-            format!("cargo non-zero exit; stderr: {}", stderr_tail),
-        );
+        let tail: String = String::from_utf8_lossy(&out.stderr).chars().take(200).collect();
+        return (false, format!("cargo non-zero exit; stderr: {}", tail));
     }
     (false, format!("cargo check: {} compiler-error(s)", errs))
+}
+
+/// Entry point. Runs `cargo check --workspace` on `manifest_dir` ONLY if
+/// `manifest_dir` (after canonicalize) matches one of `allowed_paths`.
+pub fn check(
+    manifest_dir: &Path,
+    allowed_paths: &[PathBuf],
+    root: &Path,
+) -> (bool, String) {
+    let manifest_canon = match path_resolve::resolve_confined(manifest_dir, root) {
+        Ok(p) => p,
+        Err(e) => return (false, e),
+    };
+    if !manifest_canon.join("Cargo.toml").exists() {
+        return (false, format!("no Cargo.toml at {}", manifest_canon.display()));
+    }
+    if let Err(e) = verify_allowlist(&manifest_canon, allowed_paths, root) {
+        return (false, e);
+    }
+    let child = match spawn(&manifest_canon) {
+        Ok(c) => c,
+        Err(e) => return (false, e),
+    };
+    run_and_classify(child)
 }

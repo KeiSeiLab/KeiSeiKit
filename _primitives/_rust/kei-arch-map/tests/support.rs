@@ -28,6 +28,20 @@ pub fn cargo_check(manifest_dir: &str, root: &Path) -> (bool, String) {
     kei_arch_map::evidence::cargo_check::check(Path::new(manifest_dir), root)
 }
 
+pub fn cargo_check_safe(
+    manifest_dir: &str,
+    allowed: &[&str],
+    root: &Path,
+) -> (bool, String) {
+    let allowed_bufs: Vec<std::path::PathBuf> =
+        allowed.iter().map(std::path::PathBuf::from).collect();
+    kei_arch_map::evidence::cargo_check_safe::check(
+        Path::new(manifest_dir),
+        &allowed_bufs,
+        root,
+    )
+}
+
 pub fn http_status(url: &str, expected: &[u16]) -> (bool, String) {
     kei_arch_map::evidence::http_status::check(url, expected)
 }
