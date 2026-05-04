@@ -60,6 +60,17 @@ jobs:
       # v0.22.3: cross-linker step removed — aarch64-linux now builds
       # natively on ubuntu-24.04-arm. No cross-compile, no gcc-aarch64-linux-gnu.
 
+      # Phase 1.6 P2 + #27/#28 fix (2026-05-04): mold linker for Linux
+      # opt-in via env var (NOT static .cargo/config.toml). Allows local
+      # devs without mold to build cleanly. CI sets CARGO_BUILD_RUSTFLAGS
+      # via $GITHUB_ENV → propagates to subsequent cargo invocations.
+      - name: Install mold linker (Linux only)
+        if: contains(matrix.target, 'linux')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mold clang
+          echo "CARGO_BUILD_RUSTFLAGS=-C linker=clang -C link-arg=-fuse-ld=mold" >> "$GITHUB_ENV"
+
       - name: Build workspace (release)
         working-directory: _primitives/_rust
         run: cargo build --workspace --release --target ${{ matrix.target }}

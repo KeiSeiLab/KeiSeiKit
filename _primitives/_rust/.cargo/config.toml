@@ -1,7 +1,17 @@
-[target.x86_64-unknown-linux-gnu]
-linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
-
-[target.aarch64-unknown-linux-gnu]
-linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+# Cargo workspace config — kept INTENTIONALLY EMPTY for portability.
+#
+# Phase 1.6 P2 originally hardcoded mold linker for Linux targets. That
+# broke any local Linux build without mold installed. Fix #28 (2026-05-04):
+# move mold opt-in from this static config → env var via CI.
+#
+# Local devs WITH mold (faster builds):
+#   export CARGO_BUILD_RUSTFLAGS="-C linker=clang -C link-arg=-fuse-ld=mold"
+#   cargo build --release
+#
+# Local devs WITHOUT mold: no setup; default linker used.
+#
+# CI (release.yml + ci.yml): "Install mold linker (Linux only)" step
+# exports CARGO_BUILD_RUSTFLAGS via $GITHUB_ENV — affects all subsequent
+# cargo invocations in the same job.
+#
+# Documented in docs/INSTALL.md "Linux: optional mold linker" section.

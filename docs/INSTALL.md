@@ -222,6 +222,18 @@ Of the 82 blocks, the **8 base blocks** (`baseline`, `evidence-grading`, `memory
 
 **Cognitive mode blocks** (`_blocks/mode-*.md`) are composable behavioural skews — `mode-skeptic`, `mode-devils-advocate`, `mode-minimalist`, `mode-maximalist`, `mode-first-principles`. Add any combination to an agent's manifest `blocks = [...]` list to stack the mode. See `_blocks/README.md` for the full list.
 
+## Linux: optional mold linker for faster builds
+
+For ~3× faster link times on Linux, install mold:
+
+```bash
+sudo apt-get install -y mold clang
+export CARGO_BUILD_RUSTFLAGS="-C linker=clang -C link-arg=-fuse-ld=mold"
+cargo build --release
+```
+
+CI uses this automatically. Without mold, the default linker is used — slower but no setup required. The opt-in is intentional (#28 fix 2026-05-04): a static `.cargo/config.toml` would have broken every Linux contributor without mold installed.
+
 ## Next steps
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — how agents, blocks, manifests, and the assembler fit together
