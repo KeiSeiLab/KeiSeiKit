@@ -179,18 +179,10 @@ members = [
     "kei-db-contract",
     # Live runtime-graph exporter (registry + ledger → D3 space fragment)
     "kei-graph-export",
-    # SSoT validator: claims declared in arch/PLAN.toml, verified against repo state
-    "kei-arch-map",
-    # Code-hygiene scanner: dead code, unused deps, LOC checks, dep drift (CLEANUP-RUNTIME-SPEC.md)
-    "kei-cleanup",
-    # Phase 2 PR-3: bridge kei-registry formulas → arch/PLAN.toml (MATH-DNA-DESIGN §4)
-    "kei-arch-derive",
-    # Wave 10: KeiWiki — auto-extract source → markdown for living docs site
-    "keidocs",
-    # Wave 10: KeiWiki — DNA manifest signing per primitive (sha256, ed25519 phase 2)
-    "keidna-sign",
-    # Wave 12: sovereign comments backend (replaces Giscus + GitHub Discussions)
-    "kei-comments",
+    # Live agent-events.jsonl tail → WebSocket stream (kei-graph-stream daemon)
+    "kei-graph-stream",
+    # Wave 5 e2e — full-pipeline integration test (cleanup → derive → arch-map verify)
+    "kei-pipeline-test",
 ]
 
 [workspace.package]
@@ -202,7 +194,7 @@ repository = "https://github.com/KeiSei84/KeiSeiKit-1.0"
 homepage = "https://github.com/KeiSei84/KeiSeiKit-1.0"
 
 [workspace.dependencies]
-clap = { version = "4", features = ["derive", "env"] }
+clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.9"
@@ -220,10 +212,7 @@ flate2 = "1"
 walkdir = "2"
 pretty_assertions = "1"
 # Shared async + HTTP deps (Waves 31/32/33/35/36 etc — kei-tty / kei-router / etc)
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "sync"] }
-tower = { version = "0.4", features = ["limit", "buffer", "util"] }
-dashmap = "5"
-notify = "8"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "time", "process", "fs", "io-util", "io-std", "sync"] }
 tokio-stream = "0.1"
 futures = "0.3"
 reqwest = { version = "0.12", features = ["json", "stream", "multipart", "rustls-tls"], default-features = false }
@@ -241,15 +230,13 @@ lru = "0.12"
 nix = { version = "0.29", default-features = false, features = ["fs"] }
 # A2.1 — kei-import-project trait pattern matcher (syn AST parsing)
 syn = { version = "2", features = ["full"] }
-# kei-arch-map Phase 1.5 hardening — format-preserving toml edits + advisory file locks + child wait-with-timeout
-toml_edit = "0.22"
-fs2 = "0.4"
-wait-timeout = "0.2"
-# kei-arch-map Wave 4 #50B — PATH-hijack guard: resolve cargo via absolute path
-which = "6"
+# Fix 2: hoisted from member crates for SSoT
+dashmap = "6"
+tower = { version = "0.5", features = ["limit", "buffer", "util"] }
+notify = "8"
 
 [profile.release]
 opt-level = "z"
-lto = "thin"          # was true (full LTO is 3-5× slower)
+lto = true
 strip = true
-codegen-units = 16    # was 1 (4× more parallelism in codegen)
+codegen-units = 1
