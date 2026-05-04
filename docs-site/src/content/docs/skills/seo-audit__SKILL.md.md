@@ -1,0 +1,42 @@
+---
+title: SKILL
+path: seo-audit/SKILL.md
+dna_hash: sha256:a6b1a2620cb298b9
+language: markdown
+size_loc: 55
+generated: by-keidocs
+---
+
+# seo-audit/SKILL.md
+
+## Public API
+
+- `SEO Audit Workflow` — ---
+- `When to use` — - Auditing a live URL or project codebase for technical SEO issues (meta tags, canonical, sitemap, Core Web Vitals).
+- `Step 1: Technical SEO` — Fetch and analyze the page:
+- `Step 2: Performance Impact` — - Image optimization: format (WebP/AVIF), size, lazy loading, alt text
+- `Step 3: Content SEO` — - Keyword presence in: title, H1, first paragraph, URL
+- `Step 4: Issues Report` — Format as prioritized list:
+- `Step 5: Action Items` — - Generate fix list ordered by impact
+
+## Related
+
+- parent: `seo-audit`
+
+## Discussion
+
+<script src="https://giscus.app/client.js"
+        data-repo="KeiSei84/KeiSeiKit-1.0"
+        data-repo-id="PLACEHOLDER_REPO_ID"
+        data-category="wiki-comments"
+        data-category-id="PLACEHOLDER_CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async></script>

@@ -1,0 +1,67 @@
+---
+title: lib.rs
+path: kei-net-openvpn/src/lib.rs
+dna_hash: sha256:ce08047ead9b4502
+language: rust
+size_loc: 46
+generated: by-keidocs
+---
+
+# kei-net-openvpn/src/lib.rs
+
+kei-net-openvpn — `NetworkMode` impl over a host-resident OpenVPN server.
+
+Lifecycle:
+* `configure` → `systemctl start openvpn-server@<name>`
+* `teardown`  → `systemctl stop  openvpn-server@<name>`
+* `peers`     → connect to the management-interface UNIX socket
+(`/var/run/openvpn/<name>.sock` by default), send
+`status 2`, parse `CLIENT_LIST,...` rows.
+
+`is_public` returns `true` — OpenVPN is typically routed over a
+public UDP/TCP endpoint (unlike `tailscale` / `wireguard`-private
+analogs in the sibling crates).
+
+Constructor Pattern (5 cubes, each <200 LOC, one responsibility):
+* `error.rs`   — crate error + `From<Error> for kei_runtime_core::Error`
+* `runner.rs`  — `Runner` trait abstracting `systemctl` + `SystemRunner`
+(real `std::process::Command`-backed impl)
+* `mgmt.rs`    — pure CSV-ish status parser (`parse_status_output`)
+* `network.rs` — `OpenvpnMode` struct + `NetworkMode` impl + DNA wiring
+
+DNA (literal):
+DnaBuilder::new("primitive")
+.caps(["PR", "AP", "OV"])
+.scope("keiseikit.dev/primitives/kei-net-openvpn")
+.body(b"openvpn-systemd-v1")
+.build()?
+
+Env overrides:
+* `OPENVPN_CONFIG_PATH`  — path to `<name>.conf`. Default
+`/etc/openvpn/server/<name>.conf`.
+* `OPENVPN_SERVICE_NAME` — `<name>` instance for the
+`openvpn-server@<name>` systemd unit
+and management-socket basename.
+Default `server`.
+
+## Related
+
+- parent: `kei-net-openvpn/Cargo.toml`
+
+## Discussion
+
+<script src="https://giscus.app/client.js"
+        data-repo="KeiSei84/KeiSeiKit-1.0"
+        data-repo-id="PLACEHOLDER_REPO_ID"
+        data-category="wiki-comments"
+        data-category-id="PLACEHOLDER_CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async></script>

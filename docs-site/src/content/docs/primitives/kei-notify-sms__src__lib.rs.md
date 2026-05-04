@@ -1,0 +1,68 @@
+---
+title: lib.rs
+path: kei-notify-sms/src/lib.rs
+dna_hash: sha256:d05b7b66218d9d2f
+language: rust
+size_loc: 46
+generated: by-keidocs
+---
+
+# kei-notify-sms/src/lib.rs
+
+kei-notify-sms — Twilio Programmable Messaging [`NotifyChannel`].
+
+Wave 8 atomar SMS sibling of `kei-notify-email`. Targets Twilio's
+`/2010-04-01/Accounts/{ACCOUNT_SID}/Messages.json` REST surface with
+HTTP Basic auth (`ACCOUNT_SID:AUTH_TOKEN`). Bodies are formatted as
+`[severity-emoji] subject — body_text` and UTF-8-safe truncated to
+1500 bytes to stay comfortably under Twilio's 1600-char hard limit.
+
+The channel's `min_severity()` returns [`NotifySeverity::Warn`]: SMS
+is intrusive and metered, so info / success notifications are dropped
+by the trait-default delivery filter. Override by wrapping in a
+custom [`NotifyChannel`] if you really want every Info SMS.
+
+## Quick start
+
+```ignore
+use kei_notify_sms::SmsChannel;
+use kei_runtime_core::traits::notify::NotifyChannel;
+
+# async fn ex() -> kei_runtime_core::Result<()> {
+let channel = SmsChannel::from_env(None)?;
+// ... build a Notification with severity >= Warn ...
+# Ok(())
+# }
+```
+
+## Branding axes vs `kei-notify-email`
+
+| axis             | kei-notify-email     | kei-notify-sms             |
+|------------------|----------------------|----------------------------|
+| DNA caps         | `["PR", "AP", "EM"]` | `["PR", "AP", "SM"]`       |
+| DNA scope        | `.../kei-notify-email` | `.../kei-notify-sms`     |
+| DNA body         | `b"smtp-email-v1"`   | `b"twilio-sms-v1"`         |
+| min_severity     | Info (default)       | Warn (override)            |
+| supports_batching| `true`               | `false`                    |
+
+## Related
+
+- parent: `kei-notify-sms/Cargo.toml`
+
+## Discussion
+
+<script src="https://giscus.app/client.js"
+        data-repo="KeiSei84/KeiSeiKit-1.0"
+        data-repo-id="PLACEHOLDER_REPO_ID"
+        data-category="wiki-comments"
+        data-category-id="PLACEHOLDER_CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async></script>

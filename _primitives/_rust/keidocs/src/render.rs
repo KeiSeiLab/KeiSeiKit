@@ -17,11 +17,42 @@ pub fn render_markdown(
     push_modules(&mut s, sections);
     push_items(&mut s, sections);
     push_related(&mut s, rel, deps);
+    push_giscus(&mut s);
     s
 }
 
+/// Append Giscus comments widget — GitHub Discussions backend.
+/// User must populate the four placeholders below from giscus.app
+/// (Repo Settings → Discussions enable → giscus.app wizard → copy IDs).
+fn push_giscus(s: &mut String) {
+    s.push_str("\n## Discussion\n\n");
+    s.push_str("<script src=\"https://giscus.app/client.js\"\n");
+    s.push_str("        data-repo=\"KeiSei84/KeiSeiKit-1.0\"\n");
+    s.push_str("        data-repo-id=\"PLACEHOLDER_REPO_ID\"\n");
+    s.push_str("        data-category=\"wiki-comments\"\n");
+    s.push_str("        data-category-id=\"PLACEHOLDER_CATEGORY_ID\"\n");
+    s.push_str("        data-mapping=\"pathname\"\n");
+    s.push_str("        data-strict=\"0\"\n");
+    s.push_str("        data-reactions-enabled=\"1\"\n");
+    s.push_str("        data-emit-metadata=\"0\"\n");
+    s.push_str("        data-input-position=\"bottom\"\n");
+    s.push_str("        data-theme=\"preferred_color_scheme\"\n");
+    s.push_str("        data-lang=\"en\"\n");
+    s.push_str("        data-loading=\"lazy\"\n");
+    s.push_str("        crossorigin=\"anonymous\"\n");
+    s.push_str("        async></script>\n");
+}
+
 fn push_frontmatter(s: &mut String, rel: &str, dna: &str, lang: &str, loc: usize) {
+    // Title for Astro Starlight schema — derive from path tail.
+    let title = rel
+        .rsplit('/')
+        .next()
+        .unwrap_or(rel)
+        .trim_end_matches(".md")
+        .replace("__", "/");
     s.push_str("---\n");
+    s.push_str(&format!("title: {}\n", title));
     s.push_str(&format!("path: {}\n", rel));
     s.push_str(&format!("dna_hash: {}\n", dna));
     s.push_str(&format!("language: {}\n", lang));

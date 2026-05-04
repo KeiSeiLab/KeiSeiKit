@@ -1,0 +1,62 @@
+---
+// Giscus comments widget — GitHub Discussions backend.
+// User must populate the four PLACEHOLDER values below from giscus.app
+// (visit giscus.app, paste repo, click through the wizard, copy IDs).
+//
+// What this gives:
+//   - One comment thread per wiki page (mapped by pathname)
+//   - Anyone with a GitHub account can comment
+//   - All data lives in GitHub Discussions tab of the repo (free, persistent)
+//   - Reactions, replies, markdown, code blocks
+//
+// Setup steps (one-time, by repo owner):
+//   1. Enable Discussions tab: Repo → Settings → Features → ☑ Discussions
+//   2. Go to https://giscus.app/
+//   3. Paste repo: KeiSei84/KeiSeiKit-1.0
+//   4. Pick mapping: pathname
+//   5. Pick category: create "wiki-comments" (Announcement type) and select it
+//   6. Copy `data-repo-id` and `data-category-id` from generated snippet
+//   7. Replace PLACEHOLDER values below
+
+const GISCUS_REPO = 'KeiSei84/KeiSeiKit-1.0';
+const GISCUS_REPO_ID = 'PLACEHOLDER_REPO_ID';
+const GISCUS_CATEGORY = 'wiki-comments';
+const GISCUS_CATEGORY_ID = 'PLACEHOLDER_CATEGORY_ID';
+---
+
+<div class="not-content keisei-giscus">
+  <hr />
+  <h3>Discussion</h3>
+  <p class="giscus-hint">
+    Comments powered by <a href="https://giscus.app" target="_blank" rel="noopener">Giscus</a> →
+    GitHub Discussions. Login with GitHub to post.
+  </p>
+  <script
+    src="https://giscus.app/client.js"
+    data-repo={GISCUS_REPO}
+    data-repo-id={GISCUS_REPO_ID}
+    data-category={GISCUS_CATEGORY}
+    data-category-id={GISCUS_CATEGORY_ID}
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="preferred_color_scheme"
+    data-lang="en"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</div>
+
+<style>
+  .keisei-giscus {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+  }
+  .giscus-hint {
+    color: var(--sl-color-gray-3);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+</style>

@@ -1,0 +1,11 @@
+---
+// Override Starlight's <Footer /> to inject Giscus comments per page.
+// Starlight Footer takes Props (no slot) — we forward Astro.props,
+// then append Giscus widget below.
+
+import Default from '@astrojs/starlight/components/Footer.astro';
+import Giscus from './Giscus.astro';
+---
+
+<Default {...Astro.props} />
+<Giscus />

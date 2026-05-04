@@ -18,23 +18,13 @@ export default defineConfig({
       title: 'KeiSeiKit',
       description:
         'Living wiki — auto-generated from git, signed by commit. Self-extending substrate of Rust primitives, agents, skills, and hooks.',
-      logo: {
-        src: './src/assets/keisei-mark.svg',
-        replacesTitle: false,
+      // logo: {src: './src/assets/keisei-mark.svg'},  // TODO: add brand mark SVG
+      social: {
+        github: 'https://github.com/KeiSei84/KeiSeiKit-1.0',
       },
-      social: [
-        {
-          icon: 'github',
-          label: 'GitHub',
-          href: 'https://github.com/KeiSei84/KeiSeiKit-1.0',
-        },
-        {
-          icon: 'external',
-          label: 'Forgejo',
-          href: 'http://<private-forgejo>:3000/denis/KeiSeiKit',
-        },
-      ],
       customCss: ['./src/styles/keisei.css'],
+      // Giscus comments injected directly by keidocs renderer (markdown
+      // appends <script> per page). No Starlight component override needed.
       sidebar: [
         {
           label: 'Overview',

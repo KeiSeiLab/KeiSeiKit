@@ -1,0 +1,37 @@
+---
+title: SKILL
+path: kei-registry/tests/fixtures/fake-kit/skills/sample/SKILL.md
+dna_hash: sha256:93dfe3a827f50afa
+language: markdown
+size_loc: 7
+generated: by-keidocs
+---
+
+# kei-registry/tests/fixtures/fake-kit/skills/sample/SKILL.md
+
+## Public API
+
+- `Sample Skill` — Body of a sample skill for kei-registry test fixtures.
+- `Usage` — This is just a fixture, not a real skill.
+
+## Related
+
+- parent: `kei-registry/tests/fixtures/fake-kit/skills/sample`
+
+## Discussion
+
+<script src="https://giscus.app/client.js"
+        data-repo="KeiSei84/KeiSeiKit-1.0"
+        data-repo-id="PLACEHOLDER_REPO_ID"
+        data-category="wiki-comments"
+        data-category-id="PLACEHOLDER_CATEGORY_ID"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async></script>
