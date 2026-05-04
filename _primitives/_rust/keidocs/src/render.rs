@@ -21,26 +21,18 @@ pub fn render_markdown(
     s
 }
 
-/// Append Giscus comments widget — GitHub Discussions backend.
-/// User must populate the four placeholders below from giscus.app
-/// (Repo Settings → Discussions enable → giscus.app wizard → copy IDs).
+/// Append KeiComments mount point — sovereign comment system backed by
+/// kei-cortex /api/v1/cortex/comments/{page_id} (no external services).
+/// Page ID = relative file path (used for threading).
+/// Implementation: pure-DOM `<div>` mount + client script loaded from
+/// `/keicomments.js` (no JSX → safe in plain `.md`, no MDX needed).
 fn push_giscus(s: &mut String) {
+    // Function name kept for backwards compat; sovereign mount, not Giscus.
     s.push_str("\n## Discussion\n\n");
-    s.push_str("<script src=\"https://giscus.app/client.js\"\n");
-    s.push_str("        data-repo=\"KeiSei84/KeiSeiKit-1.0\"\n");
-    s.push_str("        data-repo-id=\"PLACEHOLDER_REPO_ID\"\n");
-    s.push_str("        data-category=\"wiki-comments\"\n");
-    s.push_str("        data-category-id=\"PLACEHOLDER_CATEGORY_ID\"\n");
-    s.push_str("        data-mapping=\"pathname\"\n");
-    s.push_str("        data-strict=\"0\"\n");
-    s.push_str("        data-reactions-enabled=\"1\"\n");
-    s.push_str("        data-emit-metadata=\"0\"\n");
-    s.push_str("        data-input-position=\"bottom\"\n");
-    s.push_str("        data-theme=\"preferred_color_scheme\"\n");
-    s.push_str("        data-lang=\"en\"\n");
-    s.push_str("        data-loading=\"lazy\"\n");
-    s.push_str("        crossorigin=\"anonymous\"\n");
-    s.push_str("        async></script>\n");
+    s.push_str("<div id=\"keicomments-mount\" data-page=\"\"></div>\n");
+    // The script reads page-id from <meta name=\"keidocs-path\">,
+    // emitted by `push_frontmatter` (path: ...) → Astro renders it as meta.
+    s.push_str("<script type=\"module\" src=\"/keicomments.js\"></script>\n");
 }
 
 fn push_frontmatter(s: &mut String, rel: &str, dna: &str, lang: &str, loc: usize) {

@@ -189,6 +189,8 @@ members = [
     "keidocs",
     # Wave 10: KeiWiki — DNA manifest signing per primitive (sha256, ed25519 phase 2)
     "keidna-sign",
+    # Wave 12: sovereign comments backend (replaces Giscus + GitHub Discussions)
+    "kei-comments",
 ]
 
 [workspace.package]

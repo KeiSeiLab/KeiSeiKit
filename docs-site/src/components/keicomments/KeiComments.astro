@@ -1,0 +1,24 @@
+---
+// KeiComments.astro — wrapper for use in markdown / Starlight pages.
+// Hydrates the React island on the client (client:load) so fetch + state work.
+//
+// Usage in MDX:
+//   <KeiComments pageId="primitives/kei-cortex" />
+//
+// Props:
+//   pageId  — stable page identifier (path slug recommended)
+//   apiBase — optional override; defaults to /api/v1/cortex/comments
+
+import KeiComments from "./KeiComments.tsx";
+
+interface Props {
+  pageId: string;
+  apiBase?: string;
+}
+
+const { pageId, apiBase } = Astro.props as Props;
+---
+
+<div class="not-content">
+  <KeiComments client:load pageId={pageId} apiBase={apiBase} />
+</div>

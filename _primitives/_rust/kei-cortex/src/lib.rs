@@ -15,6 +15,8 @@ pub mod anthropic_config;
 pub mod anthropic_invoker;
 pub mod anthropic_sse;
 pub mod auth;
+pub mod comments_routes;
+pub mod comments_routes_init;
 pub mod config;
 pub mod context;
 pub mod elevenlabs;

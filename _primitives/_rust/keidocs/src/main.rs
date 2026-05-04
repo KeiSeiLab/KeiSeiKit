@@ -85,6 +85,8 @@ fn emit_one(root: &Path, src: &Path, out: &Path, lang: &str) -> Result<()> {
     let dna = compute_dna(&rel, &content, &deps);
     let loc = content.lines().count();
     let md = render_markdown(&rel, &dna, lang, loc, &sections, &deps);
+    // .md — KeiComments mounts via client-side script on <div id="keicomments-mount">.
+    // (MDX parses every `<` as JSX, breaks on the 1.6k auto-generated source files.)
     let target_path = out.join(format!("{}.md", flatten_path(&rel)));
     if let Some(parent) = target_path.parent() {
         fs::create_dir_all(parent).ok();

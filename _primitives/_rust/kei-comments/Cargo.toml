@@ -1,0 +1,28 @@
+[package]
+name = "kei-comments"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Sovereign threaded comment store — SQLite-backed, replaces Giscus/GitHub Discussions for KeiWiki."
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "kei_comments"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kei-comments"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+rusqlite = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

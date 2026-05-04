@@ -19,7 +19,7 @@ use axum::extract::DefaultBodyLimit;
 use axum::http::{header, HeaderValue, Method, StatusCode};
 use axum::middleware;
 use axum::response::IntoResponse;
-use axum::routing::{get, post};
+use axum::routing::{delete, get, post};
 use axum::Router;
 
 #[path = "routes/openai/mod.rs"]
@@ -110,6 +110,23 @@ fn build_api_router() -> Router<AppState> {
             post(tool_apply::apply).layer(DefaultBodyLimit::max(TOOL_APPLY_BODY_LIMIT)),
         )
         .route("/api/v1/cortex/term", get(term::ws_handler))
+        // Sovereign comments — inlined here (axum 0.7 `:name` syntax,
+        // NOT 0.8 `{name}`). Auth middleware applied by parent
+        // `route_layer(require_bearer)`. Handlers fetch the global
+        // store internally via `comments_routes_init::global_store()`.
+        .route(
+            "/api/v1/cortex/comments/by-page/:page_id",
+            get(crate::comments_routes::list_comments)
+                .post(crate::comments_routes::post_comment),
+        )
+        .route(
+            "/api/v1/cortex/comments/by-id/:id",
+            delete(crate::comments_routes::delete_comment),
+        )
+        .route(
+            "/api/v1/cortex/comments/by-id/:id/react",
+            post(crate::comments_routes::react_comment),
+        )
 }
 
 /// Build the CORS layer locked to a single origin.

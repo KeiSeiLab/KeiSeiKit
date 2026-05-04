@@ -63,6 +63,8 @@ kei-model = { path = "../kei-model" }
 # real data. Open lazily on AppState init; tracker IO failures must
 # never break the chat call.
 kei-token-tracker = { path = "../kei-token-tracker" }
+# Sovereign threaded comment store backing /api/v1/cortex/comments/*.
+kei-comments = { path = "../kei-comments" }
 
 [dev-dependencies]
 reqwest = { workspace = true, features = ["blocking"] }

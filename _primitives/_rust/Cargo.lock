@@ -3295,6 +3295,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "kei-comments"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+]
+
+[[package]]
 name = "kei-compute-baremetal"
 version = "0.1.0"
 dependencies = [
@@ -3397,6 +3411,7 @@ dependencies = [
  "clap",
  "dashmap",
  "futures",
+ "kei-comments",
  "kei-ledger",
  "kei-model",
  "kei-pet",
