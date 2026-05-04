@@ -64,6 +64,16 @@ pub enum FindingKind {
     LocFile,
     /// Function exceeds Constructor Pattern LOC limit.
     LocFunction,
+    /// TODO/FIXME/XXX/HACK comment older than configured threshold.
+    StaleTodo,
+    /// Derivation marker without matching test marker.
+    CoverageGap,
+    /// Test references 2+ sibling crates (dev-dep cycle risk).
+    WorkspaceTestNeeded,
+    /// `cargo doc` warning (broken intra-doc link, etc).
+    DocWarning,
+    /// Naming-pair drift: two variants of the same constant in use.
+    NamingDrift,
 }
 
 /// Severity bucket — controls `--fail-on` and HIGH/MEDIUM/LOW grouping.

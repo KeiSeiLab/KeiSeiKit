@@ -9,7 +9,7 @@
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use kei_cleanup::{run_all, run_scanner, CleanupReport, Config, Finding, Severity};
+use kei_cleanup::{registry_bridge, run_all, run_scanner, CleanupReport, Config, Finding, Severity};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -29,29 +29,48 @@ struct Cli {
     /// Comma-list of scanner names to run.
     #[arg(long)]
     only: Option<String>,
+    /// Emit findings as predicate rows to a kei-registry SQLite DB.
+    #[arg(long, value_name = "DB_PATH")]
+    emit_predicates: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    let workspace = cli.path.unwrap_or_else(|| PathBuf::from("."));
+    let workspace = cli
+        .path
+        .clone()
+        .unwrap_or_else(|| PathBuf::from("."));
     let cfg = Config::load_or_default(&workspace)?;
-
-    let report = if let Some(list) = cli.only.as_deref() {
-        run_subset(&workspace, &cfg, list)?
-    } else {
-        run_all(&workspace, &cfg)?
-    };
-
-    if !cli.quiet {
-        print_pretty(&report);
-    }
-    if let Some(json_path) = cli.json {
-        write_json(&report, &json_path)?;
-    }
+    let report = build_report(&cli, &workspace, &cfg)?;
+    emit_outputs(&cli, &report)?;
     if let Some(level) = cli.fail_on.as_deref() {
         let min = Severity::parse_min(level).ok_or_else(|| anyhow!("invalid --fail-on: {level}"))?;
         if has_at_or_above(&report.findings, min) {
             std::process::exit(1);
+        }
+    }
+    Ok(())
+}
+
+fn build_report(cli: &Cli, workspace: &PathBuf, cfg: &Config) -> Result<CleanupReport> {
+    if let Some(list) = cli.only.as_deref() {
+        run_subset(workspace, cfg, list)
+    } else {
+        Ok(run_all(workspace, cfg)?)
+    }
+}
+
+fn emit_outputs(cli: &Cli, report: &CleanupReport) -> Result<()> {
+    if !cli.quiet {
+        print_pretty(report);
+    }
+    if let Some(json_path) = cli.json.as_deref() {
+        write_json(report, &json_path.to_path_buf())?;
+    }
+    if let Some(db) = cli.emit_predicates.as_deref() {
+        match registry_bridge::emit_to_registry(db, &report.findings, &report.workspace_sha) {
+            Ok(n) => eprintln!("emitted {n} predicate rows to {}", db.display()),
+            Err(e) => eprintln!("warning: --emit-predicates failed: {e}"),
         }
     }
     Ok(())

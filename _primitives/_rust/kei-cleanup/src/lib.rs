@@ -10,6 +10,7 @@
 
 pub mod config;
 pub mod error;
+pub mod registry_bridge;
 pub mod report;
 pub mod scanners;
 
@@ -81,6 +82,11 @@ fn dispatch(name: &str, workspace: &Path, cfg: &Config) -> Result<Vec<Finding>, 
         "unused_deps" => scanners::unused_deps::scan(workspace, cfg),
         "dep_drift" => scanners::dep_drift::scan(workspace, cfg),
         "loc_check" => scanners::loc_check::scan(workspace, cfg),
+        "todo_age" => scanners::todo_age::scan(workspace, cfg),
+        "coverage_map" => scanners::coverage_map::scan(workspace, cfg),
+        "workspace_tests" => scanners::workspace_tests::scan(workspace, cfg),
+        "doc_warnings" => scanners::doc_warnings::scan(workspace, cfg),
+        "naming_consistency" => scanners::naming_consistency::scan(workspace, cfg),
         other => Err(CleanupError::ToolNotFound(format!("unknown scanner: {other}"))),
     }
 }

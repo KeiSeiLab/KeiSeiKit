@@ -1,0 +1,20 @@
+[meta]
+name = "kei-cleanup"
+role = "read-only"
+description = "Reads kei-cleanup CleanupReport, drafts prioritized fix proposals, never commits."
+version = "v1"
+
+[capabilities]
+deny-tools = ["Edit", "Write"]
+allow-tools = ["Read", "Glob", "Grep", "Bash"]
+
+[trigger]
+modes = ["manual", "skill", "scheduled"]
+manual = "Agent tool spawn by orchestrator"
+skill = "/cleanup"
+scheduled = "weekly via kei-cron-scheduler"
+
+[runtime]
+isolation = "worktree"
+timeout_min = 15
+output = "report"

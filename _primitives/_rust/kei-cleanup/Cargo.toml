@@ -24,6 +24,10 @@ walkdir = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
+regex = { workspace = true }
+syn = { workspace = true }
+rusqlite = { workspace = true }
+wait-timeout = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }
