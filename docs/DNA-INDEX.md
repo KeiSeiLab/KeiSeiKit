@@ -1,6 +1,6 @@
 # KeiSeiKit DNA Encyclopedia
 
-> Auto-generated from kei-registry. Last regenerated: 2026-05-04T14:14:18Z.
+> Auto-generated from kei-registry. Last regenerated: 2026-05-04T14:27:39Z.
 > Total blocks: 592. Per-type breakdown:
 
 | Type | Count |
@@ -21,11 +21,11 @@ Sorted alphabetically by name.
 |---|---|---|---|
 | firewall-diff::firewall-diff | primitive::_::cfe51e… | _primitives/_rust/firewall-diff/Cargo.toml | 07f0e46a |
 | frustration-matrix::frustration-matrix | primitive::_::b6ee34… | _primitives/_rust/frustration-matrix/Cargo.toml | db99150c |
-| kei-agent-runtime::kei-agent-runtime | primitive::_::18437e… | _primitives/_rust/kei-agent-runtime/Cargo.toml | 76e04f24 |
+| kei-agent-runtime::kei-agent-runtime | primitive::_::18437e… | _primitives/_rust/kei-agent-runtime/Cargo.toml | 8a05daf6 |
 | kei-arch-derive::kei-arch-derive | primitive::_::ac49de… | _primitives/_rust/kei-arch-derive/Cargo.toml | 86ce97f7 |
 | kei-arch-derive::kei-arch-derive | primitive::_::ffd66e… | _primitives/_rust/kei-arch-derive/Cargo.toml | 277075d8 |
 | kei-arch-map::kei-arch-map | primitive::_::7b2994… | _primitives/_rust/kei-arch-map/Cargo.toml | 6ac9819e |
-| kei-arch-map::kei-arch-map | primitive::_::93d979… | _primitives/_rust/kei-arch-map/Cargo.toml | b1499c38 |
+| kei-arch-map::kei-arch-map | primitive::_::93d979… | _primitives/_rust/kei-arch-map/Cargo.toml | 44929e98 |
 | kei-artifact::kei-artifact | primitive::_::111b67… | _primitives/_rust/kei-artifact/Cargo.toml | 8742aade |
 | kei-atom-discovery::kei-atom-discovery | primitive::_::85ce60… | _primitives/_rust/kei-atom-discovery/Cargo.toml | bb5db6ab |
 | kei-auth-apple::kei-auth-apple | primitive::_::95b0b0… | _primitives/_rust/kei-auth-apple/Cargo.toml | 42f38a75 |
@@ -125,12 +125,12 @@ Sorted alphabetically by name.
 | kei-registry::mini-prim | primitive::_::5fec4a… | _primitives/_rust/kei-registry/tests/fixtures/mini-kit/_primitives/_rust/mini-prim/Cargo.toml | 9fa2b304 |
 | kei-replay::kei-replay | primitive::_::e59b33… | _primitives/_rust/kei-replay/Cargo.toml | 4e8b77cb |
 | kei-router::kei-router | primitive::_::1e654e… | _primitives/_rust/kei-router/Cargo.toml | 98ab93cd |
-| kei-runtime-core::kei-runtime-core | primitive::_::3cf11b… | _primitives/_rust/kei-runtime-core/Cargo.toml | 10186e32 |
+| kei-runtime-core::kei-runtime-core | primitive::_::3cf11b… | _primitives/_rust/kei-runtime-core/Cargo.toml | 9c23c869 |
 | kei-runtime::kei-runtime | primitive::_::4d8427… | _primitives/_rust/kei-runtime/Cargo.toml | 5fcf7642 |
 | kei-sage::kei-sage | primitive::_::176fa2… | _primitives/_rust/kei-sage/Cargo.toml | df35dc55 |
 | kei-scheduler::kei-scheduler | primitive::_::2b15c6… | _primitives/_rust/kei-scheduler/Cargo.toml | ef89066d |
 | kei-search-core::kei-search-core | primitive::_::bd14ad… | _primitives/_rust/kei-search-core/Cargo.toml | ff60e666 |
-| kei-shared::kei-shared | primitive::_::9db375… | _primitives/_rust/kei-shared/Cargo.toml | df6d9f3f |
+| kei-shared::kei-shared | primitive::_::9db375… | _primitives/_rust/kei-shared/Cargo.toml | 985486d6 |
 | kei-skill-importer::kei-skill-importer | primitive::_::17a43f… | _primitives/_rust/kei-skill-importer/Cargo.toml | 99c79714 |
 | kei-skills::kei-skills | primitive::_::70203f… | _primitives/_rust/kei-skills/Cargo.toml | fa2242f8 |
 | kei-social-store::kei-social-store | primitive::_::e41e44… | _primitives/_rust/kei-social-store/Cargo.toml | a0590b58 |
@@ -1172,9 +1172,9 @@ Sorted alphabetically by name.
 - `frustration-matrix` — 3 versions: 0923b30a → d51e63c8 → 4df8a04e
 - `frustration-matrix::frustration-matrix` — 2 versions: db99150c → db99150c
 - `kei-agent-runtime` — 3 versions: 708830d4 → 33b44d6c → 841ac805
-- `kei-agent-runtime::kei-agent-runtime` — 2 versions: 76e04f24 → 76e04f24
+- `kei-agent-runtime::kei-agent-runtime` — 6 versions: 76e04f24 → 76e04f24 → f33a7022 → 45500a16 → 3e5d1243 → 8a05daf6
 - `kei-arch-derive::kei-arch-derive` — 28 versions: 2e9d962a → 5194d503 → 0c402cb7 → f2424e44 → ce755416 → 623df7cf → 222d9b53 → 3a0c6f9f → d0ec62b9 → c67c0537 → 7d96b210 → 593945dc → 8900447a → 9ea9e57a → 47ef6975 → 5c91a1a4 → 9a462393 → 057b559a → eea07b90 → c4d4e679 → 85e87da9 → 86ce97f7 → 86ce97f7 → 3f6fd9aa → f7356a40 → 24454ab8 → 64d2f1df → 277075d8
-- `kei-arch-map::kei-arch-map` — 89 versions: 2e9d962a → 8f857390 → 31c4476e → a5a88192 → 56108075 → 489c0d17 → 0249bfe4 → 33cddca1 → 9fda4ce7 → 6dbc8cc7 → d6438878 → 2389b369 → aac0b7e2 → 3dd66c1b → 43d00213 → a78aab5e → b26c1553 → 288a06ff → c0af043e → 00bfa19d → 67dae440 → 6b450504 → 631c4f6d → abac7b08 → b9b2ae96 → 4021c4ef → 26742798 → 05e55a4d → 07a38bc2 → 2641fb3f → acfac7a8 → b6a985d1 → 616d676f → 83596ed7 → 19db5b14 → f9cc92dd → 12f810ca → cf0e7d83 → 8b4d9c93 → e21c155b → b149f5a3 → 5d343463 → 1bc51349 → 2f4ae1e3 → a0991b1c → 5c1b60be → 312c7233 → bf8d22c7 → ec790973 → d276a710 → 9c87971c → 38d7a017 → 2e9d962a → 2c19c2ba → fd84bfe4 → 7c564024 → b07c49a5 → 0b6bc47a → a40e7bab → 4703d4d7 → 9f0da613 → a89aa071 → 65ddc8e2 → fa7973c2 → ce6436c9 → 8e3a6d78 → 808f3fb6 → 88a40957 → de7e5352 → c13aa048 → b64f65f9 → c0a9abac → 3028b210 → 6ac9819e → 101ce920 → 1e4634ae → 2f740fba → 39cf8d48 → 9abd7954 → 653a93fd → 2062f53a → 86c1025b → 7d1a4fba → f1e85972 → 9cbb6969 → 640ee712 → e8203dad → c883c49f → b1499c38
+- `kei-arch-map::kei-arch-map` — 90 versions: 2e9d962a → 8f857390 → 31c4476e → a5a88192 → 56108075 → 489c0d17 → 0249bfe4 → 33cddca1 → 9fda4ce7 → 6dbc8cc7 → d6438878 → 2389b369 → aac0b7e2 → 3dd66c1b → 43d00213 → a78aab5e → b26c1553 → 288a06ff → c0af043e → 00bfa19d → 67dae440 → 6b450504 → 631c4f6d → abac7b08 → b9b2ae96 → 4021c4ef → 26742798 → 05e55a4d → 07a38bc2 → 2641fb3f → acfac7a8 → b6a985d1 → 616d676f → 83596ed7 → 19db5b14 → f9cc92dd → 12f810ca → cf0e7d83 → 8b4d9c93 → e21c155b → b149f5a3 → 5d343463 → 1bc51349 → 2f4ae1e3 → a0991b1c → 5c1b60be → 312c7233 → bf8d22c7 → ec790973 → d276a710 → 9c87971c → 38d7a017 → 2e9d962a → 2c19c2ba → fd84bfe4 → 7c564024 → b07c49a5 → 0b6bc47a → a40e7bab → 4703d4d7 → 9f0da613 → a89aa071 → 65ddc8e2 → fa7973c2 → ce6436c9 → 8e3a6d78 → 808f3fb6 → 88a40957 → de7e5352 → c13aa048 → b64f65f9 → c0a9abac → 3028b210 → 6ac9819e → 101ce920 → 1e4634ae → 2f740fba → 39cf8d48 → 9abd7954 → 653a93fd → 2062f53a → 86c1025b → 7d1a4fba → f1e85972 → 9cbb6969 → 640ee712 → e8203dad → c883c49f → b1499c38 → 44929e98
 - `kei-artifact` — 3 versions: 2c55b84a → a33abf97 → 50e8c9cd
 - `kei-artifact::kei-artifact` — 2 versions: 8742aade → 8742aade
 - `kei-atom-discovery` — 3 versions: 0d532c9f → ca9202b5 → e1fde01b
@@ -1318,7 +1318,7 @@ Sorted alphabetically by name.
 - `kei-router::kei-router` — 17 versions: 186634e6 → d91e8a11 → 80d4f8c6 → f8677f1d → a2e47f61 → 299a5afe → 675effa4 → 1fa6b4bb → 89c81c79 → 29340bbb → 51682c29 → ec0a1bfb → f4fce214 → 184e4f53 → 98ab93cd → 98ab93cd → 98ab93cd
 - `kei-runtime` — 3 versions: 44b695ea → c19f68cf → b372ab7c
 - `kei-runtime-core` — 3 versions: 100eec0c → dedb3de0 → b9a37dea
-- `kei-runtime-core::kei-runtime-core` — 9 versions: 7980a704 → d64f3fbc → 9822303c → 80ad147f → ee80f871 → 663b5308 → 143c08b7 → ecfcc56c → 10186e32
+- `kei-runtime-core::kei-runtime-core` — 12 versions: 7980a704 → d64f3fbc → 9822303c → 80ad147f → ee80f871 → 663b5308 → 143c08b7 → ecfcc56c → 10186e32 → 0ace2c22 → a544e53a → 9c23c869
 - `kei-runtime::kei-runtime` — 15 versions: e23e203b → 45e2bb3a → 93b703b3 → bd5a94ce → 15d85045 → 2aa2f1e3 → 2aa2f1e3 → 23f2ee6a → 37dc01f8 → bb9a2e8d → e013e322 → 70fd5389 → 67644265 → 4b3abe12 → 5fcf7642
 - `kei-sage` — 3 versions: 773af2fd → e7617e42 → 70873353
 - `kei-sage::kei-sage` — 2 versions: df35dc55 → df35dc55
@@ -1327,7 +1327,7 @@ Sorted alphabetically by name.
 - `kei-search-core` — 3 versions: 3e15b74a → 7f980b0f → 5c3a0ced
 - `kei-search-core::kei-search-core` — 2 versions: ff60e666 → ff60e666
 - `kei-shared` — 3 versions: 5990b174 → c9abc1ac → 9effa42e
-- `kei-shared::kei-shared` — 2 versions: df6d9f3f → df6d9f3f
+- `kei-shared::kei-shared` — 8 versions: df6d9f3f → df6d9f3f → 24b821c9 → 04d318a6 → e74644f8 → cd44e72a → 92dbbe76 → 985486d6
 - `kei-skill-importer` — 3 versions: 18270170 → 8a09d39e → cb92de6f
 - `kei-skill-importer::kei-skill-importer` — 2 versions: 99c79714 → 99c79714
 - `kei-skills` — 3 versions: 0bc302bc → 9b27964c → 8b8fa1ed
