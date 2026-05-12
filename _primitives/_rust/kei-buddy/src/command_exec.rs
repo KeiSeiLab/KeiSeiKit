@@ -2,7 +2,14 @@
 //! Command execution helpers — one function per slash-command.
 //! Called by `commands::execute_command`; not public API.
 
-use crate::{chat_log::ChatLog, contacts::Contacts, topics::Topics};
+use std::sync::Arc;
+
+use crate::{
+    chat_log::ChatLog,
+    contacts::Contacts,
+    contacts_sync::{sync_from_apple, sync_from_google},
+    topics::Topics,
+};
 
 pub(crate) async fn exec_topics(chat_id: i64, topics: &Topics) -> String {
     match topics.list_topics(chat_id).await {
@@ -108,4 +115,31 @@ fn truncate(s: &str, max_chars: usize) -> &str {
         None => s,
         Some((idx, _)) => &s[..idx],
     }
+}
+
+pub(crate) async fn exec_sync_google(contacts: &Arc<Contacts>) -> String {
+    let token = match std::env::var("GOOGLE_OAUTH_ACCESS_TOKEN") {
+        Ok(t) if !t.is_empty() => t,
+        _ => return "не настроено: GOOGLE_OAUTH_ACCESS_TOKEN не задан".to_string(),
+    };
+    let r = sync_from_google(&token, contacts).await;
+    format!(
+        "Google: загружено {}, добавлено {}, пропущено {}\nошибок: {}",
+        r.fetched, r.added, r.skipped, r.errors.len()
+    )
+}
+
+pub(crate) async fn exec_sync_apple(contacts: &Arc<Contacts>) -> String {
+    let apple_id = std::env::var("APPLE_ID").unwrap_or_default();
+    let app_pw = std::env::var("APPLE_APP_PASSWORD").unwrap_or_default();
+    let url = std::env::var("APPLE_CARDDAV_URL").unwrap_or_default();
+    if apple_id.is_empty() || app_pw.is_empty() || url.is_empty() {
+        return "не настроено: APPLE_ID / APPLE_APP_PASSWORD / APPLE_CARDDAV_URL не заданы"
+            .to_string();
+    }
+    let r = sync_from_apple(&apple_id, &app_pw, &url, contacts).await;
+    format!(
+        "Apple: загружено {}, добавлено {}, пропущено {}\nошибок: {}",
+        r.fetched, r.added, r.skipped, r.errors.len()
+    )
 }

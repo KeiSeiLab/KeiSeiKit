@@ -22,6 +22,7 @@
 pub mod client;
 pub mod contact;
 pub mod error;
+pub(crate) mod pagination;
 
 pub use client::GooglePeopleClient;
 pub use contact::GoogleContact;

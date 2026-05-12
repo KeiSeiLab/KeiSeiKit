@@ -28,6 +28,7 @@ pub mod client;
 pub mod contact;
 pub mod error;
 pub mod vcard;
+pub(crate) mod discovery;
 pub(crate) mod xml;
 
 pub use client::ICloudCardDavClient;

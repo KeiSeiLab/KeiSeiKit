@@ -14,6 +14,7 @@ pub mod chat_log;
 pub(crate) mod command_exec;
 pub mod commands;
 pub mod contacts;
+pub mod contacts_sync;
 pub mod error;
 pub mod extractor;
 pub mod machine;
@@ -37,6 +38,7 @@ pub mod serve_telegram;
 
 pub use chat_log::ChatLog;
 pub use commands::{parse_command, execute_command, Command, CommandStores};
+pub use contacts_sync::{sync_from_apple, sync_from_google, SyncReport};
 pub use contacts::Contacts;
 pub use error::BuddyError;
 pub use extractor::LlmExtractor;

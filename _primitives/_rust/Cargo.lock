@@ -3195,6 +3195,8 @@ dependencies = [
  "chrono",
  "clap",
  "kei-chat-store",
+ "kei-contacts-apple",
+ "kei-contacts-google",
  "kei-memory-sqlite",
  "kei-sage",
  "kei-social-store",

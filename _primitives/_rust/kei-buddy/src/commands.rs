@@ -5,7 +5,12 @@
 
 use std::sync::Arc;
 
-use crate::{chat_log::ChatLog, command_exec as exec, contacts::Contacts, topics::Topics};
+use crate::{
+    chat_log::ChatLog,
+    command_exec as exec,
+    contacts::Contacts,
+    topics::Topics,
+};
 
 /// Recognised slash-commands. `None` = not a command → fall through to FSM.
 pub enum Command<'a> {
@@ -14,6 +19,8 @@ pub enum Command<'a> {
     Topics,
     Contacts,
     Help,
+    SyncGoogle,
+    SyncApple,
 }
 
 /// Shared store references passed to `execute_command`.
@@ -28,6 +35,8 @@ const HELP_TEXT: &str = "Доступные команды:\n\
     /find <текст> — поиск по переписке\n\
     /topics — список тем\n\
     /contacts — список контактов\n\
+    /sync-google — синхронизировать контакты Google (нужен GOOGLE_OAUTH_ACCESS_TOKEN)\n\
+    /sync-apple — синхронизировать контакты Apple (нужны APPLE_ID / APPLE_APP_PASSWORD / APPLE_CARDDAV_URL)\n\
     /help — это сообщение";
 
 /// Parse a raw user text into a Command, or None if it is not a slash-command.
@@ -53,6 +62,12 @@ pub fn parse_command(text: &str) -> Option<Command<'_>> {
     if lower.starts_with("find") {
         return Some(Command::Find(rest[4..].trim()));
     }
+    if lower.eq("sync-google") {
+        return Some(Command::SyncGoogle);
+    }
+    if lower.eq("sync-apple") {
+        return Some(Command::SyncApple);
+    }
     None
 }
 
@@ -69,6 +84,8 @@ pub async fn execute_command(
         Command::Contacts => exec::exec_contacts(stores.contacts).await,
         Command::Whois(name) => exec::exec_whois(name, stores.contacts).await,
         Command::Find(query) => exec::exec_find(query, chat_id, stores.chat_log).await,
+        Command::SyncGoogle => exec::exec_sync_google(stores.contacts).await,
+        Command::SyncApple => exec::exec_sync_apple(stores.contacts).await,
     }
 }
 
@@ -142,5 +159,26 @@ mod tests {
         let stores = make_stores(&cl, &co, &to);
         let resp = execute_command(Command::Contacts, 1, &stores).await;
         assert!(resp.contains("пусты") || resp.contains("контакт"));
+    }
+
+    #[test]
+    fn parse_sync_google() {
+        assert!(matches!(parse_command("/sync-google"), Some(Command::SyncGoogle)));
+    }
+
+    #[test]
+    fn parse_sync_apple() {
+        assert!(matches!(parse_command("/sync-apple"), Some(Command::SyncApple)));
+    }
+
+    #[tokio::test]
+    async fn help_includes_sync_commands() {
+        let cl = Arc::new(ChatLog::from_memory().unwrap());
+        let co = Arc::new(Contacts::from_memory().unwrap());
+        let to = Arc::new(Topics::from_memory().unwrap());
+        let stores = make_stores(&cl, &co, &to);
+        let resp = execute_command(Command::Help, 1, &stores).await;
+        assert!(resp.contains("/sync-google"));
+        assert!(resp.contains("/sync-apple"));
     }
 }

@@ -3,9 +3,6 @@
 //! Minimal vCard 3.0 / 4.0 parser.
 //!
 //! # Limitations (MVP)
-//! - **Line-folding** (continuation lines starting with a single space or tab)
-//!   is **not** handled. Such lines are treated as separate malformed lines and
-//!   silently skipped. This covers the vast majority of iCloud-generated vCards.
 //! - Only a fixed set of properties (FN, N, EMAIL, TEL, ORG, NOTE, UID) is extracted.
 //! - Property parameters (e.g. `TYPE=INTERNET`) are stripped; only the value is kept.
 //! - Multi-valued ORG (e.g. `ORG:Company;Department`) uses the first segment.
@@ -13,22 +10,39 @@
 use crate::contact::AppleContact;
 use crate::error::ContactsError;
 
+/// Unfold RFC 6350 §3.2 continuation lines.
+///
+/// A line beginning with a single SPACE or HTAB is a continuation of the
+/// preceding line; strip the leading whitespace and concatenate.
+fn unfold(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    for line in input.lines() {
+        if let Some(rest) = line.strip_prefix(' ').or_else(|| line.strip_prefix('\t')) {
+            // continuation — append directly to previous content
+            out.push_str(rest);
+        } else {
+            if !out.is_empty() {
+                out.push('\n');
+            }
+            out.push_str(line);
+        }
+    }
+    out
+}
+
 /// Parse a single vCard text into an [`AppleContact`].
 ///
 /// `text` must be the content of one vCard (between `BEGIN:VCARD` and `END:VCARD`
-/// inclusive).
+/// inclusive). RFC 6350 line-folding is resolved before parsing.
 pub fn parse_vcard(text: &str) -> Result<AppleContact, ContactsError> {
+    let unfolded = unfold(text);
     let mut contact = AppleContact {
         raw_vcard: text.to_string(),
         ..Default::default()
     };
 
-    for line in text.lines() {
+    for line in unfolded.lines() {
         let line = line.trim_end_matches('\r');
-        // Skip continuation lines (line-folding, not handled in MVP).
-        if line.starts_with(' ') || line.starts_with('\t') {
-            continue;
-        }
         let Some((key_full, value)) = line.split_once(':') else {
             continue;
         };
@@ -136,5 +150,25 @@ END:VCARD\r\n";
     fn parse_invalid_vcard_returns_error() {
         let text = "NOTACARD:yes\r\n";
         assert!(parse_vcard(text).is_err());
+    }
+
+    #[test]
+    fn parse_folded_vcard() {
+        // RFC 6350 §3.2 fold: continuation lines start with a single SPACE.
+        // NOTE spans three physical lines; after unfold they join into one value.
+        // Use concat! to guarantee the leading spaces are preserved.
+        let text = concat!(
+            "BEGIN:VCARD\r\n",
+            "VERSION:3.0\r\n",
+            "FN:Alice Smith\r\n",
+            "UID:uid-folded\r\n",
+            "NOTE:line one\r\n",
+            " line two\r\n",
+            " line three\r\n",
+            "END:VCARD\r\n",
+        );
+        let c = parse_vcard(text).expect("should parse folded vCard");
+        assert_eq!(c.display_name, "Alice Smith");
+        assert_eq!(c.note, "line oneline twoline three");
     }
 }

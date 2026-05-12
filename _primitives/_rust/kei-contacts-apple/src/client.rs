@@ -3,6 +3,7 @@
 //! [`ICloudCardDavClient`] — CardDAV client for iCloud Contacts.
 
 use crate::contact::AppleContact;
+use crate::discovery::discover_addressbook;
 use crate::error::ContactsError;
 use crate::xml::{addressbook_query_xml, extract_contacts_from_multistatus};
 use reqwest::{Client, Method};
@@ -53,6 +54,22 @@ impl ICloudCardDavClient {
     pub fn with_addressbook_url(mut self, url: String) -> Self {
         self.addressbook_url = Some(url);
         self
+    }
+
+    /// Discover the addressbook URL via three successive PROPFIND requests.
+    ///
+    /// Implements RFC 6764 §6:
+    /// 1. `.well-known/carddav` → principal URL
+    /// 2. principal → addressbook-home-set
+    /// 3. home-set (depth=1) → first addressbook resource href
+    pub async fn discover_addressbook_url(&self) -> Result<String, ContactsError> {
+        discover_addressbook(
+            &self.client,
+            &self.apple_id,
+            &self.app_specific_password,
+            &self.base_url,
+        )
+        .await
     }
 
     /// Fetch all contacts from the configured addressbook.

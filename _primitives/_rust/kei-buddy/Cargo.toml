@@ -34,6 +34,8 @@ kei-memory-sqlite = { path = "../kei-memory-sqlite" }
 kei-chat-store = { path = "../kei-chat-store" }
 kei-social-store = { path = "../kei-social-store" }
 kei-sage = { path = "../kei-sage" }
+kei-contacts-google = { path = "../kei-contacts-google" }
+kei-contacts-apple = { path = "../kei-contacts-apple" }
 chrono = { workspace = true }
 
 # serve feature deps
