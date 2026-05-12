@@ -11,6 +11,7 @@
 //!   * `store`      — `BuddyStore` trait + `SqliteBuddyStore` impl
 
 pub mod chat_log;
+pub mod contacts;
 pub mod error;
 pub mod extractor;
 pub mod machine;
@@ -20,6 +21,7 @@ pub mod schema;
 pub mod state;
 pub mod store;
 pub(crate) mod store_ops;
+pub mod topics;
 pub mod transition;
 
 #[cfg(feature = "serve")]
@@ -28,9 +30,11 @@ pub mod serve;
 pub mod serve_telegram;
 
 pub use chat_log::ChatLog;
+pub use contacts::Contacts;
 pub use error::BuddyError;
 pub use extractor::LlmExtractor;
 pub use machine::handle_step;
 pub use state::OnboardState;
 pub use store::{BuddyStore, SqliteBuddyStore};
+pub use topics::Topics;
 pub use transition::StepOutput;

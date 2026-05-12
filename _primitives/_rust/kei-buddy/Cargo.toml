@@ -28,6 +28,8 @@ reqwest = { workspace = true }
 anyhow = { workspace = true }
 kei-memory-sqlite = { path = "../kei-memory-sqlite" }
 kei-chat-store = { path = "../kei-chat-store" }
+kei-social-store = { path = "../kei-social-store" }
+kei-sage = { path = "../kei-sage" }
 chrono = { workspace = true }
 
 # serve feature deps
