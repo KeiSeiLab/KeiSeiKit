@@ -2,7 +2,8 @@
 //! Pure helper functions for `machine::handle_step`.
 //!
 //! Constructor Pattern split: helpers extracted so `machine.rs` stays
-//! within its 250-LOC exception budget.
+//! within its 260-LOC exception budget.
+//! Language-aware helpers live in `machine_lang.rs`.
 
 use serde_json::{json, Value};
 
@@ -121,7 +122,7 @@ pub(crate) fn finish_topic(
     }));
 
     if queue.is_empty() {
-        return ask_schedule(&json!({ "topics_done": done }), &summary);
+        return ask_schedule_finish(&json!({ "topics_done": done }), &summary);
     }
     let next_topic = &queue[0];
     let next_name = next_topic["name"].as_str().unwrap_or("?");
@@ -138,6 +139,20 @@ pub(crate) fn finish_topic(
     }
 }
 
+/// Internal schedule prompt used by `finish_topic` — always Russian (back-compat).
+/// The per-turn language-aware variant is in `machine_lang::ask_schedule_lang`.
+fn ask_schedule_finish(extra_patch: &Value, prefix: &str) -> StepOutput {
+    StepOutput {
+        next_state: OnboardState::AskSchedule,
+        response_text: format!(
+            "{prefix}\n\nТемы разобрали. ⏰ Когда удобно получать дайджесты? Напиши свободно — \
+            например, \"утром часов в 8, вечером в 10, я в Бали\" или \"вечером в 9\". \
+            Если не нужно — напиши \"нет\"."
+        ),
+        persona_patch: extra_patch.clone(),
+    }
+}
+
 fn build_source_line(research: bool, picked: &[usize], proposed: &[Value]) -> String {
     if research && !picked.is_empty() {
         let handles: Vec<_> = picked.iter()
@@ -150,22 +165,5 @@ fn build_source_line(research: bool, picked: &[usize], proposed: &[Value]) -> St
         "Источники: _не выбрано_".to_owned()
     } else {
         "_без мониторинга_".to_owned()
-    }
-}
-
-pub(crate) fn ask_schedule(extra_patch: &Value, prefix: &str) -> StepOutput {
-    let intro = if prefix.is_empty() {
-        String::new()
-    } else {
-        format!("{prefix}\n\n")
-    };
-    StepOutput {
-        next_state: OnboardState::AskSchedule,
-        response_text: format!(
-            "{intro}Темы разобрали. ⏰ Когда удобно получать дайджесты? Напиши свободно — \
-            например, \"утром часов в 8, вечером в 10, я в Бали\" или \"вечером в 9\". \
-            Если не нужно — напиши \"нет\"."
-        ),
-        persona_patch: extra_patch.clone(),
     }
 }

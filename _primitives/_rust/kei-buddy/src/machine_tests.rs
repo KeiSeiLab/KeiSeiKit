@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Tests for `machine::handle_step`.
-//! Extracted from machine.rs to keep it within the 250-LOC exception budget.
+//! Extracted from machine.rs to keep it within the 260-LOC exception budget.
+//!
+//! TopicResearch-specific tests live in the sibling module
+//! `machine_tests_topic_research` (Constructor Pattern: split by concern).
 
 use serde_json::json;
 
@@ -8,19 +11,97 @@ use crate::extractor::MockExtractor;
 use crate::machine::handle_step;
 use crate::state::OnboardState;
 
+mod machine_tests_topic_research;
+
 fn rt() -> tokio::runtime::Runtime {
     tokio::runtime::Runtime::new().unwrap()
 }
 
 #[test]
-fn intro_to_ask_name() {
+fn intro_to_ask_language() {
     rt().block_on(async {
         let mock = MockExtractor::new(json!({}));
         let out = handle_step(&OnboardState::Intro, "hi", &json!({}), &mock)
             .await
             .unwrap();
-        assert_eq!(out.next_state, OnboardState::AskName);
+        // Intro now transitions to AskLanguage, not AskName.
+        assert_eq!(out.next_state, OnboardState::AskLanguage);
         assert!(!out.response_text.is_empty(), "intro response must not be empty");
+    });
+}
+
+#[test]
+fn ask_language_en_advances_to_ask_name() {
+    rt().block_on(async {
+        let mock = MockExtractor::new(json!({}));
+        let out = handle_step(&OnboardState::AskLanguage, "en", &json!({}), &mock)
+            .await
+            .unwrap();
+        assert_eq!(out.next_state, OnboardState::AskName);
+        assert_eq!(
+            out.persona_patch["language"].as_str(),
+            Some("en"),
+            "persona_patch must contain language=en"
+        );
+        assert!(
+            out.response_text.contains("What's your name"),
+            "response must contain English ask_name phrase, got: {:?}",
+            out.response_text
+        );
+    });
+}
+
+#[test]
+fn ask_language_ru_advances_to_ask_name() {
+    rt().block_on(async {
+        let mock = MockExtractor::new(json!({}));
+        let out = handle_step(&OnboardState::AskLanguage, "ru", &json!({}), &mock)
+            .await
+            .unwrap();
+        assert_eq!(out.next_state, OnboardState::AskName);
+        assert_eq!(
+            out.persona_patch["language"].as_str(),
+            Some("ru"),
+            "persona_patch must contain language=ru"
+        );
+        assert!(
+            out.response_text.contains("называть"),
+            "response must contain Russian ask_name phrase, got: {:?}",
+            out.response_text
+        );
+    });
+}
+
+#[test]
+fn ask_language_invalid_stays_in_state() {
+    rt().block_on(async {
+        let mock = MockExtractor::new(json!({}));
+        let out = handle_step(&OnboardState::AskLanguage, "blah", &json!({}), &mock)
+            .await
+            .unwrap();
+        assert_eq!(out.next_state, OnboardState::AskLanguage, "invalid input must loop");
+        assert!(
+            out.response_text.contains("en") && out.response_text.contains("ru"),
+            "error response must mention both options, got: {:?}",
+            out.response_text
+        );
+    });
+}
+
+#[test]
+fn migration_sets_ru_when_language_missing() {
+    rt().block_on(async {
+        // Persona has no `language` key — simulates a chat started before this commit.
+        let mock = MockExtractor::new(json!({ "name": "Denis" }));
+        let persona = json!({});
+        let out = handle_step(&OnboardState::AskName, "Denis", &persona, &mock)
+            .await
+            .unwrap();
+        assert_eq!(
+            out.persona_patch["language"].as_str(),
+            Some("ru"),
+            "migration must inject language=ru when key is missing"
+        );
     });
 }
 

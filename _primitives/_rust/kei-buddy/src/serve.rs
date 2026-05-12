@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //! `BuddyContext` + axum router. Store bootstrap lives in `serve_runner`.
-//!
-//! Constructor Pattern: one responsibility — compose crate pieces into HTTP server.
-//! Each function ≤ 30 LOC. No logging of bot tokens.
+//! Constructor Pattern: one responsibility. No bot token logging.
 
 use std::sync::Arc;
 
@@ -26,6 +24,7 @@ use crate::{
     store::{BuddyStore, SqliteBuddyStore},
     topic_classify::classify_and_store_topic,
     topics::Topics,
+    voice::VoiceHandler,
 };
 
 pub use crate::serve_runner::run_serve;
@@ -36,18 +35,15 @@ pub struct ServeConfig {
     pub db_path: String,
     pub bot_token: String,
     pub webhook_secret: String,
-    /// Whitelist; `None` or empty = accept all chat_ids.
     pub allowed_chat_ids: Option<Vec<i64>>,
-    /// LLM proxy URL + key; if both set, OpenAiExtractor is used, else MockExtractor.
     pub llm_proxy_url: Option<String>,
     pub llm_api_key: Option<String>,
     pub llm_model: Option<String>,
-    /// Path to the SQLite file used by `ChatLog`. Default: `./kei-buddy-chat.db`.
     pub chat_log_db_path: String,
-    /// Path to the SQLite file used by `Topics`. Default: `./kei-buddy-topics.db`.
     pub topics_db_path: String,
-    /// Path to the SQLite file used by `Contacts`. Default: `./kei-buddy-contacts.db`.
     pub contacts_db_path: String,
+    /// STT backend name (e.g. "whisper-local"). `None` → voice messages ignored.
+    pub stt_backend: Option<String>,
 }
 
 /// Axum state — implements `WebhookContext`. `Arc<E>` allows cheap `Clone`.
@@ -57,14 +53,12 @@ pub struct BuddyContext<E: LlmExtractor + Send + Sync + 'static> {
     pub store: Arc<SqliteBuddyStore>,
     pub extractor: Arc<E>,
     pub http: reqwest::Client,
-    /// Whitelist of chat_ids; `None` or empty = accept all.
     pub allowed_chat_ids: Arc<Option<Vec<i64>>>,
-    /// Persistent log of all Telegram messages (user + bot).
     pub chat_log: Arc<ChatLog>,
-    /// Persistent topic store.
     pub topics: Arc<Topics>,
-    /// Persistent contacts store.
     pub contacts: Arc<Contacts>,
+    /// Optional voice handler; `None` = voice messages ignored.
+    pub voice: Option<Arc<VoiceHandler>>,
 }
 
 impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
@@ -79,6 +73,7 @@ impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
             chat_log: Arc::clone(&self.chat_log),
             topics: Arc::clone(&self.topics),
             contacts: Arc::clone(&self.contacts),
+            voice: self.voice.as_ref().map(Arc::clone),
         }
     }
 }
@@ -94,8 +89,11 @@ impl<E: LlmExtractor + Send + Sync + 'static> WebhookContext for BuddyContext<E>
             WebhookEvent::Text { chat_id, text, .. } => {
                 self.handle_text(chat_id, text).await;
             }
+            WebhookEvent::Voice { chat_id, file_id, mime_type, .. } => {
+                self.handle_voice(chat_id, file_id, mime_type).await;
+            }
             other => {
-                warn!(event = ?other, "ignoring non-text webhook event");
+                warn!(event = ?other, "ignoring unhandled webhook event");
             }
         }
     }
@@ -106,6 +104,21 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
         match self.allowed_chat_ids.as_ref() {
             Some(list) if !list.is_empty() => list.contains(&chat_id),
             _ => true,
+        }
+    }
+
+    async fn handle_voice(&self, chat_id: i64, file_id: String, mime_type: String) {
+        let Some(h) = self.voice.as_ref() else {
+            warn!(chat_id, "voice message: no STT backend; ignoring");
+            return;
+        };
+        if !self.chat_allowed(chat_id) {
+            warn!(chat_id, "chat_id not in whitelist; ignoring voice");
+            return;
+        }
+        match h.transcribe_file(&file_id, &mime_type).await {
+            Ok(t) => self.handle_text(chat_id, t).await,
+            Err(e) => error!(chat_id, error=%e, "voice transcription failed"),
         }
     }
 
@@ -172,16 +185,12 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
     }
 }
 
-/// Health-check handler.
 async fn health() -> Json<Value> {
     Json(json!({ "status": "ok", "crate": "kei-buddy", "version": env!("CARGO_PKG_VERSION") }))
 }
 
 /// Build the axum Router.
-pub fn build_router<E>(ctx: BuddyContext<E>) -> Router
-where
-    E: LlmExtractor + Send + Sync + 'static,
-{
+pub fn build_router<E: LlmExtractor + Send + Sync + 'static>(ctx: BuddyContext<E>) -> Router {
     Router::new()
         .route("/webhook", routing::post(kei_telegram_webhook::handle_webhook::<BuddyContext<E>>))
         .route("/health", routing::get(health))

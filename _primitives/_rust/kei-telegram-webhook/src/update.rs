@@ -6,6 +6,26 @@
 
 use serde::{Deserialize, Serialize};
 
+/// Telegram `Voice` attachment (OGG-Opus from the mic).
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Default)]
+pub struct Voice {
+    pub file_id: String,
+    #[serde(default)]
+    pub duration: i64,
+    #[serde(default)]
+    pub mime_type: String,
+}
+
+/// Telegram `Audio` attachment (music/audio file).
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Default)]
+pub struct Audio {
+    pub file_id: String,
+    #[serde(default)]
+    pub duration: i64,
+    #[serde(default)]
+    pub mime_type: String,
+}
+
 /// Top-level Telegram update payload.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Update {
@@ -16,7 +36,7 @@ pub struct Update {
     pub callback_query: Option<CallbackQuery>,
 }
 
-/// Incoming text message.
+/// Incoming text message (or voice/audio message).
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Message {
     pub message_id: i64,
@@ -26,6 +46,10 @@ pub struct Message {
     pub from: Option<User>,
     #[serde(default)]
     pub text: Option<String>,
+    #[serde(default)]
+    pub voice: Option<Voice>,
+    #[serde(default)]
+    pub audio: Option<Audio>,
 }
 
 /// Telegram user or bot.

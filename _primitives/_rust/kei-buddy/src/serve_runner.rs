@@ -14,6 +14,7 @@ use crate::{
     serve::{BuddyContext, ServeConfig},
     store::SqliteBuddyStore,
     topics::Topics,
+    voice::VoiceHandler,
 };
 
 /// Start the HTTP server (entry-point called from the binary).
@@ -25,6 +26,7 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
     let chat_log = Arc::new(ChatLog::from_path(&cfg.chat_log_db_path)?);
     let topics = Arc::new(Topics::from_path(&cfg.topics_db_path)?);
     let contacts = Arc::new(Contacts::from_path(&cfg.contacts_db_path)?);
+    let voice = build_voice_handler(cfg.stt_backend.as_deref(), &cfg.bot_token);
 
     #[cfg(feature = "extractor-openai")]
     {
@@ -37,7 +39,7 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
             return start_listener(cfg.port, BuddyContext {
                 secret: cfg.webhook_secret,
                 bot_token: cfg.bot_token,
-                store, extractor, http, allowed_chat_ids, chat_log, topics, contacts,
+                store, extractor, http, allowed_chat_ids, chat_log, topics, contacts, voice,
             }).await;
         }
     }
@@ -47,8 +49,20 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
     start_listener(cfg.port, BuddyContext {
         secret: cfg.webhook_secret,
         bot_token: cfg.bot_token,
-        store, extractor, http, allowed_chat_ids, chat_log, topics, contacts,
+        store, extractor, http, allowed_chat_ids, chat_log, topics, contacts, voice,
     }).await
+}
+
+fn build_voice_handler(stt_backend: Option<&str>, bot_token: &str) -> Option<Arc<VoiceHandler>> {
+    let name = stt_backend?;
+    std::env::set_var("KEI_STT_BACKEND", name);
+    match kei_stt::from_env() {
+        Ok(stt) => Some(Arc::new(VoiceHandler::new(bot_token.to_string(), Arc::from(stt)))),
+        Err(e) => {
+            tracing::warn!(backend = name, error = %e, "STT init failed; voice disabled");
+            None
+        }
+    }
 }
 
 async fn start_listener<E>(port: u16, ctx: BuddyContext<E>) -> anyhow::Result<()>

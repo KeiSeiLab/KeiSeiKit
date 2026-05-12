@@ -59,6 +59,7 @@ async fn cmd_serve() -> anyhow::Result<()> {
         chat_log_db_path: chat_log_path_from_env(),
         topics_db_path: topics_db_path_from_env(),
         contacts_db_path: contacts_db_path_from_env(),
+        stt_backend: std::env::var("KEI_BUDDY_STT_BACKEND").ok(),
     };
     run_serve(cfg).await
 }

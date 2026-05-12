@@ -19,11 +19,13 @@ pub mod error;
 pub mod extractor;
 pub mod machine;
 pub(crate) mod machine_helpers;
+pub(crate) mod machine_lang;
 pub mod persona_merge;
 pub mod schema;
 pub mod state;
 pub mod store;
 pub(crate) mod store_ops;
+pub mod strings;
 pub mod tick;
 pub mod topic_classify;
 pub mod topics;
@@ -35,6 +37,8 @@ pub mod serve;
 pub(crate) mod serve_runner;
 #[cfg(feature = "serve")]
 pub mod serve_telegram;
+#[cfg(feature = "serve")]
+pub mod voice;
 
 pub use chat_log::ChatLog;
 pub use commands::{parse_command, execute_command, Command, CommandStores};
@@ -45,6 +49,9 @@ pub use extractor::LlmExtractor;
 pub use machine::handle_step;
 pub use state::OnboardState;
 pub use store::{BuddyStore, SqliteBuddyStore};
+pub use strings::{Lang, Strings};
 pub use tick::{run_tick, run_tick_with, TickConfig, TickReport};
 pub use topics::Topics;
 pub use transition::StepOutput;
+#[cfg(feature = "serve")]
+pub use voice::VoiceHandler;

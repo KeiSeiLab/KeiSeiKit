@@ -9,10 +9,11 @@
 
 use serde::{Deserialize, Serialize};
 
-/// 11-state onboarding finite-state machine.
+/// 12-state onboarding finite-state machine.
 ///
-/// Mirrors the TypeScript `Step` union type exactly:
-/// `intro | ask_name | ask_tone | ask_interests | ask_hobbies |
+/// Extends the TypeScript `Step` union with `ask_language` as the second
+/// step (right after `intro`):
+/// `intro | ask_language | ask_name | ask_tone | ask_interests | ask_hobbies |
 ///  topic_specifics | topic_now_later | topic_research |
 ///  topic_sources | ask_schedule | ready`
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -20,6 +21,8 @@ use serde::{Deserialize, Serialize};
 pub enum OnboardState {
     /// Initial greeting — bot explains itself.
     Intro,
+    /// Collecting language preference (en / ru). Default: en.
+    AskLanguage,
     /// Collecting user's display name.
     AskName,
     /// Collecting preferred communication tone.
@@ -51,6 +54,7 @@ mod tests {
     fn all_variants_serde_roundtrip() {
         let variants = [
             OnboardState::Intro,
+            OnboardState::AskLanguage,
             OnboardState::AskName,
             OnboardState::AskTone,
             OnboardState::AskInterests,

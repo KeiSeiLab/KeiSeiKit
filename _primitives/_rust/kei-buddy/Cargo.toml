@@ -42,6 +42,7 @@ chrono = { workspace = true }
 axum = { version = "0.7", features = ["json", "http1", "tokio"], optional = true }
 kei-telegram-webhook = { path = "../kei-telegram-webhook", optional = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+kei-stt = { path = "../kei-stt", default-features = false, features = ["whisper-local"], optional = true }
 
 [dev-dependencies]
 wiremock = { workspace = true }
@@ -50,7 +51,7 @@ tokio = { workspace = true }
 [features]
 default = ["serve"]
 # HTTP server — axum router + webhook handler + Telegram send_message.
-serve = ["axum", "kei-telegram-webhook", "tracing-subscriber"]
+serve = ["axum", "kei-telegram-webhook", "tracing-subscriber", "kei-stt"]
 # Enables OpenAiExtractor — real HTTP to LiteLLM proxy using reqwest.
 # Off by default; tests use MockExtractor which has no extra deps.
 extractor-openai = []
