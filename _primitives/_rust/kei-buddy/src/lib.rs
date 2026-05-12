@@ -11,6 +11,8 @@
 //!   * `store`      — `BuddyStore` trait + `SqliteBuddyStore` impl
 
 pub mod chat_log;
+pub(crate) mod command_exec;
+pub mod commands;
 pub mod contacts;
 pub mod error;
 pub mod extractor;
@@ -21,20 +23,26 @@ pub mod schema;
 pub mod state;
 pub mod store;
 pub(crate) mod store_ops;
+pub mod tick;
+pub mod topic_classify;
 pub mod topics;
 pub mod transition;
 
 #[cfg(feature = "serve")]
 pub mod serve;
 #[cfg(feature = "serve")]
+pub(crate) mod serve_runner;
+#[cfg(feature = "serve")]
 pub mod serve_telegram;
 
 pub use chat_log::ChatLog;
+pub use commands::{parse_command, execute_command, Command, CommandStores};
 pub use contacts::Contacts;
 pub use error::BuddyError;
 pub use extractor::LlmExtractor;
 pub use machine::handle_step;
 pub use state::OnboardState;
 pub use store::{BuddyStore, SqliteBuddyStore};
+pub use tick::{run_tick, run_tick_with, TickConfig, TickReport};
 pub use topics::Topics;
 pub use transition::StepOutput;

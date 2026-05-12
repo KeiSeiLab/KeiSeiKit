@@ -1,0 +1,31 @@
+[package]
+name = "kei-contacts-apple"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "CardDAV client for iCloud Contacts. Authenticates with Apple ID + app-specific password (HTTP Basic Auth)."
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "kei_contacts_apple"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true, features = ["macros"] }
+tracing = "0.1"
+regex = { workspace = true }
+kei-social-store = { path = "../kei-social-store" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[package.metadata.keisei]
+maturity = "alpha"
+backend = "apple"
+description = "iCloud CardDAV thin client (Basic Auth, Vec<AppleContact>-out)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

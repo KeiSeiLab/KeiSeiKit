@@ -29,6 +29,25 @@ fn extract_wikilinks(content: &str) -> Vec<String> {
         .collect()
 }
 
+/// Normalize a wikilink target to a basename comparable against
+/// `all_basenames` (file_stem-based index).
+///
+/// Returns `None` when the target escapes the scan root via `../` —
+/// such refs point outside the scan tree (e.g. `~/.claude/rules/*` from
+/// inside a sync-repo MEMORY.md) and cannot be validated by this scanner.
+///
+/// For path-prefixed targets (`chatlogs/X/Y`, `concepts/Z`) only the
+/// last segment is compared, matching how `all_basenames` builds its
+/// index. The `.md` suffix is stripped — `file_stem` does the same.
+fn normalize_target(raw: &str) -> Option<String> {
+    if raw.starts_with("../") || raw.contains("/../") {
+        return None;
+    }
+    let bn = raw.rsplit('/').next().unwrap_or(raw);
+    let bn = bn.strip_suffix(".md").unwrap_or(bn);
+    Some(bn.to_string())
+}
+
 fn extract_handoffs(content: &str) -> Vec<String> {
     let rx = Regex::new(r"(?im)^\s*-\s*\*\*([a-z0-9][a-z0-9_-]{2,})\*\*").expect("static regex");
     rx.captures_iter(content)
@@ -48,9 +67,12 @@ pub fn scan(root: &Path) -> Vec<Conflict> {
         }
         let content = read_lossy(e.path());
         let file_rel = rel(root, e.path());
-        for target in extract_wikilinks(&content) {
-            if !index.contains(&target) {
-                out.push(orphan(&file_rel, &target, "wikilink"));
+        for raw in extract_wikilinks(&content) {
+            let Some(normalized) = normalize_target(&raw) else {
+                continue;
+            };
+            if !index.contains(&normalized) {
+                out.push(orphan(&file_rel, &raw, "wikilink"));
             }
         }
         for target in extract_handoffs(&content) {
@@ -71,4 +93,44 @@ fn orphan(file: &str, target: &str, kind: &str) -> Conflict {
         "either create the target file or remove the stale reference".to_string(),
         true,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cross_repo_ref_skipped() {
+        assert_eq!(normalize_target("../../../rules/recurrence-escalate"), None);
+        assert_eq!(normalize_target("../foo"), None);
+        assert_eq!(normalize_target("docs/../escape"), None);
+    }
+
+    #[test]
+    fn path_prefixed_target_basenamed() {
+        assert_eq!(
+            normalize_target("chatlogs/ml-keilab/2026-05-08-something"),
+            Some("2026-05-08-something".to_string())
+        );
+        assert_eq!(
+            normalize_target("concepts/keibeta"),
+            Some("keibeta".to_string())
+        );
+    }
+
+    #[test]
+    fn plain_basename_passes_through() {
+        assert_eq!(
+            normalize_target("ai-creative-engine"),
+            Some("ai-creative-engine".to_string())
+        );
+    }
+
+    #[test]
+    fn md_suffix_stripped() {
+        assert_eq!(
+            normalize_target("docs/intro.md"),
+            Some("intro".to_string())
+        );
+    }
 }

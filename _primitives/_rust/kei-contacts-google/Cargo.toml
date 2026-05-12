@@ -1,0 +1,31 @@
+[package]
+name = "kei-contacts-google"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Thin client for Google People API. Consumes an access_token from kei-auth-google; does NOT perform OAuth itself."
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "kei_contacts_google"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true, features = ["macros"] }
+tracing = "0.1"
+kei-social-store = { path = "../kei-social-store" }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[package.metadata.keisei]
+maturity = "alpha"
+backend = "google"
+description = "Google People API thin client (token-in, Vec<GoogleContact>-out)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

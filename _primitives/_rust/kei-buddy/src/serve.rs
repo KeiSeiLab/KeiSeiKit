@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! `run_serve` — axum router builder + BuddyContext impl.
+//! `BuddyContext` + axum router. Store bootstrap lives in `serve_runner`.
 //!
 //! Constructor Pattern: one responsibility — compose crate pieces into HTTP server.
 //! Each function ≤ 30 LOC. No logging of bot tokens.
@@ -15,6 +15,8 @@ use kei_telegram_webhook::{WebhookContext, WebhookEvent};
 
 use crate::{
     chat_log::ChatLog,
+    commands::{execute_command, parse_command, CommandStores},
+    contacts::Contacts,
     error::BuddyError,
     extractor::LlmExtractor,
     machine::handle_step,
@@ -22,7 +24,11 @@ use crate::{
     serve_telegram::send_message,
     state::OnboardState,
     store::{BuddyStore, SqliteBuddyStore},
+    topic_classify::classify_and_store_topic,
+    topics::Topics,
 };
+
+pub use crate::serve_runner::run_serve;
 
 /// Configuration passed from the binary to `run_serve`.
 pub struct ServeConfig {
@@ -38,6 +44,10 @@ pub struct ServeConfig {
     pub llm_model: Option<String>,
     /// Path to the SQLite file used by `ChatLog`. Default: `./kei-buddy-chat.db`.
     pub chat_log_db_path: String,
+    /// Path to the SQLite file used by `Topics`. Default: `./kei-buddy-topics.db`.
+    pub topics_db_path: String,
+    /// Path to the SQLite file used by `Contacts`. Default: `./kei-buddy-contacts.db`.
+    pub contacts_db_path: String,
 }
 
 /// Axum state — implements `WebhookContext`. `Arc<E>` allows cheap `Clone`.
@@ -51,6 +61,10 @@ pub struct BuddyContext<E: LlmExtractor + Send + Sync + 'static> {
     pub allowed_chat_ids: Arc<Option<Vec<i64>>>,
     /// Persistent log of all Telegram messages (user + bot).
     pub chat_log: Arc<ChatLog>,
+    /// Persistent topic store.
+    pub topics: Arc<Topics>,
+    /// Persistent contacts store.
+    pub contacts: Arc<Contacts>,
 }
 
 impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
@@ -63,6 +77,8 @@ impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
             http: self.http.clone(),
             allowed_chat_ids: Arc::clone(&self.allowed_chat_ids),
             chat_log: Arc::clone(&self.chat_log),
+            topics: Arc::clone(&self.topics),
+            contacts: Arc::clone(&self.contacts),
         }
     }
 }
@@ -107,19 +123,38 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
         if let Err(e) = self.chat_log.log_user(chat_id, text).await {
             error!(chat_id, error = %e, "chat_log failure");
         }
-        let state = self
-            .store
-            .load_state(chat_id)
-            .await?
-            .unwrap_or(OnboardState::Intro);
-        let persona = self
-            .store
-            .load_persona(chat_id)
-            .await?
-            .unwrap_or_else(|| serde_json::json!({}));
+        if let Some(cmd) = parse_command(text) {
+            return self.dispatch_command(cmd, chat_id).await;
+        }
+        self.run_fsm(chat_id, text).await
+    }
+
+    async fn dispatch_command(
+        &self, cmd: crate::commands::Command<'_>, chat_id: i64,
+    ) -> Result<(), BuddyError> {
+        let stores = CommandStores {
+            chat_log: &self.chat_log,
+            contacts: &self.contacts,
+            topics: &self.topics,
+        };
+        let response = execute_command(cmd, chat_id, &stores).await;
+        let _ = send_message(&self.bot_token, chat_id, &response, &self.http).await;
+        if let Err(e) = self.chat_log.log_bot(chat_id, &response).await {
+            error!(chat_id, error = %e, "chat_log failure");
+        }
+        Ok(())
+    }
+
+    async fn run_fsm(&self, chat_id: i64, text: &str) -> Result<(), BuddyError> {
+        let state = self.store.load_state(chat_id).await?.unwrap_or(OnboardState::Intro);
+        let was_ready = state == OnboardState::Ready;
+        let persona = self.store.load_persona(chat_id).await?.unwrap_or_else(|| json!({}));
         let output = handle_step(&state, text, &persona, self.extractor.as_ref()).await?;
         self.store.save_state(chat_id, &output.next_state).await?;
         self.apply_persona_patch(chat_id, output.persona_patch).await?;
+        if was_ready || output.next_state == OnboardState::Ready {
+            classify_and_store_topic(self.extractor.as_ref(), self.topics.as_ref(), chat_id, text).await;
+        }
         send_message(&self.bot_token, chat_id, &output.response_text, &self.http).await?;
         if let Err(e) = self.chat_log.log_bot(chat_id, &output.response_text).await {
             error!(chat_id, error = %e, "chat_log failure");
@@ -131,11 +166,7 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
         if patch == json!({}) {
             return Ok(());
         }
-        let base = self
-            .store
-            .load_persona(chat_id)
-            .await?
-            .unwrap_or_else(|| json!({}));
+        let base = self.store.load_persona(chat_id).await?.unwrap_or_else(|| json!({}));
         let merged = deep_merge(base, patch);
         self.store.save_persona(chat_id, &merged).await
     }
@@ -143,11 +174,7 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
 
 /// Health-check handler.
 async fn health() -> Json<Value> {
-    Json(json!({
-        "status": "ok",
-        "crate": "kei-buddy",
-        "version": env!("CARGO_PKG_VERSION")
-    }))
+    Json(json!({ "status": "ok", "crate": "kei-buddy", "version": env!("CARGO_PKG_VERSION") }))
 }
 
 /// Build the axum Router.
@@ -156,72 +183,7 @@ where
     E: LlmExtractor + Send + Sync + 'static,
 {
     Router::new()
-        .route(
-            "/webhook",
-            routing::post(kei_telegram_webhook::handle_webhook::<BuddyContext<E>>),
-        )
+        .route("/webhook", routing::post(kei_telegram_webhook::handle_webhook::<BuddyContext<E>>))
         .route("/health", routing::get(health))
         .with_state(ctx)
-}
-
-/// Start the HTTP server.
-pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
-    init_tracing();
-    let store = Arc::new(SqliteBuddyStore::from_path(&cfg.db_path)?);
-    let allowed_chat_ids = Arc::new(cfg.allowed_chat_ids);
-    let http = reqwest::Client::new();
-    let chat_log = Arc::new(ChatLog::from_path(&cfg.chat_log_db_path)?);
-
-    #[cfg(feature = "extractor-openai")]
-    {
-        if let (Some(proxy), Some(key)) = (cfg.llm_proxy_url, cfg.llm_api_key) {
-            let model = cfg
-                .llm_model
-                .unwrap_or_else(|| "gpt-4o-mini".to_string());
-            tracing::info!(model = %model, "using OpenAiExtractor (LiteLLM-compatible)");
-            let extractor = Arc::new(crate::extractor::openai::OpenAiExtractor::new_with_model(
-                proxy, key, model,
-            ));
-            return start_listener(cfg.port, BuddyContext {
-                secret: cfg.webhook_secret,
-                bot_token: cfg.bot_token,
-                store,
-                extractor,
-                http,
-                allowed_chat_ids,
-                chat_log,
-            }).await;
-        }
-    }
-
-    warn!("no LLM extractor configured — using MockExtractor (state machine will advance but field-extraction returns empty)");
-    let extractor = Arc::new(crate::extractor::MockExtractor::new(json!({})));
-    start_listener(cfg.port, BuddyContext {
-        secret: cfg.webhook_secret,
-        bot_token: cfg.bot_token,
-        store,
-        extractor,
-        http,
-        allowed_chat_ids,
-        chat_log,
-    }).await
-}
-
-async fn start_listener<E>(port: u16, ctx: BuddyContext<E>) -> anyhow::Result<()>
-where
-    E: LlmExtractor + Send + Sync + 'static,
-{
-    let router = build_router(ctx);
-    let addr = format!("0.0.0.0:{}", port);
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
-    tracing::info!(addr = %addr, "kei-buddy listening");
-    axum::serve(listener, router).await?;
-    Ok(())
-}
-
-fn init_tracing() {
-    use tracing_subscriber::{fmt, EnvFilter};
-    let _ = fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .try_init();
 }
