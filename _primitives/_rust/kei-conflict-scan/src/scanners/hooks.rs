@@ -1,67 +1,26 @@
-//! Hook-overlap detector.
+//! Hook-overlap detector — DISABLED (2026-05-12).
 //!
-//! Heuristic: two hook scripts in `hooks/` whose first line-match of
-//! `tool_name|matcher|event|PreToolUse|PostToolUse|UserPromptSubmit`
-//! targets the same value. Flags the pair as possibly-redundant.
+//! Previous heuristic flagged any two hook scripts sharing a matcher (event
+//! name like `PreToolUse:Edit`, `Stop`, etc.) as a "redundancy conflict".
+//!
+//! This is fundamentally wrong: Claude Code's hook chain is designed to
+//! support N hooks per matcher — they run in registration order, each
+//! contributes its own side effect (logging, validation, advisory). Two
+//! `Stop`-event hooks are not a conflict, they are the normal architecture.
+//!
+//! Backlog entry (`~/.claude/memory/sync-repo/backlog.md` 2026-05-11):
+//! > "Несколько хуков на один matcher" = false conflict. Claude Code
+//! > поддерживает N hooks per event by design. 9 hooks/medium findings —
+//! > все ложные. Убрать класс `hooks/medium "shares matcher"` целиком.
+//!
+//! Scanner kept as a stub returning `Vec::new()` rather than removed from
+//! the scanner registry, so the `--only hooks` CLI flag still validates.
+//! Real hook-related conflicts (broken shebangs, missing chmod, syntax
+//! errors) belong in a future `hooks-validity` scanner — not here.
 
-use crate::conflict::{Category, Conflict, Severity};
-use crate::tree::{collect_with_ext, read_lossy, rel};
-use regex::Regex;
+use crate::conflict::Conflict;
 use std::path::Path;
 
-fn extract_matcher(content: &str) -> Vec<String> {
-    let rx = Regex::new(
-        r#"(?i)(?:tool[_ ]?name|matcher|event)\s*[:=]\s*["']?([A-Za-z0-9_|/-]+)["']?"#,
-    )
-    .expect("static regex");
-    let mut out = Vec::new();
-    for c in rx.captures_iter(content) {
-        out.push(c[1].to_lowercase());
-    }
-    out.sort();
-    out.dedup();
-    out
-}
-
-pub fn scan(root: &Path) -> Vec<Conflict> {
-    let mut files = collect_with_ext(root, "hooks", "sh");
-    files.extend(collect_with_ext(root, "hooks", "py"));
-    files.extend(collect_with_ext(root, "hooks", "rs"));
-
-    let indexed: Vec<(String, Vec<String>)> = files
-        .iter()
-        .map(|f| (rel(root, f), extract_matcher(&read_lossy(f))))
-        .collect();
-
-    pairs(&indexed)
-}
-
-fn pairs(indexed: &[(String, Vec<String>)]) -> Vec<Conflict> {
-    let mut out = Vec::new();
-    for i in 0..indexed.len() {
-        for j in (i + 1)..indexed.len() {
-            let shared: Vec<&String> =
-                indexed[i].1.iter().filter(|m| indexed[j].1.contains(m)).collect();
-            if !shared.is_empty() {
-                out.push(overlap_conflict(&indexed[i].0, &indexed[j].0, &shared));
-            }
-        }
-    }
-    out
-}
-
-fn overlap_conflict(a: &str, b: &str, shared: &[&String]) -> Conflict {
-    let shared_str = shared
-        .iter()
-        .map(|s| s.as_str())
-        .collect::<Vec<_>>()
-        .join(",");
-    Conflict::new(
-        Category::Hooks,
-        Severity::Medium,
-        vec![a.to_string(), b.to_string()],
-        format!("hooks share matcher(s): {}", shared_str),
-        "consider merging into a single hook with union of patterns; keep separate if responsibilities are genuinely distinct".to_string(),
-        false,
-    )
+pub fn scan(_root: &Path) -> Vec<Conflict> {
+    Vec::new()
 }

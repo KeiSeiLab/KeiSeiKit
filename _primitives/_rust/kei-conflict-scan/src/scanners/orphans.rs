@@ -10,7 +10,7 @@
 //! prose markdown.
 
 use crate::conflict::{Category, Conflict, Severity};
-use crate::tree::{read_lossy, rel};
+use crate::tree::{read_lossy, rel, should_skip_path};
 use regex::Regex;
 use std::collections::HashSet;
 use std::path::Path;
@@ -18,7 +18,11 @@ use walkdir::WalkDir;
 
 fn all_basenames(root: &Path) -> HashSet<String> {
     let mut out = HashSet::new();
-    for e in WalkDir::new(root).into_iter().filter_map(|e| e.ok()) {
+    for e in WalkDir::new(root)
+        .into_iter()
+        .filter_entry(|e| !should_skip_path(e.path()))
+        .filter_map(|e| e.ok())
+    {
         if e.file_type().is_file() {
             if let Some(stem) = e.path().file_stem().and_then(|s| s.to_str()) {
                 out.insert(stem.to_lowercase());
@@ -57,7 +61,11 @@ fn normalize_target(raw: &str) -> Option<String> {
 pub fn scan(root: &Path) -> Vec<Conflict> {
     let index = all_basenames(root);
     let mut out = Vec::new();
-    for e in WalkDir::new(root).into_iter().filter_map(|e| e.ok()) {
+    for e in WalkDir::new(root)
+        .into_iter()
+        .filter_entry(|e| !should_skip_path(e.path()))
+        .filter_map(|e| e.ok())
+    {
         if !e.file_type().is_file() {
             continue;
         }
