@@ -1,7 +1,13 @@
 //! Orphan-reference detector.
 //!
-//! Finds `[[wikilink]]` and `handoffs: - name` references whose targets
-//! do not exist anywhere under the root. Case-insensitive basename match.
+//! Finds `[[wikilink]]` references whose targets do not exist anywhere
+//! under the root. Case-insensitive basename match.
+//!
+//! The earlier `handoffs: - **name**` heuristic was removed (2026-05-12)
+//! after a sync-repo scan showed it matched 0 real handoff sections and
+//! every match was a prose bold-bullet (e.g. `- **english-jargon** —`).
+//! Real handoff syntax in agent-graph repos uses YAML frontmatter, not
+//! prose markdown.
 
 use crate::conflict::{Category, Conflict, Severity};
 use crate::tree::{read_lossy, rel};
@@ -48,13 +54,6 @@ fn normalize_target(raw: &str) -> Option<String> {
     Some(bn.to_string())
 }
 
-fn extract_handoffs(content: &str) -> Vec<String> {
-    let rx = Regex::new(r"(?im)^\s*-\s*\*\*([a-z0-9][a-z0-9_-]{2,})\*\*").expect("static regex");
-    rx.captures_iter(content)
-        .map(|c| c[1].trim().to_lowercase())
-        .collect()
-}
-
 pub fn scan(root: &Path) -> Vec<Conflict> {
     let index = all_basenames(root);
     let mut out = Vec::new();
@@ -73,11 +72,6 @@ pub fn scan(root: &Path) -> Vec<Conflict> {
             };
             if !index.contains(&normalized) {
                 out.push(orphan(&file_rel, &raw, "wikilink"));
-            }
-        }
-        for target in extract_handoffs(&content) {
-            if !index.contains(&target) && target.contains('-') {
-                out.push(orphan(&file_rel, &target, "handoff"));
             }
         }
     }
