@@ -153,6 +153,12 @@ impl MockAnthropicServer {
 /// Spin up a wiremock server mounted with a canned `/v1/messages`
 /// reply. Bind happens on `127.0.0.1:0` via wiremock's own listener,
 /// which is reliable across macOS / Linux GitHub runners.
+///
+/// Includes a warm-up GET against the bound port so we only return
+/// once the listener is actually accepting connections — this closes
+/// the race where the first test under parallel `cargo test`
+/// dispatches an HTTP request to the mock before its acceptor loop
+/// is ready (manifests as `error sending request for url …`).
 async fn build_mock(text: &str) -> MockAnthropicServer {
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -167,31 +173,54 @@ async fn build_mock(text: &str) -> MockAnthropicServer {
         .respond_with(ResponseTemplate::new(200).set_body_json(body))
         .mount(&server)
         .await;
+    // Warm-up probe: a HEAD against an unmounted route returns 404 but
+    // confirms the listener is accepting. Retry briefly under cold CI.
+    let probe_url = server.uri();
+    for attempt in 0..20 {
+        if reqwest::Client::new()
+            .head(&probe_url)
+            .timeout(std::time::Duration::from_millis(200))
+            .send()
+            .await
+            .is_ok()
+        {
+            break;
+        }
+        if attempt == 19 {
+            panic!("wiremock listener did not respond to warm-up probe after 1s");
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+    }
     let uri = format!("{}/v1/messages", server.uri());
     MockAnthropicServer { server, uri }
 }
 
 /// Per-call mock variant. Spawns a fresh wiremock instance with the
 /// given canned reply text. Each instance keeps its server alive for
-/// the lifetime of the returned handle (drop = stop).
+/// the lifetime of the returned handle.
+///
+/// Implementation note: wiremock's hyper server is tied to the runtime
+/// that called `MockServer::start().await`. We build a dedicated
+/// **multi-thread** runtime on a helper OS-thread and keep it alive by
+/// blocking on `pending()` — this guarantees the runtime keeps driving
+/// async tasks (the previous `std::thread::park()` froze the worker
+/// thread, starving wiremock of CPU and producing
+/// `error sending request for url …` on CI under parallel tests).
 pub fn mock_anthropic_responding_with(text: &'static str) -> MockAnthropicServer {
-    // The caller is inside a `#[tokio::test]` runtime; build on it via
-    // a one-shot thread + current-thread runtime to avoid nested-runtime
-    // panics on tests that already hold a multi-thread runtime.
     let (tx, rx) = std::sync::mpsc::channel::<MockAnthropicServer>();
     let owned = text.to_string();
     std::thread::spawn(move || {
-        let rt = tokio::runtime::Builder::new_current_thread()
+        let rt = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
+            .worker_threads(2)
             .build()
             .expect("mock-runtime build");
         let mock = rt.block_on(async move { build_mock(&owned).await });
         tx.send(mock).expect("send mock back");
-        // Keep this runtime alive — wiremock's internal hyper server is
-        // tied to it. We park the thread; `MockAnthropicServer` is now
-        // owned by the caller and will Drop normally when test scope
-        // ends. The runtime drops with the thread.
-        std::thread::park();
+        // Hold the runtime open for the rest of the process — wiremock
+        // needs it to accept incoming requests. `pending()` yields
+        // forever; worker threads keep processing the hyper server.
+        rt.block_on(std::future::pending::<()>());
     });
     rx.recv().expect("mock channel closed")
 }

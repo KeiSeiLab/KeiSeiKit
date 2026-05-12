@@ -14,6 +14,7 @@
 //! file stays focused (router shape there, loop wiring here).
 
 mod common;
+use serial_test::serial;
 
 use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
@@ -58,6 +59,7 @@ fn auth_request(method: &str, uri: &str, body: Body) -> Request<Body> {
 /// Sync /v1/chat/completions — response carries the mock's "hi" and NOT
 /// the legacy stub echo. Confirms `agent_runner::collect_reply` is the
 /// production code path.
+#[serial]
 #[tokio::test]
 async fn sync_chat_completions_runs_real_loop_not_stub() {
     ensure_env();
@@ -94,6 +96,7 @@ async fn sync_chat_completions_runs_real_loop_not_stub() {
 
 /// Streaming /v1/chat/completions — SSE body carries `delta` chunks fed
 /// by the real loop. No stub marker; finish frame present.
+#[serial]
 #[tokio::test]
 async fn streaming_chat_completions_runs_real_loop_not_stub() {
     ensure_env();
@@ -144,6 +147,7 @@ async fn streaming_chat_completions_runs_real_loop_not_stub() {
 ///   4. The terminal `[DONE]` sentinel is the last `data:` line.
 ///   5. The finish-chunk index is strictly less than the sentinel index
 ///      (proves ordering: finish, then sentinel — not bundled).
+#[serial]
 #[tokio::test]
 async fn streaming_chat_completions_emits_chunked_frames_not_single_blob() {
     ensure_env();
@@ -216,6 +220,7 @@ async fn streaming_chat_completions_emits_chunked_frames_not_single_blob() {
 /// /v1/responses — sync mode — response.output[0].text carries the
 /// mock reply, not the stub echo. Witnesses `responses::handle_sync`
 /// is wired through `agent_runner::collect_reply` (P1.1.c).
+#[serial]
 #[tokio::test]
 async fn sync_responses_runs_real_loop_not_stub() {
     ensure_env();
@@ -250,6 +255,7 @@ async fn sync_responses_runs_real_loop_not_stub() {
 /// frames produced by the real loop and finishes with `response.completed`.
 /// Witnesses `responses::handle_stream` is wired through
 /// `agent_runner::stream_events` + `stream_forwarder::forward_responses`.
+#[serial]
 #[tokio::test]
 async fn streaming_responses_runs_real_loop_not_stub() {
     ensure_env();
@@ -290,6 +296,7 @@ async fn streaming_responses_runs_real_loop_not_stub() {
 /// are wired through `agent_runner::stream_events` +
 /// `stream_forwarder::forward_runs` (P1.1.d). The previous `run_stub`
 /// would have leaked `[run stub] echo:` into the delta payload.
+#[serial]
 #[tokio::test]
 async fn runs_events_stream_runs_real_loop_not_stub() {
     ensure_env();
@@ -354,6 +361,7 @@ async fn runs_events_stream_runs_real_loop_not_stub() {
 /// consumed, the registry slot's receiver is taken; a second GET must
 /// 404. Witnesses the `take_receiver` first-subscriber-wins contract is
 /// preserved by the real-loop wiring (it was true under the stub too).
+#[serial]
 #[tokio::test]
 async fn runs_events_second_subscriber_returns_not_found() {
     ensure_env();

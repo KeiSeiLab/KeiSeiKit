@@ -15,6 +15,7 @@
 //! is picked up without any source-side wiring.
 
 mod common;
+use serial_test::serial;
 
 use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
@@ -53,6 +54,7 @@ fn auth_request(method: &str, uri: &str, body: Body) -> Request<Body> {
         .unwrap()
 }
 
+#[serial]
 #[tokio::test]
 async fn list_models_returns_kei_cortex() {
     ensure_api_key();
@@ -68,6 +70,7 @@ async fn list_models_returns_kei_cortex() {
     assert!(body["data"].as_array().unwrap().len() >= 1);
 }
 
+#[serial]
 #[tokio::test]
 async fn unauthorized_without_bearer() {
     // Use the same key value as `ensure_api_key` so this test does not
@@ -88,6 +91,7 @@ async fn unauthorized_without_bearer() {
     assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
 }
 
+#[serial]
 #[tokio::test]
 async fn chat_completions_sync_returns_choices() {
     ensure_api_key();
@@ -114,6 +118,7 @@ async fn chat_completions_sync_returns_choices() {
     assert!(v["choices"][0]["message"]["content"].is_string());
 }
 
+#[serial]
 #[tokio::test]
 async fn chat_completions_stream_emits_sse() {
     ensure_api_key();
@@ -140,6 +145,7 @@ async fn chat_completions_stream_emits_sse() {
     assert!(s.contains("data:"), "expected SSE data frame, got: {s}");
 }
 
+#[serial]
 #[tokio::test]
 async fn run_create_returns_202_and_id() {
     ensure_api_key();
@@ -177,6 +183,7 @@ async fn run_create_returns_202_and_id() {
     ));
 }
 
+#[serial]
 #[tokio::test]
 async fn responses_get_unknown_id_returns_404() {
     ensure_api_key();

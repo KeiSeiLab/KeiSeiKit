@@ -67,3 +67,4 @@ kei-token-tracker = { path = "../kei-token-tracker" }
 [dev-dependencies]
 reqwest = { workspace = true, features = ["blocking"] }
 wiremock = { workspace = true }
+serial_test = "3"
