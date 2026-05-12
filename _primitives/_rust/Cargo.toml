@@ -183,6 +183,10 @@ members = [
     "kei-buddy",
     # Inbound Telegram webhook handler — parses Update payloads into typed WebhookEvent
     "kei-telegram-webhook",
+    # TTS abstraction — 4 backends (ElevenLabs/OpenAI/Google/Piper) behind feature flags
+    "kei-tts",
+    # STT abstraction — 3 backends (whisper-local/Deepgram/OpenAI-Whisper) behind feature flags
+    "kei-stt",
 ]
 
 [workspace.package]
