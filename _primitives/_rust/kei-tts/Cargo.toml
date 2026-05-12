@@ -1,0 +1,40 @@
+[package]
+name = "kei-tts"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Text-to-speech abstraction trait with 4 backends (ElevenLabs/OpenAI/Google/Piper). Default = piper (local, free, zero latency)."
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "kei_tts"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "process", "io-util"] }
+reqwest = { workspace = true }
+tracing = "0.1"
+base64 = { version = "0.22", optional = true }
+
+[features]
+default = ["piper"]
+elevenlabs = []
+openai = []
+google = ["dep:base64"]
+piper = []
+all-backends = ["elevenlabs", "openai", "google", "piper"]
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }
+
+[package.metadata.keisei]
+maturity = "alpha"
+trait = "TtsBackend"
+description = "TTS abstraction with 4 backends (ElevenLabs/OpenAI/Google/Piper). Default = piper."
+authors = ["Denis Parfionovich <info@greendragon.info>"]
