@@ -15,13 +15,16 @@ use crate::{
     chat_log::ChatLog,
     commands::{execute_command, parse_command, CommandStores},
     contacts::Contacts,
+    conversational::conversational_step,
     error::BuddyError,
     extractor::LlmExtractor,
     machine::handle_step,
     persona_merge::deep_merge,
+    retrieval::retrieve_context,
     serve_telegram::send_message,
     state::OnboardState,
     store::{BuddyStore, SqliteBuddyStore},
+    strings::Lang,
     topic_classify::classify_and_store_topic,
     topics::Topics,
     voice::VoiceHandler,
@@ -87,10 +90,14 @@ impl<E: LlmExtractor + Send + Sync + 'static> WebhookContext for BuddyContext<E>
     async fn on_event(&self, event: WebhookEvent) {
         match event {
             WebhookEvent::Text { chat_id, text, .. } => {
-                self.handle_text(chat_id, text).await;
+                let me = self.clone();
+                tokio::spawn(async move { me.handle_text(chat_id, text).await });
             }
             WebhookEvent::Voice { chat_id, file_id, mime_type, .. } => {
-                self.handle_voice(chat_id, file_id, mime_type).await;
+                let me = self.clone();
+                tokio::spawn(async move {
+                    me.handle_voice(chat_id, file_id, mime_type).await
+                });
             }
             other => {
                 warn!(event = ?other, "ignoring unhandled webhook event");
@@ -162,7 +169,13 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
         let state = self.store.load_state(chat_id).await?.unwrap_or(OnboardState::Intro);
         let was_ready = state == OnboardState::Ready;
         let persona = self.store.load_persona(chat_id).await?.unwrap_or_else(|| json!({}));
-        let output = handle_step(&state, text, &persona, self.extractor.as_ref()).await?;
+        let output = if matches!(state, OnboardState::Intro | OnboardState::AskLanguage) {
+            handle_step(&state, text, &persona, self.extractor.as_ref()).await?
+        } else {
+            let lang = Lang::from_persona(&persona);
+            let ctx = retrieve_context(&self.chat_log, &self.topics, chat_id, text, 10, 5).await;
+            conversational_step(&state, &persona, &ctx, text, self.extractor.as_ref(), lang).await?
+        };
         self.store.save_state(chat_id, &output.next_state).await?;
         self.apply_persona_patch(chat_id, output.persona_patch).await?;
         if was_ready || output.next_state == OnboardState::Ready {
