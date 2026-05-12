@@ -19,11 +19,31 @@ path = "src/lib.rs"
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "net"] }
 tracing = "0.1"
 clap = { workspace = true, features = ["derive"] }
+async-trait = { workspace = true }
+rusqlite = { workspace = true }
+reqwest = { workspace = true }
+anyhow = { workspace = true }
+kei-memory-sqlite = { path = "../kei-memory-sqlite" }
+
+# serve feature deps
+axum = { version = "0.7", features = ["json", "http1", "tokio"], optional = true }
+kei-telegram-webhook = { path = "../kei-telegram-webhook", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }
 
 [features]
+default = ["serve"]
+# HTTP server — axum router + webhook handler + Telegram send_message.
+serve = ["axum", "kei-telegram-webhook", "tracing-subscriber"]
+# Enables OpenAiExtractor — real HTTP to LiteLLM proxy using reqwest.
+# Off by default; tests use MockExtractor which has no extra deps.
+extractor-openai = []
 # future: pulls in kei-notify-telegram for real Telegram transport
 telegram = []
 

@@ -25,13 +25,53 @@ Scaffold only. The `OnboardState` enum and `TransitionInput` struct are
 defined. All transition logic is stubbed (`next()` returns `self.clone()`).
 The binary entry point prints a placeholder message and exits 0.
 
+## Running
+
+### Environment variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `TELEGRAM_BOT_TOKEN` | yes (serve) | — | Bot token from @BotFather |
+| `TELEGRAM_WEBHOOK_SECRET` | yes (serve) | — | Secret token for webhook verification |
+| `KEI_BUDDY_PORT` | no | `8080` | HTTP port to bind |
+| `KEI_BUDDY_DB_PATH` | no | `./kei-buddy.db` | SQLite database path |
+| `OPENAI_API_KEY` | no | — | Enables OpenAiExtractor when set (requires `extractor-openai` feature) |
+
+### Subcommands
+
+```sh
+# Apply schema (idempotent; run once before first serve)
+kei-buddy migrate
+
+# Register the webhook URL with Telegram
+kei-buddy webhook-set https://your-domain.com/webhook
+
+# Start the HTTP server
+kei-buddy serve
+
+# Remove the registered webhook (revert to polling)
+kei-buddy webhook-delete
+```
+
+### Example systemd unit
+
+```ini
+[Unit]
+Description=KeiBuddy Telegram bot
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/kei-buddy/env
+ExecStart=/usr/local/bin/kei-buddy serve
+Restart=on-failure
+User=keisei
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Roadmap
 
-- **State-machine transition logic** — port `handleStep` from
-  `chat-onboard.ts`; wire per-state LLM-extract calls through kei-cortex.
-- **Memory binding** — persist scratchpad and finalised persona via
-  kei-memory-sqlite; implement `getChatState` / `setChatStep` equivalents.
-- **Persona binding** — read persona manifest via `kei-pet`; apply tone
-  overlay to outgoing replies.
-- **Transport binding** — wire kei-notify-telegram for outbound messages;
-  add a real Telegram webhook server (or kei-gateway adapter) for inbound.
+- **OpenAiExtractor wiring** — pass real OPENAI_API_KEY to OpenAiExtractor in serve.rs when feature enabled.
+- **Persona binding** — read persona manifest via `kei-pet`; apply tone overlay to outgoing replies.
+- **Digest scheduling** — wire `kei-cron-scheduler` for morning/evening digest delivery.

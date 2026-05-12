@@ -24,3 +24,15 @@ pub enum BuddyError {
     #[error("transport error: {0}")]
     Transport(String),
 }
+
+impl From<rusqlite::Error> for BuddyError {
+    fn from(e: rusqlite::Error) -> Self {
+        BuddyError::Memory(e.to_string())
+    }
+}
+
+impl From<kei_memory_sqlite::Error> for BuddyError {
+    fn from(e: kei_memory_sqlite::Error) -> Self {
+        BuddyError::Memory(e.to_string())
+    }
+}
