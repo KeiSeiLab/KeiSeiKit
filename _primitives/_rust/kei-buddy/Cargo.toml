@@ -11,6 +11,10 @@ license.workspace = true
 name = "kei-buddy"
 path = "src/bin/kei-buddy.rs"
 
+[[bin]]
+name = "kei-buddy-tick"
+path = "src/bin/kei-buddy-tick.rs"
+
 [lib]
 name = "kei_buddy"
 path = "src/lib.rs"

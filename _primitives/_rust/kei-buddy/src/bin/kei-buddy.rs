@@ -57,6 +57,8 @@ async fn cmd_serve() -> anyhow::Result<()> {
             .or_else(|| std::env::var("OPENAI_API_KEY").ok()),
         llm_model: std::env::var("KEI_BUDDY_LLM_MODEL").ok(),
         chat_log_db_path: chat_log_path_from_env(),
+        topics_db_path: topics_db_path_from_env(),
+        contacts_db_path: contacts_db_path_from_env(),
     };
     run_serve(cfg).await
 }
@@ -87,8 +89,18 @@ fn cmd_migrate() -> anyhow::Result<()> {
     let _store = kei_buddy::store::SqliteBuddyStore::from_path(&path)?;
     let chat_log_path = chat_log_path_from_env();
     let _ = kei_buddy::ChatLog::from_path(&chat_log_path)?;
+    let topics_path = topics_db_path_from_env();
+    let _ = kei_buddy::Topics::from_path(&topics_path)?;
+    let contacts_path = contacts_db_path_from_env();
+    let _ = kei_buddy::Contacts::from_path(&contacts_path)?;
     init_log();
-    tracing::info!(path = %path, chat_log_path = %chat_log_path, "schema applied");
+    tracing::info!(
+        path = %path,
+        chat_log_path = %chat_log_path,
+        topics_path = %topics_path,
+        contacts_path = %contacts_path,
+        "schema applied"
+    );
     Ok(())
 }
 
@@ -148,4 +160,14 @@ fn db_path_from_env() -> String {
 
 fn chat_log_path_from_env() -> String {
     std::env::var("KEI_BUDDY_CHAT_LOG_PATH").unwrap_or_else(|_| "./kei-buddy-chat.db".into())
+}
+
+fn topics_db_path_from_env() -> String {
+    std::env::var("KEI_BUDDY_TOPICS_DB_PATH")
+        .unwrap_or_else(|_| "./kei-buddy-topics.db".into())
+}
+
+fn contacts_db_path_from_env() -> String {
+    std::env::var("KEI_BUDDY_CONTACTS_DB_PATH")
+        .unwrap_or_else(|_| "./kei-buddy-contacts.db".into())
 }

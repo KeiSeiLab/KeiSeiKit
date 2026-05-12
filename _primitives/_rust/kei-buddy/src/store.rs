@@ -66,6 +66,14 @@ impl SqliteBuddyStore {
         let store = Arc::new(SqliteStore::from_memory()?);
         Self::new(store)
     }
+
+    /// Lock and return the inner SQLite connection guard.
+    ///
+    /// Used by `tick::load_chat_ids_from_store` to read `buddy_state` chat_ids.
+    /// Callers must not hold the guard across `await` points.
+    pub fn inner_conn(&self) -> std::sync::MutexGuard<'_, rusqlite::Connection> {
+        self.inner.lock()
+    }
 }
 
 // ─── BuddyStore impl ─────────────────────────────────────────────────────────
