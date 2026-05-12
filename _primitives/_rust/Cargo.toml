@@ -181,6 +181,8 @@ members = [
     "kei-graph-export",
     # KeiBuddy personal-assistant Telegram bot — onboarding FSM scaffold
     "kei-buddy",
+    # Inbound Telegram webhook handler — parses Update payloads into typed WebhookEvent
+    "kei-telegram-webhook",
 ]
 
 [workspace.package]
