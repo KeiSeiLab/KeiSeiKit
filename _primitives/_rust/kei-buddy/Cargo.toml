@@ -1,0 +1,64 @@
+[package]
+name = "kei-buddy"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "KeiBuddy personal-assistant Telegram bot — onboarding state-machine + skeleton driver. Concept-level scaffold."
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "kei-buddy"
+path = "src/bin/kei-buddy.rs"
+
+[[bin]]
+name = "kei-buddy-tick"
+path = "src/bin/kei-buddy-tick.rs"
+
+[lib]
+name = "kei_buddy"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "net"] }
+tracing = "0.1"
+clap = { workspace = true, features = ["derive"] }
+async-trait = { workspace = true }
+rusqlite = { workspace = true }
+reqwest = { workspace = true }
+anyhow = { workspace = true }
+kei-memory-sqlite = { path = "../kei-memory-sqlite" }
+kei-chat-store = { path = "../kei-chat-store" }
+kei-social-store = { path = "../kei-social-store" }
+kei-sage = { path = "../kei-sage" }
+kei-contacts-google = { path = "../kei-contacts-google" }
+kei-contacts-apple = { path = "../kei-contacts-apple" }
+chrono = { workspace = true }
+
+# serve feature deps
+axum = { version = "0.7", features = ["json", "http1", "tokio"], optional = true }
+kei-telegram-webhook = { path = "../kei-telegram-webhook", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+kei-stt = { path = "../kei-stt", default-features = false, features = ["whisper-local"], optional = true }
+
+[dev-dependencies]
+wiremock = { workspace = true }
+tokio = { workspace = true }
+
+[features]
+default = ["serve"]
+# HTTP server — axum router + webhook handler + Telegram send_message.
+serve = ["axum", "kei-telegram-webhook", "tracing-subscriber", "kei-stt"]
+# Enables OpenAiExtractor — real HTTP to LiteLLM proxy using reqwest.
+# Off by default; tests use MockExtractor which has no extra deps.
+extractor-openai = []
+# future: pulls in kei-notify-telegram for real Telegram transport
+telegram = []
+
+[package.metadata.keisei]
+maturity = "concept"
+description = "KeiBuddy personal-assistant: onboarding FSM + bot driver scaffold"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

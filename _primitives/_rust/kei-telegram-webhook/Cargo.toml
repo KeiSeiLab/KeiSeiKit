@@ -1,0 +1,32 @@
+[package]
+name = "kei-telegram-webhook"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Inbound Telegram Bot API webhook handler — parses Update payloads into typed WebhookEvent values. Consumers mount the handler into their own axum::Router."
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "kei_telegram_webhook"
+path = "src/lib.rs"
+
+[dependencies]
+async-trait = { workspace = true }
+# axum not yet in workspace.dependencies — tracked in follow-up-required
+axum = { version = "0.7", features = ["json", "http1", "tokio"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tracing = "0.1"
+
+[dev-dependencies]
+tokio = { workspace = true }
+tower = { workspace = true }
+
+[package.metadata.keisei]
+maturity = "alpha"
+backend = "telegram"
+description = "Inbound Telegram webhook handler (secret-token verified, typed WebhookEvent)"
+authors = ["Denis Parfionovich <info@greendragon.info>"]

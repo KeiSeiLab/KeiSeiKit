@@ -179,6 +179,18 @@ members = [
     "kei-db-contract",
     # Live runtime-graph exporter (registry + ledger → D3 space fragment)
     "kei-graph-export",
+    # KeiBuddy personal-assistant Telegram bot — onboarding FSM scaffold
+    "kei-buddy",
+    # Inbound Telegram webhook handler — parses Update payloads into typed WebhookEvent
+    "kei-telegram-webhook",
+    # TTS abstraction — 4 backends (ElevenLabs/OpenAI/Google/Piper) behind feature flags
+    "kei-tts",
+    # STT abstraction — 3 backends (whisper-local/Deepgram/OpenAI-Whisper) behind feature flags
+    "kei-stt",
+    # Wave N — Google People API thin client (token-in, Vec<GoogleContact>-out)
+    "kei-contacts-google",
+    # Wave N+1 — iCloud CardDAV thin client (Basic Auth, Vec<AppleContact>-out)
+    "kei-contacts-apple",
 ]
 
 [workspace.package]
