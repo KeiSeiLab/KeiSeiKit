@@ -3189,12 +3189,21 @@ dependencies = [
 name = "kei-buddy"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "async-trait",
+ "axum",
  "clap",
+ "kei-memory-sqlite",
+ "kei-telegram-webhook",
+ "reqwest 0.12.28",
+ "rusqlite",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
  "tokio",
  "tracing",
+ "tracing-subscriber",
+ "wiremock",
 ]
 
 [[package]]

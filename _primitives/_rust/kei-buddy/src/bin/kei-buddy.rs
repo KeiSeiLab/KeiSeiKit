@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-//! kei-buddy binary entry point.
-//!
-//! Scaffold — the `serve` subcommand is a no-op stub until the
-//! Telegram webhook driver and memory layer are wired in.
+//! kei-buddy binary — 4 subcommands: serve / migrate / webhook-set / webhook-delete.
 
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(
     name = "kei-buddy",
-    about = "KeiBuddy personal-assistant bot (scaffold)",
+    about = "KeiBuddy personal-assistant Telegram bot",
     version
 )]
 struct Cli {
@@ -19,16 +16,105 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Start the Telegram webhook listener (not yet implemented).
+    /// Start the Telegram webhook HTTP listener.
     Serve,
+    /// Apply the SQLite schema (idempotent). Useful before first run.
+    Migrate,
+    /// Register a webhook URL with Telegram.
+    WebhookSet {
+        /// Public HTTPS URL for the /webhook route.
+        url: String,
+    },
+    /// Delete the registered Telegram webhook (revert to polling).
+    WebhookDelete,
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     match cli.command {
-        Command::Serve => {
-            println!("kei-buddy serve: not yet implemented, scaffold only");
-        }
+        Command::Serve => cmd_serve().await,
+        Command::Migrate => cmd_migrate(),
+        Command::WebhookSet { url } => cmd_webhook_set(url).await,
+        Command::WebhookDelete => cmd_webhook_delete().await,
     }
+}
+
+#[cfg(feature = "serve")]
+async fn cmd_serve() -> anyhow::Result<()> {
+    use kei_buddy::serve::{run_serve, ServeConfig};
+    let cfg = ServeConfig {
+        port: port_from_env(),
+        db_path: db_path_from_env(),
+        bot_token: require_env("TELEGRAM_BOT_TOKEN")?,
+        webhook_secret: require_env("TELEGRAM_WEBHOOK_SECRET")?,
+    };
+    run_serve(cfg).await
+}
+
+#[cfg(not(feature = "serve"))]
+async fn cmd_serve() -> anyhow::Result<()> {
+    anyhow::bail!("kei-buddy was compiled without the `serve` feature. Rebuild with --features serve.");
+}
+
+fn cmd_migrate() -> anyhow::Result<()> {
+    let path = db_path_from_env();
+    let _store = kei_buddy::store::SqliteBuddyStore::from_path(&path)?;
+    init_log();
+    tracing::info!(path = %path, "schema applied");
+    Ok(())
+}
+
+fn init_log() {
+    #[cfg(feature = "serve")]
+    {
+        use tracing_subscriber::{fmt, EnvFilter};
+        let _ = fmt().with_env_filter(EnvFilter::from_default_env()).try_init();
+    }
+}
+
+#[cfg(feature = "serve")]
+async fn cmd_webhook_set(url: String) -> anyhow::Result<()> {
+    use kei_buddy::serve_telegram::set_webhook;
+    let token = require_env("TELEGRAM_BOT_TOKEN")?;
+    let secret = require_env("TELEGRAM_WEBHOOK_SECRET")?;
+    let http = reqwest::Client::new();
+    set_webhook(&token, &url, &secret, &http).await?;
+    tracing::info!("webhook registered");
+    Ok(())
+}
+
+#[cfg(not(feature = "serve"))]
+async fn cmd_webhook_set(_url: String) -> anyhow::Result<()> {
+    anyhow::bail!("compile with --features serve");
+}
+
+#[cfg(feature = "serve")]
+async fn cmd_webhook_delete() -> anyhow::Result<()> {
+    use kei_buddy::serve_telegram::delete_webhook;
+    let token = require_env("TELEGRAM_BOT_TOKEN")?;
+    let http = reqwest::Client::new();
+    delete_webhook(&token, &http).await?;
+    tracing::info!("webhook deleted");
+    Ok(())
+}
+
+#[cfg(not(feature = "serve"))]
+async fn cmd_webhook_delete() -> anyhow::Result<()> {
+    anyhow::bail!("compile with --features serve");
+}
+
+fn require_env(name: &str) -> anyhow::Result<String> {
+    std::env::var(name).map_err(|_| anyhow::anyhow!("env var {name} is required"))
+}
+
+fn port_from_env() -> u16 {
+    std::env::var("KEI_BUDDY_PORT")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(8080)
+}
+
+fn db_path_from_env() -> String {
+    std::env::var("KEI_BUDDY_DB_PATH").unwrap_or_else(|_| "./kei-buddy.db".into())
 }

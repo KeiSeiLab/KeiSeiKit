@@ -1,23 +1,34 @@
 // SPDX-License-Identifier: Apache-2.0
 //! kei-buddy — KeiBuddy personal-assistant Telegram bot scaffold.
 //!
-//! Concept-level crate. This file declares the public module surface.
-//! No business logic lives here; see individual modules.
-//!
 //! Module layout (Constructor Pattern — one file, one responsibility):
-//!   * `state`      — `OnboardState` enum + `next()` stub
-//!   * `transition` — `TransitionInput` input struct
+//!   * `state`      — `OnboardState` enum
+//!   * `transition` — `StepOutput` output struct
+//!   * `extractor`  — `LlmExtractor` trait + `MockExtractor` + `OpenAiExtractor` (feature-gated)
+//!   * `machine`    — `handle_step` — the 11-arm onboarding FSM
 //!   * `error`      — `BuddyError` error type
-//!
-//! Follow-up tasks will add:
-//!   * LLM extraction via kei-cortex
-//!   * Memory persistence via kei-memory-sqlite
-//!   * Telegram webhook driver (kei-notify-telegram)
+//!   * `schema`     — buddy-specific SQLite DDL
+//!   * `store`      — `BuddyStore` trait + `SqliteBuddyStore` impl
 
 pub mod error;
+pub mod extractor;
+pub mod machine;
+pub(crate) mod machine_helpers;
+pub mod persona_merge;
+pub mod schema;
 pub mod state;
+pub mod store;
+pub(crate) mod store_ops;
 pub mod transition;
 
+#[cfg(feature = "serve")]
+pub mod serve;
+#[cfg(feature = "serve")]
+pub mod serve_telegram;
+
 pub use error::BuddyError;
+pub use extractor::LlmExtractor;
+pub use machine::handle_step;
 pub use state::OnboardState;
-pub use transition::TransitionInput;
+pub use store::{BuddyStore, SqliteBuddyStore};
+pub use transition::StepOutput;

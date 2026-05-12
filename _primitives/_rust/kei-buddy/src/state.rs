@@ -3,11 +3,11 @@
 //!
 //! Ported from `keisei-marketplace/src/lib/keibuddy/chat-onboard.ts`.
 //! Each variant corresponds to one `Step` in the TypeScript source.
-//! Transitions are stubs; real logic arrives in a follow-up task.
+//!
+//! Transitions live in `machine::handle_step` — the `next()` stub
+//! has been removed as part of the TS→Rust port.
 
 use serde::{Deserialize, Serialize};
-
-use crate::transition::TransitionInput;
 
 /// 11-state onboarding finite-state machine.
 ///
@@ -40,18 +40,6 @@ pub enum OnboardState {
     AskSchedule,
     /// Onboarding complete; regular conversation mode.
     Ready,
-}
-
-impl OnboardState {
-    /// Advance to the next state given user input.
-    ///
-    /// **Stub** — returns `self.clone()` until transition logic is ported.
-    /// Real implementation will extract fields via kei-cortex and follow
-    /// the per-topic queue logic from `chat-onboard.ts::handleStep`.
-    pub fn next(&self, _input: &TransitionInput) -> Self {
-        // TODO: port transition logic from chat-onboard.ts::handleStep
-        self.clone()
-    }
 }
 
 #[cfg(test)]
