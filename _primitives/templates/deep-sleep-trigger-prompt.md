@@ -120,6 +120,34 @@ v0.12.0 rules AND Phase C is skipped too — the marathon owns the night.
    to codify them. Without step 6, the affect matrix is a passive log;
    with it, the matrix feeds back into rule formation per RULE 0.10.
 
+   d. **(2026-05-12 extension) Emit DRAFT FILES, not just markdown.**
+      For each `proposed_rule` block in §6b, also write skeleton files
+      into the deep-sleep fork branch (only if `WITH_FORK=1` and the
+      branch was successfully created in §3):
+
+         sync-repo/sleep-deep/YYYY-MM-DD/drafts/rules/<slug>.md
+         sync-repo/sleep-deep/YYYY-MM-DD/drafts/hooks/<slug>.sh
+
+      Where `<slug>` = kebab-cased pattern name (e.g.
+      `response-conservatism-check`). File contents follow the
+      `pattern-codifier-agent` Phase 3 template — frontmatter + Why
+      + Rule + Severity ladder + Bypass for `.md`; bash skeleton with
+      stdin JSON parsing + severity exit code + bypass env for `.sh`.
+
+      DO NOT register the hook in `settings.json` here. The morning
+      `/sleep-review` skill Phase 3a presents each draft pair to the
+      user via `AskUserQuestion`; user approval triggers
+      `pattern-codifier-agent` which performs the actual install +
+      registration. Phase C's job is just to provide click-ready
+      drafts so the morning review is a 30-second click flow, not a
+      30-minute drafting flow.
+
+      Smoke-test: every emitted draft `.sh` MUST `bash -n <file>`
+      cleanly (syntax check, no execution). Any draft failing this
+      check is removed before commit + listed in the plan markdown
+      under "draft generation failures" so user knows the proposed
+      rule needs manual drafting.
+
 ## Zero-conflict guarantee
 
 Any conflict the refactor-engine marks `requires_human_decision` is
