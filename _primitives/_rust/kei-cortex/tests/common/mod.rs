@@ -14,6 +14,9 @@ use kei_cortex::{auth, build_router, AppConfig, AppState};
 use tempfile::TempDir;
 use tokio::net::TcpListener;
 use tokio::task::JoinHandle;
+// wiremock unused-import guard — actual use is inside build_mock()
+#[allow(unused_imports)]
+use wiremock as _;
 
 /// Minimal valid pet.toml used by multiple tests.
 pub const MINIMAL_PET_TOML: &str = r#"
@@ -116,10 +119,19 @@ pub fn async_client() -> reqwest::Client {
         .unwrap()
 }
 
-/// Handle to the process-wide mock Anthropic upstream. The server runs
-/// on a dedicated OS-thread runtime that outlives every `#[tokio::test]`
-/// runtime in the binary, so the listener never closes between tests.
+/// Handle to the process-wide mock Anthropic upstream.
+///
+/// (2026-05-12) Reimplemented on top of `wiremock` after the previous
+/// hand-rolled axum + dedicated-thread implementation flaked under
+/// macOS GitHub Actions runners — `error sending request for url
+/// (http://127.0.0.1:PORT/v1/messages)` on `streaming_responses_runs_real_loop_not_stub`
+/// + `sync_chat_completions_runs_real_loop_not_stub`. wiremock
+/// production-grade HTTP mock removes the loopback / fd-limit races.
 pub struct MockAnthropicServer {
+    /// The owned `wiremock::MockServer` — its `Drop` shuts down the
+    /// upstream listener. For singletons we leak it via `OnceLock` so
+    /// it outlives every `#[tokio::test]` runtime in the binary.
+    server: wiremock::MockServer,
     uri: String,
 }
 
@@ -129,61 +141,59 @@ impl MockAnthropicServer {
     pub fn uri(&self) -> &str {
         &self.uri
     }
+
+    /// Underlying wiremock server (rarely needed — exposed for tests
+    /// that want to assert request shape via `received_requests`).
+    #[allow(dead_code)]
+    pub fn server(&self) -> &wiremock::MockServer {
+        &self.server
+    }
 }
 
-/// Build the canned-reply axum router used by the mock. Same body for
-/// every POST so concurrent tests can share one server safely.
-fn build_mock_router(text: &str) -> axum::Router {
-    use axum::{routing::post, Json, Router};
+/// Spin up a wiremock server mounted with a canned `/v1/messages`
+/// reply. Bind happens on `127.0.0.1:0` via wiremock's own listener,
+/// which is reliable across macOS / Linux GitHub runners.
+async fn build_mock(text: &str) -> MockAnthropicServer {
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+    let server = MockServer::start().await;
     let body = serde_json::json!({
         "content": [{"type": "text", "text": text}],
         "stop_reason": "end_turn",
         "usage": {"input_tokens": 1, "output_tokens": 1},
     });
-    Router::new().route(
-        "/v1/messages",
-        post(move || {
-            let body = body.clone();
-            async move { Json(body) }
-        }),
-    )
+    Mock::given(method("POST"))
+        .and(path("/v1/messages"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(body))
+        .mount(&server)
+        .await;
+    let uri = format!("{}/v1/messages", server.uri());
+    MockAnthropicServer { server, uri }
 }
 
-/// Spin up the mock listener on a dedicated thread+runtime, return the
-/// resolved URI once it is bound and accepting. Kept private — tests
-/// reach it through `mock_anthropic_responding_with` (per-call wrapper)
-/// or `shared_mock_anthropic` (lazy singleton).
-fn spawn_mock_on_dedicated_thread(text: &'static str) -> String {
-    let (tx, rx) = std::sync::mpsc::channel::<String>();
-    let owned_text = text.to_string();
+/// Per-call mock variant. Spawns a fresh wiremock instance with the
+/// given canned reply text. Each instance keeps its server alive for
+/// the lifetime of the returned handle (drop = stop).
+pub fn mock_anthropic_responding_with(text: &'static str) -> MockAnthropicServer {
+    // The caller is inside a `#[tokio::test]` runtime; build on it via
+    // a one-shot thread + current-thread runtime to avoid nested-runtime
+    // panics on tests that already hold a multi-thread runtime.
+    let (tx, rx) = std::sync::mpsc::channel::<MockAnthropicServer>();
+    let owned = text.to_string();
     std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .expect("mock-runtime build");
-        rt.block_on(async move {
-            let app = build_mock_router(&owned_text);
-            let listener =
-                TcpListener::bind(SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 0))
-                    .await
-                    .expect("bind mock listener");
-            let actual = listener.local_addr().expect("local_addr");
-            let uri = format!("http://{actual}/v1/messages");
-            tx.send(uri).expect("send mock uri");
-            // Server runs forever on this thread's runtime.
-            let _ = axum::serve(listener, app).await;
-        });
+        let mock = rt.block_on(async move { build_mock(&owned).await });
+        tx.send(mock).expect("send mock back");
+        // Keep this runtime alive — wiremock's internal hyper server is
+        // tied to it. We park the thread; `MockAnthropicServer` is now
+        // owned by the caller and will Drop normally when test scope
+        // ends. The runtime drops with the thread.
+        std::thread::park();
     });
-    rx.recv().expect("mock uri channel closed")
-}
-
-/// Per-call mock variant. Spawns a fresh dedicated-thread mock so every
-/// invocation gets a unique URI and reply text. Useful for tests that
-/// want to vary the canned content; tests that just need any `200 OK`
-/// envelope should prefer `shared_mock_anthropic`.
-pub fn mock_anthropic_responding_with(text: &'static str) -> MockAnthropicServer {
-    let uri = spawn_mock_on_dedicated_thread(text);
-    MockAnthropicServer { uri }
+    rx.recv().expect("mock channel closed")
 }
 
 /// Process-wide shared mock Anthropic server. Initialised on first call

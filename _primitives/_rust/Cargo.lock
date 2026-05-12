@@ -3425,6 +3425,7 @@ dependencies = [
  "uuid",
  "walkdir",
  "which",
+ "wiremock",
 ]
 
 [[package]]
