@@ -48,8 +48,32 @@ async fn cmd_serve() -> anyhow::Result<()> {
         db_path: db_path_from_env(),
         bot_token: require_env("TELEGRAM_BOT_TOKEN")?,
         webhook_secret: require_env("TELEGRAM_WEBHOOK_SECRET")?,
+        allowed_chat_ids: allowed_chat_ids_from_env(),
+        llm_proxy_url: std::env::var("KEI_BUDDY_LLM_PROXY")
+            .ok()
+            .or_else(|| Some("https://api.openai.com".to_string())),
+        llm_api_key: std::env::var("KEI_BUDDY_LLM_KEY")
+            .ok()
+            .or_else(|| std::env::var("OPENAI_API_KEY").ok()),
+        llm_model: std::env::var("KEI_BUDDY_LLM_MODEL").ok(),
     };
     run_serve(cfg).await
+}
+
+/// Parse `KEI_BUDDY_ALLOWED_CHAT_IDS` CSV → Some(Vec<i64>); empty/missing → None.
+fn allowed_chat_ids_from_env() -> Option<Vec<i64>> {
+    let raw = std::env::var("KEI_BUDDY_ALLOWED_CHAT_IDS").ok()?;
+    let list: Vec<i64> = raw
+        .split(',')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .filter_map(|s| s.parse::<i64>().ok())
+        .collect();
+    if list.is_empty() {
+        None
+    } else {
+        Some(list)
+    }
 }
 
 #[cfg(not(feature = "serve"))]

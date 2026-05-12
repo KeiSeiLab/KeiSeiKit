@@ -29,6 +29,15 @@ pub struct ServeConfig {
     pub db_path: String,
     pub bot_token: String,
     pub webhook_secret: String,
+    /// If `Some`, only these chat_ids are processed; others are warn-logged + ignored.
+    /// `None` (or empty) means accept all chat_ids.
+    pub allowed_chat_ids: Option<Vec<i64>>,
+    /// Optional OpenAI-compatible LLM proxy. If set together with `llm_api_key`,
+    /// `run_serve` instantiates `OpenAiExtractor`; otherwise falls back to
+    /// `MockExtractor` with a warning.
+    pub llm_proxy_url: Option<String>,
+    pub llm_api_key: Option<String>,
+    pub llm_model: Option<String>,
 }
 
 /// Axum state — implements `WebhookContext` for the webhook handler.
@@ -40,6 +49,8 @@ pub struct BuddyContext<E: LlmExtractor + Send + Sync + 'static> {
     pub store: Arc<SqliteBuddyStore>,
     pub extractor: Arc<E>,
     pub http: reqwest::Client,
+    /// Whitelist of chat_ids; `None` or empty = accept all.
+    pub allowed_chat_ids: Arc<Option<Vec<i64>>>,
 }
 
 impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
@@ -50,6 +61,7 @@ impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
             store: Arc::clone(&self.store),
             extractor: Arc::clone(&self.extractor),
             http: self.http.clone(),
+            allowed_chat_ids: Arc::clone(&self.allowed_chat_ids),
         }
     }
 }
@@ -73,7 +85,18 @@ impl<E: LlmExtractor + Send + Sync + 'static> WebhookContext for BuddyContext<E>
 }
 
 impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
+    fn chat_allowed(&self, chat_id: i64) -> bool {
+        match self.allowed_chat_ids.as_ref() {
+            Some(list) if !list.is_empty() => list.contains(&chat_id),
+            _ => true,
+        }
+    }
+
     async fn handle_text(&self, chat_id: i64, text: String) {
+        if !self.chat_allowed(chat_id) {
+            warn!(chat_id, "chat_id not in whitelist; ignoring");
+            return;
+        }
         if let Err(e) = self.process_text(chat_id, &text).await {
             error!(chat_id, error = %e, "failed to process text event");
         }
@@ -138,16 +161,48 @@ where
 pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
     init_tracing();
     let store = Arc::new(SqliteBuddyStore::from_path(&cfg.db_path)?);
+    let allowed_chat_ids = Arc::new(cfg.allowed_chat_ids);
+    let http = reqwest::Client::new();
+
+    #[cfg(feature = "extractor-openai")]
+    {
+        if let (Some(proxy), Some(key)) = (cfg.llm_proxy_url, cfg.llm_api_key) {
+            let model = cfg
+                .llm_model
+                .unwrap_or_else(|| "gpt-4o-mini".to_string());
+            tracing::info!(model = %model, "using OpenAiExtractor (LiteLLM-compatible)");
+            let extractor = Arc::new(crate::extractor::openai::OpenAiExtractor::new_with_model(
+                proxy, key, model,
+            ));
+            return start_listener(cfg.port, BuddyContext {
+                secret: cfg.webhook_secret,
+                bot_token: cfg.bot_token,
+                store,
+                extractor,
+                http,
+                allowed_chat_ids,
+            }).await;
+        }
+    }
+
+    warn!("no LLM extractor configured — using MockExtractor (state machine will advance but field-extraction returns empty)");
     let extractor = Arc::new(crate::extractor::MockExtractor::new(json!({})));
-    let ctx = BuddyContext {
+    start_listener(cfg.port, BuddyContext {
         secret: cfg.webhook_secret,
         bot_token: cfg.bot_token,
         store,
         extractor,
-        http: reqwest::Client::new(),
-    };
+        http,
+        allowed_chat_ids,
+    }).await
+}
+
+async fn start_listener<E>(port: u16, ctx: BuddyContext<E>) -> anyhow::Result<()>
+where
+    E: LlmExtractor + Send + Sync + 'static,
+{
     let router = build_router(ctx);
-    let addr = format!("0.0.0.0:{}", cfg.port);
+    let addr = format!("0.0.0.0:{}", port);
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     tracing::info!(addr = %addr, "kei-buddy listening");
     axum::serve(listener, router).await?;

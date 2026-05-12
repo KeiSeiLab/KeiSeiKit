@@ -140,14 +140,20 @@ pub mod openai {
     pub struct OpenAiExtractor {
         pub proxy_url: String,
         pub api_key: String,
+        pub model: String,
         client: reqwest::Client,
     }
 
     impl OpenAiExtractor {
         pub fn new(proxy_url: String, api_key: String) -> Self {
+            Self::new_with_model(proxy_url, api_key, DEFAULT_MODEL.to_string())
+        }
+
+        pub fn new_with_model(proxy_url: String, api_key: String, model: String) -> Self {
             Self {
                 proxy_url,
                 api_key,
+                model,
                 client: reqwest::Client::new(),
             }
         }
@@ -157,7 +163,7 @@ pub mod openai {
     impl LlmExtractor for OpenAiExtractor {
         async fn extract(&self, system: &str, user_text: &str) -> Result<Value, BuddyError> {
             let body = serde_json::json!({
-                "model": DEFAULT_MODEL,
+                "model": &self.model,
                 "temperature": 0,
                 "max_tokens": 200,
                 "messages": [
