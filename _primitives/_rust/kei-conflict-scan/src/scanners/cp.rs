@@ -4,7 +4,7 @@
 //! Read-only: we do NOT propose a refactor here; refactor-engine decides.
 
 use crate::conflict::{Category, Conflict, Severity};
-use crate::tree::{read_lossy, rel};
+use crate::tree::{read_lossy, rel, should_skip_path};
 use regex::Regex;
 use std::path::Path;
 use walkdir::WalkDir;
@@ -42,8 +42,7 @@ pub fn scan(root: &Path) -> Vec<Conflict> {
 }
 
 fn skip_dir(path: &Path) -> bool {
-    let s = path.to_string_lossy();
-    s.contains("/target/") || s.contains("/.git/") || s.contains("/node_modules/")
+    should_skip_path(path)
 }
 
 fn long_fns(content: &str, ext: &str) -> Vec<(String, usize)> {

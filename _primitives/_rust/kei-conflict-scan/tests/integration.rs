@@ -63,6 +63,26 @@ fn orphan_wikilinks_flagged() {
 }
 
 #[test]
+fn cross_repo_wikilink_not_flagged() {
+    // `[[../../../rules/X]]` escapes the scan root — engine cannot validate,
+    // must not false-positive.
+    let tmp = TempDir::new().unwrap();
+    write(tmp.path(), "memory/MEMORY.md", "see [[../../../rules/recurrence-escalate]]");
+    let v = run(tmp.path(), &["--only", "orphans"]);
+    assert_eq!(v["hit_count"].as_u64().unwrap(), 0, "{}", v);
+}
+
+#[test]
+fn path_prefixed_wikilink_matches_basename() {
+    // `[[chatlogs/X/Y]]` should resolve when `Y.md` exists anywhere in the tree.
+    let tmp = TempDir::new().unwrap();
+    write(tmp.path(), "chatlogs/X/Y.md", "target body");
+    write(tmp.path(), "memory/index.md", "ref to [[chatlogs/X/Y]]");
+    let v = run(tmp.path(), &["--only", "orphans"]);
+    assert_eq!(v["hit_count"].as_u64().unwrap(), 0, "{}", v);
+}
+
+#[test]
 fn oversize_file_flagged() {
     let tmp = TempDir::new().unwrap();
     let mut body = String::new();
