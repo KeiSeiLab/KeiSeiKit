@@ -1,0 +1,33 @@
+[package]
+name = "kei-buddy"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "KeiBuddy personal-assistant Telegram bot — onboarding state-machine + skeleton driver. Concept-level scaffold."
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "kei-buddy"
+path = "src/bin/kei-buddy.rs"
+
+[lib]
+name = "kei_buddy"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tracing = "0.1"
+clap = { workspace = true, features = ["derive"] }
+
+[features]
+# future: pulls in kei-notify-telegram for real Telegram transport
+telegram = []
+
+[package.metadata.keisei]
+maturity = "concept"
+description = "KeiBuddy personal-assistant: onboarding FSM + bot driver scaffold"
+authors = ["Denis Parfionovich <parfionovich@keilab.io>"]

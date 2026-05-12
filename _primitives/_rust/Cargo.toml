@@ -179,6 +179,8 @@ members = [
     "kei-db-contract",
     # Live runtime-graph exporter (registry + ledger → D3 space fragment)
     "kei-graph-export",
+    # KeiBuddy personal-assistant Telegram bot — onboarding FSM scaffold
+    "kei-buddy",
 ]
 
 [workspace.package]
