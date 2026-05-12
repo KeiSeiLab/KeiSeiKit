@@ -27,6 +27,8 @@ rusqlite = { workspace = true }
 reqwest = { workspace = true }
 anyhow = { workspace = true }
 kei-memory-sqlite = { path = "../kei-memory-sqlite" }
+kei-chat-store = { path = "../kei-chat-store" }
+chrono = { workspace = true }
 
 # serve feature deps
 axum = { version = "0.7", features = ["json", "http1", "tokio"], optional = true }

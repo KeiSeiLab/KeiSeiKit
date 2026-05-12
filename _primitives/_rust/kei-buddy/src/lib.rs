@@ -10,6 +10,7 @@
 //!   * `schema`     — buddy-specific SQLite DDL
 //!   * `store`      — `BuddyStore` trait + `SqliteBuddyStore` impl
 
+pub mod chat_log;
 pub mod error;
 pub mod extractor;
 pub mod machine;
@@ -26,6 +27,7 @@ pub mod serve;
 #[cfg(feature = "serve")]
 pub mod serve_telegram;
 
+pub use chat_log::ChatLog;
 pub use error::BuddyError;
 pub use extractor::LlmExtractor;
 pub use machine::handle_step;

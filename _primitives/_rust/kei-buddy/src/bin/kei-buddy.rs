@@ -56,6 +56,7 @@ async fn cmd_serve() -> anyhow::Result<()> {
             .ok()
             .or_else(|| std::env::var("OPENAI_API_KEY").ok()),
         llm_model: std::env::var("KEI_BUDDY_LLM_MODEL").ok(),
+        chat_log_db_path: chat_log_path_from_env(),
     };
     run_serve(cfg).await
 }
@@ -84,8 +85,10 @@ async fn cmd_serve() -> anyhow::Result<()> {
 fn cmd_migrate() -> anyhow::Result<()> {
     let path = db_path_from_env();
     let _store = kei_buddy::store::SqliteBuddyStore::from_path(&path)?;
+    let chat_log_path = chat_log_path_from_env();
+    let _ = kei_buddy::ChatLog::from_path(&chat_log_path)?;
     init_log();
-    tracing::info!(path = %path, "schema applied");
+    tracing::info!(path = %path, chat_log_path = %chat_log_path, "schema applied");
     Ok(())
 }
 
@@ -141,4 +144,8 @@ fn port_from_env() -> u16 {
 
 fn db_path_from_env() -> String {
     std::env::var("KEI_BUDDY_DB_PATH").unwrap_or_else(|_| "./kei-buddy.db".into())
+}
+
+fn chat_log_path_from_env() -> String {
+    std::env::var("KEI_BUDDY_CHAT_LOG_PATH").unwrap_or_else(|_| "./kei-buddy-chat.db".into())
 }
