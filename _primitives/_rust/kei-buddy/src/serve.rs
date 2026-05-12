@@ -14,6 +14,7 @@ use tracing::{error, warn};
 use kei_telegram_webhook::{WebhookContext, WebhookEvent};
 
 use crate::{
+    chat_log::ChatLog,
     error::BuddyError,
     extractor::LlmExtractor,
     machine::handle_step,
@@ -29,20 +30,17 @@ pub struct ServeConfig {
     pub db_path: String,
     pub bot_token: String,
     pub webhook_secret: String,
-    /// If `Some`, only these chat_ids are processed; others are warn-logged + ignored.
-    /// `None` (or empty) means accept all chat_ids.
+    /// Whitelist; `None` or empty = accept all chat_ids.
     pub allowed_chat_ids: Option<Vec<i64>>,
-    /// Optional OpenAI-compatible LLM proxy. If set together with `llm_api_key`,
-    /// `run_serve` instantiates `OpenAiExtractor`; otherwise falls back to
-    /// `MockExtractor` with a warning.
+    /// LLM proxy URL + key; if both set, OpenAiExtractor is used, else MockExtractor.
     pub llm_proxy_url: Option<String>,
     pub llm_api_key: Option<String>,
     pub llm_model: Option<String>,
+    /// Path to the SQLite file used by `ChatLog`. Default: `./kei-buddy-chat.db`.
+    pub chat_log_db_path: String,
 }
 
-/// Axum state — implements `WebhookContext` for the webhook handler.
-///
-/// `Arc<E>` provides cheap `Clone` without requiring `E: Clone`.
+/// Axum state — implements `WebhookContext`. `Arc<E>` allows cheap `Clone`.
 pub struct BuddyContext<E: LlmExtractor + Send + Sync + 'static> {
     pub secret: String,
     pub bot_token: String,
@@ -51,6 +49,8 @@ pub struct BuddyContext<E: LlmExtractor + Send + Sync + 'static> {
     pub http: reqwest::Client,
     /// Whitelist of chat_ids; `None` or empty = accept all.
     pub allowed_chat_ids: Arc<Option<Vec<i64>>>,
+    /// Persistent log of all Telegram messages (user + bot).
+    pub chat_log: Arc<ChatLog>,
 }
 
 impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
@@ -62,6 +62,7 @@ impl<E: LlmExtractor + Send + Sync + 'static> Clone for BuddyContext<E> {
             extractor: Arc::clone(&self.extractor),
             http: self.http.clone(),
             allowed_chat_ids: Arc::clone(&self.allowed_chat_ids),
+            chat_log: Arc::clone(&self.chat_log),
         }
     }
 }
@@ -103,6 +104,9 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
     }
 
     async fn process_text(&self, chat_id: i64, text: &str) -> Result<(), BuddyError> {
+        if let Err(e) = self.chat_log.log_user(chat_id, text).await {
+            error!(chat_id, error = %e, "chat_log failure");
+        }
         let state = self
             .store
             .load_state(chat_id)
@@ -117,6 +121,9 @@ impl<E: LlmExtractor + Send + Sync + 'static> BuddyContext<E> {
         self.store.save_state(chat_id, &output.next_state).await?;
         self.apply_persona_patch(chat_id, output.persona_patch).await?;
         send_message(&self.bot_token, chat_id, &output.response_text, &self.http).await?;
+        if let Err(e) = self.chat_log.log_bot(chat_id, &output.response_text).await {
+            error!(chat_id, error = %e, "chat_log failure");
+        }
         Ok(())
     }
 
@@ -163,6 +170,7 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
     let store = Arc::new(SqliteBuddyStore::from_path(&cfg.db_path)?);
     let allowed_chat_ids = Arc::new(cfg.allowed_chat_ids);
     let http = reqwest::Client::new();
+    let chat_log = Arc::new(ChatLog::from_path(&cfg.chat_log_db_path)?);
 
     #[cfg(feature = "extractor-openai")]
     {
@@ -181,6 +189,7 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
                 extractor,
                 http,
                 allowed_chat_ids,
+                chat_log,
             }).await;
         }
     }
@@ -194,6 +203,7 @@ pub async fn run_serve(cfg: ServeConfig) -> anyhow::Result<()> {
         extractor,
         http,
         allowed_chat_ids,
+        chat_log,
     }).await
 }
 
