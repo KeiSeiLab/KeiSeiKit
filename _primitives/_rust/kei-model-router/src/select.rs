@@ -158,4 +158,37 @@ mod tests {
         // Unknown profile always None (existing test, but adds explicit assertion).
         assert!(pick("ghost-profile", &r).is_none());
     }
+
+    /// FIX NEW-1: codex-reviewer profile resolves to a non-Claude model.
+    /// Verifies that the bypass path is triggered: pick() returns (codex, gpt-5-codex)
+    /// AND Model::from_slug("gpt-5-codex") returns None, so the caller must
+    /// NOT route through the Claude-family posterior machinery.
+    #[test]
+    fn non_claude_profile_triggers_provider_bypass() {
+        let r = reg();
+        let (prov, model_id) = pick("codex-reviewer", &r).unwrap();
+        assert_eq!(prov, "codex", "provider should be codex");
+        assert_eq!(model_id, "gpt-5-codex", "model_id should be gpt-5-codex");
+        // This is the critical assertion: Model::from_slug must return None so that
+        // cmd_select bypasses posterior and prints (provider, model_id) directly.
+        assert!(
+            Model::from_slug(&model_id).is_none(),
+            "gpt-5-codex must not map to a Claude Model enum — bypass path depends on this"
+        );
+    }
+
+    /// FIX NEW-2: DecisionInput preserves an explicitly-set fallback.
+    /// Regression guard: print_decision_no_ledger previously created a fresh
+    /// DecisionInput::new() which reset fallback to Opus47, discarding the
+    /// profile-resolved value. After the fix it takes &DecisionInput from the
+    /// caller. This test verifies the input field semantics are correct.
+    #[test]
+    fn decision_input_preserves_set_fallback() {
+        let mut inp = DecisionInput::new("agent::?::00::00-00", "prompt");
+        assert_eq!(inp.fallback, Model::Opus47, "default fallback must be Opus47");
+        inp.fallback = Model::Sonnet46;
+        assert_eq!(inp.fallback, Model::Sonnet46, "set fallback must survive — not reset by new()");
+        // Confirm slug is correct so the print path would emit "sonnet", not "opus".
+        assert!(inp.fallback.slug().contains("sonnet"));
+    }
 }

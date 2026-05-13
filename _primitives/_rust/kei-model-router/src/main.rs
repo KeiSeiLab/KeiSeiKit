@@ -1,11 +1,5 @@
-//! kei-model-router CLI.
-//!
-//! Subcommands:
-//!   pricing                — print pricing table from models.toml
-//!   select <agent> [--prompt P]
-//!                          — query router decision for given agent spawn
-//!   calibrate              — re-fit kernel weights against ledger outcomes
-//!   --help
+//! kei-model-router CLI — model selection for Claude Code Agent spawns.
+//! Subcommands: pricing | select <agent> [--prompt P] | calibrate | --help
 
 use kei_model_router::{
     calibrate, pick, select, DecisionInput, KernelWeights, Model, Registry,
@@ -68,28 +62,19 @@ fn cmd_select(args: &[String]) {
         std::process::exit(2);
     });
     let prompt = parse_prompt_flag(args);
-    let synthetic_dna = format!("{agent}::?::00000000::00000000-00000000");
+    let dna = format!("{agent}::?::00000000::00000000-00000000");
+    let (input, non_claude) = build_select_input(agent, &prompt, &dna);
 
-    // Finding 2: always proceed through select(); profile default_model_ref
-    // becomes the fallback rather than an early-return shortcut.
-    let mut input = DecisionInput::new(synthetic_dna.clone(), prompt.clone());
-    input.kernel_weights = KernelWeights::default();
-    input.pinned = read_pinned_for_agent(agent);
-
-    // If registry loads and profile resolves, use its model as fallback.
-    if let Ok(reg) = Registry::load() {
-        if let Some((_, model_id)) = pick(agent, &reg) {
-            if let Some(m) = Model::from_slug(&model_id) {
-                input.fallback = m;
-            }
-        }
+    if let Some((prov, model_id)) = non_claude {
+        print_non_claude(agent, &prov, &model_id);
+        return;
     }
 
     let conn = match open_ledger() {
         Some(c) => c,
         None => {
             eprintln!("warning: ledger not available; falling back to default");
-            print_decision_no_ledger(&synthetic_dna, &prompt);
+            print_decision_no_ledger(&input, &dna);
             return;
         }
     };
@@ -98,13 +83,48 @@ fn cmd_select(args: &[String]) {
         Ok(d) => d,
         Err(e) => { eprintln!("ledger query failed: {e}"); std::process::exit(1); }
     };
+    print_claude_decision(agent, &d);
+}
 
+fn print_non_claude(agent: &str, prov: &str, model_id: &str) {
+    println!("agent:        {agent}");
+    println!("provider:     {prov}");
+    println!("model:        {model_id}");
+    println!("reason:       profile_default_non_claude");
+}
+
+fn print_claude_decision(agent: &str, d: &kei_model_router::Decision) {
     println!("agent:        {agent}");
     println!("model:        {}", d.model.slug());
     println!("expected_cost ${:.4} (microcents={})",
         d.expected_cost_micro_cents as f64 / 100_000_000.0, d.expected_cost_micro_cents);
     println!("q_lower_bound {:.3} (posterior n={})", d.quality_lower_bound, d.posterior_n);
     println!("reason:       {}", d.reason);
+}
+
+/// Build DecisionInput; FIX NEW-1: returns non-Claude (prov, model_id) when
+/// profile resolves to a non-Anthropic model, so caller bypasses posterior.
+fn build_select_input(
+    agent: &str,
+    prompt: &str,
+    dna: &str,
+) -> (DecisionInput, Option<(String, String)>) {
+    let mut input = DecisionInput::new(dna.to_string(), prompt.to_string());
+    input.kernel_weights = KernelWeights::default();
+    input.pinned = read_pinned_for_agent(agent);
+
+    let non_claude = if let Ok(reg) = Registry::load() {
+        match pick(agent, &reg) {
+            Some((prov, model_id)) => match Model::from_slug(&model_id) {
+                Some(m) => { input.fallback = m; None }
+                None => Some((prov, model_id)),
+            },
+            None => None,
+        }
+    } else {
+        None
+    };
+    (input, non_claude)
 }
 
 fn parse_prompt_flag(args: &[String]) -> String {
@@ -118,12 +138,12 @@ fn parse_prompt_flag(args: &[String]) -> String {
     String::new()
 }
 
-fn print_decision_no_ledger(dna: &str, prompt: &str) {
-    let inp = DecisionInput::new(dna.to_string(), prompt.to_string());
+/// FIX NEW-2: takes &DecisionInput so the profile-resolved fallback survives.
+fn print_decision_no_ledger(input: &DecisionInput, dna: &str) {
     let est = kei_model_router::complexity::estimate(
-        prompt, kei_model_router::dna_class::role(dna));
+        &input.prompt, kei_model_router::dna_class::role(dna));
     println!("model:     {}\nτ:         {:.2}\nreason:    no_ledger_fallback",
-        inp.fallback.slug(), est.tau);
+        input.fallback.slug(), est.tau);
 }
 
 fn cmd_calibrate() {
@@ -151,7 +171,6 @@ fn open_ledger() -> Option<Connection> {
     let path = if let Ok(p) = std::env::var("KEI_LEDGER_DB") {
         p
     } else {
-        // Finding 8: HOME unset → emit warning and bail; don't open a garbled path.
         let home = std::env::var("HOME").unwrap_or_default();
         if home.is_empty() {
             eprintln!("[kei-model-router] HOME unset; cannot resolve ledger path");
@@ -160,7 +179,6 @@ fn open_ledger() -> Option<Connection> {
         format!("{home}/.claude/agents/ledger.sqlite")
     };
     let conn = Connection::open(&path).ok()?;
-    // Finding 9: WAL mode + busy timeout prevent SQLITE_BUSY for concurrent readers.
     conn.pragma_update(None, "journal_mode", "WAL").ok();
     conn.busy_timeout(std::time::Duration::from_secs(5)).ok();
     Some(conn)
