@@ -1,17 +1,13 @@
 //! Beta posterior over per-(task-class, model) success rate.
 //!
 //! For each (task_class_dna, model) pair in the ledger we count:
-//!   n+ = rows with outcome='functional' AND escalation_depth=0 (clean wins)
-//!   n- = rows with anything else (partial, scaffolding, fail, retry)
+//!   n+ = rows with outcome='functional' AND escalation_depth=0
+//!   n- = rows with anything else
 //!
-//! Posterior on success probability q ∼ Beta(α₀ + n+, β₀ + n-) with
-//! uniform prior α₀ = β₀ = 1. Confidence-bounded lower estimate
-//! `q_lower(δ)` returned via the inverse-Beta CDF approximation
-//! (Wilson-style normal approx — adequate for our regime where n is
-//! typically small but δ ≈ 0.10).
+//! Model identity is keyed by `Model::slug()` — the canonical model id
+//! string (e.g. `claude-sonnet-4-6`) stored in `agents.model`.
 //!
-//! Constructor Pattern: SQL is one query, math is pure-fn,
-//! `Posterior::from_ledger` is the only DB-touching surface.
+//! Constructor Pattern: SQL is one query, math is pure-fn.
 
 use crate::pricing::Model;
 use rusqlite::{params, Connection, OptionalExtension, Result as SqlResult};
@@ -24,11 +20,7 @@ pub struct Posterior {
 }
 
 impl Posterior {
-    pub const PRIOR: Posterior = Posterior {
-        alpha: 1.0,
-        beta: 1.0,
-        n: 0,
-    };
+    pub const PRIOR: Posterior = Posterior { alpha: 1.0, beta: 1.0, n: 0 };
 
     /// Posterior mean q̄ = α / (α + β).
     pub fn mean(&self) -> f64 {
@@ -41,40 +33,23 @@ impl Posterior {
         (self.alpha * self.beta) / (s * s * (s + 1.0))
     }
 
-    /// Wilson-style normal-approx lower confidence bound:
-    /// q_lower = mean − z(1−δ) · sqrt(var). Floor at 0, cap at 1.
-    /// Adequate when n ≥ 5; for smaller n the prior dominates and bound
-    /// is conservative (i.e., very low) which biases toward Opus — desired
-    /// behavior under uncertainty per RULE -1.
+    /// Wilson-style normal-approx lower confidence bound.
     pub fn quality_lower_bound(&self, delta: f64) -> f64 {
         let z = z_one_sided(delta);
         let lb = self.mean() - z * self.variance().sqrt();
         lb.clamp(0.0, 1.0)
     }
 
-    /// Bayesian update with new observation (success ⇒ α+1, failure ⇒ β+1).
+    /// Bayesian update with new observation.
     pub fn observe(self, success: bool) -> Self {
         if success {
-            Self {
-                alpha: self.alpha + 1.0,
-                beta: self.beta,
-                n: self.n + 1,
-            }
+            Self { alpha: self.alpha + 1.0, beta: self.beta, n: self.n + 1 }
         } else {
-            Self {
-                alpha: self.alpha,
-                beta: self.beta + 1.0,
-                n: self.n + 1,
-            }
+            Self { alpha: self.alpha, beta: self.beta + 1.0, n: self.n + 1 }
         }
     }
 
-    /// Build posterior from ledger rows for a given (task_class_dna, model).
-    /// Counts rows where:
-    ///   success := outcome='functional' AND COALESCE(escalation_depth, 0) = 0
-    ///   failure := everything else with non-NULL outcome
-    /// Rows with NULL outcome (legacy / in-progress) are skipped — they
-    /// don't update the posterior but don't bias it either.
+    /// Build posterior from ledger rows for (task_class_dna, model).
     pub fn from_ledger(
         conn: &Connection,
         task_class: &str,
@@ -93,8 +68,10 @@ impl Posterior {
                  FROM agents
                  WHERE task_class_dna = ?1 AND model = ?2",
                 params![task_class, model.slug()],
-                |r| Ok((r.get::<_, Option<i64>>(0)?.unwrap_or(0),
-                        r.get::<_, Option<i64>>(1)?.unwrap_or(0))),
+                |r| Ok((
+                    r.get::<_, Option<i64>>(0)?.unwrap_or(0),
+                    r.get::<_, Option<i64>>(1)?.unwrap_or(0),
+                )),
             )
             .optional()?;
         let (n_plus, n_minus) = row.unwrap_or((0, 0));
@@ -106,10 +83,6 @@ impl Posterior {
     }
 }
 
-/// One-sided z-score for confidence (1−δ). Approximates inverse normal
-/// CDF for δ ∈ {0.01, 0.05, 0.10, 0.20}. For other δ uses a coarse
-/// Newton-Raphson around the standard table values. Sufficient for the
-/// router's needs — we never need finer than 1% steps.
 fn z_one_sided(delta: f64) -> f64 {
     match delta {
         d if d <= 0.01 => 2.326,
@@ -129,11 +102,8 @@ mod tests {
         let c = Connection::open_in_memory().unwrap();
         c.execute_batch(
             "CREATE TABLE agents (
-                id TEXT,
-                task_class_dna TEXT,
-                model TEXT,
-                outcome TEXT,
-                escalation_depth INTEGER DEFAULT 0
+                id TEXT, task_class_dna TEXT, model TEXT,
+                outcome TEXT, escalation_depth INTEGER DEFAULT 0
             );",
         )
         .unwrap();
@@ -169,29 +139,27 @@ mod tests {
     #[test]
     fn ledger_aggregates_by_model_slug() {
         let c = fresh_db();
+        // Use canonical model ids (matching Model::slug())
+        let haiku = Model::Haiku45.slug();
+        let opus = Model::Opus47.slug();
         c.execute(
-            "INSERT INTO agents VALUES ('1','tc1','haiku','functional',0)",
-            [],
-        )
-        .unwrap();
+            "INSERT INTO agents VALUES ('1','tc1',?1,'functional',0)",
+            rusqlite::params![haiku],
+        ).unwrap();
         c.execute(
-            "INSERT INTO agents VALUES ('2','tc1','haiku','functional',0)",
-            [],
-        )
-        .unwrap();
+            "INSERT INTO agents VALUES ('2','tc1',?1,'functional',0)",
+            rusqlite::params![haiku],
+        ).unwrap();
         c.execute(
-            "INSERT INTO agents VALUES ('3','tc1','haiku','partial',0)",
-            [],
-        )
-        .unwrap();
+            "INSERT INTO agents VALUES ('3','tc1',?1,'partial',0)",
+            rusqlite::params![haiku],
+        ).unwrap();
         c.execute(
-            "INSERT INTO agents VALUES ('4','tc1','opus','functional',0)",
-            [],
-        )
-        .unwrap();
+            "INSERT INTO agents VALUES ('4','tc1',?1,'functional',0)",
+            rusqlite::params![opus],
+        ).unwrap();
         let h = Posterior::from_ledger(&c, "tc1", Model::Haiku45).unwrap();
         assert_eq!(h.n, 3);
-        // 2 successes + 1 failure → α=3, β=2, mean=0.6
         assert!((h.mean() - 0.6).abs() < 1e-9);
         let o = Posterior::from_ledger(&c, "tc1", Model::Opus47).unwrap();
         assert_eq!(o.n, 1);
@@ -200,13 +168,12 @@ mod tests {
     #[test]
     fn escalated_success_counts_as_failure_for_first_pass() {
         let c = fresh_db();
+        let slug = Model::Haiku45.slug();
         c.execute(
-            "INSERT INTO agents VALUES ('1','tc','haiku','functional',1)",
-            [],
-        )
-        .unwrap();
+            "INSERT INTO agents VALUES ('1','tc',?1,'functional',1)",
+            rusqlite::params![slug],
+        ).unwrap();
         let p = Posterior::from_ledger(&c, "tc", Model::Haiku45).unwrap();
-        // depth>0 ⇒ counted in n_minus
         assert_eq!(p.alpha, 1.0);
         assert_eq!(p.beta, 2.0);
     }
@@ -218,7 +185,6 @@ mod tests {
             p = p.observe(true);
         }
         let lb = p.quality_lower_bound(0.10);
-        // mean ≈ 101/102 ≈ 0.99; lb should still be > 0.95
         assert!(lb > 0.95, "lb={}", lb);
     }
 
@@ -226,7 +192,6 @@ mod tests {
     fn lower_bound_with_no_data_is_conservative() {
         let p = Posterior::PRIOR;
         let lb = p.quality_lower_bound(0.10);
-        // mean=0.5, var=1/12 ≈ 0.083, sqrt ≈ 0.289, z=1.282 → lb ≈ 0.13
         assert!(lb < 0.30);
     }
 }
