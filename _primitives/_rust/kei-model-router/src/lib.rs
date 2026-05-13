@@ -11,7 +11,8 @@
 //!   - `registry_types` — Provider / Model / Profile TOML structs
 //!   - `registry`  — Registry loader + lookup methods
 //!   - `pricing`   — cost_micro_cents + legacy Model enum
-//!   - `dna_class` — task-class DNA extraction
+//!   - `dna_class` — task-class DNA extraction (legacy 4-segment)
+//!   - `agent_shell_dna` — 5-segment marketplace agent DNA parser
 //!   - `complexity` — τ-estimator (heuristic)
 //!   - `posterior`  — Beta posterior from ledger
 //!   - `kernel`     — DNA similarity kernel
@@ -21,6 +22,7 @@
 //!   - `escalate`   — next_model() + legacy escalation ladder
 //!   - `calibrate`  — offline kernel-weight calibration
 
+pub mod agent_shell_dna;
 pub mod calibrate;
 pub mod complexity;
 pub mod dna_class;
