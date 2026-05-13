@@ -1,17 +1,24 @@
-//! Registry loader — reads providers.toml, models.toml, agent-profiles.toml.
+//! Registry loader — providers.toml / models.toml / agent-profiles.toml.
 //!
-//! Path resolution:
-//!   1. `KEI_REGISTRIES_DIR` env var (if set)
-//!   2. `~/Projects/KeiSeiKit-public/_blocks/registries/` (default)
-//!
-//! Types live in `registry_types.rs` (separate cube per Constructor Pattern).
-//! This cube owns loading + lookup methods only.
+//! Path resolution: KEI_REGISTRIES_DIR env → disk default → embedded copy.
+//! Finding 4: `include_str!()` embeds TOMLs at compile time (install-safe).
+//! Finding 8: HOME unset → warning + embedded fallback, no garbled path.
+//! Types in `registry_types.rs` (Constructor Pattern: types separate from loader).
 
 use serde::de::DeserializeOwned;
 use std::path::{Path, PathBuf};
 
 pub use crate::registry_types::{Model, Profile, Provider};
 use crate::registry_types::{ModelsFile, ProfilesFile, ProvidersFile};
+
+// Embedded compile-time copies. Cargo tracks these as implicit dependencies:
+// if the TOML changes, the crate is recompiled automatically.
+const EMBEDDED_PROVIDERS: &str =
+    include_str!("../../../../_blocks/registries/providers.toml");
+const EMBEDDED_MODELS: &str =
+    include_str!("../../../../_blocks/registries/models.toml");
+const EMBEDDED_PROFILES: &str =
+    include_str!("../../../../_blocks/registries/agent-profiles.toml");
 
 #[derive(Debug, Clone)]
 pub struct Registry {
@@ -21,18 +28,41 @@ pub struct Registry {
 }
 
 impl Registry {
-    /// Load all three TOML files from `dir`.
+    /// Load from `dir` on disk.
     pub fn load_from(dir: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let providers = parse_toml::<ProvidersFile>(&dir.join("providers.toml"))?.provider;
-        let models = parse_toml::<ModelsFile>(&dir.join("models.toml"))?.model;
-        let profiles =
-            parse_toml::<ProfilesFile>(&dir.join("agent-profiles.toml"))?.profile;
-        Ok(Self { providers, models, profiles })
+        Ok(Self {
+            providers: parse_toml::<ProvidersFile>(&dir.join("providers.toml"))?.provider,
+            models: parse_toml::<ModelsFile>(&dir.join("models.toml"))?.model,
+            profiles: parse_toml::<ProfilesFile>(&dir.join("agent-profiles.toml"))?.profile,
+        })
     }
 
-    /// Load from `KEI_REGISTRIES_DIR` or the project-default path.
+    /// Load: KEI_REGISTRIES_DIR → disk default → embedded fallback.
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_from(&registries_dir())
+        if let Ok(dir) = std::env::var("KEI_REGISTRIES_DIR") {
+            return Self::load_from(&PathBuf::from(dir));
+        }
+        match disk_registries_dir() {
+            Some(dir) if dir.exists() => Self::load_from(&dir),
+            Some(_) | None => {
+                if std::env::var("HOME").unwrap_or_default().is_empty() {
+                    eprintln!("[kei-model-router] HOME unset; using embedded registry");
+                }
+                Self::load_embedded()
+            }
+        }
+    }
+
+    /// Parse the compile-time embedded TOML constants.
+    pub fn load_embedded() -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(Self {
+            providers: toml::from_str::<ProvidersFile>(EMBEDDED_PROVIDERS)
+                .map_err(|e| format!("embedded providers.toml: {e}"))?.provider,
+            models: toml::from_str::<ModelsFile>(EMBEDDED_MODELS)
+                .map_err(|e| format!("embedded models.toml: {e}"))?.model,
+            profiles: toml::from_str::<ProfilesFile>(EMBEDDED_PROFILES)
+                .map_err(|e| format!("embedded agent-profiles.toml: {e}"))?.profile,
+        })
     }
 
     pub fn provider_by_id(&self, id: &str) -> Option<&Provider> {
@@ -59,14 +89,15 @@ impl Registry {
     }
 }
 
-fn registries_dir() -> PathBuf {
-    if let Ok(v) = std::env::var("KEI_REGISTRIES_DIR") {
-        return PathBuf::from(v);
+/// Returns the disk path derived from HOME, or None if HOME is empty/unset.
+fn disk_registries_dir() -> Option<PathBuf> {
+    let home = std::env::var("HOME").ok()?;
+    if home.is_empty() {
+        return None;
     }
-    let home = std::env::var("HOME").unwrap_or_default();
-    PathBuf::from(format!(
+    Some(PathBuf::from(format!(
         "{home}/Projects/KeiSeiKit-public/_blocks/registries"
-    ))
+    )))
 }
 
 fn parse_toml<T: DeserializeOwned>(path: &Path) -> Result<T, Box<dyn std::error::Error>> {
@@ -148,5 +179,18 @@ mod tests {
         for m in ms {
             assert!(!m.is_deprecated(), "{} should not be deprecated", m.id);
         }
+    }
+
+    /// Finding 4: embedded registry must parse cleanly and match disk.
+    #[test]
+    fn embedded_registry_matches_disk() {
+        let disk = reg();
+        let emb = Registry::load_embedded().expect("embedded parse failed");
+        assert_eq!(disk.models.len(), emb.models.len(),
+            "disk and embedded model count differ");
+        assert_eq!(disk.providers.len(), emb.providers.len(),
+            "disk and embedded provider count differ");
+        assert_eq!(disk.profiles.len(), emb.profiles.len(),
+            "disk and embedded profile count differ");
     }
 }

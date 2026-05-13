@@ -60,6 +60,16 @@ impl Model {
         }
     }
 
+    /// Legacy short slug used in ledger rows written before 2026-05.
+    /// Used for backward-compat SQL queries (`WHERE model = slug OR model = legacy_slug`).
+    pub fn legacy_slug(&self) -> &'static str {
+        match self {
+            Self::Haiku45 => "haiku",
+            Self::Sonnet46 => "sonnet",
+            Self::Opus47 => "opus",
+        }
+    }
+
     pub fn from_slug(s: &str) -> Option<Model> {
         match s {
             "haiku" | "haiku-4.5" | "claude-haiku-4-5" => Some(Self::Haiku45),
@@ -71,6 +81,19 @@ impl Model {
 
     pub fn all() -> [Model; 3] {
         [Self::Haiku45, Self::Sonnet46, Self::Opus47]
+    }
+
+    /// Next escalation tier. Returns None if already at Opus47 (top).
+    ///
+    /// Finding 10: consolidated here from escalate.rs so all inherent Model
+    /// behaviour lives in one impl block. escalate.rs uses pure functions
+    /// that take &Model as argument.
+    pub fn next_tier(&self) -> Option<Model> {
+        match self {
+            Self::Haiku45 => Some(Self::Sonnet46),
+            Self::Sonnet46 => Some(Self::Opus47),
+            Self::Opus47 => None,
+        }
     }
 }
 

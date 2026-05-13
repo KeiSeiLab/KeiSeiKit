@@ -68,15 +68,23 @@ fn cmd_select(args: &[String]) {
         std::process::exit(2);
     });
     let prompt = parse_prompt_flag(args);
+    let synthetic_dna = format!("{agent}::?::00000000::00000000-00000000");
 
+    // Finding 2: always proceed through select(); profile default_model_ref
+    // becomes the fallback rather than an early-return shortcut.
+    let mut input = DecisionInput::new(synthetic_dna.clone(), prompt.clone());
+    input.kernel_weights = KernelWeights::default();
+    input.pinned = read_pinned_for_agent(agent);
+
+    // If registry loads and profile resolves, use its model as fallback.
     if let Ok(reg) = Registry::load() {
-        if let Some((prov, model)) = pick(agent, &reg) {
-            println!("agent:    {agent}\nprovider: {prov}\nmodel:    {model}\nreason:   profile_default_model_ref");
-            return;
+        if let Some((_, model_id)) = pick(agent, &reg) {
+            if let Some(m) = Model::from_slug(&model_id) {
+                input.fallback = m;
+            }
         }
     }
 
-    let synthetic_dna = format!("{agent}::?::00000000::00000000-00000000");
     let conn = match open_ledger() {
         Some(c) => c,
         None => {
@@ -86,9 +94,6 @@ fn cmd_select(args: &[String]) {
         }
     };
 
-    let mut input = DecisionInput::new(synthetic_dna.clone(), prompt);
-    input.kernel_weights = KernelWeights::default();
-    input.pinned = read_pinned_for_agent(agent);
     let d = match select(&input, &conn) {
         Ok(d) => d,
         Err(e) => { eprintln!("ledger query failed: {e}"); std::process::exit(1); }
@@ -143,11 +148,22 @@ fn cmd_calibrate() {
 }
 
 fn open_ledger() -> Option<Connection> {
-    let path = std::env::var("KEI_LEDGER_DB").unwrap_or_else(|_| {
+    let path = if let Ok(p) = std::env::var("KEI_LEDGER_DB") {
+        p
+    } else {
+        // Finding 8: HOME unset → emit warning and bail; don't open a garbled path.
         let home = std::env::var("HOME").unwrap_or_default();
+        if home.is_empty() {
+            eprintln!("[kei-model-router] HOME unset; cannot resolve ledger path");
+            return None;
+        }
         format!("{home}/.claude/agents/ledger.sqlite")
-    });
-    Connection::open(&path).ok()
+    };
+    let conn = Connection::open(&path).ok()?;
+    // Finding 9: WAL mode + busy timeout prevent SQLITE_BUSY for concurrent readers.
+    conn.pragma_update(None, "journal_mode", "WAL").ok();
+    conn.busy_timeout(std::time::Duration::from_secs(5)).ok();
+    Some(conn)
 }
 
 fn read_pinned_for_agent(agent: &str) -> Option<Model> {

@@ -10,7 +10,7 @@
 use crate::complexity::{self, ComplexityEstimate};
 use crate::dna_class;
 use crate::posterior::Posterior;
-use crate::pricing::Model;
+use crate::pricing::{self, Model};
 use crate::select::{Decision, DecisionInput};
 use crate::select_kernel;
 use rusqlite::{Connection, Result as SqlResult};
@@ -75,10 +75,18 @@ fn posterior_for(
     }
 }
 
+/// Finding 3: use registry-backed pricing when available; fallback table
+/// for legacy call paths where no registry is threaded in.
 fn estimated_cost(input: &DecisionInput, m: Model) -> u64 {
     let t_in = input.tokens_in.unwrap_or(DecisionInput::DEFAULT_TOKENS_IN);
     let t_out = input.tokens_out.unwrap_or(DecisionInput::DEFAULT_TOKENS_OUT);
-    // Constants mirror models.toml exactly (verified 2026-04-30).
+    if let Some(reg) = &input.registry {
+        if let Some(cost) = pricing::cost_micro_cents(m.slug(), t_in, t_out, reg) {
+            return cost;
+        }
+        eprintln!("[kei-model-router] [FALLBACK: registry missing] model {} not found; using hardcoded table", m.slug());
+    }
+    // Hardcoded fallback — mirrors models.toml exactly (verified 2026-04-30).
     let (in_micro, out_micro): (u64, u64) = match m {
         Model::Haiku45 => (100_000_000, 500_000_000),
         Model::Sonnet46 => (300_000_000, 1_500_000_000),

@@ -39,8 +39,9 @@ pub fn agent_class_dna(full: &str) -> Option<&str> {
 }
 
 /// First `::` separated component — the substrate role slug.
+/// Returns None for empty input or empty role segment (side fix).
 pub fn role(dna: &str) -> Option<&str> {
-    dna.split("::").next()
+    dna.split("::").next().filter(|s| !s.is_empty())
 }
 
 /// Second `::` separated component — capability bundle codes.
@@ -118,7 +119,8 @@ mod tests {
     fn empty_returns_none() {
         assert_eq!(task_class_dna(""), None);
         assert_eq!(agent_class_dna(""), None);
-        assert_eq!(role(""), Some(""));
+        // Side fix: role("") returns None (not Some("")) — empty role is not useful.
+        assert_eq!(role(""), None);
     }
 
     #[test]

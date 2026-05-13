@@ -66,7 +66,7 @@ const HEAVY_ROLES: &[&str] = &[
     "physics-deriver", "ml-implementer", "ml-researcher",
     "kei-architect", "architect", "kei-critic", "critic",
     "code-implementer-rust", "code-implementer",
-    "infra-implementer-iac", "ml-implementer",
+    "infra-implementer-iac",
 ];
 
 /// Roles known to be read-only / lookup. Subtract 0.20 from τ.
