@@ -179,8 +179,12 @@ fn open_ledger() -> Option<Connection> {
         format!("{home}/.claude/agents/ledger.sqlite")
     };
     let conn = Connection::open(&path).ok()?;
-    conn.pragma_update(None, "journal_mode", "WAL").ok();
-    conn.busy_timeout(std::time::Duration::from_secs(5)).ok();
+    if let Err(e) = conn.pragma_update(None, "journal_mode", "WAL") {
+        eprintln!("[kei-model-router] WAL pragma failed (continuing without WAL): {e}");
+    }
+    if let Err(e) = conn.busy_timeout(std::time::Duration::from_secs(5)) {
+        eprintln!("[kei-model-router] busy_timeout failed (concurrent writes may block): {e}");
+    }
     Some(conn)
 }
 
