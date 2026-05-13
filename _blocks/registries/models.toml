@@ -1,0 +1,178 @@
+# Реестр моделей. Слой 2 из трёх.
+#
+# Каждая модель привязана к провайдеру через `provider_ref`. Цены в
+# microcents (1e-6 USD) на 1M токенов — совместимо с
+# kei-ledger.cost_micro_cents и kei-model-router::pricing.rs.
+#
+# Источники цен: pricing-страница соответствующего провайдера.
+# Каждая запись помечена `verified_at` — дата последней сверки.
+#
+# `deprecated_at = null` ⇒ модель живая. После deprecate kei-model-router
+# не выбирает её для новых invocation-ов, но старые записи в ledger
+# продолжают резолвиться.
+
+# ─── Anthropic ─────────────────────────────────────────────────────────
+
+[[model]]
+provider_ref = "anthropic"
+id = "claude-haiku-4-5"
+slug = "haiku"
+display_name = "Claude Haiku 4.5"
+context_window = 200000
+cost_input_per_mtok_micro = 100_000_000     # $1.00
+cost_output_per_mtok_micro = 500_000_000    # $5.00
+cache_write_5m_per_mtok_micro = 125_000_000
+cache_read_per_mtok_micro = 10_000_000
+verified_at = "2026-04-30"
+deprecated_at = ""
+notes = "Cheapest Claude. Single-edit, formatting, lookup."
+
+[[model]]
+provider_ref = "anthropic"
+id = "claude-sonnet-4-6"
+slug = "sonnet"
+display_name = "Claude Sonnet 4.6"
+context_window = 1000000
+cost_input_per_mtok_micro = 300_000_000     # $3.00
+cost_output_per_mtok_micro = 1_500_000_000  # $15.00
+cache_write_5m_per_mtok_micro = 375_000_000
+cache_read_per_mtok_micro = 30_000_000
+verified_at = "2026-04-30"
+deprecated_at = ""
+notes = "RULE 0.20 default for code-implementer-* / researcher-*."
+
+[[model]]
+provider_ref = "anthropic"
+id = "claude-opus-4-7"
+slug = "opus"
+display_name = "Claude Opus 4.7"
+context_window = 1000000
+cost_input_per_mtok_micro = 500_000_000     # $5.00
+cost_output_per_mtok_micro = 2_500_000_000  # $25.00
+cache_write_5m_per_mtok_micro = 625_000_000
+cache_read_per_mtok_micro = 50_000_000
+verified_at = "2026-04-30"
+deprecated_at = ""
+notes = "Architecture, novel reasoning, math derivation. Tokenizer overhead 1.35x vs Sonnet."
+
+# ─── OpenAI ────────────────────────────────────────────────────────────
+
+[[model]]
+provider_ref = "openai"
+id = "gpt-5"
+slug = "gpt-5"
+display_name = "GPT-5"
+context_window = 400000
+cost_input_per_mtok_micro = 200_000_000     # $2.00 (placeholder, verify on use)
+cost_output_per_mtok_micro = 800_000_000    # $8.00
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = ""
+deprecated_at = ""
+notes = "[UNVERIFIED] — re-fetch pricing page before billing-grade decisions."
+
+[[model]]
+provider_ref = "codex"
+id = "gpt-5-codex"
+slug = "codex"
+display_name = "GPT-5 Codex (via ChatGPT OAuth)"
+context_window = 200000
+cost_input_per_mtok_micro = 0               # subscription, not per-token
+cost_output_per_mtok_micro = 0
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = "2026-05-10"
+deprecated_at = ""
+notes = "RULE 0.23 dual-review. ChatGPT Plus/Pro/Team subscription quota."
+
+# ─── xAI ───────────────────────────────────────────────────────────────
+
+[[model]]
+provider_ref = "xai"
+id = "grok-4"
+slug = "grok-4"
+display_name = "Grok 4"
+context_window = 256000
+cost_input_per_mtok_micro = 300_000_000     # [UNVERIFIED]
+cost_output_per_mtok_micro = 1_500_000_000
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = ""
+deprecated_at = ""
+notes = "[UNVERIFIED] — verify before billing."
+
+# ─── DeepSeek ──────────────────────────────────────────────────────────
+
+[[model]]
+provider_ref = "deepseek"
+id = "deepseek-r1"
+slug = "r1"
+display_name = "DeepSeek R1"
+context_window = 64000
+cost_input_per_mtok_micro = 55_000_000      # $0.55 [UNVERIFIED — pricing fluctuates]
+cost_output_per_mtok_micro = 219_000_000    # $2.19
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 14_000_000      # $0.14 cache hit
+verified_at = ""
+deprecated_at = ""
+notes = "Cheapest reasoning tier. Long thinking time."
+
+[[model]]
+provider_ref = "deepseek"
+id = "deepseek-v3"
+slug = "v3"
+display_name = "DeepSeek V3"
+context_window = 64000
+cost_input_per_mtok_micro = 27_000_000      # $0.27 [UNVERIFIED]
+cost_output_per_mtok_micro = 110_000_000    # $1.10
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 7_000_000
+verified_at = ""
+deprecated_at = ""
+notes = "Non-reasoning baseline. Cheap bulk inference."
+
+# ─── Google ────────────────────────────────────────────────────────────
+
+[[model]]
+provider_ref = "google"
+id = "gemini-2.5-pro"
+slug = "gemini-pro"
+display_name = "Gemini 2.5 Pro"
+context_window = 2000000
+cost_input_per_mtok_micro = 125_000_000     # $1.25 [UNVERIFIED]
+cost_output_per_mtok_micro = 1_000_000_000  # $10.00
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = ""
+deprecated_at = ""
+notes = "2M context. Long-document analysis."
+
+# ─── Local (zero per-token cost) ───────────────────────────────────────
+
+[[model]]
+provider_ref = "ollama-local"
+id = "llama-3.3-70b"
+slug = "llama-70b-local"
+display_name = "Llama 3.3 70B (Ollama local)"
+context_window = 128000
+cost_input_per_mtok_micro = 0
+cost_output_per_mtok_micro = 0
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = "2026-05-13"
+deprecated_at = ""
+notes = "Local. Compute cost is electricity + opportunity, not per-token."
+
+[[model]]
+provider_ref = "mlx-local"
+id = "qwen-2.5-coder-32b"
+slug = "qwen-coder-local"
+display_name = "Qwen 2.5 Coder 32B (MLX)"
+context_window = 32000
+cost_input_per_mtok_micro = 0
+cost_output_per_mtok_micro = 0
+cache_write_5m_per_mtok_micro = 0
+cache_read_per_mtok_micro = 0
+verified_at = "2026-05-13"
+deprecated_at = ""
+notes = "Code-focused local model. Apple silicon Metal."
