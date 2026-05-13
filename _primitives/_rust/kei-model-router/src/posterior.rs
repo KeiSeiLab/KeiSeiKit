@@ -1,12 +1,6 @@
 //! Beta posterior over per-(task-class, model) success rate.
-//!
-//! For each (task_class_dna, model) pair in the ledger we count:
-//!   n+ = rows with outcome='functional' AND escalation_depth=0
-//!   n- = rows with anything else
-//!
-//! Model identity is keyed by `Model::slug()` — the canonical model id
-//! string (e.g. `claude-sonnet-4-6`) stored in `agents.model`.
-//!
+//! n+ = outcome='functional' AND escalation_depth=0; n- = everything else.
+//! Model keyed by slug (canonical) OR legacy short slug (pre-migration compat).
 //! Constructor Pattern: SQL is one query, math is pure-fn.
 
 use crate::pricing::Model;
@@ -49,7 +43,8 @@ impl Posterior {
         }
     }
 
-    /// Build posterior from ledger rows for (task_class_dna, model).
+    /// Build posterior from ledger rows. Accepts canonical + legacy slugs
+    /// so pre-migration rows in production ledger are counted (Finding 1).
     pub fn from_ledger(
         conn: &Connection,
         task_class: &str,
@@ -66,8 +61,9 @@ impl Posterior {
                                        AND COALESCE(escalation_depth, 0) = 0)
                              THEN 1 ELSE 0 END) AS n_minus
                  FROM agents
-                 WHERE task_class_dna = ?1 AND model = ?2",
-                params![task_class, model.slug()],
+                 WHERE task_class_dna = ?1
+                   AND (model = ?2 OR model = ?3)",
+                params![task_class, model.slug(), model.legacy_slug()],
                 |r| Ok((
                     r.get::<_, Option<i64>>(0)?.unwrap_or(0),
                     r.get::<_, Option<i64>>(1)?.unwrap_or(0),
@@ -75,10 +71,13 @@ impl Posterior {
             )
             .optional()?;
         let (n_plus, n_minus) = row.unwrap_or((0, 0));
+        // Finding 6: saturating_add prevents i64 overflow before cast to u32.
+        let n_total = n_plus.saturating_add(n_minus);
+        let n = u32::try_from(n_total).unwrap_or(u32::MAX);
         Ok(Posterior {
             alpha: 1.0 + n_plus as f64,
             beta: 1.0 + n_minus as f64,
-            n: (n_plus + n_minus) as u32,
+            n,
         })
     }
 }
@@ -100,33 +99,21 @@ mod tests {
 
     fn fresh_db() -> Connection {
         let c = Connection::open_in_memory().unwrap();
-        c.execute_batch(
-            "CREATE TABLE agents (
-                id TEXT, task_class_dna TEXT, model TEXT,
-                outcome TEXT, escalation_depth INTEGER DEFAULT 0
-            );",
-        )
-        .unwrap();
+        c.execute_batch("CREATE TABLE agents (
+            id TEXT, task_class_dna TEXT, model TEXT,
+            outcome TEXT, escalation_depth INTEGER DEFAULT 0);").unwrap();
         c
     }
-
     #[test]
-    fn prior_mean_is_one_half() {
-        let p = Posterior::PRIOR;
-        assert!((p.mean() - 0.5).abs() < 1e-9);
-    }
-
+    fn prior_mean_is_one_half() { assert!((Posterior::PRIOR.mean() - 0.5).abs() < 1e-9); }
     #[test]
     fn observe_success_shifts_mean_up() {
         let p = Posterior::PRIOR.observe(true).observe(true).observe(true);
-        assert!(p.mean() > 0.5);
-        assert_eq!(p.n, 3);
+        assert!(p.mean() > 0.5); assert_eq!(p.n, 3);
     }
-
     #[test]
     fn observe_failure_shifts_mean_down() {
-        let p = Posterior::PRIOR.observe(false).observe(false);
-        assert!(p.mean() < 0.5);
+        assert!(Posterior::PRIOR.observe(false).observe(false).mean() < 0.5);
     }
 
     #[test]
@@ -139,25 +126,17 @@ mod tests {
     #[test]
     fn ledger_aggregates_by_model_slug() {
         let c = fresh_db();
-        // Use canonical model ids (matching Model::slug())
         let haiku = Model::Haiku45.slug();
         let opus = Model::Opus47.slug();
-        c.execute(
-            "INSERT INTO agents VALUES ('1','tc1',?1,'functional',0)",
-            rusqlite::params![haiku],
-        ).unwrap();
-        c.execute(
-            "INSERT INTO agents VALUES ('2','tc1',?1,'functional',0)",
-            rusqlite::params![haiku],
-        ).unwrap();
-        c.execute(
-            "INSERT INTO agents VALUES ('3','tc1',?1,'partial',0)",
-            rusqlite::params![haiku],
-        ).unwrap();
-        c.execute(
-            "INSERT INTO agents VALUES ('4','tc1',?1,'functional',0)",
-            rusqlite::params![opus],
-        ).unwrap();
+        for (id, model, outcome) in [
+            ("1", haiku, "functional"), ("2", haiku, "functional"),
+            ("3", haiku, "partial"),   ("4", opus, "functional"),
+        ] {
+            c.execute(
+                "INSERT INTO agents VALUES (?1,'tc1',?2,?3,0)",
+                rusqlite::params![id, model, outcome],
+            ).unwrap();
+        }
         let h = Posterior::from_ledger(&c, "tc1", Model::Haiku45).unwrap();
         assert_eq!(h.n, 3);
         assert!((h.mean() - 0.6).abs() < 1e-9);
@@ -180,18 +159,33 @@ mod tests {
 
     #[test]
     fn lower_bound_at_high_n_concentrates_near_mean() {
-        let mut p = Posterior::PRIOR;
-        for _ in 0..100 {
-            p = p.observe(true);
-        }
-        let lb = p.quality_lower_bound(0.10);
-        assert!(lb > 0.95, "lb={}", lb);
+        let p = (0..100).fold(Posterior::PRIOR, |acc, _| acc.observe(true));
+        assert!(p.quality_lower_bound(0.10) > 0.95);
     }
 
     #[test]
     fn lower_bound_with_no_data_is_conservative() {
-        let p = Posterior::PRIOR;
-        let lb = p.quality_lower_bound(0.10);
-        assert!(lb < 0.30);
+        assert!(Posterior::PRIOR.quality_lower_bound(0.10) < 0.30);
+    }
+
+    /// Finding 1: legacy short slug ("haiku") must be accepted alongside canonical.
+    #[test]
+    fn ledger_legacy_slug_counted() {
+        let c = fresh_db();
+        for (id, o) in [("1","functional"),("2","partial")] {
+            c.execute("INSERT INTO agents VALUES (?1,'tc-legacy','haiku',?2,0)",
+                rusqlite::params![id, o]).unwrap();
+        }
+        let p = Posterior::from_ledger(&c, "tc-legacy", Model::Haiku45).unwrap();
+        assert_eq!(p.n, 2); // n=2 proves rows were read
+        assert!((p.mean() - 0.5).abs() < 1e-9); // 1+/1- → mean = 0.5
+    }
+
+    /// Finding 6: saturating overflow must not panic.
+    #[test]
+    fn overflow_guard_on_huge_n() {
+        let big: i64 = i64::MAX / 2;
+        let n = u32::try_from(big.saturating_add(big)).unwrap_or(u32::MAX);
+        assert_eq!(n, u32::MAX);
     }
 }

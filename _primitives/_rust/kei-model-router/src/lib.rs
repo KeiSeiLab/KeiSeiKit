@@ -36,16 +36,22 @@ pub(crate) mod select_posterior;
 
 // Registry API
 pub use registry::Registry;
-pub use registry_types::{Model as RegistryModel, Profile, Provider};
+/// `RegistryModel` is the TOML wire record from `models.toml`.
+/// It is distinct from the `Model` enum (canonical tier identifier).
+pub use registry_types::Model as RegistryModel;
+pub use registry_types::{Profile, Provider};
 
-// Pricing API
+// Pricing API — `Model` is the canonical model enum used for posterior/escalation.
 pub use pricing::{cost_micro_cents, Model, OPUS_47_TOKENIZER_OVERHEAD};
 
 // Selection API
 pub use select::{pick, select, Decision, DecisionInput};
 
 // Escalation API
-pub use escalate::{next_model, next_after_failure, EscalationDecision, MAX_ESCALATION_DEPTH};
+pub use escalate::{
+    next_model, next_after_failure, EscalationDecision, EscalationResult,
+    MAX_ESCALATION_DEPTH,
+};
 
 // Utility re-exports
 pub use complexity::{ComplexityEstimate, Tier};

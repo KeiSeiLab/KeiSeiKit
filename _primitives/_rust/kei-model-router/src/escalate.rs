@@ -28,25 +28,41 @@ pub enum EscalationDecision {
 // Registry-backed escalation
 // ──────────────────────────────────────────────────────────────────────────────
 
-/// Given `current_model_id` within `provider_id`, return the id of the next
+/// Result of a registry-backed escalation lookup.
+/// Distinguishes "at top of ladder" from "model not found" (e.g. typo).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EscalationResult<'r> {
+    /// Caller should retry on this model id.
+    Next(&'r str),
+    /// `current_model_id` is the most expensive non-deprecated model.
+    AtTop,
+    /// `current_model_id` is not present in this provider's model list.
+    NotFound,
+}
+
+/// Given `current_model_id` within `provider_id`, return the next
 /// more expensive non-deprecated model from the registry (sorted by
-/// `cost_output_per_mtok_micro` ascending). Returns `None` if already at top.
+/// `cost_output_per_mtok_micro` ascending).
 pub fn next_model<'r>(
     current_model_id: &str,
     provider_id: &str,
     registry: &'r Registry,
-) -> Option<&'r str> {
+) -> EscalationResult<'r> {
     let sorted = registry.models_for_provider(provider_id);
     let mut found_current = false;
     for m in &sorted {
         if found_current {
-            return Some(&m.id);
+            return EscalationResult::Next(&m.id);
         }
         if m.id == current_model_id {
             found_current = true;
         }
     }
-    None // current not found, or already at top
+    if found_current {
+        EscalationResult::AtTop
+    } else {
+        EscalationResult::NotFound
+    }
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -67,17 +83,6 @@ pub fn next_after_failure(
     match current.next_tier() {
         Some(next) => EscalationDecision::Retry { next, depth: depth + 1 },
         None => EscalationDecision::Surrender,
-    }
-}
-
-impl Model {
-    /// Next-tier (escalation). Returns None if already at top.
-    pub fn next_tier(&self) -> Option<Model> {
-        match self {
-            Self::Haiku45 => Some(Self::Sonnet46),
-            Self::Sonnet46 => Some(Self::Opus47),
-            Self::Opus47 => None,
-        }
     }
 }
 
@@ -104,29 +109,34 @@ mod tests {
     #[test]
     fn haiku_escalates_to_sonnet_within_anthropic() {
         let r = reg();
-        let next = next_model("claude-haiku-4-5", "anthropic", &r);
-        assert_eq!(next, Some("claude-sonnet-4-6"));
+        assert_eq!(next_model("claude-haiku-4-5", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6"));
     }
 
     #[test]
     fn sonnet_escalates_to_opus_within_anthropic() {
         let r = reg();
-        let next = next_model("claude-sonnet-4-6", "anthropic", &r);
-        assert_eq!(next, Some("claude-opus-4-7"));
+        assert_eq!(next_model("claude-sonnet-4-6", "anthropic", &r), EscalationResult::Next("claude-opus-4-7"));
     }
 
+    /// Finding 5: at-top must be `AtTop`, not `NotFound`.
     #[test]
-    fn opus_at_top_returns_none() {
+    fn opus_at_top_returns_at_top() {
         let r = reg();
-        let next = next_model("claude-opus-4-7", "anthropic", &r);
-        assert!(next.is_none(), "expected None at top, got {next:?}");
+        assert_eq!(next_model("claude-opus-4-7", "anthropic", &r), EscalationResult::AtTop);
     }
 
+    /// Finding 5: typo / unknown model must be `NotFound`, not `AtTop`.
     #[test]
-    fn unknown_model_returns_none() {
+    fn unknown_model_returns_not_found() {
         let r = reg();
-        let next = next_model("does-not-exist", "anthropic", &r);
-        assert!(next.is_none());
+        assert_eq!(next_model("does-not-exist", "anthropic", &r), EscalationResult::NotFound);
+    }
+
+    /// Finding 5: `Next` variant carries the correct model id.
+    #[test]
+    fn next_variant_carries_model_id() {
+        let r = reg();
+        assert!(matches!(next_model("claude-haiku-4-5", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6")));
     }
 
     #[test]

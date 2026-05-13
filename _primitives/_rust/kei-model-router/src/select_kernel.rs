@@ -10,6 +10,8 @@ use crate::posterior::Posterior;
 use crate::pricing::Model;
 use rusqlite::{Connection, Result as SqlResult};
 
+// Finding 1: accept canonical slug (?2) OR legacy short slug (?3) for
+// backward-compat with pre-migration ledger rows.
 const QUERY: &str = "SELECT task_class_dna,
         SUM(CASE WHEN outcome = 'functional'
                   AND COALESCE(escalation_depth, 0) = 0
@@ -21,7 +23,7 @@ const QUERY: &str = "SELECT task_class_dna,
  FROM agents
  WHERE task_class_dna IS NOT NULL
    AND task_class_dna != ?1
-   AND model = ?2
+   AND (model = ?2 OR model = ?3)
  GROUP BY task_class_dna";
 
 /// Weighted-sum posterior borrowing from neighbour task-classes.
@@ -37,7 +39,7 @@ pub fn smooth(
     let mut stmt = conn.prepare(QUERY)?;
 
     let rows = stmt.query_map(
-        rusqlite::params![target_task_class, model.slug()],
+        rusqlite::params![target_task_class, model.slug(), model.legacy_slug()],
         |r| {
             Ok((
                 r.get::<_, String>(0)?,
