@@ -1,16 +1,9 @@
-//! kei-model-router CLI.
-//!
-//! Subcommands:
-//!   pricing                — print verified pricing table (default)
-//!   select <agent> [--prompt P]
-//!                          — query router decision for given agent
-//!                            spawn. Reads ledger at $KEI_LEDGER_DB.
-//!   calibrate              — re-fit kernel weights against ledger
-//!                            outcomes. Print baseline vs best MSE.
-//!   --help
+//! kei-model-router CLI — model selection for Claude Code Agent spawns.
+//! Subcommands: pricing | select <agent> [--prompt P] | calibrate | --help
 
 use kei_model_router::{
-    calibrate, select, DecisionInput, KernelWeights, Model, OPUS_47_TOKENIZER_OVERHEAD,
+    calibrate, pick, select, DecisionInput, KernelWeights, Model, Registry,
+    OPUS_47_TOKENIZER_OVERHEAD,
 };
 use rusqlite::Connection;
 
@@ -30,177 +23,179 @@ fn main() {
 }
 
 fn print_help() {
-    println!("kei-model-router — model selection for Claude Code Agent spawns");
-    println!();
-    println!("Usage:");
-    println!("  kei-model-router [pricing]          print verified pricing table");
-    println!("  kei-model-router select <agent> [--prompt P]");
-    println!("                                      route a synthetic spawn");
-    println!("  kei-model-router calibrate          re-fit kernel weights");
-    println!("  kei-model-router --help");
-    println!();
-    println!("Env:");
-    println!("  KEI_LEDGER_DB                      override ledger path");
-    println!("                                     (default: ~/.claude/agents/ledger.sqlite)");
+    print!(concat!(
+        "kei-model-router — model selection for Claude Code Agent spawns\n\n",
+        "Usage:\n",
+        "  kei-model-router [pricing]              print pricing table from models.toml\n",
+        "  kei-model-router select <agent> [--prompt P]\n",
+        "  kei-model-router calibrate              re-fit kernel weights\n",
+        "  kei-model-router --help\n\n",
+        "Env:\n",
+        "  KEI_LEDGER_DB          override ledger path\n",
+        "  KEI_REGISTRIES_DIR     override registries dir\n",
+    ));
 }
 
 fn print_pricing() {
-    println!("kei-model-router — verified Claude API pricing (microcents per 1M tokens)");
-    println!("Source: https://platform.claude.com/docs/en/docs/about-claude/pricing");
-    println!("Verified: 2026-04-30 (RULE 0.4)");
-    println!();
-    println!(
-        "{:<10} {:>12} {:>12} {:>12} {:>12}",
-        "model", "input/M", "output/M", "cache_w_5m", "cache_r"
-    );
-    for m in Model::all() {
-        let p = m.pricing();
+    let reg = match Registry::load() {
+        Ok(r) => r,
+        Err(e) => { eprintln!("registry load error: {e}"); std::process::exit(1); }
+    };
+    println!("kei-model-router — pricing from models.toml\n");
+    println!("{:<30} {:>12} {:>12} {:>12}", "model", "input/M", "output/M", "cache_r");
+    for m in &reg.models {
         println!(
-            "{:<10} {:>12} {:>12} {:>12} {:>12}",
-            m.slug(),
-            fmt_microcents(p.input_micro_cents_per_mtok),
-            fmt_microcents(p.output_micro_cents_per_mtok),
-            fmt_microcents(p.cache_write_5m_micro_cents_per_mtok),
-            fmt_microcents(p.cache_read_micro_cents_per_mtok),
+            "{:<30} {:>12} {:>12} {:>12}",
+            m.id,
+            fmt_micro(m.cost_input_per_mtok_micro),
+            fmt_micro(m.cost_output_per_mtok_micro),
+            fmt_micro(m.cache_read_per_mtok_micro),
         );
     }
-    println!();
-    println!(
-        "Note: Opus 4.7 tokenizer may use up to {:.0}% more tokens",
-        (OPUS_47_TOKENIZER_OVERHEAD - 1.0) * 100.0
-    );
-    println!("on identical text vs Sonnet/Haiku; multiply Opus quote accordingly.");
+    println!("\nNote: Opus 4.7 tokenizer may use up to {:.0}% more tokens vs Sonnet/Haiku.",
+        (OPUS_47_TOKENIZER_OVERHEAD - 1.0) * 100.0);
 }
 
 fn cmd_select(args: &[String]) {
-    let agent = match args.first() {
-        Some(a) => a,
-        None => {
-            eprintln!("usage: kei-model-router select <agent> [--prompt PROMPT]");
-            std::process::exit(2);
-        }
-    };
-    let mut prompt = String::new();
-    let mut i = 1;
-    while i < args.len() {
-        if args[i] == "--prompt" {
-            if let Some(p) = args.get(i + 1) {
-                prompt = p.clone();
-                i += 2;
-                continue;
-            }
-        }
-        i += 1;
-    }
+    let agent = args.first().unwrap_or_else(|| {
+        eprintln!("usage: kei-model-router select <agent> [--prompt PROMPT]");
+        std::process::exit(2);
+    });
+    let prompt = parse_prompt_flag(args);
+    let dna = format!("{agent}::?::00000000::00000000-00000000");
+    let (input, non_claude) = build_select_input(agent, &prompt, &dna);
 
-    // Synthesize a DNA from agent name. Real spawns get DNA from
-    // agent-fork-logger.sh via kei-shared::compose_dna; this CLI uses
-    // a stable synthetic so users can probe without a real spawn.
-    let synthetic_dna = format!("{agent}::?::00000000::00000000-00000000");
+    if let Some((prov, model_id)) = non_claude {
+        print_non_claude(agent, &prov, &model_id);
+        return;
+    }
 
     let conn = match open_ledger() {
         Some(c) => c,
         None => {
             eprintln!("warning: ledger not available; falling back to default");
-            print_decision_no_ledger(&synthetic_dna, &prompt);
+            print_decision_no_ledger(&input, &dna);
             return;
         }
     };
 
-    let mut input = DecisionInput::new(synthetic_dna.clone(), prompt);
-    input.kernel_weights = KernelWeights::default();
-    input.pinned = read_pinned_for_agent(agent);
-    let decision = match select(&input, &conn) {
+    let d = match select(&input, &conn) {
         Ok(d) => d,
-        Err(e) => {
-            eprintln!("ledger query failed: {e}");
-            std::process::exit(1);
-        }
+        Err(e) => { eprintln!("ledger query failed: {e}"); std::process::exit(1); }
     };
-
-    println!("agent:        {agent}");
-    println!("dna:          {synthetic_dna}");
-    println!("model:        {}", decision.model.slug());
-    println!(
-        "expected_cost ${:.4} (microcents={})",
-        decision.expected_cost_micro_cents as f64 / 100_000_000.0,
-        decision.expected_cost_micro_cents
-    );
-    println!(
-        "q_lower_bound {:.3} (posterior n={})",
-        decision.quality_lower_bound, decision.posterior_n
-    );
-    println!(
-        "complexity τ={:.2} ({:?} signals)",
-        decision.complexity.tau, decision.complexity.features
-    );
-    println!("reason:       {}", decision.reason);
+    print_claude_decision(agent, &d);
 }
 
-fn print_decision_no_ledger(dna: &str, prompt: &str) {
-    let inp = DecisionInput::new(dna.to_string(), prompt.to_string());
-    let est = kei_model_router::complexity::estimate(prompt, kei_model_router::dna_class::role(dna));
-    println!("model:     {}", inp.fallback.slug());
-    println!("τ:         {:.2}", est.tau);
-    println!("reason:    no_ledger_fallback");
+fn print_non_claude(agent: &str, prov: &str, model_id: &str) {
+    println!("agent:        {agent}");
+    println!("provider:     {prov}");
+    println!("model:        {model_id}");
+    println!("reason:       profile_default_non_claude");
+}
+
+fn print_claude_decision(agent: &str, d: &kei_model_router::Decision) {
+    println!("agent:        {agent}");
+    println!("model:        {}", d.model.slug());
+    println!("expected_cost ${:.4} (microcents={})",
+        d.expected_cost_micro_cents as f64 / 100_000_000.0, d.expected_cost_micro_cents);
+    println!("q_lower_bound {:.3} (posterior n={})", d.quality_lower_bound, d.posterior_n);
+    println!("reason:       {}", d.reason);
+}
+
+/// Build DecisionInput; FIX NEW-1: returns non-Claude (prov, model_id) when
+/// profile resolves to a non-Anthropic model, so caller bypasses posterior.
+fn build_select_input(
+    agent: &str,
+    prompt: &str,
+    dna: &str,
+) -> (DecisionInput, Option<(String, String)>) {
+    let mut input = DecisionInput::new(dna.to_string(), prompt.to_string());
+    input.kernel_weights = KernelWeights::default();
+    input.pinned = read_pinned_for_agent(agent);
+
+    let non_claude = if let Ok(reg) = Registry::load() {
+        match pick(agent, &reg) {
+            Some((prov, model_id)) => match Model::from_slug(&model_id) {
+                Some(m) => { input.fallback = m; None }
+                None => Some((prov, model_id)),
+            },
+            None => None,
+        }
+    } else {
+        None
+    };
+    (input, non_claude)
+}
+
+fn parse_prompt_flag(args: &[String]) -> String {
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "--prompt" {
+            if let Some(p) = args.get(i + 1) { return p.clone(); }
+        }
+        i += 1;
+    }
+    String::new()
+}
+
+/// FIX NEW-2: takes &DecisionInput so the profile-resolved fallback survives.
+fn print_decision_no_ledger(input: &DecisionInput, dna: &str) {
+    let est = kei_model_router::complexity::estimate(
+        &input.prompt, kei_model_router::dna_class::role(dna));
+    println!("model:     {}\nτ:         {:.2}\nreason:    no_ledger_fallback",
+        input.fallback.slug(), est.tau);
 }
 
 fn cmd_calibrate() {
     let conn = match open_ledger() {
         Some(c) => c,
-        None => {
-            eprintln!("ledger not found; aborting calibration");
-            std::process::exit(1);
-        }
+        None => { eprintln!("ledger not found; aborting calibration"); std::process::exit(1); }
     };
-    let result = match calibrate::calibrate(&conn) {
+    let r = match calibrate::calibrate(&conn) {
         Ok(r) => r,
-        Err(e) => {
-            eprintln!("calibration query failed: {e}");
-            std::process::exit(1);
-        }
+        Err(e) => { eprintln!("calibration query failed: {e}"); std::process::exit(1); }
     };
-    println!("rows evaluated: {}", result.rows_evaluated);
-    if result.rows_evaluated < 5 {
+    println!("rows evaluated: {}", r.rows_evaluated);
+    if r.rows_evaluated < 5 {
         println!("(too few rows for calibration; using default weights)");
         return;
     }
-    println!("baseline MSE:   {:.4}", result.baseline_mse);
-    println!("best MSE:       {:.4}", result.best_mse);
-    println!(
-        "improvement:    {:.4}",
-        result.baseline_mse - result.best_mse
-    );
-    println!();
-    println!("calibrated weights:");
-    println!("  alpha_role:  {:.2}", result.best_weights.alpha_role);
-    println!("  alpha_caps:  {:.2}", result.best_weights.alpha_caps);
-    println!("  alpha_scope: {:.2}", result.best_weights.alpha_scope);
-    println!("  alpha_body:  {:.2}", result.best_weights.alpha_body);
+    println!("baseline MSE:   {:.4}\nbest MSE:       {:.4}\nimprovement:    {:.4}",
+        r.baseline_mse, r.best_mse, r.baseline_mse - r.best_mse);
+    println!("calibrated weights:\n  alpha_role:  {:.2}\n  alpha_caps:  {:.2}\n  alpha_scope: {:.2}\n  alpha_body:  {:.2}",
+        r.best_weights.alpha_role, r.best_weights.alpha_caps,
+        r.best_weights.alpha_scope, r.best_weights.alpha_body);
 }
 
 fn open_ledger() -> Option<Connection> {
-    let path = std::env::var("KEI_LEDGER_DB").unwrap_or_else(|_| {
+    let path = if let Ok(p) = std::env::var("KEI_LEDGER_DB") {
+        p
+    } else {
         let home = std::env::var("HOME").unwrap_or_default();
+        if home.is_empty() {
+            eprintln!("[kei-model-router] HOME unset; cannot resolve ledger path");
+            return None;
+        }
         format!("{home}/.claude/agents/ledger.sqlite")
-    });
-    Connection::open(&path).ok()
+    };
+    let conn = Connection::open(&path).ok()?;
+    if let Err(e) = conn.pragma_update(None, "journal_mode", "WAL") {
+        eprintln!("[kei-model-router] WAL pragma failed (continuing without WAL): {e}");
+    }
+    if let Err(e) = conn.busy_timeout(std::time::Duration::from_secs(5)) {
+        eprintln!("[kei-model-router] busy_timeout failed (concurrent writes may block): {e}");
+    }
+    Some(conn)
 }
 
-/// Read `~/.claude/settings.json::router.pinned[agent]` if present.
-/// Returns Some(Model) for agents the user has pinned to a specific tier.
-/// Examples: "Explore" → Haiku, "ml-implementer" → Opus.
 fn read_pinned_for_agent(agent: &str) -> Option<Model> {
     let home = std::env::var("HOME").ok()?;
-    let path = format!("{home}/.claude/settings.json");
-    let raw = std::fs::read_to_string(&path).ok()?;
+    let raw = std::fs::read_to_string(format!("{home}/.claude/settings.json")).ok()?;
     let json: serde_json::Value = serde_json::from_str(&raw).ok()?;
-    let pinned = json.get("router")?.get("pinned")?;
-    let model_slug = pinned.get(agent)?.as_str()?;
+    let model_slug = json.get("router")?.get("pinned")?.get(agent)?.as_str()?;
     Model::from_slug(model_slug)
 }
 
-fn fmt_microcents(uc: u64) -> String {
-    let dollars = uc as f64 / 100_000_000.0;
-    format!("${:.2}", dollars)
+fn fmt_micro(uc: u64) -> String {
+    format!("${:.2}", uc as f64 / 100_000_000.0)
 }

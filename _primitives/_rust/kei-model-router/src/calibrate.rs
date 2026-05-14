@@ -1,21 +1,9 @@
 //! Offline calibration of kernel weights from observed ledger outcomes.
 //!
-//! Goal: re-fit (α_role, α_caps, α_scope, α_body) so that predicted
-//! posterior mean q̂(d, m) tracks the ACTUAL post-hoc success rate of
-//! similar past task-classes.
+//! Approach: leave-one-out on each ledger row, coarse grid search over
+//! weight tuples (5 × 4 × 3 × 3 = 180 configs) minimising MSE.
 //!
-//! Approach: leave-one-out on each ledger row. For row i with full DNA
-//! d_i, model m_i, observed outcome ω_i, compute the kernel-smoothed
-//! prediction q̂_{-i}(d_i, m_i) using all OTHER rows. The residual
-//! (ω_i − q̂_{-i}) measures bias; the weights that minimize sum of
-//! squared residuals are the calibrated weights.
-//!
-//! For initial seed weights this implementation uses a coarse grid
-//! search over weight tuples (5 levels × 4 dims = 625 configs) — small
-//! enough to brute force on the typical ledger size (≤10k rows).
-//!
-//! Constructor Pattern: pure-fn cube; no I/O outside passing in a
-//! Connection. Caller (CLI subcommand) decides where to print results.
+//! Constructor Pattern: pure-fn cube; no I/O outside passing a Connection.
 
 use crate::kernel::{self, KernelWeights};
 use crate::pricing::Model;
@@ -49,7 +37,6 @@ pub fn calibrate(conn: &Connection) -> SqlResult<CalibrationResult> {
     }
 
     let baseline_mse = mse(&observations, KernelWeights::default());
-
     let mut best_weights = KernelWeights::default();
     let mut best_mse = baseline_mse;
 
@@ -73,12 +60,7 @@ pub fn calibrate(conn: &Connection) -> SqlResult<CalibrationResult> {
         }
     }
 
-    Ok(CalibrationResult {
-        best_weights,
-        best_mse,
-        baseline_mse,
-        rows_evaluated,
-    })
+    Ok(CalibrationResult { best_weights, best_mse, baseline_mse, rows_evaluated })
 }
 
 fn load_observations(conn: &Connection) -> SqlResult<Vec<Observation>> {
@@ -100,15 +82,9 @@ fn load_observations(conn: &Connection) -> SqlResult<Vec<Observation>> {
     let mut out = Vec::new();
     for row in rows {
         let (tc, model_slug, outcome, depth) = row?;
-        let Some(model) = Model::from_slug(&model_slug) else {
-            continue;
-        };
+        let Some(model) = Model::from_slug(&model_slug) else { continue };
         let success = outcome == "functional" && depth == 0;
-        out.push(Observation {
-            task_class: tc,
-            model,
-            success,
-        });
+        out.push(Observation { task_class: tc, model, success });
     }
     Ok(out)
 }
@@ -126,7 +102,6 @@ fn mse(observations: &[Observation], weights: KernelWeights) -> f64 {
     sum_sq / observations.len() as f64
 }
 
-/// Leave-one-out kernel-weighted mean prediction for observation i.
 fn predict_loo(
     observations: &[Observation],
     skip: usize,
@@ -161,11 +136,8 @@ mod tests {
         let c = Connection::open_in_memory().unwrap();
         c.execute_batch(
             "CREATE TABLE agents (
-                id TEXT,
-                task_class_dna TEXT,
-                model TEXT,
-                outcome TEXT,
-                escalation_depth INTEGER DEFAULT 0
+                id TEXT, task_class_dna TEXT, model TEXT,
+                outcome TEXT, escalation_depth INTEGER DEFAULT 0
             );",
         )
         .unwrap();
@@ -183,23 +155,18 @@ mod tests {
     #[test]
     fn calibration_improves_or_matches_baseline() {
         let c = fresh_db();
-        // Same role, different scopes, mostly successful Haiku — should
-        // teach kernel that role-match is informative.
+        let haiku = Model::Haiku45.slug();
         for i in 0..15 {
             c.execute(
-                "INSERT INTO agents VALUES
-                    (?1, 'roleA::caps::scope::body12', 'haiku', 'functional', 0)",
-                rusqlite::params![format!("a{i}")],
-            )
-            .unwrap();
+                "INSERT INTO agents VALUES (?1,'roleA::caps::scope::body12',?2,'functional',0)",
+                rusqlite::params![format!("a{i}"), haiku],
+            ).unwrap();
         }
         for i in 0..5 {
             c.execute(
-                "INSERT INTO agents VALUES
-                    (?1, 'roleB::caps::scope::body12', 'haiku', 'partial', 0)",
-                rusqlite::params![format!("b{i}")],
-            )
-            .unwrap();
+                "INSERT INTO agents VALUES (?1,'roleB::caps::scope::body12',?2,'partial',0)",
+                rusqlite::params![format!("b{i}"), haiku],
+            ).unwrap();
         }
         let r = calibrate(&c).unwrap();
         assert_eq!(r.rows_evaluated, 20);
