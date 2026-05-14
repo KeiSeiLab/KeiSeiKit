@@ -54,7 +54,7 @@ pub enum Model {
 impl Model {
     pub fn slug(&self) -> &'static str {
         match self {
-            Self::Haiku45 => "claude-haiku-4-5",
+            Self::Haiku45 => "claude-haiku-4-5-20251001",
             Self::Sonnet46 => "claude-sonnet-4-6",
             Self::Opus47 => "claude-opus-4-7",
         }
@@ -72,7 +72,7 @@ impl Model {
 
     pub fn from_slug(s: &str) -> Option<Model> {
         match s {
-            "haiku" | "haiku-4.5" | "claude-haiku-4-5" => Some(Self::Haiku45),
+            "haiku" | "haiku-4.5" | "claude-haiku-4-5" | "claude-haiku-4-5-20251001" => Some(Self::Haiku45),
             "sonnet" | "sonnet-4.6" | "claude-sonnet-4-6" => Some(Self::Sonnet46),
             "opus" | "opus-4.7" | "claude-opus-4-7" => Some(Self::Opus47),
             _ => None,
@@ -131,7 +131,7 @@ mod tests {
     #[test]
     fn haiku_output_1m_is_500m_microcents() {
         let r = reg();
-        let c = cost_micro_cents("claude-haiku-4-5", 0, 1_000_000, &r).unwrap();
+        let c = cost_micro_cents("claude-haiku-4-5-20251001", 0, 1_000_000, &r).unwrap();
         assert_eq!(c, 500_000_000);
     }
 

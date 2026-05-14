@@ -1,5 +1,10 @@
 //! Agent-shell DNA — 5-segment per-invocation identifier.
 //!
+//! **Consumer:** `keisei-marketplace` (not yet wired into kei-model-router's
+//! routing/posterior; planned for v0.18 when the marketplace pushes invocation
+//! records into the shared ledger). See `docs/DNA-MIGRATION.md` for the
+//! two-format coexistence policy.
+//!
 //! Format emitted by `keisei-marketplace/src/lib/cryptoid.ts::agentDna`:
 //!
 //!   `agent-shell::<provider>:<model>:<caps>::<scope_sha>::<body_sha>-<nonce>`

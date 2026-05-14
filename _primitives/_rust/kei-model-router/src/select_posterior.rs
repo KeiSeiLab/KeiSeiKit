@@ -172,7 +172,7 @@ mod tests {
         let c = fresh_db();
         for i in 0..30 {
             c.execute(
-                "INSERT INTO agents VALUES (?1,'tc1','claude-haiku-4-5','functional',0)",
+                "INSERT INTO agents VALUES (?1,'tc1','claude-haiku-4-5-20251001','functional',0)",
                 rusqlite::params![format!("a{i}")],
             )
             .unwrap();

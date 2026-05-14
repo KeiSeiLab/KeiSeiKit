@@ -109,7 +109,7 @@ mod tests {
     #[test]
     fn haiku_escalates_to_sonnet_within_anthropic() {
         let r = reg();
-        assert_eq!(next_model("claude-haiku-4-5", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6"));
+        assert_eq!(next_model("claude-haiku-4-5-20251001", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6"));
     }
 
     #[test]
@@ -136,7 +136,7 @@ mod tests {
     #[test]
     fn next_variant_carries_model_id() {
         let r = reg();
-        assert!(matches!(next_model("claude-haiku-4-5", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6")));
+        assert!(matches!(next_model("claude-haiku-4-5-20251001", "anthropic", &r), EscalationResult::Next("claude-sonnet-4-6")));
     }
 
     #[test]
