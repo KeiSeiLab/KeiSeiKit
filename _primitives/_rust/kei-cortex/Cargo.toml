@@ -27,7 +27,7 @@ clap = { workspace = true }
 thiserror = { workspace = true }
 rusqlite = { workspace = true }
 anyhow = { workspace = true }
-rand = "0.8"
+rand = "0.10"
 reqwest = { workspace = true }
 tokio-stream = { workspace = true }
 futures = { workspace = true }
