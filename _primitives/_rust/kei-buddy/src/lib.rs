@@ -22,6 +22,7 @@ pub mod machine;
 pub(crate) mod machine_helpers;
 pub(crate) mod machine_lang;
 pub mod persona_merge;
+pub mod provision_decrypt;
 pub mod retrieval;
 pub mod schema;
 pub mod state;
