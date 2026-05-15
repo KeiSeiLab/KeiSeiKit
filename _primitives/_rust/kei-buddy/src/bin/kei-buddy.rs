@@ -2,6 +2,7 @@
 //! kei-buddy binary — 4 subcommands: serve / migrate / webhook-set / webhook-delete.
 
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(
@@ -27,6 +28,27 @@ enum Command {
     },
     /// Delete the registered Telegram webhook (revert to polling).
     WebhookDelete,
+    /// Generate x25519 keypair, write PKCS#8 PEM private key, print pubkey
+    /// (standard base64, 44 chars) to stdout. Cloud-init fallback if openssl
+    /// is unavailable.
+    Genkeys {
+        /// Path to write the PKCS#8 PEM private key (chmod 400).
+        #[arg(long)]
+        key: PathBuf,
+    },
+    /// Decrypt sealed bot-token blob from marketplace and append BOT_TOKEN
+    /// to env file. Mirrors marketplace/src/lib/crypto-box.ts::sealBoxToVps.
+    DecryptAndExport {
+        /// Path to PKCS#8 PEM x25519 private key (default: /etc/keisei-vps.key).
+        #[arg(long, default_value = "/etc/keisei-vps.key")]
+        vps_key: PathBuf,
+        /// Path to sealed blob JSON (default: /etc/keisei-blob.json).
+        #[arg(long, default_value = "/etc/keisei-blob.json")]
+        blob: PathBuf,
+        /// Path to env file to append BOT_TOKEN into (default: /etc/keisei.env).
+        #[arg(long, default_value = "/etc/keisei.env")]
+        env_out: PathBuf,
+    },
 }
 
 #[tokio::main]
@@ -37,7 +59,29 @@ async fn main() -> anyhow::Result<()> {
         Command::Migrate => cmd_migrate(),
         Command::WebhookSet { url } => cmd_webhook_set(url).await,
         Command::WebhookDelete => cmd_webhook_delete().await,
+        Command::Genkeys { key } => cmd_genkeys(&key),
+        Command::DecryptAndExport {
+            vps_key,
+            blob,
+            env_out,
+        } => cmd_decrypt_and_export(&vps_key, &blob, &env_out),
     }
+}
+
+fn cmd_genkeys(key_path: &std::path::Path) -> anyhow::Result<()> {
+    let pub_b64 = kei_buddy::provision_decrypt::genkeys(key_path)?;
+    println!("{pub_b64}");
+    Ok(())
+}
+
+fn cmd_decrypt_and_export(
+    vps_key: &std::path::Path,
+    blob: &std::path::Path,
+    env_out: &std::path::Path,
+) -> anyhow::Result<()> {
+    kei_buddy::provision_decrypt::decrypt_and_export(vps_key, blob, env_out)?;
+    eprintln!("BOT_TOKEN exported to {}", env_out.display());
+    Ok(())
 }
 
 #[cfg(feature = "serve")]

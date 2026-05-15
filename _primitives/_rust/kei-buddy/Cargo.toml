@@ -38,6 +38,17 @@ kei-contacts-google = { path = "../kei-contacts-google" }
 kei-contacts-apple = { path = "../kei-contacts-apple" }
 chrono = { workspace = true }
 
+# provision-crypto: x25519 ECDH + HKDF-SHA256 + XChaCha20-Poly1305
+# Mirrors marketplace/src/lib/crypto-box.ts so VPS can decrypt the
+# bot-token blob emitted by the browser.
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+chacha20poly1305 = { version = "0.10", features = ["alloc"] }
+hkdf = "0.12"
+sha2 = "0.10"
+base64 = "0.22"
+rand_core = "0.6"
+zeroize = "1"
+
 # serve feature deps
 axum = { version = "0.7", features = ["json", "http1", "tokio"], optional = true }
 kei-telegram-webhook = { path = "../kei-telegram-webhook", optional = true }
