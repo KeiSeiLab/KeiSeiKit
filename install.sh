@@ -41,6 +41,8 @@ source "$LIB_DIR/lib-profile.sh"
 source "$LIB_DIR/lib-args.sh"
 # shellcheck source=install/lib-menu.sh
 source "$LIB_DIR/lib-menu.sh"
+# shellcheck source=install/lib-onboarding.sh
+source "$LIB_DIR/lib-onboarding.sh"
 # shellcheck source=install/lib-plan.sh
 source "$LIB_DIR/lib-plan.sh"
 # shellcheck source=install/lib-prereqs.sh
@@ -139,6 +141,11 @@ case "$PROFILE" in
     ;;
 esac
 say "profile: $PROFILE"
+
+# --- onboarding wizard (язык / транспорт / провайдер / модель / ключи) ---
+# Запускается только в TTY и при отсутствии ~/.claude/.onboarded.
+# Skip: KEISEI_SKIP_ONBOARD=1 ./install.sh
+onboarding_run
 
 # --- prerequisites -------------------------------------------------------
 check_prereqs
