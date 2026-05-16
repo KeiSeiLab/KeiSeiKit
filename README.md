@@ -63,15 +63,25 @@ fork it.
 ## Quick start
 
 ```bash
+# Web installer (recommended — one line, no prior clone)
+curl -fsSL https://install.keisei.app | bash
+curl -fsSL https://install.keisei.app | bash -s -- --profile=dev --yes  # CI
+
 # Claude Code (primary target — full hook + agent integration)
 /plugin marketplace add KeiSei84/KeiSeiKit-1.0
 /plugin install keisei@keisei-marketplace
 
 # Any MCP-compatible client (Cursor / Continue / Zed / Aider / etc)
-git clone https://github.com/KeiSei84/KeiSeiKit-1.0
+git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0
 cd KeiSeiKit-1.0
-./install.sh --profile=minimal
+./bootstrap.sh                    # interactive profile picker
+# or: ./install.sh --profile=minimal   # direct
 ```
+
+The web installer (`web-install.sh` in this repo, served at
+`install.keisei.app`) is a thin curl-pipeable wrapper that clones the
+repo and delegates to `bootstrap.sh` — single source of truth, no
+duplicated install logic.
 
 38 agents + 68 skills + 38 hooks + nightly consolidation wired in
 ~60 seconds. Twelve install profiles (`outcome-only`, `minimal`,
