@@ -295,12 +295,116 @@ jobs:
           done
           echo "✓ Release $TAG published with all assets"
 
-  npm-publish:
-    name: Publish npm packages (optional)
+  # ─────────────────────────────────────────────────────────────────────
+  # npm publish — две независимые job'ы.
+  #
+  # PRIMARY:  keigit.com (наш приватный Forgejo). Активируется когда
+  #           установлен secret KEIGIT_NPM_TOKEN. Forgejo требует
+  #           Basic-auth (`Authorization: Basic base64(user:token)`),
+  #           поэтому публикация через прямой curl PUT с manual payload —
+  #           npm CLI не умеет Basic для Forgejo packages API.
+  #
+  # FUTURE:   registry.npmjs.org. Активируется когда установлен secret
+  #           NPM_TOKEN. Сейчас не подключено (secret не задан) — job
+  #           gracefully скипается. Оставлен для будущего публичного
+  #           хостинга когда захотим.
+  # ─────────────────────────────────────────────────────────────────────
+
+  npm-publish-keigit:
+    name: Publish to keigit.com (primary)
     needs: release
     runs-on: ubuntu-latest
-    # Graceful skip: if NPM_TOKEN secret is not configured, the first step
-    # reports "skipped" and exits 0 — Rust-binary release above still succeeds.
+    steps:
+      - name: Check KEIGIT_NPM_TOKEN presence
+        id: have_token
+        env:
+          KEIGIT_NPM_TOKEN: ${{ secrets.KEIGIT_NPM_TOKEN }}
+        run: |
+          if [ -n "${KEIGIT_NPM_TOKEN:-}" ]; then
+            echo "present=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=0" >> "$GITHUB_OUTPUT"
+            echo "::notice::KEIGIT_NPM_TOKEN not set — skipping keigit publish gracefully"
+          fi
+
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+        if: steps.have_token.outputs.present == '1'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        if: steps.have_token.outputs.present == '1'
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        run: npm ci
+
+      - name: Build workspaces
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        run: npm run build --workspaces --if-present
+
+      - name: Publish each package via curl PUT
+        if: steps.have_token.outputs.present == '1'
+        working-directory: _ts_packages
+        env:
+          KEIGIT_NPM_TOKEN: ${{ secrets.KEIGIT_NPM_TOKEN }}
+          KEIGIT_NPM_USER: ${{ secrets.KEIGIT_NPM_USER }}
+        run: |
+          set -euo pipefail
+          : "${KEIGIT_NPM_USER:?KEIGIT_NPM_USER secret required (e.g. 'Parfionovich')}"
+          B64_AUTH=$(printf '%s' "${KEIGIT_NPM_USER}:${KEIGIT_NPM_TOKEN}" | base64 -w0)
+
+          for pkg in packages/*/; do
+            [ -f "$pkg/package.json" ] || continue
+            pkgname=$(jq -r '.name' "$pkg/package.json")
+            version=$(jq -r '.version' "$pkg/package.json")
+            short=$(echo "$pkgname" | cut -d/ -f2)
+            echo "::group::publish $pkgname@$version → keigit"
+            (
+              cd "$pkg"
+              npm pack >/dev/null
+              tarball="keisei-${short}-${version}.tgz"
+              [ -f "$tarball" ] || { echo "::warning::tarball $tarball missing"; exit 0; }
+              data=$(base64 -w0 "$tarball")
+              shasum=$(sha1sum "$tarball" | awk '{print $1}')
+              integrity="sha512-$(sha512sum "$tarball" | awk '{print $1}' | xxd -r -p | base64 -w0)"
+              size=$(stat -c '%s' "$tarball")
+              jq -n \
+                --arg name "$pkgname" --arg version "$version" \
+                --arg tarball "https://keigit.com/api/packages/keisei/npm/%40keisei%2F${short}/-/${version}/${short}-${version}.tgz" \
+                --arg shasum "$shasum" --arg integrity "$integrity" \
+                --arg data "$data" --argjson length "$size" \
+                --arg attach "${short}-${version}.tgz" --slurpfile pkg package.json \
+                '{ _id: $name, name: $name, "dist-tags": {latest: $version},
+                   versions: { ($version): ($pkg[0] + {_id: ($name + "@" + $version), dist: {tarball: $tarball, shasum: $shasum, integrity: $integrity}}) },
+                   _attachments: ({} | .[$attach] = { content_type:"application/octet-stream", data:$data, length:$length }) }' > payload.json
+              http=$(curl -sS -X PUT "https://keigit.com/api/packages/keisei/npm/@keisei%2F${short}" \
+                -H "Authorization: Basic ${B64_AUTH}" -H "Content-Type: application/json" \
+                --data-binary @payload.json -o resp.txt -w "%{http_code}")
+              if [ "$http" = "201" ]; then
+                echo "$pkgname@$version → keigit OK"
+              elif [ "$http" = "409" ] || grep -q "already exists" resp.txt 2>/dev/null; then
+                echo "::warning::$pkgname@$version already published (skipping)"
+              else
+                echo "::error::$pkgname@$version → HTTP $http"
+                cat resp.txt
+                exit 1
+              fi
+              rm -f "$tarball" payload.json resp.txt
+            )
+            echo "::endgroup::"
+          done
+
+  npm-publish-npmjs:
+    name: Publish to registry.npmjs.org (future, gracefully skipped)
+    needs: release
+    runs-on: ubuntu-latest
+    # FUTURE: добавит публичный хостинг через npmjs параллельно keigit.
+    # Сейчас secret NPM_TOKEN не установлен → job просто скипается.
+    # Когда захотим подключить — добавить secret NPM_TOKEN с
+    # https://www.npmjs.com/settings/<user>/tokens, scope=Automation.
     steps:
       - name: Check NPM_TOKEN presence
         id: have_token
@@ -311,7 +415,7 @@ jobs:
             echo "present=1" >> "$GITHUB_OUTPUT"
           else
             echo "present=0" >> "$GITHUB_OUTPUT"
-            echo "::notice::NPM_TOKEN not set — skipping npm publish gracefully"
+            echo "::notice::NPM_TOKEN not set — skipping npmjs publish gracefully (keigit publish is primary)"
           fi
 
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
@@ -333,7 +437,7 @@ jobs:
         working-directory: _ts_packages
         run: npm run build --workspaces --if-present
 
-      - name: Publish each package
+      - name: Publish each package via npm CLI (override registry)
         if: steps.have_token.outputs.present == '1'
         working-directory: _ts_packages
         env:
@@ -342,9 +446,10 @@ jobs:
           set -euo pipefail
           for pkg in packages/*/; do
             if [ -f "$pkg/package.json" ]; then
-              echo "::group::publish $pkg"
-              ( cd "$pkg" && npm publish --access public ) \
-                || echo "::warning::publish failed for $pkg (continuing)"
+              echo "::group::publish $pkg → npmjs"
+              # --registry overrides publishConfig.registry (keigit) for this run.
+              ( cd "$pkg" && npm publish --access public --registry=https://registry.npmjs.org ) \
+                || echo "::warning::npmjs publish failed for $pkg (continuing)"
               echo "::endgroup::"
             fi
           done

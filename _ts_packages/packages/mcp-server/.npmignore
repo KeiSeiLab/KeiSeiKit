@@ -1,0 +1,7 @@
+# Source maps leak absolute paths of dev machine.
+# Tested 2026-05-15: dist/*.js.map content includes "/Users/<dev>/Projects/..." strings.
+**/*.map
+**/*.tsbuildinfo
+src/
+test/
+tsconfig*.json

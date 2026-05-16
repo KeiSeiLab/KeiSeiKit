@@ -29,5 +29,9 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "author": "Denis Parfionovich <parfionovich@keilab.io>"
+  "author": "Denis Parfionovich <parfionovich@keilab.io>",
+  "publishConfig": {
+    "registry": "https://keigit.com/api/packages/keisei/npm/",
+    "access": "public"
+  }
 }
