@@ -6,7 +6,16 @@ preflight_check_ollama_local() {
     local cmd
     case "$(uname -s)" in
       Darwin) cmd="brew install ollama" ;;
-      Linux)  cmd="curl -fsSL https://ollama.com/install.sh | sh" ;;
+      Linux)
+        # WARNING: curl|sh без verification — supply-chain риск.
+        # Если есть apt/dnf — лучше через них, но ollama не в репах
+        # большинства дистров. Предупреждаем юзера явно.
+        echo "  ⚠ Linux установка ollama тянет скрипт с https://ollama.com и" >&2
+        echo "    выполняет его как shell — без проверки хэша/подписи." >&2
+        echo "    Альтернатива: скачать вручную с https://ollama.com/download/linux" >&2
+        echo "    и проверить SHA256 перед запуском." >&2
+        cmd="curl -fsSL https://ollama.com/install.sh | sh"
+        ;;
       *)      cmd="см. https://ollama.com/download" ;;
     esac
     preflight_offer_install "ollama" "$cmd" || return 1

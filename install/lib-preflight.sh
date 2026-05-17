@@ -26,10 +26,13 @@ preflight_offer_install() {
   echo "  Установить: $install_cmd" >&2
   echo "" >&2
   if [ -t 0 ] && [ -t 1 ]; then
+    echo "  ⓘ команда: $install_cmd" >&2
     read -r -p "  Поставить сейчас? [y/N/skip] " ans
     case "$ans" in
       y|Y|yes)
-        eval "$install_cmd"
+        # bash -c вместо eval — explicit subshell, не word-splitting'тся
+        # лишний раз в текущем процессе.
+        bash -c "$install_cmd"
         return $?
         ;;
       skip|s|S)
@@ -51,8 +54,17 @@ preflight_offer_install() {
 preflight_run() {
   local provider="$1"
   [ -z "$provider" ] && return 0
+  # Whitelist символов в provider-id: только [a-z0-9_-], длина 1..64.
+  # Защищает от path-traversal (../) и shell-инъекций через имя файла.
+  if ! [[ "$provider" =~ ^[a-z0-9][a-z0-9_-]{0,63}$ ]]; then
+    echo "  ⚠ preflight: provider id '$provider' содержит недопустимые символы — пропуск" >&2
+    return 0
+  fi
   local script="$PREFLIGHT_DIR/${provider}.sh"
-  if [ ! -f "$script" ]; then
+  # Проверяем что resolved путь не вышел за PREFLIGHT_DIR (на случай symlink'ов).
+  local resolved
+  resolved="$(cd "$PREFLIGHT_DIR" 2>/dev/null && pwd -P)/${provider}.sh"
+  if [ ! -f "$script" ] || [ ! -f "$resolved" ]; then
     return 0   # CLI не нужен — direct-api, ключ собирается ниже
   fi
   # shellcheck disable=SC1090

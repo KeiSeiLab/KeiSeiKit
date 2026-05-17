@@ -9,7 +9,8 @@ preflight_check_mlx_local() {
     return 1
   fi
   if ! command -v mlx_lm.server >/dev/null 2>&1; then
-    preflight_offer_install "mlx_lm" "pip install mlx-lm" || return 1
+    # --user избегает sudo и не загрязняет system Python.
+    preflight_offer_install "mlx_lm" "pip install --user mlx-lm" || return 1
   fi
   if ! curl -fsS --max-time 3 http://127.0.0.1:8080/v1/models >/dev/null 2>&1; then
     echo "" >&2
