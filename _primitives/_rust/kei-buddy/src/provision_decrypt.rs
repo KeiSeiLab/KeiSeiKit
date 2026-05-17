@@ -59,6 +59,17 @@ fn b64decode(s: &str) -> Result<Vec<u8>> {
         .map_err(|e| anyhow!("base64 decode: {e}"))
 }
 
+/// Парсит PKCS#8 v1 PEM с приватником X25519 (RFC 8410 §7).
+///
+/// Ожидаемый формат — ровно 48 байт DER, последние 32 — raw priv.
+/// Проверки до взятия хвоста:
+///   - длина DER ровно 48 байт
+///   - OID 1.3.101.110 (X25519) по смещению 9..12: 0x2b 0x65 0x6e
+///
+/// Без OID-проверки RSA/EC/Ed25519 ключ молча даст 32 неправильных байта.
+const X25519_OID: [u8; 3] = [0x2b, 0x65, 0x6e]; // RFC 8410 §3
+const X25519_PKCS8_DER_LEN: usize = 48;
+
 fn parse_x25519_pkcs8_pem(pem: &str) -> Result<[u8; 32]> {
     let dash_prefix = "-".repeat(5);
     let body: String = pem
@@ -69,8 +80,18 @@ fn parse_x25519_pkcs8_pem(pem: &str) -> Result<[u8; 32]> {
     let der = STANDARD
         .decode(body.trim())
         .context("PEM body is not valid base64")?;
-    if der.len() < 32 {
-        bail!("PKCS#8 DER too short: {} bytes", der.len());
+    if der.len() != X25519_PKCS8_DER_LEN {
+        bail!(
+            "PKCS#8 DER must be {} bytes for X25519, got {}",
+            X25519_PKCS8_DER_LEN,
+            der.len()
+        );
+    }
+    if der[9..12] != X25519_OID {
+        bail!(
+            "PKCS#8 OID does not match X25519 (1.3.101.110); got {:02x?}",
+            &der[9..12]
+        );
     }
     let mut out = [0u8; 32];
     out.copy_from_slice(&der[der.len() - 32..]);
@@ -327,6 +348,37 @@ mod tests {
         let urlsafe = "SGVsbG8gd29ybGQ";
         assert_eq!(b64decode(standard).unwrap(), b"Hello world");
         assert_eq!(b64decode(urlsafe).unwrap(), b"Hello world");
+    }
+
+    #[test]
+    fn parse_rejects_wrong_length_der() {
+        // ровно 32 байта — слишком короткий для PKCS#8 v1 wrapper
+        let bad_pem = format!(
+            "{}\n{}\n{}\n",
+            pem_begin(),
+            STANDARD.encode([0u8; 32]),
+            pem_end()
+        );
+        let err = parse_x25519_pkcs8_pem(&bad_pem).err().unwrap();
+        assert!(err.to_string().contains("48 bytes"));
+    }
+
+    #[test]
+    fn parse_rejects_wrong_oid() {
+        // 48 байт правильной длины, но OID не X25519 (например Ed25519: 0x2b 0x65 0x70)
+        let mut der = vec![
+            0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x04, 0x22,
+            0x04, 0x20,
+        ];
+        der.extend_from_slice(&[0u8; 32]);
+        let bad_pem = format!(
+            "{}\n{}\n{}\n",
+            pem_begin(),
+            STANDARD.encode(&der),
+            pem_end()
+        );
+        let err = parse_x25519_pkcs8_pem(&bad_pem).err().unwrap();
+        assert!(err.to_string().contains("X25519"));
     }
 
     fn tempdir_unique() -> std::path::PathBuf {
