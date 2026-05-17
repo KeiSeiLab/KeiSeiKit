@@ -45,6 +45,8 @@ source "$LIB_DIR/lib-menu.sh"
 source "$LIB_DIR/lib-i18n.sh"
 # Загружаем английский словарь по умолчанию — welcome banner идёт до выбора языка.
 i18n_load_default
+# shellcheck source=install/lib-preflight.sh
+source "$LIB_DIR/lib-preflight.sh"
 # shellcheck source=install/lib-onboarding.sh
 source "$LIB_DIR/lib-onboarding.sh"
 # shellcheck source=install/lib-plan.sh

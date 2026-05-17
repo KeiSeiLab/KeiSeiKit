@@ -319,6 +319,11 @@ onboarding_run() {
   onboarding_pick_transport
   onboarding_pick_provider
   onboarding_pick_model
+  # Preflight — проверка CLI/daemon до сбора ключей.
+  # Для direct-api провайдеров файла preflight нет → silent pass.
+  if command -v preflight_run >/dev/null 2>&1; then
+    preflight_run "$ONBOARDING_PROVIDER" || true
+  fi
   onboarding_collect_auth
   onboarding_write_secrets
   onboarding_write_config
