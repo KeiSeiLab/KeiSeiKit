@@ -21,19 +21,37 @@ i18n_load_default() {
 
 i18n_load_lang() {
   local lang="$1"
-  case "$lang" in
-    en)
-      i18n_load_default
-      ;;
-    ru)
-      i18n_load_default                       # base (fallback values)
-      # shellcheck source=install/i18n/ru.sh
-      [ -f "$I18N_DIR/ru.sh" ] && source "$I18N_DIR/ru.sh"
-      ;;
-    *)
-      i18n_load_default
-      ;;
-  esac
+  # Сначала всегда грузим английский — это база fallback.
+  i18n_load_default
+  # Если выбран не-английский — поверх кладём словарь языка.
+  # Любой STR_*, отсутствующий в файле, остаётся с английским значением.
+  if [ "$lang" != "en" ] && [ -f "$I18N_DIR/${lang}.sh" ]; then
+    # shellcheck disable=SC1090
+    source "$I18N_DIR/${lang}.sh"
+  fi
+}
+
+# Список доступных языков — для onboarding_pick_language.
+# Формат: <code>\t<display_name>
+i18n_available_languages() {
+  cat <<'EOF'
+en	English
+ru	Русский
+uk	Українська
+de	Deutsch
+fr	Français
+es	Español
+pt	Português
+it	Italiano
+tr	Türkçe
+ar	العربية
+hi	हिन्दी
+zh	简体中文
+ja	日本語
+ko	한국어
+id	Bahasa Indonesia
+vi	Tiếng Việt
+EOF
 }
 
 # Welcome banner. Всегда EN. Запускается из install.sh до мастера.

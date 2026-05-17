@@ -108,23 +108,42 @@ onboarding_models_for_provider() {
 # UI: язык
 # ───────────────────────────────────────────────────────────────────────
 onboarding_pick_language() {
-  # На этом шаге язык ещё не выбран — экран на двух языках одновременно.
+  # Список языков читается из lib-i18n.sh::i18n_available_languages.
+  # На этом шаге язык ещё не выбран — заголовок двуязычный.
+  local langs
+  langs="$(i18n_available_languages 2>/dev/null)"
+  if [ -z "$langs" ]; then
+    # Fallback если lib-i18n не подключён.
+    langs="$(printf 'en\tEnglish\nru\tРусский\n')"
+  fi
+
   if command -v whiptail >/dev/null 2>&1; then
-    ONBOARDING_LANG=$(whiptail --title "KeiSei · Language / Язык" --radiolist \
-      "Choose interface language / Выберите язык:" 12 60 2 \
-      "en" "English" ON \
-      "ru" "Русский" OFF \
-      3>&1 1>&2 2>&3) || ONBOARDING_LANG="en"
+    local args=() first=1
+    while IFS=$'\t' read -r code name; do
+      [ -z "$code" ] && continue
+      if [ "$first" = "1" ]; then
+        args+=("$code" "$name" "ON"); first=0
+      else
+        args+=("$code" "$name" "OFF")
+      fi
+    done <<< "$langs"
+    ONBOARDING_LANG=$(whiptail --title "KeiSei · Language / Язык / 语言 / 言語 / ..." --radiolist \
+      "Choose interface language / Выберите язык:" 22 70 16 \
+      "${args[@]}" 3>&1 1>&2 2>&3) || ONBOARDING_LANG="en"
   else
     echo "" >&2
-    echo "Choose language / Выберите язык:" >&2
-    echo "  1) en — English (default)" >&2
-    echo "  2) ru — Русский" >&2
-    read -r -p "[1-2, default 1]: " ans
-    case "$ans" in
-      2) ONBOARDING_LANG="ru" ;;
-      *) ONBOARDING_LANG="en" ;;
-    esac
+    echo "Choose language / Выберите язык / 选择语言 / 言語選択:" >&2
+    declare -a codes=()
+    local i=1
+    while IFS=$'\t' read -r code name; do
+      [ -z "$code" ] && continue
+      codes+=("$code")
+      printf "  %2d) %s — %s\n" "$i" "$code" "$name" >&2
+      i=$((i+1))
+    done <<< "$langs"
+    read -r -p "[1-${#codes[@]}, default 1=en]: " ans
+    ans="${ans:-1}"
+    ONBOARDING_LANG="${codes[$((ans-1))]:-en}"
   fi
   # Перегружаем словарь — все последующие строки на выбранном языке.
   if command -v i18n_load_lang >/dev/null 2>&1; then
