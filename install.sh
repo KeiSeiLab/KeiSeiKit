@@ -41,6 +41,10 @@ source "$LIB_DIR/lib-profile.sh"
 source "$LIB_DIR/lib-args.sh"
 # shellcheck source=install/lib-menu.sh
 source "$LIB_DIR/lib-menu.sh"
+# shellcheck source=install/lib-i18n.sh
+source "$LIB_DIR/lib-i18n.sh"
+# Загружаем английский словарь по умолчанию — welcome banner идёт до выбора языка.
+i18n_load_default
 # shellcheck source=install/lib-onboarding.sh
 source "$LIB_DIR/lib-onboarding.sh"
 # shellcheck source=install/lib-plan.sh
@@ -142,9 +146,13 @@ case "$PROFILE" in
 esac
 say "profile: $PROFILE"
 
-# --- onboarding wizard (язык / транспорт / провайдер / модель / ключи) ---
-# Запускается только в TTY и при отсутствии ~/.claude/.onboarded.
+# --- welcome banner + onboarding wizard ----------------------------------
+# Banner всегда EN — пользователь ещё не выбрал язык.
+# Wizard: TTY + нет ~/.claude/.onboarded + не задан KEISEI_SKIP_ONBOARD.
 # Skip: KEISEI_SKIP_ONBOARD=1 ./install.sh
+if onboarding_should_run; then
+  i18n_print_welcome
+fi
 onboarding_run
 
 # --- prerequisites -------------------------------------------------------

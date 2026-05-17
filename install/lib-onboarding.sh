@@ -93,22 +93,27 @@ onboarding_models_for_provider() {
 # UI: язык
 # ───────────────────────────────────────────────────────────────────────
 onboarding_pick_language() {
+  # На этом шаге язык ещё не выбран — экран на двух языках одновременно.
   if command -v whiptail >/dev/null 2>&1; then
     ONBOARDING_LANG=$(whiptail --title "KeiSei · Language / Язык" --radiolist \
       "Choose interface language / Выберите язык:" 12 60 2 \
-      "ru" "Русский" ON \
-      "en" "English" OFF \
-      3>&1 1>&2 2>&3) || ONBOARDING_LANG="ru"
+      "en" "English" ON \
+      "ru" "Русский" OFF \
+      3>&1 1>&2 2>&3) || ONBOARDING_LANG="en"
   else
     echo "" >&2
     echo "Choose language / Выберите язык:" >&2
-    echo "  1) ru — Русский (default)" >&2
-    echo "  2) en — English" >&2
+    echo "  1) en — English (default)" >&2
+    echo "  2) ru — Русский" >&2
     read -r -p "[1-2, default 1]: " ans
     case "$ans" in
-      2) ONBOARDING_LANG="en" ;;
-      *) ONBOARDING_LANG="ru" ;;
+      2) ONBOARDING_LANG="ru" ;;
+      *) ONBOARDING_LANG="en" ;;
     esac
+  fi
+  # Перегружаем словарь — все последующие строки на выбранном языке.
+  if command -v i18n_load_lang >/dev/null 2>&1; then
+    i18n_load_lang "$ONBOARDING_LANG"
   fi
 }
 
@@ -118,21 +123,20 @@ onboarding_pick_language() {
 onboarding_pick_transport() {
   local transports
   transports=$(onboarding_list_transports)
-  local title="${ONBOARDING_LANG:-ru}"
-  local prompt; [ "$title" = "ru" ] && prompt="Выберите способ подключения:" || prompt="Choose connection transport:"
+  local prompt="${STR_PICK_TRANSPORT:-Choose connection transport:}"
 
   if command -v whiptail >/dev/null 2>&1; then
     local args=()
     while IFS= read -r tr; do
       local desc
       case "$tr" in
-        direct-api)      desc="Прямой API провайдера (ключ)" ;;
-        aws-bedrock)     desc="AWS Bedrock (IAM/role)" ;;
-        azure-openai)    desc="Azure OpenAI (deployment+key)" ;;
-        google-vertex)   desc="Google Vertex AI (GCP)" ;;
-        local)           desc="Локально (Ollama/MLX/LMStudio)" ;;
-        proxy)           desc="Прокси (LiteLLM/OpenRouter)" ;;
-        subscription)    desc="OAuth-подписка (ChatGPT)" ;;
+        direct-api)      desc="${STR_TR_DIRECT_API:-Direct provider API}" ;;
+        aws-bedrock)     desc="${STR_TR_AWS_BEDROCK:-AWS Bedrock}" ;;
+        azure-openai)    desc="${STR_TR_AZURE_OPENAI:-Azure OpenAI}" ;;
+        google-vertex)   desc="${STR_TR_GOOGLE_VERTEX:-Google Vertex AI}" ;;
+        local)           desc="${STR_TR_LOCAL:-Local}" ;;
+        proxy)           desc="${STR_TR_PROXY:-Proxy}" ;;
+        subscription)    desc="${STR_TR_SUBSCRIPTION:-OAuth subscription}" ;;
         *)               desc="$tr" ;;
       esac
       args+=("$tr" "$desc" "OFF")
@@ -173,12 +177,13 @@ onboarding_pick_provider() {
     while IFS=$'\t' read -r id dn ae; do
       args+=("$id" "$dn" "OFF")
     done <<< "$rows"
+    local prompt="${STR_PICK_PROVIDER:-Provider within} $ONBOARDING_TRANSPORT:"
     ONBOARDING_PROVIDER=$(whiptail --title "KeiSei · Provider" --radiolist \
-      "Provider within $ONBOARDING_TRANSPORT:" 16 70 8 "${args[@]}" 3>&1 1>&2 2>&3) \
+      "$prompt" 16 70 8 "${args[@]}" 3>&1 1>&2 2>&3) \
       || ONBOARDING_PROVIDER=$(echo "$rows" | head -1 | awk -F'\t' '{print $1}')
   else
     echo "" >&2
-    echo "Providers within $ONBOARDING_TRANSPORT:" >&2
+    echo "${STR_PICK_PROVIDER:-Providers within} $ONBOARDING_TRANSPORT:" >&2
     declare -a ids=()
     local i=1
     while IFS=$'\t' read -r id dn ae; do
@@ -213,11 +218,11 @@ onboarding_pick_model() {
       args+=("$id" "$dn" "OFF")
     done <<< "$rows"
     ONBOARDING_MODEL=$(whiptail --title "KeiSei · Model" --radiolist \
-      "Default model:" 16 70 8 "${args[@]}" 3>&1 1>&2 2>&3) \
+      "${STR_PICK_MODEL:-Default model:}" 16 70 8 "${args[@]}" 3>&1 1>&2 2>&3) \
       || ONBOARDING_MODEL=$(echo "$rows" | head -1 | awk -F'\t' '{print $1}')
   else
     echo "" >&2
-    echo "Models for $lookup:" >&2
+    echo "${STR_PICK_MODEL:-Models for} $lookup:" >&2
     declare -a ids=()
     local i=1
     while IFS=$'\t' read -r id dn; do
@@ -241,15 +246,15 @@ onboarding_collect_auth() {
   [ -z "$ae" ] || [ "$ae" = "_" ] && return  # local / subscription — нет ключей
 
   echo "" >&2
-  echo "Auth для $ONBOARDING_PROVIDER ($ae):" >&2
-  echo "Введите значения (Enter — оставить пустым, заполним позже)." >&2
+  echo "${STR_AUTH_INTRO:-Auth for} $ONBOARDING_PROVIDER ($ae):" >&2
+  echo "${STR_AUTH_PROMPT:-Enter values (Enter — leave empty, fill later).}" >&2
 
   local IFS_old="$IFS"; IFS=','
   for key in $ae; do
     IFS="$IFS_old"
     local cur="${!key:-}"
     local prompt_msg="$key"
-    [ -n "$cur" ] && prompt_msg="$key (текущее: <скрыто>)"
+    [ -n "$cur" ] && prompt_msg="$key ${STR_AUTH_CURRENT_HINT:-(current: <hidden>)}"
     # silent read — значение не светит в терминале
     read -r -s -p "  $prompt_msg = " val
     echo "" >&2
@@ -305,9 +310,9 @@ onboarding_run() {
   onboarding_should_run || return 0
 
   if command -v say >/dev/null 2>&1; then
-    say "onboarding wizard (5 шагов)"
+    say "${STR_ONBOARDING_INTRO:-Onboarding wizard (5 steps)}"
   else
-    echo "── KeiSei onboarding (5 шагов) ──" >&2
+    echo "── KeiSei: ${STR_ONBOARDING_INTRO:-onboarding (5 steps)} ──" >&2
   fi
 
   onboarding_pick_language
@@ -319,8 +324,8 @@ onboarding_run() {
   onboarding_write_config
 
   if command -v say >/dev/null 2>&1; then
-    say "✓ onboarding: $ONBOARDING_TRANSPORT / $ONBOARDING_PROVIDER / $ONBOARDING_MODEL"
-    say "  config: $ONBOARDING_CONFIG"
-    [ "${#ONBOARDING_AUTH_ENV_KEYS[@]}" -gt 0 ] && say "  secrets: $SECRETS_ENV (chmod 600)"
+    say "✓ ${STR_DONE_TITLE:-onboarding complete}: $ONBOARDING_TRANSPORT / $ONBOARDING_PROVIDER / $ONBOARDING_MODEL"
+    say "  ${STR_DONE_CONFIG:-config:} $ONBOARDING_CONFIG"
+    [ "${#ONBOARDING_AUTH_ENV_KEYS[@]}" -gt 0 ] && say "  ${STR_DONE_SECRETS:-secrets:} $SECRETS_ENV (chmod 600)"
   fi
 }
