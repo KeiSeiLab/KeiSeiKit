@@ -1,7 +1,8 @@
 # Реестр блоков KeiSeiKit
 
 > SSoT для assembler. Все блоки доступные для `blocks = [...]` в `_manifests/<agent>.toml`.
-> Авто-генерируется из `_blocks/*.md`. Каждый файл = атомарный кубик (Constructor Pattern).
+> Авто-генерируется из `_blocks/*.md` через `bash build-index.sh`.
+> Каждый файл = атомарный кубик (Constructor Pattern).
 
 Пример:
 ```toml
@@ -145,3 +146,4 @@ blocks = ["baseline", "rule-pre-dev-gate", "api-anthropic"]
 ---
 
 Всего блоков: 84.
+Перегенерация: `bash _blocks/build-index.sh`.

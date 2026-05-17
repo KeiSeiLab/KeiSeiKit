@@ -30,8 +30,8 @@ menu_should_skip() {
 # Profile choice = how many ADDITIONAL primitive binaries to add on top.
 menu_whiptail_profile() {
   local tool="$1"
-  "$tool" --title "KeiSeiKit Installer — substrate always installed; profile = primitives ADDED on top" --radiolist \
-    "Choose install profile (SPACE to select, ENTER to confirm):" 28 86 12 \
+  "$tool" --title "${STR_MENU_TITLE:-KeiSeiKit Installer} — ${STR_MENU_SUBSTRATE:-substrate always installed; profile = primitives ADDED on top}" --radiolist \
+    "${STR_MENU_PROFILE_PROMPT:-Choose install profile (SPACE to select, ENTER to confirm):}" 28 86 12 \
     "minimal"      "substrate only — 0 primitives (~5s)"                       ON  \
     "core"         "+ 2 primitives (tomd, kei-doctor) (~5s)"                   OFF \
     "frontend"     "+ 8 site tools — mock-render, visual-diff, figma-tokens"   OFF \
@@ -77,7 +77,7 @@ menu_plain_profile() {
   echo "   • 82 blocks            • 16 caps      •  7 roles"                           >&2
   echo "   • 11 cross-tool bridges (Cursor / Copilot / Codex / Aider / …)"             >&2
   echo                                                                                  >&2
-  echo " Profile = primitive binaries ADDED on top of substrate."                      >&2
+  echo " ${STR_MENU_PROFILE_PROMPT:-Profile = primitive binaries ADDED on top of substrate.}"                      >&2
   echo "------------------------------------------------------------"                  >&2
   echo                                                                                  >&2
   echo "  Standard:"                                                                    >&2
