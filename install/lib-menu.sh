@@ -69,10 +69,10 @@ menu_whiptail_custom() {
 # plain-text profile picker → profile name. Exits 1 on cancel.
 menu_plain_profile() {
   echo "============================================================"                  >&2
-  echo " KeiSeiKit Installer"                                                          >&2
+  echo " ${STR_MENU_TITLE:-KeiSeiKit Installer}"                                       >&2
   echo "============================================================"                  >&2
   echo                                                                                  >&2
-  echo " Substrate baseline (ALWAYS installed, regardless of profile):"                >&2
+  echo " ${STR_MENU_SUBSTRATE:-Substrate baseline (ALWAYS installed):}"                >&2
   echo "   • 37 agent manifests   • 67 skills    • 39 hooks"                           >&2
   echo "   • 82 blocks            • 16 caps      •  7 roles"                           >&2
   echo "   • 11 cross-tool bridges (Cursor / Copilot / Codex / Aider / …)"             >&2

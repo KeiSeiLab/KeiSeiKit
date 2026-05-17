@@ -50,6 +50,30 @@ preflight_offer_install() {
   fi
 }
 
+# Универсальный helper для типового CLI-чека (command -v + offer-install + version).
+# Используется per-provider preflight файлами чтобы убрать boilerplate.
+#
+# Аргументы:
+#   $1 — имя CLI (для сообщений), например "aws CLI"
+#   $2 — бинарь (для command -v), например "aws"
+#   $3 — install_cmd (для preflight_offer_install)
+#   $4 — version_cmd (для печати при success), например "aws --version"
+#
+# Возврат: 0 если CLI есть, 1 если нет и юзер не поставил.
+preflight_check_cli() {
+  local label="$1"
+  local bin="$2"
+  local install_cmd="$3"
+  local version_cmd="$4"
+  if ! command -v "$bin" >/dev/null 2>&1; then
+    preflight_offer_install "$label" "$install_cmd" || return 1
+    # После install проверяем что бинарь появился в PATH.
+    command -v "$bin" >/dev/null 2>&1 || return 1
+  fi
+  echo "  ✓ $label: $(eval "$version_cmd" 2>&1 | head -1)" >&2
+  return 0
+}
+
 # Главный диспетчер. Вызывается из onboarding между pick_model и collect_auth.
 preflight_run() {
   local provider="$1"

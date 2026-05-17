@@ -59,10 +59,25 @@ onboarding_list_providers() {
 }
 
 # Fallback если submodule не подтянут.
+# Покрывает 7 транспортов (direct-api / aws / azure / vertex / local / proxy
+# / subscription) минимальными представителями. Используется только когда
+# providers.toml отсутствует — синхронизировать ручно если добавится новый
+# транспорт-тип в реестр.
 onboarding_fallback_providers() {
   printf "anthropic\tdirect-api\tAnthropic (Direct API)\tANTHROPIC_API_KEY\n"
+  printf "anthropic-bedrock\taws-bedrock\tAnthropic (AWS Bedrock)\tAWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION\n"
   printf "openai\tdirect-api\tOpenAI (Direct API)\tOPENAI_API_KEY\n"
+  printf "openai-azure\tazure-openai\tOpenAI (Azure)\tAZURE_OPENAI_API_KEY,AZURE_OPENAI_ENDPOINT,AZURE_OPENAI_DEPLOYMENT\n"
+  printf "xai\tdirect-api\txAI\tXAI_API_KEY\n"
+  printf "deepseek\tdirect-api\tDeepSeek\tDEEPSEEK_API_KEY\n"
+  printf "google\tdirect-api\tGoogle Gemini (Direct API)\tGEMINI_API_KEY\n"
+  printf "google-vertex\tgoogle-vertex\tGoogle Gemini (Vertex AI)\tGOOGLE_APPLICATION_CREDENTIALS,GCP_PROJECT_ID,GCP_REGION\n"
   printf "ollama-local\tlocal\tOllama (local)\t_\n"
+  printf "mlx-local\tlocal\tMLX (Apple silicon local)\t_\n"
+  printf "lmstudio-local\tlocal\tLM Studio (local)\t_\n"
+  printf "litellm-proxy\tproxy\tLiteLLM proxy (keisei.app)\tKEI_LITELLM_KEY\n"
+  printf "openrouter\tproxy\tOpenRouter\tOPENROUTER_API_KEY\n"
+  printf "codex\tsubscription\tOpenAI Codex (ChatGPT OAuth)\t_\n"
 }
 
 # Уникальные транспорты — для первого экрана выбора.
@@ -183,7 +198,8 @@ onboarding_pick_provider() {
       || ONBOARDING_PROVIDER=$(echo "$rows" | head -1 | awk -F'\t' '{print $1}')
   else
     echo "" >&2
-    echo "${STR_PICK_PROVIDER:-Providers within} $ONBOARDING_TRANSPORT:" >&2
+    # Используем единый fallback что и для whiptail — устраняем plural mismatch.
+    echo "${STR_PICK_PROVIDER:-Provider within} $ONBOARDING_TRANSPORT:" >&2
     declare -a ids=()
     local i=1
     while IFS=$'\t' read -r id dn ae; do
@@ -337,7 +353,27 @@ onboarding_run() {
   # Preflight — проверка CLI/daemon до сбора ключей.
   # Для direct-api провайдеров файла preflight нет → silent pass.
   if command -v preflight_run >/dev/null 2>&1; then
-    preflight_run "$ONBOARDING_PROVIDER" || true
+    if ! preflight_run "$ONBOARDING_PROVIDER"; then
+      # Provider preflight failed (CLI missing / daemon down / no creds).
+      # Не молчим — спрашиваем юзера, иначе onboarding закончится
+      # с .onboarded флагом для нерабочей конфигурации (HIGH аудит-9).
+      echo "" >&2
+      echo "  ⚠ ${STR_PREFLIGHT_FAILED:-Preflight failed — provider may not work.}" >&2
+      if [ -t 0 ] && [ -t 1 ]; then
+        read -r -p "  ${STR_PREFLIGHT_CONTINUE:-Continue anyway? [y/N]} " _ans
+        case "$_ans" in
+          y|Y|yes|да|Да)
+            echo "  → продолжаю; ключи запишутся но runtime может упасть." >&2
+            ;;
+          *)
+            echo "  → прервано; флаг .onboarded НЕ выставляется, перезапустите." >&2
+            return 1
+            ;;
+        esac
+      else
+        echo "  → non-TTY, продолжаю — настройте CLI вручную потом." >&2
+      fi
+    fi
   fi
   onboarding_collect_auth
   onboarding_write_secrets

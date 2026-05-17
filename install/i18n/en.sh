@@ -30,4 +30,13 @@ STR_AUTH_CURRENT_HINT="(current: <hidden>)"
 STR_DONE_TITLE="Onboarding complete"
 STR_DONE_CONFIG="config:"
 STR_DONE_SECRETS="secrets:"
-STR_DONE_NEXT="Next: run ./install.sh or restart this script to apply profile"
+
+# Profile menu (lib-menu.sh strings)
+STR_MENU_TITLE="KeiSeiKit Installer"
+STR_MENU_SUBSTRATE="Substrate baseline (always installed):"
+STR_MENU_PROFILE_PROMPT="Choose install profile:"
+STR_MENU_CONFIRM="Confirm selection?"
+
+# Preflight warnings
+STR_PREFLIGHT_FAILED="Preflight failed — provider may not work."
+STR_PREFLIGHT_CONTINUE="Continue anyway? [y/N]"

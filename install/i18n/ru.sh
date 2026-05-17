@@ -30,4 +30,13 @@ STR_AUTH_CURRENT_HINT="(текущее: <скрыто>)"
 STR_DONE_TITLE="Первичная настройка завершена"
 STR_DONE_CONFIG="конфиг:"
 STR_DONE_SECRETS="секреты:"
-STR_DONE_NEXT="Дальше: запустите ./install.sh или перезапустите этот скрипт для установки профиля"
+
+# Меню профилей (lib-menu.sh)
+STR_MENU_TITLE="Установщик KeiSeiKit"
+STR_MENU_SUBSTRATE="Базовая часть (ставится всегда):"
+STR_MENU_PROFILE_PROMPT="Выберите профиль установки:"
+STR_MENU_CONFIRM="Подтвердить выбор?"
+
+# Preflight-предупреждения
+STR_PREFLIGHT_FAILED="Preflight упал — провайдер может не работать."
+STR_PREFLIGHT_CONTINUE="Продолжить всё равно? [y/N]"
