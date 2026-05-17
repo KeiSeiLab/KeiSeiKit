@@ -17,7 +17,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # TODO migrate to notify 8 (workspace) — pinned to 6 pending API migration
-notify = "6"
+notify = "8"
 rusqlite = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
