@@ -6,7 +6,13 @@ preflight_check_google_vertex() {
     local cmd
     case "$(uname -s)" in
       Darwin) cmd="brew install --cask google-cloud-sdk" ;;
-      Linux)  cmd="curl https://sdk.cloud.google.com | bash" ;;
+      Linux)
+        echo "  ⚠ Linux установка gcloud тянет скрипт с sdk.cloud.google.com" >&2
+        echo "    и выполняет его как bash — без проверки хэша." >&2
+        echo "    Альтернатива: пакет из репов apt/dnf, либо ручная установка по" >&2
+        echo "    https://cloud.google.com/sdk/docs/install#linux" >&2
+        cmd="curl https://sdk.cloud.google.com | bash"
+        ;;
       *)      cmd="см. https://cloud.google.com/sdk/docs/install" ;;
     esac
     preflight_offer_install "gcloud CLI" "$cmd" || return 1

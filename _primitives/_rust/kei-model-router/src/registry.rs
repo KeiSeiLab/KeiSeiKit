@@ -6,10 +6,21 @@
 //! Types in `registry_types.rs` (Constructor Pattern: types separate from loader).
 
 use serde::de::DeserializeOwned;
+use serde::Deserialize;
 use std::path::{Path, PathBuf};
 
 pub use crate::registry_types::{Model, Profile, Provider};
 use crate::registry_types::{ModelsFile, ProfilesFile, ProvidersFile};
+
+/// User-tier override: что пользователь выбрал в onboarding мастере.
+/// Парсится из `~/.claude/config/user-model-override.toml`.
+#[derive(Debug, Clone, Deserialize)]
+pub struct UserModelOverride {
+    pub provider: String,
+    pub model: String,
+    #[serde(default)]
+    pub transport: Option<String>,
+}
 
 // Embedded compile-time copies. Cargo tracks these as implicit dependencies:
 // if the TOML changes, the crate is recompiled automatically.
@@ -63,6 +74,25 @@ impl Registry {
             profiles: toml::from_str::<ProfilesFile>(EMBEDDED_PROFILES)
                 .map_err(|e| format!("embedded agent-profiles.toml: {e}"))?.profile,
         })
+    }
+
+    /// Загружает user-tier override из `~/.claude/config/user-model-override.toml`.
+    /// Файл пишется установщиком (install/lib-onboarding.sh::onboarding_write_config)
+    /// при первичной настройке. Содержит выбор юзера: provider/model/transport.
+    ///
+    /// Priority в router: `--pinned` flag > этот файл > agent-profiles.toml::default_model_ref.
+    /// Без него выбор провайдера в onboarding декоративен (HIGH аудит-1, 2026-05-17).
+    pub fn load_user_override() -> Option<UserModelOverride> {
+        let home = std::env::var("HOME").ok()?;
+        if home.is_empty() {
+            return None;
+        }
+        let path = PathBuf::from(format!("{home}/.claude/config/user-model-override.toml"));
+        if !path.exists() {
+            return None;
+        }
+        let raw = std::fs::read_to_string(&path).ok()?;
+        toml::from_str::<UserModelOverride>(&raw).ok()
     }
 
     pub fn provider_by_id(&self, id: &str) -> Option<&Provider> {
@@ -137,7 +167,38 @@ mod tests {
     fn provider_by_id_anthropic() {
         let r = reg();
         let p = r.provider_by_id("anthropic").expect("anthropic missing");
-        assert_eq!(p.display_name, "Anthropic");
+        // После RULE 0.26 transport-расширения display_name стало
+        // "Anthropic (Direct API)" чтобы отличать от "anthropic-bedrock".
+        assert!(
+            p.display_name.starts_with("Anthropic"),
+            "got: {}", p.display_name
+        );
+    }
+
+    #[test]
+    fn user_override_parses_minimal_toml() {
+        // Round-trip: TOML → UserModelOverride.
+        let toml_src = r#"
+            provider = "ollama-local"
+            model = "llama-3.3-70b"
+            transport = "local"
+        "#;
+        let ov: UserModelOverride = toml::from_str(toml_src).expect("parse failed");
+        assert_eq!(ov.provider, "ollama-local");
+        assert_eq!(ov.model, "llama-3.3-70b");
+        assert_eq!(ov.transport.as_deref(), Some("local"));
+    }
+
+    #[test]
+    fn user_override_transport_optional() {
+        // transport — optional поле.
+        let toml_src = r#"
+            provider = "openai"
+            model = "gpt-5"
+        "#;
+        let ov: UserModelOverride = toml::from_str(toml_src).expect("parse failed");
+        assert_eq!(ov.provider, "openai");
+        assert!(ov.transport.is_none());
     }
 
     #[test]
