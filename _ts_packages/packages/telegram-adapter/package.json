@@ -1,6 +1,6 @@
 {
   "name": "@keisei/telegram-adapter",
-  "version": "0.14.0",
+  "version": "0.38.0",
   "description": "Telegram Bot API adapter for the KeiSei MCP server",
   "type": "module",
   "main": "./dist/index.js",

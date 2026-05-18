@@ -65,6 +65,7 @@ impl Firmware {
     ///
     /// For `.jsonl`, extracts user turns only. For `.md`, drops
     /// `### Assistant` blocks. See `firmware_corpus` for the extractor.
+    #[allow(dead_code)] // публичное API для будущего CLI `firmware train --dir`
     pub fn train_from_dir(path: &Path, max_depth: usize) -> Result<Self> {
         let text = load_corpus_text(path)
             .with_context(|| format!("load corpus from {}", path.display()))?;

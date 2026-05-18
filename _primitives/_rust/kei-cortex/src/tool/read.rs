@@ -55,13 +55,6 @@ pub async fn run(raw: Value, project_root: &Path) -> Result<String, ToolError> {
 /// Lexical-only path checks (cheap pre-filter before canonicalisation).
 /// Reject relative paths, parent traversal, and empty paths.
 ///
-/// `validate_path` kept as a deprecated alias for `tool_apply.rs`
-/// (wave44b territory, will be reconciled at merge).
-#[deprecated(note = "use validate_path_lexical")]
-pub(crate) fn validate_path(path: &str) -> Result<(), ToolError> {
-    validate_path_lexical(path)
-}
-
 pub(crate) fn validate_path_lexical(path: &str) -> Result<(), ToolError> {
     if path.is_empty() {
         return Err(ToolError::InvalidInput("empty path".into()));
