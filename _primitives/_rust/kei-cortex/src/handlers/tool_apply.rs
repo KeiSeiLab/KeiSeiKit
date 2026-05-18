@@ -8,7 +8,7 @@ use crate::error::AppError;
 use crate::state::AppState;
 use super::tool_apply_atomic::atomic_write_nofollow;
 use crate::tool::edit::count_occurrences;
-use crate::tool::read::validate_path as validate_abs_path;
+use crate::tool::read::validate_path_lexical as validate_abs_path;
 use crate::tool::write::deny_system_dirs;
 use axum::extract::State;
 use axum::Json;

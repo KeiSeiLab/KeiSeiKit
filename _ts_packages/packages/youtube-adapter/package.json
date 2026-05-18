@@ -1,6 +1,6 @@
 {
   "name": "@keisei/youtube-adapter",
-  "version": "0.14.0",
+  "version": "0.38.0",
   "description": "YouTube Data API v3 adapter for the KeiSei MCP server",
   "type": "module",
   "main": "./dist/index.js",

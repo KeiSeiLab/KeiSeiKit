@@ -29,11 +29,11 @@ use toml::Value as TomlValue;
 const SPAWN_TIMEOUT: Duration = Duration::from_secs(120);
 
 #[derive(Debug, Deserialize)]
-struct Input {
-    description: String,
-    prompt: String,
+pub(crate) struct Input {
+    pub(crate) description: String,
+    pub(crate) prompt: String,
     #[serde(default)]
-    subagent_type: Option<String>,
+    pub(crate) subagent_type: Option<String>,
 }
 
 pub async fn run(raw: Value) -> Result<String, ToolError> {

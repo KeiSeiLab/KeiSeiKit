@@ -39,6 +39,7 @@ pub struct EvalInput {
 }
 
 /// Full report produced by `evaluate`.
+#[allow(dead_code)] // confusion_* поля для будущего CLI subcommand --confusion-matrix
 pub struct EvalReport {
     pub total_gold_rows: usize,
     pub regex_metrics: Metrics,

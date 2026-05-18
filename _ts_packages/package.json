@@ -1,7 +1,7 @@
 {
   "name": "@keisei/ts-packages",
   "private": true,
-  "version": "0.14.0",
+  "version": "0.38.0",
   "description": "KeiSeiKit TypeScript layer — MCP server and external-API adapters",
   "type": "module",
   "workspaces": [
