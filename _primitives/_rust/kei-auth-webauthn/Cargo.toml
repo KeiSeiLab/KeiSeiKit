@@ -22,6 +22,13 @@ webauthn-rs = "0.5"
 uuid = { version = "1", features = ["v4", "serde"] }
 kei-runtime-core = { path = "../kei-runtime-core" }
 
+# webauthn-rs тянет openssl-sys транзитивно (webauthn-attestation-ca).
+# В CI release.yml `x86_64-apple-darwin` собирается на `macos-latest` (arm64)
+# через cross-compile, где системный openssl не найден через pkg-config.
+# vendored-фича компилирует openssl из исходников — работает на любом хосте
+# (CI fail 2026-05-18 run 26014515768).
+openssl-sys = { version = "0.9", features = ["vendored"] }
+
 [dev-dependencies]
 tokio = { workspace = true }
 
