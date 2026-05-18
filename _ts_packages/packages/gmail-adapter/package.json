@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "googleapis": "^144.0.0",
-    "zod": "^3.23.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
