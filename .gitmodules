@@ -1,4 +1,4 @@
 [submodule "_blocks/registries"]
 	path = _blocks/registries
-	url = https://github.com/KeiSeiLab/kei-registries.git
+	url = https://keigit.com/keisei/kei-registries.git
 	shallow = true

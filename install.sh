@@ -157,21 +157,29 @@ if onboarding_should_run; then
 fi
 onboarding_run
 
-# --- prerequisites -------------------------------------------------------
-check_prereqs
+# --- early exit: --no-execute или --skip-prereqs ДО prereqs --------------
+# Это позволяет смотреть план без установленных зависимостей.
+if [ "$NO_EXECUTE" = "1" ]; then
+  CONFIRM_LABEL="$PROFILE"
+  [ "$PROFILE" = "custom" ] && CONFIRM_LABEL="custom ($CUSTOM_PRIMS)"
+  CONFIRM_INPUT="$(printf '%s\n' $PROFILE_PRIMS | grep -v '^$' || true)"
+  printf '%s\n' "$CONFIRM_INPUT" | show_confirm_screen "$CONFIRM_LABEL" || true
+  say "--no-execute: plan resolved, exiting before install"
+  exit 0
+fi
 
-# --- confirm screen + --no-execute ---------------------------------------
+# --- prerequisites -------------------------------------------------------
+if [ "$SKIP_PREREQS" != "1" ]; then
+  check_prereqs
+fi
+
+# --- confirm screen ------------------------------------------------------
 CONFIRM_LABEL="$PROFILE"
 [ "$PROFILE" = "custom" ] && CONFIRM_LABEL="custom ($CUSTOM_PRIMS)"
 CONFIRM_INPUT="$(printf '%s\n' $PROFILE_PRIMS | grep -v '^$' || true)"
 if ! printf '%s\n' "$CONFIRM_INPUT" | show_confirm_screen "$CONFIRM_LABEL"; then
   say "install declined at confirm screen — aborting"
   exit 1
-fi
-
-if [ "$NO_EXECUTE" = "1" ]; then
-  say "--no-execute: plan resolved, exiting before install"
-  exit 0
 fi
 
 # --- execute install phases ----------------------------------------------

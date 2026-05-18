@@ -17,6 +17,7 @@ REMOVE_NAME=""
 LIST_MODE=0
 ASSUME_YES=0
 NO_EXECUTE=0
+SKIP_PREREQS=0
 REBUILD_RUST_LIST=""
 REBUILD_RUST_FLAG=0
 OUTCOME_DRY_RUN=0
@@ -130,6 +131,7 @@ parse_args() {
       --list)            LIST_MODE=1 ;;
       --yes|-y)          ASSUME_YES=1 ;;
       --no-execute)      NO_EXECUTE=1 ;;
+      --skip-prereqs)    SKIP_PREREQS=1 ;;
       --rebuild-rust)    REBUILD_RUST_FLAG=1 ;;
       --rebuild-rust=*)  REBUILD_RUST_FLAG=1; REBUILD_RUST_LIST="${arg#--rebuild-rust=}" ;;
       --dry-run)         OUTCOME_DRY_RUN=1 ;;

@@ -14,7 +14,7 @@
 #
 # Env / args:
 #   KEISEI_ROOT     install dir          (default: $HOME/.local/share/keisei)
-#   KEISEI_REPO     git URL              (default: git@github.com:KeiSeiLab/KeiSeiKit-1.0.git)
+#   KEISEI_REPO     git URL              (default: https://keigit.com/keisei/KeiSeiKit-1.0.git)
 #   KEISEI_REF      branch/tag/sha       (default: main)
 #   --profile=NAME  passed through to ./bootstrap.sh
 #   --yes           passed through to ./bootstrap.sh
@@ -24,7 +24,7 @@
 set -euo pipefail
 
 KEISEI_ROOT="${KEISEI_ROOT:-$HOME/.local/share/keisei}"
-KEISEI_REPO="${KEISEI_REPO:-git@github.com:KeiSeiLab/KeiSeiKit-1.0.git}"
+KEISEI_REPO="${KEISEI_REPO:-https://keigit.com/keisei/KeiSeiKit-1.0.git}"
 KEISEI_REF="${KEISEI_REF:-main}"
 
 PASS_THROUGH=()

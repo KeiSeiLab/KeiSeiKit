@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "keisei-marketplace",
+  "displayName": "KeiSei",
+  "description": "Constructor Pattern agent kit — agents, skills, hooks, Rust primitives.",
+  "version": "0.38.0",
+  "plugins": [
+    {
+      "name": "keisei",
+      "source": "."
+    }
+  ]
+}
