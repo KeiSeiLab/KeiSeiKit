@@ -130,9 +130,12 @@ cmd_create() {
   fi
 
   log "creating '$label' ($plan @ $region, os=$os_id)…"
-  vultr-cli "${args[@]}" -o json >/tmp/provision-vultr-$$.json
-  local ip; ip=$(jq -r '.instance.main_ip' /tmp/provision-vultr-$$.json)
-  rm -f /tmp/provision-vultr-$$.json
+  # mktemp вместо /tmp/$$ — устраняет symlink-race TOCTOU (security MEDIUM
+  # audit 2026-05-18).
+  local tmpf; tmpf=$(mktemp /tmp/provision-vultr.XXXXXX.json) || return 1
+  vultr-cli "${args[@]}" -o json >"$tmpf"
+  local ip; ip=$(jq -r '.instance.main_ip' "$tmpf")
+  rm -f "$tmpf"
   # Vultr assigns IP asynchronously — re-poll if empty.
   if [ "$ip" = "" ] || [ "$ip" = "null" ] || [ "$ip" = "0.0.0.0" ]; then
     log "IP pending — polling instance status up to 60s…"

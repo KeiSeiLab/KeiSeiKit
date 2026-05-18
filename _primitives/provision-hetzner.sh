@@ -108,9 +108,12 @@ cmd_create() {
   [ -n "$user_data" ] && { [ -r "$user_data" ] || die "user-data not readable: $user_data" 1; args+=(--user-data-from-file "$user_data"); }
 
   log "creating '$name' ($type @ $location, image=$image)…"
-  hcloud "${args[@]}" -o json >/tmp/provision-hetzner-$$.json
-  local ip; ip=$(jq -r '.server.public_net.ipv4.ip' /tmp/provision-hetzner-$$.json)
-  rm -f /tmp/provision-hetzner-$$.json
+  # mktemp вместо /tmp/$$ — устраняет symlink-race TOCTOU (security MEDIUM
+  # audit 2026-05-18).
+  local tmpf; tmpf=$(mktemp /tmp/provision-hetzner.XXXXXX.json) || return 1
+  hcloud "${args[@]}" -o json >"$tmpf"
+  local ip; ip=$(jq -r '.server.public_net.ipv4.ip' "$tmpf")
+  rm -f "$tmpf"
   [ "$ip" != "null" ] && [ -n "$ip" ] || die "create returned no IPv4 (check stderr)"
   log "created '$name' → $ip"
   echo "$ip"

@@ -4,7 +4,7 @@ All notable changes are tagged via `git tag v*`. This file tracks unreleased wor
 
 ## Unreleased
 
-- `chore(docs)`: regenerate DNA-INDEX without project-vortex (`302ca661`)
+- `chore(docs)`: regenerate DNA-INDEX (reduced scope) (`302ca661`)
 - `fix(kei-conflict-scan)`: close 3 backlog bugs + Phase C draft emission (`f354aacc`)
 - `feat(kei-buddy)`: conversational LLM-driven flow + kei-sage retrieval graph-RAG (`b61b17ea`)
 - `feat(contacts)`: glue sync + Google pagination + Apple discovery + folding (`06bcce99`)

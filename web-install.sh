@@ -39,6 +39,10 @@ done
 
 LOG="$HOME/.keisei-install.log"
 mkdir -p "$(dirname "$LOG")"
+# chmod 600 чтобы Forgejo admin creds в логе не были world-readable
+# (security MEDIUM audit 2026-05-18).
+( umask 077 && : > "$LOG" )
+chmod 600 "$LOG" 2>/dev/null || true
 exec > >(tee -a "$LOG") 2>&1
 
 say() { printf "\033[1;36m[web-install]\033[0m %s\n" "$*"; }

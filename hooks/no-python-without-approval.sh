@@ -37,7 +37,7 @@ RULE 0.2 Rust First:
   node, или существующий Rust-код в проекте.
 
 Approved alternatives BEFORE retrying:
-  • Rust one-shot:  write genesis-verify/examples/xxx.rs, cargo run
+  • Rust one-shot:  write my-project/examples/foo.rs, cargo run
   • Shell math:     awk 'BEGIN{printf "%.10f\n", ...}'
   • Arbitrary prec: bc -l / dc
   • JSON munge:     jq '.path.to.value'

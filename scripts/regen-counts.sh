@@ -44,7 +44,7 @@ count_profile() {
   ' "$MANIFEST"
 }
 
-count_files() { eval "$1" | wc -l | tr -d ' '; }
+count_files() { bash -c "$1" | wc -l | tr -d ' '; }   # bash -c вместо eval (security audit LOW 2026-05-18)
 
 RUST_CRATES=$(count_rust_crates)
 RUST_PRIMITIVES=$(count_primitive_kind rust)

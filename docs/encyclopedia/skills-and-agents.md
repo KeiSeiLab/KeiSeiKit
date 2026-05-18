@@ -105,7 +105,7 @@
 | 19 | infra-implementer-container | Container specialist. Docker, Podman, multi-stage, image optimization, registry, scanning, K8s workloads. | Containerized projects | NOT CI-only, NOT IaC-only |
 | 20 | infra-implementer-iac | Infrastructure-as-code specialist. Terraform, Ansible, CloudFormation, state management, drift detection. | All infrastructure projects | NOT manual ops, NOT CI-only |
 | 21 | infra-implementer-secrets | Secrets + credentials management. Vault, sealed-secrets, env rotations, compliance (GDPR, SOC2, HIPAA). | All projects handling sensitive data | NOT code-writing, NOT deployment gates |
-| 22 | ml-implementer | ML training/inference implementation. Modal jobs, experiment runners, Math-First paradigm, Pre-Experiment Check, observability-first. | ML/RL/CfC projects | NOT physics, NOT code-writing generically, NOT infra-only |
+| 22 | ml-implementer | ML training/inference implementation. Modal jobs, experiment runners, Math-First paradigm, Pre-Experiment Check, observability-first. | ML/RL projects | NOT physics, NOT code-writing generically, NOT infra-only |
 | 23 | ml-researcher | ML research specialist. Paper analysis, experiment design, architecture search, hyperparameter optimization, literature synthesis. | ML/RL projects | NOT production training, NOT code-writing |
 | 24 | modal-runner | Modal infrastructure orchestration. Job spawning, volume management, GPU selection, cost estimation, result collection. | Modal-based ML/compute projects | NOT code-writing, NOT training logic |
 | 25 | researcher | Open-ended research. Literature, web, code analysis. Evidence grading E1-E6. | All research-heavy projects | NOT code-writing, NOT decision-making |

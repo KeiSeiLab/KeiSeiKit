@@ -70,7 +70,9 @@ preflight_check_cli() {
     # После install проверяем что бинарь появился в PATH.
     command -v "$bin" >/dev/null 2>&1 || return 1
   fi
-  echo "  ✓ $label: $(eval "$version_cmd" 2>&1 | head -1)" >&2
+  # bash -c вместо eval: explicit subshell, не word-splitится в текущем
+  # процессе (security MEDIUM-3 audit 2026-05-18).
+  echo "  ✓ $label: $(bash -c "$version_cmd" 2>&1 | head -1)" >&2
   return 0
 }
 
