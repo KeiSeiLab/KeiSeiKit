@@ -89,4 +89,13 @@ git -C "$KEISEI_ROOT" submodule update --init --recursive 2>/dev/null || true
 [ -x "$KEISEI_ROOT/bootstrap.sh" ] || die "kit's bootstrap.sh not found in $KEISEI_ROOT"
 say "delegating to $KEISEI_ROOT/bootstrap.sh ${PASS_THROUGH[*]:-}"
 cd "$KEISEI_ROOT"
+
+# curl|bash сценарий: stdin = pipe от curl, поэтому wizard'у read нечего читать.
+# Если есть /dev/tty (т.е. сессия реально интерактивная), переподключаем stdin
+# к терминалу — иначе onboarding/whiptail падают на первом prompt.
+# audit 2026-05-18 bug #4.
+if [ -r /dev/tty ] && [ ! -t 0 ]; then
+  exec < /dev/tty
+fi
+
 exec ./bootstrap.sh "${PASS_THROUGH[@]}"

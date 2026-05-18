@@ -22,7 +22,11 @@ frontend = ["mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-
 ops     = ["kei-ledger", "ssh-check", "firewall-diff", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-provision"]
 dev     = ["kei-migrate", "kei-changelog", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-artifact", "kei-agent-runtime", "kei-capability", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay"]
 mcp     = ["kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth"]
-cortex  = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery"]
+# cortex profile: kei-cortex daemon + транзитивные path-deps.
+# cortex-ui удалён — исходник отсутствует в репо (audit 2026-05-18 #3).
+# kei-model добавлен — kei-router имеет path-dep, без него workspace
+# сломан с «failed to read kei-model/Cargo.toml» (audit 2026-05-18 #1).
+cortex  = ["kei-cortex", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-model", "kei-dna-index", "kei-atom-discovery"]
 buddy   = ["kei-buddy", "kei-telegram-webhook", "kei-shared", "kei-chat-store", "kei-social-store", "kei-memory-sqlite", "kei-router", "kei-llm-bridge-mlx"]
 # --- dev-hub bundle profiles (Wave 45) ------------------------------------
 # Adds local-first git server (Forgejo), CI runner, project dashboard,
