@@ -1,5 +1,10 @@
 {
-  "_comment": "Merge these entries into your ~/.claude/settings.json under the matching keys. If you already have PostToolUse/PreToolUse/Stop arrays, append the objects below to them instead of overwriting. install.sh --activate-hooks automates the merge and de-dupes by hooks[].command.",
+  "_comment": "Merge these entries into your ~/.claude/settings.json under the matching keys. If you already have PostToolUse/PreToolUse/Stop arrays, append the objects below to them instead of overwriting. install.sh --activate-hooks automates the merge and de-dupes by hooks[].command. statusLine (the KeiSei tamagotchi) is set ONLY when you have none — an existing statusLine is never clobbered.",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/scripts/keisei-pet.sh",
+    "padding": 0
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -18,6 +23,10 @@
             "type": "command",
             "command": "~/.claude/hooks/post-write-check.sh",
             "statusMessage": "post-write checks..."
+          },
+          {
+            "type": "command",
+            "command": "FILE=$(cat | jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && [ \"${FILE##*.}\" = 'rs' ] && ~/.claude/scripts/keisei-pet-update.sh rust_write; exit 0"
           }
         ]
       },
@@ -113,6 +122,10 @@
             "type": "command",
             "command": "~/.claude/hooks/no-github-push.sh",
             "statusMessage": "no-github-push guard (RULE 0.1)..."
+          },
+          {
+            "type": "command",
+            "command": "CMD=$(cat | jq -r '.tool_input.command // empty'); echo \"$CMD\" | grep -qiE 'git push.*github|gh repo (create|push|sync)' && ~/.claude/scripts/keisei-pet-update.sh github_block; exit 0"
           }
         ]
       },
@@ -207,6 +220,10 @@
             "type": "command",
             "command": "~/.claude/hooks/chat-numeric-prewarn.sh",
             "statusMessage": "chat-numeric-prewarn (RULE 0.18)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/keisei-pet-update.sh prompt"
           }
         ]
       }
@@ -238,6 +255,10 @@
             "type": "command",
             "command": "~/.claude/hooks/chat-numeric-postflag.sh",
             "statusMessage": "chat-numeric-postflag (RULE 0.18)..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/scripts/keisei-pet-update.sh sleep"
           }
         ]
       }

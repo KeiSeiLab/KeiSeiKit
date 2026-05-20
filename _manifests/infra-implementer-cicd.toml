@@ -33,7 +33,7 @@ forbidden_domain = [
     "IaC (Terraform/Pulumi/CDK) — hand off to infra-implementer-iac",
     "Dockerfiles or OCI images — hand off to infra-implementer-container",
     "Secrets management (Vault, sops, age) — hand off to infra-implementer-secrets",
-    "Hardcoded secrets in workflow YAML (RULE 0.8) — use `${{ secrets.NAME }}` / ENV refs",
+    "Hardcoded secrets in workflow YAML (RULE 0.8) — use repo/org secret refs + ENV, never inline",
     "Skipping build-cache steps — always cache cargo registry + target, node_modules, pip cache",
 ]
 output_extra_fields = [

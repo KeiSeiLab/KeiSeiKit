@@ -24,7 +24,8 @@ setup_target_dirs() {
     "$AGENTS_DIR/_generated" \
     "$HOOKS_DIR" \
     "$SKILLS_DIR/new-agent" \
-    "$HOME_DIR/.claude/memory"
+    "$HOME_DIR/.claude/memory" \
+    "$HOME_DIR/.claude/scripts"
 }
 
 # Write a stub MEMORY.md if the user has no index yet. We never overwrite.
@@ -65,6 +66,23 @@ copy_sleep_scripts() {
   fi
 }
 
+# KeiSei tamagotchi statusline — copy the renderer + state updater into
+# ~/.claude/scripts/. Zero binary deps (pure bash, state under ~/.claude/pet/),
+# always available regardless of profile. The statusLine + pet-update hooks
+# are wired into settings.json by the settings-snippet merge (lib-hooks.sh).
+copy_pet_scripts() {
+  local pet_sh src dst="$HOME_DIR/.claude/scripts"
+  [ -d "$KIT_DIR/scripts" ] || return 0
+  mkdir -p "$dst"
+  for pet_sh in keisei-pet.sh keisei-pet-update.sh; do
+    src="$KIT_DIR/scripts/$pet_sh"
+    if [ -f "$src" ]; then
+      cp -f "$src" "$dst/$pet_sh"
+      chmod +x "$dst/$pet_sh"
+    fi
+  done
+}
+
 # Clean slate: drop every shell .sh + rust crate dir from the installed set.
 # FAST (no per-rust rebuild). A single regenerate_rust_workspace at the end
 # of install_primitives handles the final state.
@@ -99,6 +117,7 @@ install_profile_primitives() {
 run_primitives_phase() {
   copy_primitives_meta
   copy_sleep_scripts
+  copy_pet_scripts
   say "resolving primitives for profile=$PROFILE"
   clean_slate_primitives
   install_profile_primitives

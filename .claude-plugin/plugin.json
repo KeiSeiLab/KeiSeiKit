@@ -1,13 +1,13 @@
 {
   "name": "keisei",
-  "version": "0.16.0",
-  "description": "Constructor-Pattern agent kit for Claude Code: 38 agent manifests, 68 portable skills, 38 hooks, 105 Rust workspace crates (47 installable primitives + 14 shell primitives via MANIFEST.toml `full` profile), typed artifact handoff, sleep-sync cloud consolidation, MCP server layer.",
+  "version": "0.38.0",
+  "description": "Constructor-Pattern agent substrate for Claude Code: agent manifests, portable skills, hooks, Rust workspace primitives (installable via MANIFEST.toml profiles through classic ./install.sh), typed artifact handoff, sleep-sync cloud consolidation, MCP server layer.",
   "author": {
-    "name": "KeiSei",
-    "url": "https://github.com/KeiSei84"
+    "name": "Denis Parfionovich",
+    "url": "https://github.com/KeiSeiLab"
   },
-  "homepage": "https://github.com/KeiSei84/KeiSeiKit",
-  "repository": "https://github.com/KeiSei84/KeiSeiKit",
+  "homepage": "https://github.com/KeiSeiLab/KeiSeiKit-1.0",
+  "repository": "https://github.com/KeiSeiLab/KeiSeiKit-1.0",
   "license": "Apache-2.0",
   "keywords": [
     "constructor-pattern",

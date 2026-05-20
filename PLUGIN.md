@@ -6,7 +6,7 @@ This document describes the plugin-format install path (v0.16+) and how it relat
 
 ```bash
 # One-time
-/plugin marketplace add KeiSei84/KeiSeiKit
+/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
 # Install
 /plugin install keisei@keisei-marketplace
 ```
@@ -50,7 +50,7 @@ Paths inside `hooks/hooks.json` use `${CLAUDE_PLUGIN_ROOT}` (expanded by Claude 
 
 **For plugin install:**
 - Claude Code 2.1+ (check with `claude --version`)
-- Network access to `github.com/KeiSei84/KeiSeiKit` on `/plugin marketplace add`
+- Network access to `github.com/KeiSeiLab/KeiSeiKit-1.0` on `/plugin marketplace add`
 
 **For the MCP server subset:**
 - `@keisei/mcp-server` available from **keigit.com**
@@ -76,7 +76,7 @@ Paths inside `hooks/hooks.json` use `${CLAUDE_PLUGIN_ROOT}` (expanded by Claude 
 
 ## Feedback & bugs
 
-Open an issue at [github.com/KeiSei84/KeiSeiKit/issues](https://github.com/KeiSei84/KeiSeiKit/issues). A well-formed problem description is already half the solution.
+Open an issue at [github.com/KeiSeiLab/KeiSeiKit-1.0/issues](https://github.com/KeiSeiLab/KeiSeiKit-1.0/issues). A well-formed problem description is already half the solution.
 
 ## References
 

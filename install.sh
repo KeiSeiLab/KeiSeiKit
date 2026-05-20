@@ -148,6 +148,26 @@ case "$PROFILE" in
 esac
 say "profile: $PROFILE"
 
+# --- resolve profile -> primitive list (UNCONDITIONAL, SSoT) -------------
+# Must run BEFORE any reader of PROFILE_PRIMS: the --no-execute plan block
+# below, the --skip-prereqs path (which bypasses check_prereqs), and the
+# conditional cargo gate in check_hard_prereqs. Previously this lived only
+# inside check_prereqs, so --no-execute / --skip-prereqs saw PROFILE_PRIMS
+# unbound and silently resolved to 0 primitives.
+resolve_profile_prims
+
+# --- skip heavy substrate workspace build for no-rust-primitive profiles --
+# The agent assembler always compiles (tiny), but the 105-crate substrate
+# workspace (kei-fork / kei-ledger / kei-cortex / ...) only matters for
+# profiles that ship rust primitives. With no prebuilt release binaries,
+# every install would otherwise fall back to a 5-15 min `cargo build
+# --workspace`. Auto-skip keeps minimal / shell-only profiles fast. An
+# explicit user-set KEI_SKIP_RUST always wins.
+if [ -z "${KEI_SKIP_RUST:-}" ] && ! _profile_needs_cargo; then
+  export KEI_SKIP_RUST=1
+  say "no rust primitives in profile=$PROFILE -> skipping substrate workspace build (assembler only)"
+fi
+
 # --- welcome banner + onboarding wizard ----------------------------------
 # Banner всегда EN — пользователь ещё не выбрал язык.
 # Wizard: TTY + нет ~/.claude/.onboarded + не задан KEISEI_SKIP_ONBOARD.
