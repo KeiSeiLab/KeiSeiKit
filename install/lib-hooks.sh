@@ -80,6 +80,13 @@ _jq_merge_hooks() {
             )
         )
       )
+    # statusLine (KeiSei tamagotchi): set ONLY when the target has none.
+    # Never clobber an existing statusLine. Fresh-install path drops the
+    # snippet verbatim, so this only matters when merging into a
+    # pre-existing settings.json.
+    | if (.statusLine // null) == null and ($add.statusLine // null) != null
+      then .statusLine = $add.statusLine
+      else . end
   ' "$target" > "$tmp"
   if [ -s "$tmp" ] && jq -e . "$tmp" >/dev/null 2>&1; then
     mv "$tmp" "$target"

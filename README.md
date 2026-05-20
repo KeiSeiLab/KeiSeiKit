@@ -68,7 +68,7 @@ curl -fsSL https://install.keisei.app | bash
 curl -fsSL https://install.keisei.app | bash -s -- --profile=dev --yes  # CI
 
 # Claude Code (primary target — full hook + agent integration)
-/plugin marketplace add KeiSei84/KeiSeiKit-1.0
+/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
 /plugin install keisei@keisei-marketplace
 
 # Any MCP-compatible client (Cursor / Continue / Zed / Aider / etc)

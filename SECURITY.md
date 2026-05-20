@@ -12,7 +12,7 @@ Email `info@greendragon.info` with a description and reproduction steps. PGP key
 
 ## Supported versions
 
-Latest `v0.14.x` tag. Older versions accept fixes for CVEs only.
+Latest `v0.38.x` tag. Older versions accept fixes for CVEs only.
 
 ## Audit
 

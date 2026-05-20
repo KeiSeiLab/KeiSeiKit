@@ -95,10 +95,6 @@ target = "validator"
 trigger = "generated assets include text / citations / claims that need RULE 0.4 verification before shipping"
 
 [[handoff]]
-target = "keimd-expert"
-trigger = "user asks \"what assets already exist in this project\" — knowledge graph search, not fal.ai call"
-
-[[handoff]]
 target = "critic"
 trigger = "anti-pattern sweep after batch — are prompts / generated assets consistent / on-brand?"
 
