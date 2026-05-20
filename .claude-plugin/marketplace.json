@@ -1,21 +1,21 @@
 {
   "name": "keisei-marketplace",
   "owner": {
-    "name": "KeiSei84",
-    "url": "https://github.com/KeiSei84"
+    "name": "Denis Parfionovich",
+    "url": "https://github.com/KeiSeiLab"
   },
   "metadata": {
     "description": "KeiSei Constructor-Pattern kits and primitives for Claude Code",
-    "version": "0.16.0"
+    "version": "0.38.0"
   },
   "plugins": [
     {
       "name": "keisei",
       "source": {
         "source": "github",
-        "repo": "KeiSei84/KeiSeiKit"
+        "repo": "KeiSeiLab/KeiSeiKit-1.0"
       },
-      "description": "Full KeiSeiKit — 38 agent manifests, 68 skills, 38 hooks, 105 Rust workspace crates (47 installable primitives via MANIFEST.toml `full` profile + 14 shell primitives), sleep-sync cloud consolidation, MCP server layer"
+      "description": "Full KeiSeiKit — agent manifests, skills, hooks, Rust workspace primitives via MANIFEST.toml profiles (classic ./install.sh), sleep-sync cloud consolidation, MCP server layer"
     }
   ]
 }

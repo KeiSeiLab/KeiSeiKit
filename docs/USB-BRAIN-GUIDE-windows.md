@@ -18,7 +18,7 @@ New-Item -ItemType Directory -Path $BRAIN,"$BRAIN\bin","$BRAIN\memory","$BRAIN\a
 ## 2. Download MCP server binaries
 
 ```powershell
-$BASE = "https://github.com/KeiSei84/KeiSeiKit/releases/download/v0.21.0"
+$BASE = "https://github.com/KeiSeiLab/KeiSeiKit-1.0/releases/download/v0.21.0"
 Push-Location "$BRAIN\bin"
 
 $names = @(

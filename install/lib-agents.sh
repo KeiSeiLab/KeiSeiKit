@@ -98,7 +98,15 @@ build_assembler() {
 }
 
 # Run the built assembler in --in-place mode to write the agent .md files.
+# Tolerant by design: a handful of stale/broken manifests (e.g. a handoff to
+# an agent not shipped in this profile, or an un-substituted template field)
+# must NOT abort the whole install — hooks, skills, settings still need to
+# land. The assembler prints per-manifest FAIL lines for visibility, and the
+# commit-time assembler-validate gate stays strict, so genuine breakage is
+# still caught at authoring time.
 generate_agents() {
   say "generating agent .md files (--in-place)"
-  AGENT_ROOT="$AGENTS_DIR" "$AGENTS_DIR/_assembler/target/release/assemble" --in-place
+  if ! AGENT_ROOT="$AGENTS_DIR" "$AGENTS_DIR/_assembler/target/release/assemble" --in-place; then
+    warn "some agent manifests failed to assemble (see FAIL lines above) — continuing install"
+  fi
 }

@@ -9,8 +9,29 @@
 # Reads globals: $PROFILE, $CUSTOM_PRIMS, $MANIFEST.
 # Sets global:  $PROFILE_PRIMS (space-separated primitive names).
 
-# Hard checks: cargo + jq. Exit 1 on missing — without them the install
-# (or the installed hooks afterwards) cannot function.
+# Does the resolved profile contain at least one rust primitive? Only then
+# is a functional cargo toolchain a HARD requirement. Profiles like minimal
+# (0 primitives) and shell-only customs build nothing and must install
+# without Rust — README promises "minimal — NO Rust compile". Requires
+# PROFILE_PRIMS already resolved (resolve_profile_prims, called by install.sh
+# and at the top of check_prereqs).
+_profile_needs_cargo() {
+  local p kind
+  for p in ${PROFILE_PRIMS:-}; do
+    kind="$(primitive_field "$p" kind 2>/dev/null || true)"
+    [ "$kind" = "rust" ] && return 0
+  done
+  return 1
+}
+
+# Hard checks: cargo + jq, both always required.
+#   cargo — the agent assembler (build_assembler) compiles a small rust binary
+#           to generate the agent .md files on EVERY profile, so cargo is
+#           non-negotiable. The heavy 105-crate substrate *workspace* build is
+#           a separate concern: install.sh auto-sets KEI_SKIP_RUST for profiles
+#           with no rust primitives so minimal stays fast (assembler only).
+#   jq    — the installed hooks parse Claude Code JSON via jq and would abort
+#           tool calls without it.
 check_hard_prereqs() {
   say "checking prerequisites"
   if ! command -v cargo >/dev/null 2>&1; then
@@ -103,9 +124,12 @@ check_soft_prereqs() {
   fi
 }
 
-# Top-level orchestrator: hard first (exit on miss), then resolve + soft.
+# Top-level orchestrator: resolve profile first (idempotent — install.sh
+# already resolved it before the no-execute/skip-prereqs branches), so the
+# conditional cargo gate in check_hard_prereqs can see PROFILE_PRIMS; then
+# hard checks (exit on miss); then soft warnings.
 check_prereqs() {
-  check_hard_prereqs
   resolve_profile_prims
+  check_hard_prereqs
   check_soft_prereqs
 }

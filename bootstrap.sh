@@ -8,7 +8,7 @@
 #
 # Usage from a fresh machine (private repo, gh CLI required for clone):
 #     gh auth login
-#     gh repo clone KeiSei84/KeiSeiKit-1.0
+#     gh repo clone KeiSeiLab/KeiSeiKit-1.0
 #     cd KeiSeiKit-1.0 && ./bootstrap.sh
 #
 # What it does (idempotent — re-running is safe):
@@ -164,7 +164,7 @@ fi
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ ! -f "$KIT_DIR/install.sh" ]; then
     err "install.sh not found in $KIT_DIR — am I inside a KeiSeiKit checkout?"
-    err "if not: gh repo clone KeiSei84/KeiSeiKit-1.0 && cd KeiSeiKit-1.0 && ./bootstrap.sh"
+    err "if not: gh repo clone KeiSeiLab/KeiSeiKit-1.0 && cd KeiSeiKit-1.0 && ./bootstrap.sh"
     exit 1
 fi
 log "checkout: $KIT_DIR"

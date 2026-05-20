@@ -28,7 +28,7 @@ Usage: ./install.sh [flags]
 
   NOTE: this classic installer is for power users (Rust primitives, custom
   profiles, full control). Most users should prefer the Claude Code plugin:
-      /plugin marketplace add KeiSei84/KeiSeiKit
+      /plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
       /plugin install keisei@keisei-marketplace
   See README.md "Plugin install (v0.16+, recommended)" and PLUGIN.md for
   details. The classic installer and the plugin can coexist — use whichever
