@@ -39,6 +39,7 @@ fi
 MODEL=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.model // .tool_input.model // ""' 2>/dev/null | tr '[:upper:]' '[:lower:]')
 IN_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.usage.input_tokens // 0' 2>/dev/null)
 OUT_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.usage.output_tokens // 0' 2>/dev/null)
+TOT_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.totalTokens // 0' 2>/dev/null)
 cost_usd=$(awk -v m="$MODEL" -v i="$IN_TOK" -v o="$OUT_TOK" 'BEGIN{
     if(index(m,"haiku")>0){p=0.000001;q=0.000005}
     else if(index(m,"sonnet")>0){p=0.000003;q=0.000015}
@@ -52,8 +53,9 @@ jq -cn \
     --argjson duration_ms "$(printf '%s' "$PAYLOAD" | jq '.duration_ms // .tool_response.totalDurationMs // null' 2>/dev/null)" \
     --argjson tool_use_count "$(printf '%s' "$PAYLOAD" | jq '.tool_response.totalToolUseCount // null' 2>/dev/null)" \
     --argjson cost_usd "$cost_usd" \
+    --argjson total_tokens "${TOT_TOK:-0}" \
     '{ts:$ts,event:"agent_done",id:$id,outcome:$outcome,
-      duration_ms:$duration_ms,tool_use_count:$tool_use_count,cost_usd:$cost_usd}' \
+      duration_ms:$duration_ms,tool_use_count:$tool_use_count,cost_usd:$cost_usd,total_tokens:$total_tokens}' \
     >> "$EVENTS_FILE" 2>/dev/null || true
 
 # Remove this spawn from active-children ledger (mirror of spawn hook).

@@ -65,7 +65,7 @@
           },
           {
             "type": "command",
-            "command": "~/.claude/scripts/keisei-pet-update.sh agent_done"
+            "command": "~/.claude/hooks/agent-event-done.sh"
           }
         ]
       },
@@ -205,7 +205,7 @@
           },
           {
             "type": "command",
-            "command": "~/.claude/scripts/keisei-pet-update.sh agent_start"
+            "command": "~/.claude/hooks/agent-event-spawn.sh"
           }
         ]
       }
