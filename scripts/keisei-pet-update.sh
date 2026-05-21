@@ -19,9 +19,7 @@ set -u
 STATE_DIR="${HOME}/.claude/pet"
 STATE="${STATE_DIR}/state"
 HISTORY="${STATE_DIR}/history.log"
-AGENTS_DIR="${STATE_DIR}/agents"
-TOKENS_FILE="${STATE_DIR}/agent_tokens"
-mkdir -p "$STATE_DIR" "$AGENTS_DIR"
+mkdir -p "$STATE_DIR"
 
 # Slurp stdin once (hook JSON). Non-blocking; never hang.
 INPUT=""
@@ -30,29 +28,7 @@ if [ ! -t 0 ]; then INPUT="$(cat 2>/dev/null || true)"; fi
 event="${1:-}"
 now=$(date +%s)
 
-# ── emoji maps ──────────────────────────────────────────────────────────────
-_agent_emoji() {
-  case "$1" in
-    *researcher*)                       echo "🔬" ;;
-    *architect*)                        echo "🏗️" ;;
-    *critic*)                           echo "🔪" ;;
-    *security*)                         echo "🛡️" ;;
-    *validator*)                        echo "✅" ;;
-    *cost*)                             echo "💰" ;;
-    *modal*)                            echo "☁️" ;;
-    *fal*ai*|*fal_ai*)                  echo "🎨" ;;
-    *ml-implementer*|*ml_implementer*)  echo "🧠" ;;
-    *ml-researcher*|*ml_researcher*)    echo "📚" ;;
-    *infra*)                            echo "🔧" ;;
-    *implementer*)                      echo "⚙️" ;;
-    *patent*)                           echo "📜" ;;
-    Explore|*explore*)                  echo "🔭" ;;
-    Plan|*plan*)                        echo "📐" ;;
-    *general*)                          echo "🤖" ;;
-    *)                                  echo "🤖" ;;
-  esac
-}
-
+# ── language emoji map (agent emojis live in the renderer keisei-pet.sh) ─────
 _lang_emoji() {
   case "$1" in
     rs)               echo "🦀" ;;
@@ -88,29 +64,10 @@ if [ "${day:-}" != "$today" ]; then rust_today=0; patents_today=0; violations=0;
 
 # ── agent / plan / language events (do not change mood face) ─────────────────
 case "$event" in
-  agent_start)
-    sub="$(printf '%s' "$INPUT" | jq -r '.tool_input.subagent_type // .tool_input.description // "agent"' 2>/dev/null)"
-    [ -z "$sub" ] && sub="agent"
-    em="$(_agent_emoji "$sub")"
-    short="$(printf '%s' "$sub" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9].*$//' | cut -c1-12)"
-    [ -z "$short" ] && short="agent"
-    id="${now}-$$-${RANDOM}"
-    printf '%s|%s|%s\n' "$em" "$short" "$now" > "$AGENTS_DIR/$id" 2>/dev/null || true
-    exit 0
-    ;;
-  agent_done)
-    # extract tokens from tool_response if present (Agent results carry usage)
-    tok="$(printf '%s' "$INPUT" | grep -oE 'total_tokens["[:space:]]*[:=]?[[:space:]]*[0-9]+' | grep -oE '[0-9]+' | head -1)"
-    if [ -n "${tok:-}" ]; then
-      prev=0; [ -f "$TOKENS_FILE" ] && prev="$(cat "$TOKENS_FILE" 2>/dev/null || echo 0)"
-      echo $(( prev + tok )) > "$TOKENS_FILE" 2>/dev/null || true
-    fi
-    # remove the oldest running-agent file (FIFO approximation — hooks give no
-    # stable per-agent id to match start↔done exactly).
-    oldest="$(ls -1tr "$AGENTS_DIR" 2>/dev/null | head -1)"
-    [ -n "$oldest" ] && rm -f "$AGENTS_DIR/$oldest" 2>/dev/null || true
-    exit 0
-    ;;
+  # NOTE: running-agent tracking + token/cost accounting are NOT done here —
+  # the kit already does it (hooks/task-timer.sh → time-metrics/.task-*.start,
+  # hooks/agent-event-done.sh → agent-events.jsonl). keisei-pet.sh READS those
+  # (SSoT). This updater only owns mood / language / plan / counters.
   plan)
     plan="📋"; mood="proud"; message="план готов"
     ;;
