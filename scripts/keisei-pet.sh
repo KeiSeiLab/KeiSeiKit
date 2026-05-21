@@ -8,7 +8,11 @@
 #   - mood / lang / plan  ← ~/.claude/pet/state (keisei-pet-update.sh)
 
 set -u
-if [ ! -t 0 ]; then cat >/dev/null 2>&1 || true; fi
+# Claude Code pipes the live session JSON to the statusLine on stdin. Capture
+# it (don't discard) — it carries this session's token/context/cost, which is
+# what replaced the default statusline when the pet took over.
+SLINE=""
+if [ ! -t 0 ]; then SLINE="$(cat 2>/dev/null || true)"; fi
 
 STATE="${HOME}/.claude/pet/state"
 TM_DIR="${HOME}/.claude/memory/time-metrics"
@@ -65,10 +69,30 @@ if [ -f "$EVENTS" ]; then
       if (match($0,/"cost_usd"[: ]*[0-9.]+/)) { s=substr($0,RSTART,RLENGTH); gsub(/[^0-9.]/,"",s); c=s }
       T+=t; C+=c
     } END { printf "%d %.4f", T+0, C+0 }' "$EVENTS" 2>/dev/null)
+  # agent COST only (💰) — session tokens are shown separately as 🪙 above,
+  # so we don't repeat a token count here. Cost is non-null only when the
+  # sub-agent payload carried a model.
   if [ "${tot_cost:-0}" != "0.0000" ] && [ -n "${tot_cost:-}" ]; then
     spend=" 💰\$$(printf '%.2f' "$tot_cost" 2>/dev/null)"
-  elif [ "${tot_tok:-0}" -gt 0 ] 2>/dev/null; then
-    if [ "$tot_tok" -ge 1000 ]; then spend=" 🪙$(( tot_tok / 1000 ))k"; else spend=" 🪙${tot_tok}"; fi
+  fi
+fi
+
+# ── THIS session: tokens + context% (from statusLine stdin) ─────────────────
+sess=""
+if [ -n "$SLINE" ]; then
+  read -r s_in s_out s_pct < <(printf '%s' "$SLINE" | jq -r '[
+      (.context_window.total_input_tokens // 0),
+      (.context_window.total_output_tokens // 0),
+      (.context_window.used_percentage // 0)] | @tsv' 2>/dev/null)
+  st=$(( ${s_in:-0} + ${s_out:-0} ))
+  if [ "$st" -gt 0 ] 2>/dev/null; then
+    if   [ "$st" -ge 1000000 ]; then tk="$(awk "BEGIN{printf \"%.1fM\",$st/1000000}")"
+    elif [ "$st" -ge 1000 ];    then tk="$(( st / 1000 ))k"
+    else                             tk="$st"; fi
+    pct="${s_pct%%.*}"; pcol=$'\033[32m'
+    [ "${pct:-0}" -ge 70 ] 2>/dev/null && pcol=$'\033[33m'
+    [ "${pct:-0}" -ge 90 ] 2>/dev/null && pcol=$'\033[31m'
+    sess="🪙${tk} ${pcol}${pct}%${reset}"
   fi
 fi
 
@@ -91,8 +115,8 @@ stats=""
 proj="${PWD##*/}"; [ -z "$proj" ] && proj="~"
 
 out=""
-if [ -n "${agents// }" ]; then out+="${agents# }${spend}  "
-elif [ -n "$spend" ];      then out+="${spend# }  "; fi
+[ -n "$sess" ] && out+="${sess}  "
+[ -n "${agents// }" ] && out+="${agents# }${spend}  "
 [ -n "$plan" ] && out+="${plan} "
 out+="${color}${face}${reset}"
 [ -n "$message" ] && out+=" ${dim}${message}${reset}"
