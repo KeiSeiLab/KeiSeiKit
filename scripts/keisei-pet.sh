@@ -27,12 +27,42 @@ dim=$'\033[2m'; reset=$'\033[0m'
 
 _agent_emoji() {
   case "$1" in
-    *researcher*) echo "🔬";; *architect*) echo "🏗️";; *critic*) echo "🔪";;
-    *security*) echo "🛡️";; *validator*) echo "✅";; *cost*) echo "💰";;
-    *modal*) echo "☁️";; *fal*) echo "🎨";; *ml-implementer*|*ml_implementer*) echo "🧠";;
-    *ml-researcher*|*ml_researcher*) echo "📚";; *infra*) echo "🔧";; *implementer*) echo "⚙️";;
-    *patent*) echo "📜";; Explore|*explore*) echo "🔭";; Plan|*plan*) echo "📐";;
-    *) echo "🤖";;
+    # ── project specialists (match before generic families) ──
+    *cartoon*)                          echo "🎬" ;;
+    *cloudsync*)                        echo "🔄" ;;
+    *vortex*)                           echo "🌀" ;;
+    *recruiter*)                        echo "🧑‍💼" ;;
+    *leadgen*)                          echo "🎯" ;;
+    *surf*)                             echo "🏄" ;;
+    *neuralcloak*)                      echo "🕶️" ;;
+    *openclaw*)                         echo "🦞" ;;
+    *keit0*|*keisense*)                 echo "🖐️" ;;
+    *wave*)                             echo "🌊" ;;
+    *cortex*)                           echo "🧬" ;;
+    *keimd*)                            echo "🕸️" ;;
+    *keisei-os*|*keiseios*)             echo "🧩" ;;
+    *sa-specialist*|*sa_specialist*)    echo "🏝️" ;;
+    # ── kit agent families ──
+    *researcher*)                       echo "🔬" ;;
+    *architect*)                        echo "🏗️" ;;
+    *critic*)                           echo "🔪" ;;
+    *security*)                         echo "🛡️" ;;
+    *validator*)                        echo "✅" ;;
+    *cost*)                             echo "💰" ;;
+    *modal*)                            echo "☁️" ;;
+    *fal*)                              echo "🎨" ;;
+    *ml-implementer*|*ml_implementer*)  echo "🧠" ;;
+    *ml-researcher*|*ml_researcher*)    echo "📚" ;;
+    *infra*)                            echo "🔧" ;;
+    *implementer*)                      echo "⚙️" ;;
+    *patent*)                           echo "📜" ;;
+    *frontend*)                         echo "🎨" ;;
+    *debug*)                            echo "🐞" ;;
+    *guide*)                            echo "📖" ;;
+    Explore|*explore*)                  echo "🔭" ;;
+    Plan|*plan*)                        echo "📐" ;;
+    *general*)                          echo "🤖" ;;
+    *)                                  echo "🤖" ;;
   esac
 }
 _elapsed() {
@@ -111,6 +141,11 @@ esac
 stats=""
 [ "${rust_today:-0}"    -gt 0 ] 2>/dev/null && stats+=" 🦀${rust_today}"
 [ "${patents_today:-0}" -gt 0 ] 2>/dev/null && stats+=" 📜${patents_today}"
+# recent errors — from the kit's error-spike-detector rolling window (SSoT)
+errn=0
+EWIN="${HOME}/.claude/memory/error-window.txt"
+[ -f "$EWIN" ] && errn="$(awk '$2==1' "$EWIN" 2>/dev/null | wc -l | tr -d ' ')"
+[ "${errn:-0}" -gt 0 ] 2>/dev/null && stats+=" $(printf '\033[31m')❌${errn}${reset}"
 [ "${violations:-0}"    -gt 0 ] 2>/dev/null && stats+=" ⚠${violations}"
 proj="${PWD##*/}"; [ -z "$proj" ] && proj="~"
 
