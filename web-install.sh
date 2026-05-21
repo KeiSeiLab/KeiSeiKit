@@ -91,10 +91,15 @@ say "delegating to $KEISEI_ROOT/bootstrap.sh ${PASS_THROUGH[*]:-}"
 cd "$KEISEI_ROOT"
 
 # curl|bash сценарий: stdin = pipe от curl, поэтому wizard'у read нечего читать.
-# Если есть /dev/tty (т.е. сессия реально интерактивная), переподключаем stdin
+# Если /dev/tty реально ОТКРЫВАЕТСЯ (сессия интерактивная), переподключаем stdin
 # к терминалу — иначе onboarding/whiptail падают на первом prompt.
-# audit 2026-05-18 bug #4.
-if [ -r /dev/tty ] && [ ! -t 0 ]; then
+# ВАЖНО: `[ -r /dev/tty ]` недостаточно — путь может stat'иться readable, но
+# `exec < /dev/tty` падает с "No such device or address" когда нет управляющего
+# терминала (ssh non-interactive, CI, cron). Поэтому пробуем реально открыть его
+# через `{ : < /dev/tty; }` и реаттачим ТОЛЬКО при успехе. Иначе установка идёт
+# неинтерактивно (рассчитано на --yes / KEISEI_SKIP_ONBOARD).
+# audit 2026-05-18 bug #4; non-TTY e2e fix 2026-05-21.
+if [ ! -t 0 ] && { : < /dev/tty; } 2>/dev/null; then
   exec < /dev/tty
 fi
 
