@@ -12,6 +12,23 @@
 #   - lib-i18n.sh: STR_* словарь + i18n_available_languages + i18n_load_lang
 #   - lib-onboarding-registry.sh: списки провайдеров/моделей
 
+# Read a validated 1-based menu choice. Non-numeric or out-of-range input is
+# rejected with a re-prompt instead of crashing: bash arithmetic $((ans-1))
+# treats a non-numeric "ans" (e.g. the user typing "claude") as a variable name
+# → "unbound variable" under `set -u`. $1=option count, $2=prompt.
+# Echoes a number in [1,$1] on stdout; prompts/warnings go to stderr.
+_onb_read_choice() {
+  local max="$1" prompt="$2" ans
+  while true; do
+    read -r -p "$prompt" ans
+    ans="${ans:-1}"
+    if [[ "$ans" =~ ^[0-9]+$ ]] && [ "$ans" -ge 1 ] && [ "$ans" -le "$max" ]; then
+      printf '%s' "$ans"; return 0
+    fi
+    printf '  ⚠ %s\n' "${STR_PICK_INVALID:-please enter a number from 1 to $max}" >&2
+  done
+}
+
 onboarding_pick_language() {
   local langs
   langs="$(i18n_available_languages 2>/dev/null)"
@@ -43,8 +60,7 @@ onboarding_pick_language() {
       printf "  %2d) %s — %s\n" "$i" "$code" "$name" >&2
       i=$((i+1))
     done <<< "$langs"
-    read -r -p "[1-${#codes[@]}, default 1=en]: " ans
-    ans="${ans:-1}"
+    ans="$(_onb_read_choice "${#codes[@]}" "[1-${#codes[@]}, default 1=en]: ")"
     ONBOARDING_LANG="${codes[$((ans-1))]:-en}"
   fi
   command -v i18n_load_lang >/dev/null 2>&1 && i18n_load_lang "$ONBOARDING_LANG"
@@ -76,6 +92,7 @@ onboarding_pick_transport() {
   else
     echo "" >&2
     echo "$prompt" >&2
+    echo "  ${STR_EXPLAIN_TRANSPORT:-How the agents reach the AI. subscription = log in with your plan (no API key); direct-api = your own API key. Default is fine for most.}" >&2
     local i=1
     declare -a opts=()
     while IFS= read -r tr; do
@@ -83,8 +100,7 @@ onboarding_pick_transport() {
       echo "  $i) $tr" >&2
       i=$((i+1))
     done <<< "$transports"
-    read -r -p "[1-${#opts[@]}, default 1]: " ans
-    ans="${ans:-1}"
+    ans="$(_onb_read_choice "${#opts[@]}" "[1-${#opts[@]}, default 1]: ")"
     ONBOARDING_TRANSPORT="${opts[$((ans-1))]:-direct-api}"
   fi
 }
@@ -111,6 +127,7 @@ onboarding_pick_provider() {
   else
     echo "" >&2
     echo "${STR_PICK_PROVIDER:-Provider within} $ONBOARDING_TRANSPORT:" >&2
+    echo "  ${STR_EXPLAIN_PROVIDER:-Which AI service. Option 1 is the recommended default.}" >&2
     declare -a ids=()
     local i=1
     while IFS=$'\t' read -r id dn ae; do
@@ -118,8 +135,7 @@ onboarding_pick_provider() {
       echo "  $i) $id — $dn" >&2
       i=$((i+1))
     done <<< "$rows"
-    read -r -p "[1-${#ids[@]}, default 1]: " ans
-    ans="${ans:-1}"
+    ans="$(_onb_read_choice "${#ids[@]}" "[1-${#ids[@]}, default 1]: ")"
     ONBOARDING_PROVIDER="${ids[$((ans-1))]:-${ids[0]}}"
   fi
 }
@@ -135,6 +151,12 @@ onboarding_pick_model() {
   local rows; rows=$(onboarding_models_for_provider "$lookup")
   [ -z "$rows" ] && rows=$(printf "claude-sonnet-4-6\tClaude Sonnet 4.6 (fallback)\n")
 
+  # Single model → auto-select, no dead-end prompt (mirrors provider count==1).
+  if [ "$(printf '%s\n' "$rows" | grep -c .)" = "1" ]; then
+    ONBOARDING_MODEL=$(printf '%s\n' "$rows" | head -1 | awk -F'\t' '{print $1}')
+    return
+  fi
+
   if command -v whiptail >/dev/null 2>&1; then
     local args=()
     while IFS=$'\t' read -r id dn; do
@@ -146,6 +168,7 @@ onboarding_pick_model() {
   else
     echo "" >&2
     echo "${STR_PICK_MODEL:-Models for} $lookup:" >&2
+    echo "  ${STR_EXPLAIN_MODEL:-Default model the agents use. Option 1 is the recommended default.}" >&2
     declare -a ids=()
     local i=1
     while IFS=$'\t' read -r id dn; do
@@ -153,8 +176,7 @@ onboarding_pick_model() {
       echo "  $i) $id — $dn" >&2
       i=$((i+1))
     done <<< "$rows"
-    read -r -p "[1-${#ids[@]}, default 1]: " ans
-    ans="${ans:-1}"
+    ans="$(_onb_read_choice "${#ids[@]}" "[1-${#ids[@]}, default 1]: ")"
     ONBOARDING_MODEL="${ids[$((ans-1))]:-${ids[0]}}"
   fi
 }
