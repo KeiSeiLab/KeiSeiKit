@@ -19,7 +19,7 @@ STR_TR_AZURE_OPENAI="Azure OpenAI (deployment+ключ)"
 STR_TR_GOOGLE_VERTEX="Google Vertex AI (GCP)"
 STR_TR_LOCAL="Локально (Ollama/MLX/LMStudio)"
 STR_TR_PROXY="Прокси (LiteLLM/OpenRouter)"
-STR_TR_SUBSCRIPTION="OAuth-подписка (ChatGPT)"
+STR_TR_SUBSCRIPTION="Вход по подписке (Claude Code / ChatGPT — без API-ключа)"
 
 # Сбор ключей
 STR_AUTH_INTRO="Аутентификация для"
@@ -40,3 +40,9 @@ STR_MENU_CONFIRM="Подтвердить выбор?"
 # Preflight-предупреждения
 STR_PREFLIGHT_FAILED="Preflight упал — провайдер может не работать."
 STR_PREFLIGHT_CONTINUE="Продолжить всё равно? [y/N]"
+
+# Пояснения мастера + валидация ввода
+STR_PICK_INVALID="введите один из показанных номеров"
+STR_EXPLAIN_TRANSPORT="Как агенты обращаются к ИИ. subscription = вход по подписке, без API-ключа (Claude Code — вариант 1); direct-api = свой API-ключ. Нажми Enter для варианта по умолчанию."
+STR_EXPLAIN_PROVIDER="Какой ИИ-сервис. Вариант 1 — рекомендуемый по умолчанию, нажми Enter."
+STR_EXPLAIN_MODEL="Модель, которую используют агенты. Вариант 1 — рекомендуемый по умолчанию, нажми Enter."
