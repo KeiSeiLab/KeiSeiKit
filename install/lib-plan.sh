@@ -100,7 +100,7 @@ _print_primitive_rows() {
     [ -z "$name" ] && continue
     kind="$(primitive_field "$name" kind 2>/dev/null || echo '?')"
     extra="$(primitive_time_secs "$name")s, $(( $(primitive_disk_kb "$name") / 1024 )) MB"
-    printf '  + %-22s (%s, ~%s)\n' "$name" "$kind" "$extra"
+    printf '  + %s%-22s%s (%s, ~%s)\n' "${KEI_BLUE:-}" "$name" "${KEI_RST:-}" "$kind" "$extra"
   done
 }
 

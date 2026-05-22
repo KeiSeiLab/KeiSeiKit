@@ -28,7 +28,7 @@ copy_shell_primitive() {
   mkdir -p "$AGENTS_DIR/_primitives"
   cp -f "$src" "$dst"
   chmod +x "$dst"
-  say "  + shell: $name ($file)"
+  say "  + shell: ${KEI_BLUE:-}$name${KEI_RST:-} ($file)"
 }
 
 remove_shell_primitive() {
@@ -65,7 +65,7 @@ copy_rust_primitive() {
       cp -rf "$src/$sibling/"* "$dst/$sibling/" 2>/dev/null || true
     fi
   done
-  say "  + rust:  $name (crate $crate)"
+  say "  + rust:  ${KEI_BLUE:-}$name${KEI_RST:-} (crate $crate)"
 }
 
 remove_rust_primitive() {
@@ -103,7 +103,7 @@ copy_node_primitive() {
       find "$dst" -depth -name "$ex" -exec rm -rf {} + 2>/dev/null || true
     done < <(_node_excludes)
   fi
-  say "  + node:  $name (path $rel)"
+  say "  + node:  ${KEI_BLUE:-}$name${KEI_RST:-} (path $rel)"
 }
 
 remove_node_primitive() {
@@ -171,7 +171,7 @@ install_external_primitive() {
     err "external primitive $name: entry point $slug not found in $file"
     return 1
   fi
-  say "  + external: $name (via $file)"
+  say "  + external: ${KEI_BLUE:-}$name${KEI_RST:-} (via $file)"
   "$slug" || warn "$name install failed — re-run after fixing prereqs"
 }
 
