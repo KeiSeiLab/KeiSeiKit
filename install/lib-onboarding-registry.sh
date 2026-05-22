@@ -45,12 +45,20 @@ onboarding_fallback_providers() {
   printf "lmstudio-local\tlocal\tLM Studio (local)\t_\n"
   printf "litellm-proxy\tproxy\tLiteLLM proxy (keisei.app)\tKEI_LITELLM_KEY\n"
   printf "openrouter\tproxy\tOpenRouter\tOPENROUTER_API_KEY\n"
+  printf "claude-code\tsubscription\tClaude Code (subscription — your claude CLI, no API key)\t_\n"
   printf "codex\tsubscription\tOpenAI Codex (ChatGPT OAuth)\t_\n"
 }
 
 # Уникальные транспорты — для первого экрана выбора.
+# Claude-Code-native kit → выводим subscription + direct-api ПЕРВЫМИ, чтобы
+# рекомендованный путь (Claude Code, опция 1) был дефолтом. Остальные следом.
 onboarding_list_transports() {
-  onboarding_list_providers | awk -F'\t' '{print $2}' | sort -u
+  local all; all="$(onboarding_list_providers | awk -F'\t' '{print $2}' | sort -u)"
+  local t
+  for t in subscription direct-api; do
+    printf '%s\n' "$all" | grep -qx "$t" && echo "$t"
+  done
+  printf '%s\n' "$all" | grep -vxE 'subscription|direct-api' || true
 }
 
 # Провайдеры внутри транспорта.

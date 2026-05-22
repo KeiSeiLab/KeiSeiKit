@@ -19,7 +19,7 @@ STR_TR_AZURE_OPENAI="Azure OpenAI (deployment+key)"
 STR_TR_GOOGLE_VERTEX="Google Vertex AI (GCP)"
 STR_TR_LOCAL="Local (Ollama/MLX/LMStudio)"
 STR_TR_PROXY="Proxy (LiteLLM/OpenRouter)"
-STR_TR_SUBSCRIPTION="OAuth subscription (ChatGPT)"
+STR_TR_SUBSCRIPTION="Subscription login (Claude Code / ChatGPT — no API key)"
 
 # Auth collection
 STR_AUTH_INTRO="Auth for"
@@ -40,3 +40,9 @@ STR_MENU_CONFIRM="Confirm selection?"
 # Preflight warnings
 STR_PREFLIGHT_FAILED="Preflight failed — provider may not work."
 STR_PREFLIGHT_CONTINUE="Continue anyway? [y/N]"
+
+# Wizard explanations + input validation
+STR_PICK_INVALID="please type one of the numbers shown"
+STR_EXPLAIN_TRANSPORT="How the agents reach the AI. subscription = log in with your plan, no API key (Claude Code is option 1); direct-api = your own API key. Press Enter for the default."
+STR_EXPLAIN_PROVIDER="Which AI service. Option 1 is the recommended default — press Enter."
+STR_EXPLAIN_MODEL="Default model the agents use. Option 1 is the recommended default — press Enter."

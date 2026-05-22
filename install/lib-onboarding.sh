@@ -95,4 +95,9 @@ onboarding_run() {
     say "  ${STR_DONE_CONFIG:-config:} $ONBOARDING_CONFIG"
     [ "${#ONBOARDING_AUTH_ENV_KEYS[@]}" -gt 0 ] && say "  ${STR_DONE_SECRETS:-secrets:} $SECRETS_ENV (chmod 600)"
   fi
+  # MUST end on success: the last statement above is a short-circuit `&&` that
+  # evaluates false when the provider has no auth keys (claude-code / codex /
+  # local) → function would return 1 → `set -e` aborts the whole install at the
+  # onboarding_run call. Subscription/local providers are exactly the no-key case.
+  return 0
 }
