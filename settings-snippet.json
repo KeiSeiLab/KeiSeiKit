@@ -279,6 +279,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/first-run-onboard.sh",
+            "statusMessage": "KeiSeiKit first-run onboard nudge..."
+          }
+        ]
+      }
     ]
   }
 }
