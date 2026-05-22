@@ -66,7 +66,9 @@ print_summary() {
       $AGENTS_DIR/_assembler/target/release/assemble --validate
       ./install.sh --list   # show installed primitives
 
-  To create a new project-specialist agent:
+  To set up agents for ALL your projects (scan stack + create one per project):
+      /onboard ~/Projects/*
+  Or create a single project-specialist agent:
       /new-agent
 
 ==========================================================================
@@ -93,7 +95,9 @@ EOF
       $AGENTS_DIR/_assembler/target/release/assemble --validate
       ./install.sh --list   # show installed primitives
 
-  To create a new project-specialist agent:
+  To set up agents for ALL your projects (scan stack + create one per project):
+      /onboard ~/Projects/*
+  Or create a single project-specialist agent:
       /new-agent
 
 ==========================================================================
