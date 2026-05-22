@@ -233,7 +233,11 @@ fi
 # target/release/ regardless of profile (lib-substrate.sh), so PATH wiring
 # is meaningful for every profile except minimal-without-prebuilt.
 if [ "$NO_PATHWAY" != "1" ]; then
-  if [ "$WITH_PATHWAY" = "1" ] || { [ -t 0 ] && [ -t 1 ]; }; then
+  # Gate on interactive stdin only — NOT -t 1: curl|bash tees stdout to a
+  # logfile, so -t 1 is false even interactively. Requiring it skipped PATH
+  # wiring (~/.claude/bin), so the `kei` entry-point was not found after a
+  # curl|bash install. (Same tee/-t1 trap as the onboarding gates.)
+  if [ "$WITH_PATHWAY" = "1" ] || [ -t 0 ]; then
     pathway_install
   fi
 fi
