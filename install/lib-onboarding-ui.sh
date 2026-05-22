@@ -57,7 +57,7 @@ onboarding_pick_language() {
     while IFS=$'\t' read -r code name; do
       [ -z "$code" ] && continue
       codes+=("$code")
-      printf "  %2d) %s — %s\n" "$i" "$code" "$name" >&2
+      printf "  %2d) ${KEI_BLUE:-}%s${KEI_RST:-} — ${KEI_GOLD:-}%s${KEI_RST:-}\n" "$i" "$code" "$name" >&2
       i=$((i+1))
     done <<< "$langs"
     ans="$(_onb_read_choice "${#codes[@]}" "[1-${#codes[@]}, default 1=en]: ")"

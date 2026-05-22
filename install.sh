@@ -203,6 +203,7 @@ if ! printf '%s\n' "$CONFIRM_INPUT" | show_confirm_screen "$CONFIRM_LABEL"; then
 fi
 
 # --- execute install phases ----------------------------------------------
+kei_banner
 setup_target_dirs
 scaffold_memory_index
 install_blocks
