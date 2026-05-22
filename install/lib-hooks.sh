@@ -129,7 +129,7 @@ maybe_activate_hooks() {
   elif [ ! -f "$settings_file" ]; then
     say "no existing settings.json; installing snippet"
     activate_hooks && DID_ACTIVATE=1
-  elif [ -t 0 ] && [ -t 1 ]; then
+  elif [ -t 0 ]; then  # stdin-only: stdout may be tee'd in curl|bash
     if [ "$COLOR" = "1" ]; then
       printf '\033[1;36m[install]\033[0m activate hooks now? [y/N] '
     else

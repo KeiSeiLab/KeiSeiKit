@@ -25,7 +25,7 @@ preflight_offer_install() {
   echo "  ⚠ $cli не найден." >&2
   echo "  Установить: $install_cmd" >&2
   echo "" >&2
-  if [ -t 0 ] && [ -t 1 ]; then
+  if [ -t 0 ]; then  # stdin-only: stdout may be tee'd in curl|bash
     echo "  ⓘ команда: $install_cmd" >&2
     read -r -p "  Поставить сейчас? [y/N/skip] " ans
     case "$ans" in

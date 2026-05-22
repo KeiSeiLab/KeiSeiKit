@@ -48,7 +48,10 @@ done
 # fallback to cortex for compat with v0.16 default behaviour.
 prompt_profile() {
     if [ -n "$PROFILE" ]; then return 0; fi
-    if [ ! -t 0 ] || [ ! -t 1 ]; then PROFILE="cortex"; return 0; fi
+    # Interactive iff stdin is a terminal. NOT stdout: web-install.sh tees stdout
+    # to a logfile (pipe), so -t 1 is false even in an interactive curl|bash.
+    # Prompts print to the terminal via tee; the menu reads from stdin.
+    if [ ! -t 0 ]; then PROFILE="cortex"; return 0; fi
     cat <<'WIZARD'
 
 ╔═══════════════════════════════════════════════════════════════════╗
