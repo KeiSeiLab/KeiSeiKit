@@ -8,6 +8,7 @@
 #   kei                     # splash → claude (interactive REPL)
 #   kei --no-splash         # skip splash → exec claude
 #   kei --status            # status only, don't launch claude
+#   kei message ...         # inter-session mailbox (send/inbox/list) — see kei-message.sh
 #   kei [args...]           # splash → claude args... (forwarded verbatim)
 #
 # The splash shows: substrate version, agent count, last sleep run,
@@ -16,6 +17,15 @@
 # Returns: same exit code as `claude`.
 
 set -e
+
+# --- subcommand dispatch (before splash) ---------------------------------
+# `kei message ...` → the mailbox CLI; everything else falls through to launch.
+case "${1:-}" in
+  message|msg|m)
+    shift
+    exec "$HOME/.claude/scripts/kei-message.sh" "$@"
+    ;;
+esac
 
 # --- args ----------------------------------------------------------------
 SPLASH=1

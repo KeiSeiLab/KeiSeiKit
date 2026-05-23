@@ -241,6 +241,11 @@
           {
             "type": "command",
             "command": "~/.claude/scripts/keisei-pet-update.sh prompt"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/mailbox-inject.sh",
+            "statusMessage": "kei mailbox pull-inbox..."
           }
         ]
       }
