@@ -66,20 +66,19 @@ copy_sleep_scripts() {
   fi
 }
 
-# KeiSei tamagotchi statusline — copy the renderer + state updater into
-# ~/.claude/scripts/. Zero binary deps (pure bash, state under ~/.claude/pet/),
-# always available regardless of profile. The statusLine + pet-update hooks
-# are wired into settings.json by the settings-snippet merge (lib-hooks.sh).
+# Pure-bash scripts → ~/.claude/scripts/ (tamagotchi renderer + state updater,
+# kei-message mailbox CLI, any future scripts). Zero binary deps, always
+# available regardless of profile. statusLine + pet-update + mailbox-inject
+# hooks are wired into settings.json by the settings-snippet merge (lib-hooks.sh).
 copy_pet_scripts() {
-  local pet_sh src dst="$HOME_DIR/.claude/scripts"
+  local src dst="$HOME_DIR/.claude/scripts" name
   [ -d "$KIT_DIR/scripts" ] || return 0
   mkdir -p "$dst"
-  for pet_sh in keisei-pet.sh keisei-pet-update.sh; do
-    src="$KIT_DIR/scripts/$pet_sh"
-    if [ -f "$src" ]; then
-      cp -f "$src" "$dst/$pet_sh"
-      chmod +x "$dst/$pet_sh"
-    fi
+  for src in "$KIT_DIR/scripts/"*.sh; do
+    [ -f "$src" ] || continue
+    name="$(basename "$src")"
+    cp -f "$src" "$dst/$name"
+    chmod +x "$dst/$name"
   done
 }
 
