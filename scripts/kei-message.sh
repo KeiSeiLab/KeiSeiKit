@@ -32,6 +32,9 @@ case "$cmd" in
         --to)   to="$2";   shift; shift ;;
         --from) me="$2";   shift; shift ;;
         --)     shift; body="$body $*"; break ;;
+        # Leading @name = recipient (e.g. `send @frontend hi`). First token only;
+        # a later @x stays literal text.
+        @?*)    if [ "$to" = "all" ] && [ -z "$body" ]; then to="${1#@}"; else body="$body $1"; fi; shift ;;
         *)      body="$body $1"; shift ;;
       esac
     done
