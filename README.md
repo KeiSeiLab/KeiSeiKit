@@ -8,8 +8,8 @@ OpenClaw / Kimi from the same source-of-truth.
 
 **Apache 2.0** — explicit patent grant + retaliation clause. 105 Rust
 crates [REAL: `grep -E '^\s*"[a-z-]+",' _primitives/_rust/Cargo.toml | wc -l`],
-68 skills [REAL: `ls skills/ | wc -l`], 38 hooks
-[REAL: `grep -c '"command":' settings-snippet.json`], 38 agent manifests
+68 skills [REAL: `ls skills/ | wc -l`], 54 hooks
+[REAL: `ls hooks/*.sh | wc -l`], 38 agent manifests
 [REAL: `ls _manifests/*.toml | wc -l`], 85 substrate blocks
 [REAL: `find _blocks/ -name '*.md' | wc -l`], 18 capability atoms
 [REAL: `find _capabilities/ -mindepth 2 -maxdepth 2 -type d | wc -l`],
@@ -83,7 +83,7 @@ The web installer (`web-install.sh` in this repo, served at
 repo and delegates to `bootstrap.sh` — single source of truth, no
 duplicated install logic.
 
-38 agents + 68 skills + 38 hooks + nightly consolidation wired in
+38 agents + 68 skills + 54 hooks + nightly consolidation wired in
 ~60 seconds. Twelve install profiles (`outcome-only`, `minimal`,
 `core`, `frontend`, `ops`, `dev`, `mcp`, `cortex`, `local-mirror`,
 `dashboard`, `full-hub`, `full`) defined in

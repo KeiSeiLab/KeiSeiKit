@@ -37,7 +37,7 @@ menu_whiptail_profile() {
     "ops"          "+ 9 infra tools — provision, ssh-check, firewall-diff"     OFF \
     "dev"          "+ 17 dev tools — kei-migrate, kei-memory, deep-sleep"      OFF \
     "mcp"          "+ 10 MCP tools — kei-router, kei-sage, kei-auth, kei-pet"  OFF \
-    "cortex"       "+ 11 cortex stack — kei-cortex daemon + cortex-ui"         OFF \
+    "cortex"       "+ 11 cortex stack — kei-cortex daemon + UI primitives"     OFF \
     "full"         "+ all 62 primitives (~5 min, 380 MB)"                      OFF \
     "local-mirror" "dev hub: cortex + Forgejo + CI runner (+ 13 prims)"        OFF \
     "dashboard"    "local-mirror + projects-index + Datasette (+ 16 prims)"    OFF \

@@ -78,6 +78,13 @@ mkdir -p "$(dirname "$KEISEI_ROOT")"
 if [ -d "$KEISEI_ROOT/.git" ]; then
   say "pulling $KEISEI_REF in $KEISEI_ROOT"
   git -C "$KEISEI_ROOT" fetch --depth=1 origin "$KEISEI_REF"
+  # reset --hard discards ANY local edits in this managed clone. It's a managed
+  # dir (don't hand-edit it — change the repo + push instead), but warn loudly
+  # so a manual tweak isn't lost silently.
+  if ! git -C "$KEISEI_ROOT" diff --quiet 2>/dev/null \
+     || ! git -C "$KEISEI_ROOT" diff --cached --quiet 2>/dev/null; then
+    say "  ⚠ local changes in $KEISEI_ROOT will be DISCARDED by reset --hard"
+  fi
   git -C "$KEISEI_ROOT" reset --hard "origin/$KEISEI_REF"
 else
   say "cloning $KEISEI_REPO ($KEISEI_REF) → $KEISEI_ROOT"

@@ -60,9 +60,9 @@ _jq_merge_hooks() {
     | reduce ($add.hooks | keys[]) as $phase ($orig;
         .hooks[$phase] = (
           ((.hooks[$phase] // []) + ($add.hooks[$phase] // []))
-          # Normalize null/absent matcher → "" (Claude Code /doctor rejects null;
-          # user's pre-kit hooks often have no matcher field). Before group_by so
-          # null + "" collapse into one group.
+          # Normalize null/absent matcher to "" (Claude Code /doctor rejects null;
+          # pre-kit user hooks often have no matcher field) before group_by so
+          # null and "" collapse into one group.
           | map(.matcher //= "")
           | group_by(.matcher)
           | map(

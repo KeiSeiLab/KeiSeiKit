@@ -128,6 +128,8 @@ _dhz_print_banner() {
 # Public — install entry point. Called from install.sh primitives phase.
 install_dev_hub_zoekt() {
   say "[dev-hub-zoekt] install starting"
+  # shellcheck source=./lib-launchd.sh
+  . "$KIT_DIR/install/lib-launchd.sh"   # install_service / detect_brew_prefix (was unsourced → command not found)
   _dhz_check_brew                  || return 1
   _dhz_check_go_runtime
   _dhz_brew_install                || return 1

@@ -34,10 +34,10 @@ buddy   = ["kei-buddy", "kei-telegram-webhook", "kei-shared", "kei-chat-store", 
 # previous one — `dashboard` extends `local-mirror`, `full-hub` extends
 # `dashboard`. Native macOS arm64 (brew + launchd plists). See
 # `install/lib-dev-hub-*.sh` for the install logic per component.
-local-mirror = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner"]
-dashboard    = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette"]
-full-hub     = ["kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
-full    = ["tomd", "kei-doctor", "kei-ledger", "kei-migrate", "kei-changelog", "ssh-check", "firewall-diff", "mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-preview", "figma-tokens", "frontend-inspect", "screenshot-decode", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth", "kei-artifact", "keisei", "kei-agent-runtime", "kei-capability", "kei-provision", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay", "kei-cortex", "cortex-ui", "kei-pet", "kei-shared", "frustration-matrix", "kei-skill-importer", "kei-projects-index", "kei-projects-watcher", "dev-hub-forgejo", "dev-hub-forgejo-runner", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
+local-mirror = ["kei-cortex", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner"]
+dashboard    = ["kei-cortex", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette"]
+full-hub     = ["kei-cortex", "kei-pet", "kei-shared", "kei-ledger", "kei-memory", "frustration-matrix", "kei-skill-importer", "kei-router", "kei-dna-index", "kei-atom-discovery", "dev-hub-forgejo", "dev-hub-forgejo-runner", "kei-projects-index", "kei-projects-watcher", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
+full    = ["tomd", "kei-doctor", "kei-ledger", "kei-migrate", "kei-changelog", "ssh-check", "firewall-diff", "mock-render", "visual-diff", "tokens-sync", "design-scrape", "live-preview", "figma-tokens", "frontend-inspect", "screenshot-decode", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth", "kei-artifact", "keisei", "kei-agent-runtime", "kei-capability", "kei-provision", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay", "kei-cortex", "kei-pet", "kei-shared", "frustration-matrix", "kei-skill-importer", "kei-projects-index", "kei-projects-watcher", "dev-hub-forgejo", "dev-hub-forgejo-runner", "dev-hub-datasette", "dev-hub-zoekt", "dev-hub-mdbook", "dev-hub-restic", "dev-hub-gdrive-import"]
 
 # --- shell primitives (13) -------------------------------------------------
 
@@ -356,12 +356,6 @@ kind = "rust"
 crate = "kei-cortex"
 deps = ["python3 (>=3.9, for whisper_worker.py subprocess)", "pip install -r scripts/requirements.txt", "ffmpeg (on PATH, faster-whisper audio demux)"]
 desc = "Local HTTP daemon exposing chat/TTS/STT/portrait endpoints — backs cortex-ui browser app"
-
-[primitive.cortex-ui]
-kind = "node"
-path = "_ts_packages/packages/cortex-ui"
-deps = ["node>=18", "pnpm"]
-desc = "Svelte 5 + Vite 5 web UI for kei-cortex daemon (chat panel, Live2D pet renderer, portrait uploader)"
 
 [primitive.frustration-matrix]
 kind = "rust"

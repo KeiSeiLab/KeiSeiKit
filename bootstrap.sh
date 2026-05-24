@@ -51,7 +51,11 @@ prompt_profile() {
     # Interactive iff stdin is a terminal. NOT stdout: web-install.sh tees stdout
     # to a logfile (pipe), so -t 1 is false even in an interactive curl|bash.
     # Prompts print to the terminal via tee; the menu reads from stdin.
-    if [ ! -t 0 ]; then PROFILE="cortex"; return 0; fi
+    # Non-interactive (CI / piped, no controlling terminal) → minimal: fast,
+    # no 105-crate compile, can't half-fail. Matches install.sh's own default
+    # (was "cortex" here → divergent install vs direct install.sh). Opt up with
+    # --profile=cortex/full-hub.
+    if [ ! -t 0 ]; then PROFILE="minimal"; return 0; fi
     cat <<'WIZARD'
 
 ╔═══════════════════════════════════════════════════════════════════╗
