@@ -147,6 +147,9 @@ case "$PROFILE" in
     ;;
 esac
 say "profile: $PROFILE"
+# Stamp the chosen profile so `kei` splash + tools can show it (bin/kei reads this).
+mkdir -p "$HOME_DIR/.claude" 2>/dev/null || true
+printf '%s\n' "$PROFILE" > "$HOME_DIR/.claude/.kei-profile" 2>/dev/null || true
 
 # --- resolve profile -> primitive list (UNCONDITIONAL, SSoT) -------------
 # Must run BEFORE any reader of PROFILE_PRIMS: the --no-execute plan block

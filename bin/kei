@@ -62,12 +62,10 @@ agent_count() {
 
 # Profile from .installed marker file
 profile_name() {
-  local f="${AGENTS_DIR}/_primitives/.installed"
-  if [ -f "$f" ]; then
-    grep -E "^profile" "$f" 2>/dev/null | head -1 | awk -F= '{gsub(/[ "]/,"",$2); print $2}' || echo "?"
-  else
-    echo "?"
-  fi
+  # install.sh stamps the chosen profile here; .installed only holds primitive
+  # names (so the old `grep ^profile .installed` always returned "?").
+  local f="$HOME/.claude/.kei-profile"
+  if [ -f "$f" ]; then head -1 "$f"; else echo "?"; fi
 }
 
 # Last Phase B sleep timestamp
