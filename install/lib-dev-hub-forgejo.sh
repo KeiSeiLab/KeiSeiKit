@@ -160,6 +160,8 @@ _dhf_bootstrap_admin_user() {
 # Public — install entry point. Called from install.sh primitives phase.
 install_dev_hub_forgejo() {
   say "[dev-hub-forgejo] install starting"
+  # shellcheck source=./lib-launchd.sh
+  . "$KIT_DIR/install/lib-launchd.sh"   # install_service / detect_brew_prefix (was unsourced → command not found)
   _dhf_check_brew              || return 1
   _dhf_brew_install            || return 1
   _dhf_ensure_data_dir         || return 1

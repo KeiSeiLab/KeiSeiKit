@@ -37,7 +37,13 @@ case "$cmd" in
     done
     body="${body# }"
     [ -n "$body" ] || { echo "usage: kei message send [--to <name|all>] <text>" >&2; exit 1; }
-    id="$(date +%s)$(date +%N 2>/dev/null | cut -c1-6 || printf '000000')"
+    # Sub-second component: GNU `date +%N` where available; on stock macOS (BSD
+    # date) %N is unsupported and prints literal "N" → fall back to /dev/urandom.
+    # Result id = epoch(10) + 6 digits = 16-digit integer, safely < 2^53.
+    ns="$(date +%N 2>/dev/null)"
+    case "$ns" in *[!0-9]*|'') ns="$(od -An -N4 -tu4 /dev/urandom 2>/dev/null | tr -dc 0-9)" ;; esac
+    sub="$(printf '%s000000' "$ns" | cut -c1-6)"
+    id="$(date +%s)${sub}"
     jq -cn --argjson id "$id" --arg ts "$(date -u +%FT%TZ)" \
            --arg from "$me" --arg to "$to" --arg body "$body" \
        '{id:$id, ts:$ts, from:$from, to:$to, body:$body}' >> "$LOG"
