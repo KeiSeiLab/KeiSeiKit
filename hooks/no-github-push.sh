@@ -1,9 +1,10 @@
 #!/bin/sh
-# no-github-push.sh — PreToolUse:Bash hard deny (RULE 0.1 NO GITHUB PUSH)
+# no-github-push.sh — PreToolUse:Bash hard deny.
 #
-# Blocks any Bash command that would push code to github.com.
-# KeiTech portfolio contains unfiled patent IP — a public push destroys
-# priority date and trade secrets. Irrecoverable.
+# Blocks any Bash command that would push code or create a repo on github.com.
+# Opt-in guard for teams that keep proprietary code on a private remote
+# (Forgejo / Gitea / self-hosted) and want a hard stop against an accidental
+# public push. Off by default in the public kit — enable it in onboarding.
 #
 # Exit codes:
 #   0  = pass (command is safe)
@@ -69,18 +70,16 @@ fi
 
 # --- Block ------------------------------------------------------------------
 cat >&2 <<'EOF'
-[no-github-push] BLOCK — RULE 0.1 NO GITHUB PUSH
-KeiTech portfolio contains unfiled patent IP. Public push destroys
-priority date + trade secrets. Irrecoverable.
+[no-github-push] BLOCK — push to github.com is disabled by this guard.
+This checkout is configured to stay on a private remote; a public push
+could expose code you intend to keep private.
 
-Use a private remote instead (Forgejo, Gitea, self-hosted):
+Use your private remote instead (Forgejo, Gitea, self-hosted):
   git remote set-url origin ssh://git@<private-host>/<user>/<repo>.git
   git push origin <branch>
 
 Bypass (visible, per-call):
   Set env KEI_NO_GITHUB_PUSH_BYPASS=1 before the command.
-  You must also add confirmation phrase: "yes, push patent code to github"
-  + "confirm publication" in the session turn.
 EOF
 
 exit 2

@@ -463,4 +463,4 @@ behaviour-verified: yes | no | not-applicable
 follow-up-required:
   - <bullet list>
 ```
-- `MEMORY.md → Architecture Overlay Incident (model_brain.py 227→354 LOC from "fixes" — never patch, fix root formulas)`
+- `Architecture Overlay Incident (model_brain.py 227→354 LOC from "fixes" — never patch, fix root formulas)`

@@ -99,7 +99,7 @@ extra = [
     "path:user-rules/dev-workflow.md",
     "path:user-rules/debugging.md",
     "path:user-rules/karpathy-behavioral.md",
-    "MEMORY.md → Architecture Overlay Incident (model_brain.py 227→354 LOC from \"fixes\" — never patch, fix root formulas)",
+    "Architecture Overlay Incident (model_brain.py 227→354 LOC from \"fixes\" — never patch, fix root formulas)",
 ]
 
 [taxonomy]

@@ -27,7 +27,7 @@ Store the reply verbatim as `REPO`.
 }
 ```
 
-Store as `PLATFORM`. If `Both` is selected, emit a one-line confirm: "You understand  — only non-patent code ever pushes to GitHub?" and wait for a `y` typed reply before proceeding.
+Store as `PLATFORM`. If `Both` is selected, emit a one-line confirm: "You understand — only public-safe code ever pushes to GitHub?" and wait for a `y` typed reply before proceeding.
 
 ## 1c — Languages click (AskUserQuestion, multi-select)
 

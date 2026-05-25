@@ -32,8 +32,8 @@ All hooks live under `hooks/` directory. Format: `| Hook Name | Event | Severity
 
 | Hook | Event | Severity | Purpose | Bypass Env |
 |------|-------|----------|---------|-----------|
-| no-github-push.sh | PreToolUse:Bash | block | Prevent pushing KeiTech patent IP to github.com — destroys priority date | KEI_NO_GITHUB_PUSH_BYPASS |
-| no-python-without-approval.sh | PreToolUse:Bash | block | Enforce RULE 0.2 (Rust first) — Python requires exception justification | none |
+| no-github-push.sh | PreToolUse:Bash | block | Block accidental push / repo-create to github.com (opt-in; for code kept on a private remote) | KEI_NO_GITHUB_PUSH_BYPASS |
+| no-python-without-approval.sh | PreToolUse:Bash | block | Optional Rust-first policy — Python requires explicit justification (opt-in, stack-gated) | none |
 | rust-first.sh | UserPromptSubmit | remind | Remind about Rust-first default for new work | none |
 | secrets-pre-guard.sh | PreToolUse:Edit\|Write | block | Detect hardcoded API keys, tokens, private keys before commit | KEI_SECRETS_GUARD_BYPASS |
 | destructive-guard.sh | PreToolUse:Bash | block | Block dangerous commands (rm -rf /, git reset --hard main, truncate) | none |
