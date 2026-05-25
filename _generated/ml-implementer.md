@@ -483,8 +483,8 @@ Blockers / next: <list>
 - `{path::user-rules}/manifold-tangent-sanity.md`
 - `{path::user-rules}/no-downgrade-constructive.md`
 - `{path::user-memory}/wrong-paths-specialized-ml.md`
-- `MEMORY.md → Compute Cost Incident (2026-02-26): promised $27, spent $98.78 on Modal. NEVER AGAIN.`
-- `MEMORY.md → Architecture Overlay Incident: model_brain.py 227→354 LOC from audit fixes. No Patching.`
+- `Compute Cost Incident: promised $27, spent $98.78 on Modal. NEVER AGAIN.`
+- `Architecture Overlay Incident: model_brain.py 227→354 LOC from audit fixes. No Patching.`
 
 ## Output Footer (RULE 0.16)
 

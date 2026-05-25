@@ -3,7 +3,7 @@
 # Bypass: GRAPH_EXPORT_BYPASS=1
 
 INTERVAL="${KEI_GRAPH_EXPORT_INTERVAL_S:-5}"
-OUT="${KEI_GRAPH_VIZ_DIR:-$HOME/Projects/lbm-graph-viz}/data-runtime.js"
+OUT="${KEI_GRAPH_VIZ_DIR:-$HOME/.local/share/kei/graph-viz}/data-runtime.js"
 BIN="$(command -v kei-graph-export 2>/dev/null || echo "$HOME/.cargo/bin/kei-graph-export")"
 
 [ -x "$BIN" ] || exit 0
