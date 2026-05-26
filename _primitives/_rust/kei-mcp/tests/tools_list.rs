@@ -68,12 +68,19 @@ async fn tools_list_returns_two_atoms_with_descriptors() {
     let resp = dispatch(req, &ctx).await;
     let result = resp.result.expect("should have result");
     let tools = result["tools"].as_array().expect("tools array");
-    // v0.39: list also includes the built-in `spawn_agent` tool (atoms + 1).
-    assert_eq!(tools.len(), 3);
+    // v0.40 (Phase C): list includes 4 built-ins (spawn_agent + kei_bash +
+    // kei_edit + kei_write) on top of discovered atoms.
+    assert_eq!(tools.len(), 6); // 2 atoms + 4 built-ins
     assert!(
         tools.iter().any(|t| t["name"] == "spawn_agent"),
         "spawn_agent built-in must be present"
     );
+    for kei in ["kei_bash", "kei_edit", "kei_write"] {
+        assert!(
+            tools.iter().any(|t| t["name"] == kei),
+            "{kei} built-in must be present"
+        );
+    }
     // sorted alphabetically
     assert_eq!(tools[0]["name"], "kei-sage::ask");
     assert_eq!(tools[1]["name"], "kei-task::search");
@@ -96,8 +103,14 @@ async fn tools_list_handles_empty_root() {
     };
     let resp = dispatch(req, &ctx).await;
     let result = resp.result.expect("should have result");
-    // v0.39: empty atoms root still surfaces the built-in `spawn_agent` tool.
+    // v0.40 (Phase C): empty atoms root surfaces 4 built-ins
+    // (spawn_agent + kei_bash + kei_edit + kei_write).
     let tools = result["tools"].as_array().unwrap();
-    assert_eq!(tools.len(), 1);
-    assert_eq!(tools[0]["name"], "spawn_agent");
+    assert_eq!(tools.len(), 4);
+    let names: Vec<&str> = tools.iter()
+        .filter_map(|t| t["name"].as_str())
+        .collect();
+    for required in ["spawn_agent", "kei_bash", "kei_edit", "kei_write"] {
+        assert!(names.contains(&required), "missing built-in: {required}");
+    }
 }
