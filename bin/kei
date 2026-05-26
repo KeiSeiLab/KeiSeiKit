@@ -10,10 +10,12 @@
 #   kei --status            # status only, don't launch claude
 #   kei message ...         # inter-session mailbox (send/inbox/list) — see kei-message.sh
 #   kei configure           # re-pick stack profile + opt-in hook packs
-#   kei run-via <backend> <agent> "<task>"
-#                           # invoke a KeiSeiKit agent via an external LLM CLI
+#   kei agent <name> "<task>"        # invoke agent, backend from DNA → primary
+#   kei agent --on=<backend> <name> "<task>"   # override backend
+#   kei run-via <backend> <name> "<task>"      # invoke agent on explicit backend
 #                           # backends: claude grok agy copilot kimi codex
-#                           # `kei run-via list` shows install status
+#                           # `kei run-via list` shows install status + agents
+#   kei primary [<backend>] # get/set primary LLM provider (DNA fallback)
 #   kei [args...]           # splash → claude args... (forwarded verbatim)
 #
 # The splash shows: substrate version, agent count, last sleep run,
@@ -24,8 +26,12 @@
 set -e
 
 # --- subcommand dispatch (before splash) ---------------------------------
-# `kei message ...` → mailbox CLI; `kei configure` → hook/stack re-picker;
-# `kei run-via ...` → invoke agent through external LLM CLI; rest = launch.
+# `kei message ...`  → mailbox CLI
+# `kei configure`    → hook/stack re-picker
+# `kei agent ...`    → DNA-resolved agent (manifest provider → primary → claude)
+# `kei run-via ...`  → explicit-backend agent invocation
+# `kei primary ...`  → get/set primary LLM provider
+# rest = splash + launch claude (legacy primary).
 case "${1:-}" in
   message|msg|m)
     shift
@@ -35,9 +41,17 @@ case "${1:-}" in
     shift
     exec "$HOME/.claude/scripts/kei-configure.sh" "$@"
     ;;
-  run-via|via|run|agent-via)
+  agent)
     shift
     exec "$HOME/.claude/scripts/kei-agent-cli.sh" "$@"
+    ;;
+  run-via|via|agent-via)
+    shift
+    exec "$HOME/.claude/scripts/kei-agent-cli.sh" "$@"
+    ;;
+  primary)
+    shift
+    exec "$HOME/.claude/scripts/kei-agent-cli.sh" primary "$@"
     ;;
 esac
 

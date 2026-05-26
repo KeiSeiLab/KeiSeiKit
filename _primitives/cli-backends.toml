@@ -34,8 +34,8 @@ homepage    = "https://github.com/github/copilot-cli"
 
 [backend.kimi]
 bin         = "kimi"
-prompt_flag = "stdin"
-notes       = "Moonshot Kimi CLI — primarily TUI/ACP; non-interactive via stdin"
+prompt_flag = "tui-only"
+notes       = "Moonshot Kimi CLI — TUI-ONLY (smoke 2026-05-26). Headless requires ACP client; launcher saves prompt to tmpfile + opens TUI for paste."
 homepage    = "https://moonshotai.github.io/kimi-cli/"
 
 [backend.codex]
