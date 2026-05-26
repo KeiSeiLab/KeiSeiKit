@@ -9,6 +9,11 @@
 #   kei --no-splash         # skip splash → exec claude
 #   kei --status            # status only, don't launch claude
 #   kei message ...         # inter-session mailbox (send/inbox/list) — see kei-message.sh
+#   kei configure           # re-pick stack profile + opt-in hook packs
+#   kei run-via <backend> <agent> "<task>"
+#                           # invoke a KeiSeiKit agent via an external LLM CLI
+#                           # backends: claude grok agy copilot kimi codex
+#                           # `kei run-via list` shows install status
 #   kei [args...]           # splash → claude args... (forwarded verbatim)
 #
 # The splash shows: substrate version, agent count, last sleep run,
@@ -20,7 +25,7 @@ set -e
 
 # --- subcommand dispatch (before splash) ---------------------------------
 # `kei message ...` → mailbox CLI; `kei configure` → hook/stack re-picker;
-# everything else falls through to launch.
+# `kei run-via ...` → invoke agent through external LLM CLI; rest = launch.
 case "${1:-}" in
   message|msg|m)
     shift
@@ -29,6 +34,10 @@ case "${1:-}" in
   configure|config|reconfigure)
     shift
     exec "$HOME/.claude/scripts/kei-configure.sh" "$@"
+    ;;
+  run-via|via|run|agent-via)
+    shift
+    exec "$HOME/.claude/scripts/kei-agent-cli.sh" "$@"
     ;;
 esac
 
