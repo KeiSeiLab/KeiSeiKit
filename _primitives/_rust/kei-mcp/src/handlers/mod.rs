@@ -12,6 +12,7 @@
 pub mod initialize;
 pub mod prompts;
 pub mod resources;
+pub mod safe_tools;
 pub mod tools;
 
 use crate::protocol::{err, JsonRpcRequest, JsonRpcResponse, Method, ServerContext, METHOD_NOT_FOUND};
