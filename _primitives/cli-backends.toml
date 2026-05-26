@@ -1,0 +1,45 @@
+# cli-backends.toml — SSoT for external LLM CLIs that can host KeiSeiKit agents.
+#
+# Each backend is a CLI you have a subscription / local install of. The
+# `kei run-via <backend> <agent> "<task>"` launcher composes an agent's
+# assembled .md prompt with the task and invokes the backend's
+# non-interactive (print) mode.
+#
+# Add a backend by appending a `[backend.<name>]` table. The launcher
+# (`scripts/kei-agent-cli.sh`) reads `bin` + `prompt_flag` and execs.
+
+[backend.claude]
+bin         = "claude"
+prompt_flag = "-p"
+notes       = "Claude Code (Anthropic) — native --agent flag also supported"
+homepage    = "https://claude.com/claude-code"
+
+[backend.grok]
+bin         = "grok"
+prompt_flag = "--print"
+notes       = "xAI Grok Build TUI — native --agent flag also supported"
+homepage    = "https://x.ai/grok"
+
+[backend.agy]
+bin         = "agy"
+prompt_flag = "--print"
+notes       = "Google Antigravity (alias: antigravity)"
+aliases     = ["antigravity"]
+
+[backend.copilot]
+bin         = "copilot"
+prompt_flag = "--prompt"
+notes       = "GitHub Copilot CLI (@github/copilot npm)"
+homepage    = "https://github.com/github/copilot-cli"
+
+[backend.kimi]
+bin         = "kimi"
+prompt_flag = "stdin"
+notes       = "Moonshot Kimi CLI — primarily TUI/ACP; non-interactive via stdin"
+homepage    = "https://moonshotai.github.io/kimi-cli/"
+
+[backend.codex]
+bin         = "codex"
+prompt_flag = "-p"
+notes       = "OpenAI Codex CLI — register here, install separately"
+homepage    = "https://github.com/openai/codex"
