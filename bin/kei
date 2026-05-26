@@ -20,6 +20,8 @@
 #   kei mcp-wire [<cli>]    # wire kei-mcp into a CLI's MCP config + hook setup
 #                           # (Phase C cross-CLI policy enforcement)
 #   kei mcp-wire --list     # show enforcement tier per CLI
+#   kei limits              # probe each CLI's subscription quota (best-effort)
+#                           # (4 of 5 CLIs have no public API — honest report)
 #   kei --on=<backend>      # one-shot launch of <backend> (does not change primary)
 #   kei [args...]           # splash → exec primary CLI (default: claude)
 #
@@ -65,6 +67,10 @@ case "${1:-}" in
   mcp-wire|wire)
     shift
     exec "$HOME/.claude/scripts/kei-mcp-wire.sh" "$@"
+    ;;
+  limits|quota|usage)
+    shift
+    exec "$HOME/.claude/scripts/kei-limits.sh" "$@"
     ;;
 esac
 
