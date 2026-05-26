@@ -68,7 +68,12 @@ async fn tools_list_returns_two_atoms_with_descriptors() {
     let resp = dispatch(req, &ctx).await;
     let result = resp.result.expect("should have result");
     let tools = result["tools"].as_array().expect("tools array");
-    assert_eq!(tools.len(), 2);
+    // v0.39: list also includes the built-in `spawn_agent` tool (atoms + 1).
+    assert_eq!(tools.len(), 3);
+    assert!(
+        tools.iter().any(|t| t["name"] == "spawn_agent"),
+        "spawn_agent built-in must be present"
+    );
     // sorted alphabetically
     assert_eq!(tools[0]["name"], "kei-sage::ask");
     assert_eq!(tools[1]["name"], "kei-task::search");
@@ -91,5 +96,8 @@ async fn tools_list_handles_empty_root() {
     };
     let resp = dispatch(req, &ctx).await;
     let result = resp.result.expect("should have result");
-    assert_eq!(result["tools"].as_array().unwrap().len(), 0);
+    // v0.39: empty atoms root still surfaces the built-in `spawn_agent` tool.
+    let tools = result["tools"].as_array().unwrap();
+    assert_eq!(tools.len(), 1);
+    assert_eq!(tools[0]["name"], "spawn_agent");
 }

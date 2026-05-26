@@ -108,6 +108,69 @@ strengths; the substrate is agnostic about which you pick. Pick by:
 - **Independent second opinion** — same agent, different model, see if
   conclusions diverge.
 
+## Orchestrator picker — `kei` no longer hardcodes claude
+
+Without args, `kei` reads `~/.claude/config/primary.toml` and execs that CLI.
+The picker lets you change it interactively:
+
+```bash
+kei pick               # interactive menu → set primary → launch it
+kei                    # splash → exec the configured primary
+kei --on=grok          # one-shot launch of grok (does NOT change primary)
+kei primary grok       # set default to grok (no launch)
+kei primary            # show current primary
+```
+
+The splash shows `primary CLI: <backend>` so you always know which orchestrator
+will start. If the chosen primary isn't installed, `kei` prints the install
+command and offers `kei pick` as recovery.
+
+## Cross-CLI sub-agent spawn via MCP — `spawn_agent`
+
+`kei-mcp` exposes a built-in `spawn_agent` MCP tool. Any CLI that connects
+to it as an MCP client can invoke KeiSeiKit agents on any backend, no matter
+what the orchestrator is:
+
+```jsonrpc
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "spawn_agent",
+    "arguments": {
+      "name": "critic",
+      "task": "review src/auth.rs for race conditions",
+      "on": "grok"
+    }
+  }
+}
+```
+
+Internally `spawn_agent` shells out to `kei-agent-cli.sh` with the same DNA
+resolution as `kei agent`. The `on` argument is optional — without it, the
+backend is picked from the agent's manifest, then `primary.toml`, then claude.
+
+**Why this matters:** Claude Code has a native `Agent` tool for sub-agent
+spawning. Grok / Antigravity / Copilot / Kimi do NOT have that surface
+natively — but they all support MCP. With `spawn_agent` exposed via kei-mcp,
+**every backend that speaks MCP gets KeiSeiKit's sub-agent capability**. So
+when Grok is your orchestrator, it can still spawn `critic` on Claude (or
+`code-implementer` on Antigravity, or anything else) — the orchestrator
+choice no longer caps your sub-agent surface.
+
+Wire kei-mcp into the orchestrator's MCP config (each CLI has its own):
+
+| CLI | MCP config |
+|---|---|
+| claude | `~/.claude/settings.json` `mcpServers` block |
+| grok | `~/.grok/config.json` (or check `grok --help`) |
+| agy | `~/.antigravity/mcp.json` (check `agy plugin list`) |
+| copilot | `~/.copilot/mcp.json` (check `copilot --help`) |
+| kimi | `kimi mcp add` subcommand |
+
+Point each at `<kit>/_primitives/_rust/target/release/kei-mcp` (built via
+`cargo build -p kei-mcp --release`).
+
 ## Rule enforcement caveat (READ THIS)
 
 KeiSeiKit hooks (`numeric-claims-guard`, `citation-verify`, `no-github-push`,

@@ -18,7 +18,9 @@ path = "src/lib.rs"
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
-tokio = { workspace = true }
+# v0.39: io-std added for tokio::io::stdin/stdout used by the MCP stdio
+# transport in main.rs (workspace tokio doesn't enable io-std by default).
+tokio = { workspace = true, features = ["io-std"] }
 anyhow = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 kei-skills = { path = "../kei-skills" }
