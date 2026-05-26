@@ -10,13 +10,15 @@
 #   kei --status            # status only, don't launch claude
 #   kei message ...         # inter-session mailbox (send/inbox/list) — see kei-message.sh
 #   kei configure           # re-pick stack profile + opt-in hook packs
+#   kei pick                # interactive picker → set primary → launch it
 #   kei agent <name> "<task>"        # invoke agent, backend from DNA → primary
 #   kei agent --on=<backend> <name> "<task>"   # override backend
 #   kei run-via <backend> <name> "<task>"      # invoke agent on explicit backend
 #                           # backends: claude grok agy copilot kimi codex
 #                           # `kei run-via list` shows install status + agents
 #   kei primary [<backend>] # get/set primary LLM provider (DNA fallback)
-#   kei [args...]           # splash → claude args... (forwarded verbatim)
+#   kei --on=<backend>      # one-shot launch of <backend> (does not change primary)
+#   kei [args...]           # splash → exec primary CLI (default: claude)
 #
 # The splash shows: substrate version, agent count, last sleep run,
 # active sessions (kei-ping). Press any key to skip the dwell.
@@ -53,7 +55,19 @@ case "${1:-}" in
     shift
     exec "$HOME/.claude/scripts/kei-agent-cli.sh" primary "$@"
     ;;
+  pick)
+    shift
+    exec "$HOME/.claude/scripts/kei-pick.sh" "$@"
+    ;;
 esac
+
+# --- one-shot --on=<backend> override (does not write primary.toml) -------
+ONESHOT_BACKEND=""
+for arg in "$@"; do
+  case "$arg" in
+    --on=*) ONESHOT_BACKEND="${arg#--on=}" ;;
+  esac
+done
 
 # --- args ----------------------------------------------------------------
 SPLASH=1
@@ -61,19 +75,67 @@ STATUS_ONLY=0
 PASSTHROUGH=()
 for arg in "$@"; do
   case "$arg" in
+    --on=*)      ;;  # already captured in ONESHOT_BACKEND; don't forward
     --no-splash) SPLASH=0 ;;
     --status)    STATUS_ONLY=1; SPLASH=1 ;;
     *)           PASSTHROUGH+=("$arg") ;;
   esac
 done
 
-# --- locate claude on PATH -----------------------------------------------
-CLAUDE_BIN="$(command -v claude 2>/dev/null || true)"
-if [ -z "$CLAUDE_BIN" ] && [ "$STATUS_ONLY" = "0" ]; then
-  echo "error: 'claude' not on PATH. Install Claude Code first:" >&2
-  echo "  curl -fsSL https://claude.ai/install.sh | sh" >&2
+# --- resolve primary backend ---------------------------------------------
+# Order: --on=<backend> override → ~/.claude/config/primary.toml → claude.
+resolve_primary() {
+  if [ -n "$ONESHOT_BACKEND" ]; then printf '%s\n' "$ONESHOT_BACKEND"; return; fi
+  if [ -n "${KEI_PRIMARY:-}" ]; then printf '%s\n' "$KEI_PRIMARY"; return; fi
+  local cfg="$HOME/.claude/config/primary.toml"
+  if [ -f "$cfg" ]; then
+    awk -F'=' '/^provider[[:space:]]*=/ {
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2)
+      gsub(/^"|"$/, "", $2)
+      print $2; exit
+    }' "$cfg"
+    return
+  fi
+  printf 'claude\n'
+}
+
+# Map backend name → executable. Mirrors scripts/kei-agent-cli.sh::backend_bin.
+backend_bin_for() {
+  case "$1" in
+    claude)               echo "claude"  ;;
+    grok)                 echo "grok"    ;;
+    agy|antigravity)      echo "agy"     ;;
+    copilot)              echo "copilot" ;;
+    kimi)                 echo "kimi"    ;;
+    codex)                echo "codex"   ;;
+    *) return 1 ;;
+  esac
+}
+
+PRIMARY="$(resolve_primary)"
+PRIMARY_CLI="$(backend_bin_for "$PRIMARY")" || {
+  echo "error: unknown primary backend: $PRIMARY" >&2
+  exit 2
+}
+PRIMARY_BIN="$(command -v "$PRIMARY_CLI" 2>/dev/null || true)"
+
+if [ -z "$PRIMARY_BIN" ] && [ "$STATUS_ONLY" = "0" ]; then
+  echo "error: primary backend '$PRIMARY' → '$PRIMARY_CLI' not on PATH." >&2
+  case "$PRIMARY" in
+    claude)  echo "  install: curl -fsSL https://claude.ai/install.sh | sh" >&2 ;;
+    grok)    echo "  install: see https://x.ai/grok" >&2 ;;
+    copilot) echo "  install: npm i -g @github/copilot" >&2 ;;
+    kimi)    echo "  install: uv tool install kimi-cli" >&2 ;;
+    agy)     echo "  install: see https://antigravity.dev" >&2 ;;
+    codex)   echo "  install: see https://github.com/openai/codex" >&2 ;;
+  esac
+  echo "  or: kei pick   (interactive picker to choose + set primary)" >&2
+  echo "  or: kei primary <backend>   (set a different default)" >&2
   exit 127
 fi
+
+# Legacy var name for splash code below.
+CLAUDE_BIN="$PRIMARY_BIN"
 
 # --- read state ----------------------------------------------------------
 AGENTS_DIR="${HOME}/.claude/agents"
@@ -155,8 +217,9 @@ ${C1}    ██╔═██╗ ██╔══╝  ██║╚════█�
 ${C1}    ██║  ██╗███████╗██║███████║███████╗██║${C0}
 ${C1}    ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚══════╝╚═╝${C0}
 
-${C2}    KeiSeiKit · substrate v0.38${C0}
+${C2}    KeiSeiKit · substrate v0.39${C0}
 ${C3}    ─────────────────────────────────────${C0}
+      primary CLI    : ${CV}${PRIMARY}${C0}
       profile        : ${CV}${p}${C0}
       agents         : ${CV}${ac}${C0}
       last sleep run : ${CV}${sl}${C0}
