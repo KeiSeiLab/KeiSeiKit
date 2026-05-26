@@ -27,14 +27,16 @@ install_hooks() {
   say "  installed $hook_count hook(s)"
 
   # v0.17 — shared hook library (gate.sh + test-gate.sh)
+  # v0.40 — also copy *.toml files from _lib/ (policy-chain.toml for safe_tools).
   if [ -d "$KIT_DIR/hooks/_lib" ]; then
     mkdir -p "$HOOKS_DIR/_lib"
     local lib_count=0 lib_src lib_name
-    for lib_src in "$KIT_DIR/hooks/_lib/"*.sh; do
+    for lib_src in "$KIT_DIR/hooks/_lib/"*.sh "$KIT_DIR/hooks/_lib/"*.toml; do
       [ -f "$lib_src" ] || continue
       lib_name="$(basename "$lib_src")"
       cp -f "$lib_src" "$HOOKS_DIR/_lib/$lib_name"
-      chmod +x "$HOOKS_DIR/_lib/$lib_name"
+      # chmod +x only for shell scripts; .toml stays read-only.
+      case "$lib_name" in *.sh) chmod +x "$HOOKS_DIR/_lib/$lib_name" ;; esac
       lib_count=$((lib_count+1))
     done
     say "  installed $lib_count hook library file(s) -> $HOOKS_DIR/_lib/"
