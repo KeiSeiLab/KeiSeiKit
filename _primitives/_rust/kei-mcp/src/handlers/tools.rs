@@ -33,6 +33,10 @@ pub fn list(req: JsonRpcRequest, ctx: &ServerContext) -> JsonRpcResponse {
         .into_iter()
         .map(atom_to_tool_descriptor)
         .collect();
+    // v0.39: built-in spawn_agent tool — exposed to all MCP clients so any
+    // CLI (grok / agy / copilot / kimi / claude) can spawn a KeiSeiKit agent
+    // as a sub-agent. Bypasses atom discovery (it's an internal handler).
+    tools.push(spawn_agent_descriptor());
     tools.sort_by(|a, b| {
         a.get("name").and_then(Value::as_str).unwrap_or("")
             .cmp(b.get("name").and_then(Value::as_str).unwrap_or(""))
@@ -50,12 +54,112 @@ pub async fn call(req: JsonRpcRequest, ctx: &ServerContext) -> JsonRpcResponse {
         None => return err(req.id, INVALID_PARAMS, "missing tool name"),
     };
     let args = params.get("arguments").cloned().unwrap_or(json!({}));
+
+    // v0.39: spawn_agent built-in — short-circuit before atom dispatch.
+    if name == "spawn_agent" {
+        return match invoke_spawn_agent(&args).await {
+            Ok(text) => ok(req.id, json!({
+                "content": [{ "type": "text", "text": text }],
+                "isError": false,
+            })),
+            Err(e) => err(req.id, INTERNAL_ERROR, e),
+        };
+    }
+
     match invoke_atom(&ctx.atoms_root, &name, &args).await {
         Ok(result) => ok(req.id, json!({
             "content": [{ "type": "text", "text": serde_json::to_string(&result).unwrap_or_default() }],
             "isError": false,
         })),
         Err(e) => err(req.id, INTERNAL_ERROR, e),
+    }
+}
+
+/// v0.39: built-in `spawn_agent` MCP tool descriptor.
+/// Exposes KeiSeiKit's cross-CLI agent launcher (`kei-agent-cli.sh`) so any
+/// MCP client can spawn an agent on any backend (claude / grok / agy /
+/// copilot / kimi). Solves the "non-claude orchestrator can't natively spawn
+/// sub-agents" gap — any CLI with MCP support gets the spawn capability.
+fn spawn_agent_descriptor() -> Value {
+    json!({
+        "name": "spawn_agent",
+        "description": "Spawn a KeiSeiKit agent as a sub-agent through any configured LLM CLI backend. Reads ~/.claude/agents/<name>.md, composes with the task, and execs the chosen backend non-interactively. Backend resolution: explicit `on` arg → agent manifest's `provider` → ~/.claude/config/primary.toml → claude.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Agent name (looked up in ~/.claude/agents/<name>.md)"
+                },
+                "task": {
+                    "type": "string",
+                    "description": "The task / question to give the agent"
+                },
+                "on": {
+                    "type": "string",
+                    "description": "Optional explicit backend override (claude/grok/agy/copilot/kimi/codex). Default: DNA → primary → claude.",
+                    "enum": ["claude", "grok", "agy", "antigravity", "copilot", "kimi", "codex"]
+                }
+            },
+            "required": ["name", "task"]
+        }
+    })
+}
+
+/// v0.39: handler for `tools/call name=spawn_agent`. Shells out to
+/// `kei-agent-cli.sh` (located via $HOME/.claude/scripts/) and returns
+/// the backend's stdout as the tool result.
+async fn invoke_spawn_agent(args: &Value) -> Result<String, String> {
+    let name = args.get("name").and_then(Value::as_str)
+        .ok_or_else(|| "spawn_agent: missing 'name' argument".to_string())?;
+    let task = args.get("task").and_then(Value::as_str)
+        .ok_or_else(|| "spawn_agent: missing 'task' argument".to_string())?;
+    let on_opt = args.get("on").and_then(Value::as_str);
+
+    // Locate the launcher script. Honors KEI_AGENT_CLI override for testing.
+    let script = match std::env::var("KEI_AGENT_CLI") {
+        Ok(v) => PathBuf::from(v),
+        Err(_) => {
+            let home = std::env::var("HOME").map_err(|_| "HOME not set".to_string())?;
+            PathBuf::from(home).join(".claude/scripts/kei-agent-cli.sh")
+        }
+    };
+    if !script.is_file() {
+        return Err(format!("kei-agent-cli.sh not found: {}", script.display()));
+    }
+
+    let mut cmd = Command::new(&script);
+    if let Some(on) = on_opt {
+        cmd.arg(format!("--on={on}"));
+    }
+    cmd.arg(name).arg(task);
+    cmd.stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true);
+
+    let child = cmd.spawn()
+        .map_err(|e| format!("spawn {}: {e}", script.display()))?;
+    let fut = child.wait_with_output();
+
+    // Reuse the existing ATOM_TIMEOUT_SECS for the spawn_agent cap too —
+    // 60s should suffice for non-interactive prompts; longer tasks would
+    // need streaming, which the MCP tools-call contract doesn't support
+    // anyway. Hung agents are killed at the timeout.
+    match tokio::time::timeout(Duration::from_secs(ATOM_TIMEOUT_SECS), fut).await {
+        Ok(Ok(out)) => {
+            let stdout = String::from_utf8_lossy(&out.stdout).to_string();
+            if !out.status.success() {
+                let stderr = String::from_utf8_lossy(&out.stderr).trim().to_string();
+                return Err(format!(
+                    "spawn_agent backend exited {}: {stderr}",
+                    out.status.code().unwrap_or(-1)
+                ));
+            }
+            Ok(stdout)
+        }
+        Ok(Err(e)) => Err(format!("wait: {e}")),
+        Err(_) => Err("spawn_agent timeout".into()),
     }
 }
 
