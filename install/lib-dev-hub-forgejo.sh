@@ -97,11 +97,19 @@ _dhf_bootstrap_admin_user() {
   local kc_token_svc kc_pass_svc
   config="$(_dhf_app_ini)"
   username="${KEI_FORGEJO_ADMIN_USER:-${USER:-denis}}"
-  # Single-source Keychain service names (override per-host via env).
-  # Wizard MUST read identical names — see drive-import-wizard.sh.tmpl.
   kc_token_svc="${KEI_FORGEJO_KC_TOKEN_SERVICE:-forgejo-api-token}"
   kc_pass_svc="${KEI_FORGEJO_KC_PASS_SERVICE:-forgejo-admin-password}"
-  # Detection: any rows beyond header in `admin user list`?
+
+  # v0.45 fix: Forgejo on first install needs `migrate` to create the sqlite
+  # schema. Without it, `admin user create` fails with "no such table: user"
+  # (verified bug 2026-05-26 in prod curl|bash test). `migrate` is idempotent
+  # — safe to re-run.
+  if ! forgejo --config "$config" migrate 2>/dev/null; then
+    warn "  → forgejo migrate failed; daemon may need restart before admin create"
+  fi
+
+  # Detection: any rows beyond header in `admin user list`? Now safe to
+  # parse since migrate has ensured the user table exists.
   user_count="$(forgejo --config "$config" admin user list 2>/dev/null \
     | tail -n +2 | grep -cv '^$' || echo 0)"
   if [ "$user_count" -gt 0 ]; then

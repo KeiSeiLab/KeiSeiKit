@@ -204,6 +204,25 @@ log ""
 log "==========================================================================="
 log "DONE — KeiSeiKit installed (profile: $PROFILE)"
 log "==========================================================================="
+
+# v0.45: post-install onboarding wizard.
+# Auto-triggers if stdin is a TTY (real terminal). Wizard itself re-checks
+# and exits cleanly if non-interactive — so curl|bash one-liner runs work too.
+ONBOARD_SH="$HOME/.claude/scripts/kei-onboard.sh"
+if [ -x "$ONBOARD_SH" ] && [ -t 0 ] && [ "${KEI_NO_ONBOARD:-0}" != "1" ]; then
+  log ""
+  log "Starting post-install onboarding (pick primary CLI + wire MCP)..."
+  log "Skip with KEI_NO_ONBOARD=1; re-run anytime with 'kei onboard'."
+  log ""
+  "$ONBOARD_SH" || log "(onboarding exited non-zero; re-run with 'kei onboard')"
+else
+  log ""
+  log "Post-install wizard skipped (no TTY or KEI_NO_ONBOARD=1)."
+  log "Run interactively to configure primary CLI:"
+  log "  kei onboard           # full wizard"
+  log "  kei pick              # just pick primary"
+  log "  kei mcp-wire          # wire MCP into installed CLIs"
+fi
 log ""
 log "Next steps:"
 log "  - Open a new shell so PATH picks up ~/.cargo/bin and the kei-* binaries."

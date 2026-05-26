@@ -80,14 +80,29 @@ _mint_runner_token() {
   printf '%s' "$token"
 }
 
-# Internal: register act_runner with the local Forgejo. Writes ${DATA}/.runner.
-# Args: <data_dir> <token>.
+# v0.45 fix: brew installs `gitea-runner` (not `act_runner`); the binary is
+# named `gitea-runner`. Resolver tries both names so future brew packaging
+# changes don't re-break this. act_runner upstream and gitea-runner fork are
+# functionally equivalent and both register with Forgejo.
+_runner_bin() {
+  if command -v act_runner >/dev/null 2>&1; then
+    echo "act_runner"
+  elif command -v gitea-runner >/dev/null 2>&1; then
+    echo "gitea-runner"
+  else
+    return 1
+  fi
+}
+
+# Internal: register the runner with the local Forgejo. Writes ${DATA}/.runner.
 _register_act_runner() {
   local data_dir="$1"
   local token="$2"
   local label="self-hosted,macos-arm64,native"
   local name="$(hostname -s)-keisei"
-  ( cd "$data_dir" && act_runner register \
+  local runner
+  runner="$(_runner_bin)" || { err "no runner binary found (looked for act_runner + gitea-runner)"; return 1; }
+  ( cd "$data_dir" && "$runner" register \
       --no-interactive \
       --instance http://127.0.0.1:3001 \
       --token "$token" \
@@ -97,12 +112,19 @@ _register_act_runner() {
 
 # Public entry: install + register + bootstrap the runner.
 install_dev_hub_forgejo_runner() {
-  say "installing dev-hub-forgejo-runner (act_runner)"
+  say "installing dev-hub-forgejo-runner (Forgejo Actions runner)"
   _require_forgejo_binary || return 1
   _require_forgejo_running || return 1
 
-  say "brew install act_runner"
-  brew install act_runner
+  # Prefer the Forgejo-official runner; fall back to the gitea-runner fork
+  # (which is what `brew install gitea-runner` actually provides today).
+  if ! _runner_bin >/dev/null 2>&1; then
+    say "brew install gitea-runner (Forgejo-compatible)"
+    brew install gitea-runner || {
+      warn "brew install gitea-runner failed — try 'brew tap actions/runner' for act_runner"
+      return 1
+    }
+  fi
 
   local data_dir
   data_dir="$(_runner_data_dir)"
@@ -125,7 +147,9 @@ install_dev_hub_forgejo_runner() {
   . "$KIT_DIR/install/lib-launchd.sh"
   install_service forgejo-runner
 
-  say "act_runner registered + running. Polling http://127.0.0.1:3001 for jobs."
+  local runner_name
+  runner_name="$(_runner_bin 2>/dev/null || echo runner)"
+  say "$runner_name registered + running. Polling http://127.0.0.1:3001 for jobs."
 }
 
 # Public entry: stop + unload the runner. Keeps ${DATA}/.runner so re-install

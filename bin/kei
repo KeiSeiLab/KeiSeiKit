@@ -22,6 +22,7 @@
 #   kei mcp-wire --list     # show enforcement tier per CLI
 #   kei limits              # probe each CLI's subscription quota (best-effort)
 #                           # (4 of 5 CLIs have no public API — honest report)
+#   kei onboard             # post-install wizard (pick primary + mcp-wire + check)
 #   kei --on=<backend>      # one-shot launch of <backend> (does not change primary)
 #   kei [args...]           # splash → exec primary CLI (default: claude)
 #
@@ -71,6 +72,10 @@ case "${1:-}" in
   limits|quota|usage)
     shift
     exec "$HOME/.claude/scripts/kei-limits.sh" "$@"
+    ;;
+  onboard|setup|wizard)
+    shift
+    exec "$HOME/.claude/scripts/kei-onboard.sh" "$@"
     ;;
 esac
 
@@ -230,7 +235,7 @@ ${C1}    ██╔═██╗ ██╔══╝  ██║╚════█�
 ${C1}    ██║  ██╗███████╗██║███████║███████╗██║${C0}
 ${C1}    ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚══════╝╚═╝${C0}
 
-${C2}    KeiSeiKit · substrate v0.44${C0}
+${C2}    KeiSeiKit · substrate v0.45${C0}
 ${C3}    ─────────────────────────────────────${C0}
       primary CLI    : ${CV}${PRIMARY}${C0}
       profile        : ${CV}${p}${C0}

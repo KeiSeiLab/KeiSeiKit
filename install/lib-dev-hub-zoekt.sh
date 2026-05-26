@@ -41,13 +41,38 @@ _dhz_check_go_runtime() {
   fi
 }
 
-# Step b — brew install zoekt (idempotent).
+# Step b — install zoekt. Zoekt is NOT in homebrew/core — try tap first,
+# then fall back to building from source via Go (if installed). On total
+# failure, skip cleanly rather than aborting the whole install.
+# v0.45 fix: prior version errored hard ("No formula") and bailed the entire
+# dev-hub install. Now degrades gracefully.
 _dhz_brew_install() {
-  say "installing zoekt via brew (idempotent)"
-  if ! brew install zoekt; then
-    err "brew install zoekt failed — see brew log above"
-    return 1
+  say "installing zoekt (idempotent)"
+  if command -v zoekt-webserver >/dev/null 2>&1 && command -v zoekt-index >/dev/null 2>&1; then
+    say "  → zoekt already installed; skipping"
+    return 0
   fi
+  if brew install zoekt 2>/dev/null; then
+    say "  → installed via brew core"
+    return 0
+  fi
+  if brew install sourcegraph/zoekt/zoekt 2>/dev/null \
+     || brew install hyperdiscovery/zoekt/zoekt 2>/dev/null; then
+    say "  → installed via tap"
+    return 0
+  fi
+  if command -v go >/dev/null 2>&1; then
+    say "  → falling back to 'go install' from sourcegraph/zoekt"
+    if go install github.com/sourcegraph/zoekt/cmd/zoekt-webserver@latest \
+       && go install github.com/sourcegraph/zoekt/cmd/zoekt-index@latest; then
+      say "  → installed via go"
+      return 0
+    fi
+  fi
+  warn "zoekt unavailable: not in brew core/taps + no go fallback."
+  warn "Skipping zoekt service install. Other dev-hub services continue."
+  warn "To install later: brew install --HEAD sourcegraph/zoekt/zoekt"
+  return 2  # signal partial — caller treats as skip, not fatal
 }
 
 # Step c — ensure data dir tree (+ index dir).
