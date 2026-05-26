@@ -36,36 +36,67 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
     cp -f "$transcript" "$dest" 2>/dev/null || true
 fi
 
-# Best-effort ingest — advisory only; never blocks the session from ending.
+# RECURRENCE FIX 2026-05-26: 18MB+ transcripts caused 4-minute "Recombobulating…"
+# hangs at session end. The three heavy ops below now run async-detached:
+# hook returns immediately, ingest / scan / sync grind in background.
+# Raw JSONL is already saved sync (line 36) — no data loss; only the
+# index/embedding step is deferred. kei-memory ingest is idempotent on
+# session_id so partial runs are safe.
+
+bg_log="${HOME}/.claude/memory/traces/session-end.bg.log"
+mkdir -p "$(dirname "$bg_log")" 2>/dev/null || true
+
+# Portable timeout (macOS has no `timeout` / `gtimeout` by default).
+# Fallback: perl alarm. Final fallback: no timeout (rely on detach).
+kei_with_timeout() {
+    secs="$1"; shift
+    if command -v timeout >/dev/null 2>&1; then
+        timeout "$secs" "$@"
+    elif command -v gtimeout >/dev/null 2>&1; then
+        gtimeout "$secs" "$@"
+    elif command -v perl >/dev/null 2>&1; then
+        perl -e 'alarm shift @ARGV; exec @ARGV' "$secs" "$@"
+    else
+        "$@"
+    fi
+}
+
+# Best-effort ingest — async-detached.
 if command -v kei-memory >/dev/null 2>&1 && [ -f "$dest" ]; then
-    kei-memory ingest \
-        --session-id "$session_id" \
-        --transcript "$dest" \
-        >/dev/null 2>&1 || true
+    (
+        kei_with_timeout 90 kei-memory ingest \
+            --session-id "$session_id" \
+            --transcript "$dest" \
+            >>"$bg_log" 2>&1 \
+        || printf '[%s] kei-memory ingest timeout/fail for %s\n' \
+             "$(date +%H:%M:%S)" "$session_id" >>"$bg_log"
+    ) </dev/null >/dev/null 2>&1 &
+    disown 2>/dev/null || true
 fi
 
-# Wave 25 — frustration-matrix scan: regex+firmware classifier produces a
-# JSONL of per-line affect hits per session, much smaller than the full
-# transcript. Cloud REM agent reads the affect file instead of 80MB JSONL.
-# Silent no-op when the primitive is absent.
+# Wave 25 — frustration-matrix scan.
 if command -v frustration-matrix >/dev/null 2>&1; then
     affect_dir="${HOME}/.claude/memory/affect"
     mkdir -p "$affect_dir" 2>/dev/null || true
     affect_out="${affect_dir}/${session_id}.jsonl"
-    frustration-matrix scan \
-        --root "$traces_dir" \
-        --since 1d \
-        --format jsonl \
-        --output "$affect_out" \
-        >/dev/null 2>&1 || true
+    (
+        kei_with_timeout 60 frustration-matrix scan \
+            --root "$traces_dir" \
+            --since 1d \
+            --format jsonl \
+            --output "$affect_out" \
+            >>"$bg_log" 2>&1 || true
+    ) </dev/null >/dev/null 2>&1 &
+    disown 2>/dev/null || true
 fi
 
-# v0.11 sleep-sync (RULE 0.15) — push traces to the user's memory-repo so a
-# cloud agent can consolidate them overnight. Silent no-op when the primitive
-# is absent or the user hasn't opted in via /sleep-setup.
+# v0.11 sleep-sync (RULE 0.15) — push traces to memory-repo.
 sleep_sync="${HOME}/.claude/agents/_primitives/kei-sleep-sync.sh"
 if [ -x "$sleep_sync" ]; then
-    "$sleep_sync" >/dev/null 2>&1 || true
+    (
+        kei_with_timeout 120 "$sleep_sync" >>"$bg_log" 2>&1 || true
+    ) </dev/null >/dev/null 2>&1 &
+    disown 2>/dev/null || true
 fi
 
 exit 0
