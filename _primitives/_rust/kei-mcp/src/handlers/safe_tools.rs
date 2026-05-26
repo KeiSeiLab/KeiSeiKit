@@ -15,17 +15,29 @@
 //! abstraction layer. Shell-out per hook keeps the contract identical to
 //! Claude's native PreToolUse pipeline.
 //!
-//! Guard against double-enforcement: if the parent process is already inside
-//! Claude Code (`$CLAUDECODE=1`) or Grok (`$GROKCODE=1`), the chain is
-//! skipped — the CLI's native hooks already fired on its own PreToolUse.
+//! CLAUDECODE / GROKCODE guard — DESIGN NOTE (NOT a security boundary):
+//! When invoked from inside Claude Code (`$CLAUDECODE=1`) or Grok the chain
+//! is SKIPPED to avoid double-firing the same hooks (they already ran on the
+//! CLI's own PreToolUse). This is a perf / UX optimization for the inside-CLI
+//! call path — NOT an authorization check. An attacker who can set the
+//! parent process's environment already controls the CLI invocation anyway;
+//! re-running hooks would not stop them. To raise the bar for confused-deputy
+//! scenarios use full sandboxing (Phase D) or run kei-mcp as a separate UID.
+//!
+//! v0.41 audit fixes (2026-05-26, Gemini security review):
+//!   #1 fail-CLOSED on missing hooks (was: silently skip)
+//!   #2 path-traversal guard on kei_edit/kei_write (canonicalize + root check)
+//!   #3 CLAUDECODE bypass — documented as design (see above), no behavior change
+//!   #4 tokio::fs for async file I/O (was: blocking std::fs on tokio thread)
+//!   #5 process-group kill on Unix (was: kill_on_drop SIGKILLs only direct child)
 
 use crate::protocol::{err, ok, JsonRpcRequest, JsonRpcResponse, INTERNAL_ERROR, INVALID_PARAMS};
 use serde::Deserialize;
 use serde_json::{json, Value};
-use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::time::Duration;
+use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 
@@ -132,12 +144,25 @@ async fn handle_bash(args: &Value) -> Result<String, String> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .kill_on_drop(true);
+    // v0.41 fix #5 (Gemini MED): put child in its own process group so timeout
+    // kills it and ALL grandchildren together (not just the immediate shell).
+    set_process_group(&mut cmd);
 
-    let fut = cmd.spawn().map_err(|e| format!("spawn bash: {e}"))?.wait_with_output();
-    let out = tokio::time::timeout(Duration::from_secs(SAFE_TOOL_TIMEOUT_SECS), fut)
-        .await
-        .map_err(|_| "kei_bash timeout".to_string())?
-        .map_err(|e| format!("wait bash: {e}"))?;
+    let child = cmd.spawn().map_err(|e| format!("spawn bash: {e}"))?;
+    let pid_opt = child.id();
+    let fut = child.wait_with_output();
+
+    let out = match tokio::time::timeout(Duration::from_secs(SAFE_TOOL_TIMEOUT_SECS), fut).await {
+        Ok(Ok(o)) => o,
+        Ok(Err(e)) => return Err(format!("wait bash: {e}")),
+        Err(_) => {
+            // Timeout — kill the entire process group, not just the child.
+            if let Some(pid) = pid_opt {
+                killpg_best_effort(pid);
+            }
+            return Err("kei_bash timeout".to_string());
+        }
+    };
 
     let stdout = String::from_utf8_lossy(&out.stdout).to_string();
     let stderr = String::from_utf8_lossy(&out.stderr).to_string();
@@ -151,6 +176,27 @@ async fn handle_bash(args: &Value) -> Result<String, String> {
     Ok(if stderr.is_empty() { stdout } else { format!("{stdout}\n[stderr]\n{stderr}") })
 }
 
+// v0.41 fix #5: process-group helpers (Unix-only; no-op on other platforms).
+// tokio::process::Command::process_group is available on Unix without
+// requiring the std::os::unix::process::CommandExt trait import.
+#[cfg(unix)]
+fn set_process_group(cmd: &mut Command) {
+    cmd.process_group(0); // 0 = new session leader for this child
+}
+#[cfg(not(unix))]
+fn set_process_group(_cmd: &mut Command) {}
+
+#[cfg(unix)]
+fn killpg_best_effort(pid: u32) {
+    // SAFETY: libc::kill on a negative PID targets the process group.
+    // SIGKILL = 9. Best-effort — ignore errors (process may have exited).
+    unsafe {
+        let _ = libc::kill(-(pid as i32), libc::SIGKILL);
+    }
+}
+#[cfg(not(unix))]
+fn killpg_best_effort(_pid: u32) {}
+
 async fn handle_edit(args: &Value) -> Result<String, String> {
     let file_path = args.get("file_path").and_then(Value::as_str)
         .ok_or_else(|| missing_arg("kei_edit", "file_path"))?;
@@ -159,25 +205,29 @@ async fn handle_edit(args: &Value) -> Result<String, String> {
     let new_string = args.get("new_string").and_then(Value::as_str)
         .ok_or_else(|| missing_arg("kei_edit", "new_string"))?;
 
+    // v0.41 fix #2: path-traversal guard
+    let safe_path = validate_path(file_path)?;
+
     let hook_input = json!({
         "tool_name": "Edit",
         "tool_input": {
-            "file_path": file_path,
+            "file_path": safe_path.display().to_string(),
             "old_string": old_string,
             "new_string": new_string
         }
     });
     run_chain("edit", &hook_input).await?;
 
-    let contents = fs::read_to_string(file_path)
-        .map_err(|e| format!("read {file_path}: {e}"))?;
+    // v0.41 fix #4: tokio::fs (async)
+    let contents = fs::read_to_string(&safe_path).await
+        .map_err(|e| format!("read {}: {e}", safe_path.display()))?;
     if !contents.contains(old_string) {
-        return Err(format!("kei_edit: old_string not found in {file_path}"));
+        return Err(format!("kei_edit: old_string not found in {}", safe_path.display()));
     }
     let updated = contents.replacen(old_string, new_string, 1);
-    fs::write(file_path, &updated)
-        .map_err(|e| format!("write {file_path}: {e}"))?;
-    Ok(format!("edited {file_path} ({} bytes)", updated.len()))
+    fs::write(&safe_path, &updated).await
+        .map_err(|e| format!("write {}: {e}", safe_path.display()))?;
+    Ok(format!("edited {} ({} bytes)", safe_path.display(), updated.len()))
 }
 
 async fn handle_write(args: &Value) -> Result<String, String> {
@@ -186,21 +236,113 @@ async fn handle_write(args: &Value) -> Result<String, String> {
     let content = args.get("content").and_then(Value::as_str)
         .ok_or_else(|| missing_arg("kei_write", "content"))?;
 
+    // v0.41 fix #2: path-traversal guard
+    let safe_path = validate_path(file_path)?;
+
     let hook_input = json!({
         "tool_name": "Write",
-        "tool_input": { "file_path": file_path, "content": content }
+        "tool_input": { "file_path": safe_path.display().to_string(), "content": content }
     });
     run_chain("write", &hook_input).await?;
 
-    if let Some(parent) = std::path::Path::new(file_path).parent() {
+    if let Some(parent) = safe_path.parent() {
         if !parent.as_os_str().is_empty() {
-            fs::create_dir_all(parent)
+            fs::create_dir_all(parent).await
                 .map_err(|e| format!("mkdir {}: {e}", parent.display()))?;
         }
     }
-    fs::write(file_path, content)
-        .map_err(|e| format!("write {file_path}: {e}"))?;
-    Ok(format!("wrote {file_path} ({} bytes)", content.len()))
+    fs::write(&safe_path, content).await
+        .map_err(|e| format!("write {}: {e}", safe_path.display()))?;
+    Ok(format!("wrote {} ({} bytes)", safe_path.display(), content.len()))
+}
+
+/// v0.41 fix #2 (Gemini HIGH): reject obvious path-traversal / sensitive-path
+/// targets BEFORE running hooks. Defense-in-depth: hooks may also flag this,
+/// but having the Rust layer reject obvious attacks gives a fast-fail
+/// independent of hook configuration.
+///
+/// Allowed roots: $PWD (recursively), $HOME (excluding dotfile-secret dirs).
+/// Override: set KEI_ALLOWED_ROOTS=":" -separated absolute paths.
+/// Always rejected: /etc/, /usr/, /System/, /var/, /private/etc/, $HOME/.ssh/,
+/// $HOME/.aws/, $HOME/.config/gcloud/, $HOME/.gnupg/, any path containing "..".
+fn validate_path(p: &str) -> Result<PathBuf, String> {
+    if p.is_empty() {
+        return Err("file_path: empty".into());
+    }
+    // 1. Reject literal `..` segments — covers most traversal attempts.
+    if p.split('/').any(|seg| seg == "..") {
+        return Err(format!("file_path: '..' segment not allowed in {p}"));
+    }
+    let path = Path::new(p);
+    // 2. Canonicalize the parent (file may not exist yet for kei_write);
+    //    if even the parent doesn't exist, use the absolute form.
+    let canonical = if let Some(parent) = path.parent() {
+        if parent.as_os_str().is_empty() || parent == Path::new("") {
+            std::env::current_dir()
+                .map_err(|e| format!("file_path: cwd unavailable: {e}"))?
+                .join(path)
+        } else if parent.exists() {
+            parent.canonicalize()
+                .map_err(|e| format!("file_path: canonicalize {}: {e}", parent.display()))?
+                .join(path.file_name().unwrap_or_default())
+        } else if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            std::env::current_dir()
+                .map_err(|e| format!("file_path: cwd unavailable: {e}"))?
+                .join(path)
+        }
+    } else {
+        return Err(format!("file_path: invalid {p}"));
+    };
+    let canon_str = canonical.display().to_string();
+
+    // 3. Reject obvious sensitive directories.
+    let denylist = [
+        "/etc/", "/usr/", "/System/", "/var/", "/private/etc/", "/private/var/",
+        "/root/",
+    ];
+    for d in denylist {
+        if canon_str.starts_with(d) {
+            return Err(format!("file_path: denied (system dir): {canon_str}"));
+        }
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        let secret_dirs = [".ssh/", ".aws/", ".gnupg/", ".config/gcloud/"];
+        for sd in secret_dirs {
+            let full = format!("{home}/{sd}");
+            if canon_str.starts_with(&full) {
+                return Err(format!("file_path: denied (secret dir): {canon_str}"));
+            }
+        }
+    }
+
+    // 4. Enforce allowed-root containment.
+    let roots = allowed_roots();
+    if !roots.is_empty() {
+        let ok = roots.iter().any(|r| canon_str.starts_with(r));
+        if !ok {
+            return Err(format!(
+                "file_path: outside allowed roots {roots:?}: {canon_str}"
+            ));
+        }
+    }
+
+    Ok(canonical)
+}
+
+fn allowed_roots() -> Vec<String> {
+    if let Ok(v) = std::env::var("KEI_ALLOWED_ROOTS") {
+        return v.split(':').filter(|s| !s.is_empty()).map(String::from).collect();
+    }
+    let mut roots = Vec::new();
+    if let Ok(cwd) = std::env::current_dir() {
+        roots.push(format!("{}/", cwd.display()));
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        roots.push(format!("{home}/"));
+    }
+    roots
 }
 
 // ---- chain runner -------------------------------------------------------
@@ -229,11 +371,15 @@ async fn run_chain(tool: &str, hook_input: &Value) -> Result<(), String> {
     for hook in chain {
         let path = hooks_dir.join(&hook);
         if !path.is_file() {
-            // Missing hook is a config error — log but don't block. Better
-            // to surface it to the user as a stderr-side warning than to
-            // silently allow the action.
-            eprintln!("[safe_tools] missing hook (skipped): {}", path.display());
-            continue;
+            // v0.41 fix #1 (Gemini HIGH): FAIL-CLOSED on missing hook.
+            // Previously we logged a warning and continued — that meant a
+            // misconfigured deployment (hook deleted, wrong path) silently
+            // disabled enforcement. Now: refuse the action, surface the
+            // error so the operator notices.
+            return Err(format!(
+                "[policy-chain] hook missing: {} (declared in policy-chain.toml [{}])",
+                path.display(), tool
+            ));
         }
 
         let mut child = Command::new(&path)
@@ -274,12 +420,19 @@ async fn run_chain(tool: &str, hook_input: &Value) -> Result<(), String> {
 fn load_chain(tool: &str) -> Result<Vec<String>, String> {
     let path = chain_path()?;
     if !path.is_file() {
-        // No policy-chain.toml → unsafe default = pass through with a warning.
-        // This matches Claude Code's behavior when no hooks are configured.
-        eprintln!("[safe_tools] no policy-chain.toml at {}; passing through", path.display());
-        return Ok(vec![]);
+        // v0.41 fix #1 (Gemini HIGH companion): default behavior when
+        // policy-chain.toml is absent is now configurable via env. Without
+        // explicit opt-in to pass-through, FAIL-CLOSED — caller sees a
+        // clear error instead of silent bypass.
+        if std::env::var("KEI_POLICY_CHAIN_OPTIONAL").as_deref() == Ok("1") {
+            return Ok(vec![]);
+        }
+        return Err(format!(
+            "[policy-chain] config missing: {} (set KEI_POLICY_CHAIN_OPTIONAL=1 to allow pass-through, e.g. for tests)",
+            path.display()
+        ));
     }
-    let raw = fs::read_to_string(&path)
+    let raw = std::fs::read_to_string(&path)
         .map_err(|e| format!("read policy-chain.toml: {e}"))?;
     let parsed: PolicyChain = toml::from_str(&raw)
         .map_err(|e| format!("parse policy-chain.toml: {e}"))?;
