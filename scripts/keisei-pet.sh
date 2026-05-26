@@ -72,40 +72,60 @@ _elapsed() {
   else                         printf '%dh%dm' $(( s / 3600 )) $(( (s % 3600) / 60 )); fi
 }
 
-# ── running sub-agents (from task-timer's .task-*.start) ─────────────────────
-agents=""; n_agents=0
+# ── running sub-agents (count only — compact view, no per-agent list) ────────
+# Counts younger-than-2h .task-*.start markers across ALL parallel sessions.
+# v0.40: dropped per-agent emoji+name list to keep status line readable when
+# many parallel sessions/agents fire. Per-agent detail moved to `kei status`
+# (see TODO) — pet stays as a single counter.
+n_agents=0
 if [ -d "$TM_DIR" ]; then
   for f in "$TM_DIR"/.task-*.start; do
     [ -f "$f" ] || continue
-    typ="$(jq -r '.type // "agent"' "$f" 2>/dev/null)"
     st="$(jq -r '.start_epoch // empty' "$f" 2>/dev/null)"
     [ -z "$st" ] && continue
     age=$(( now - st ))
-    [ "$age" -gt 7200 ] && continue   # ignore stale (kit removes on done)
-    short="$(printf '%s' "$typ" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9].*$//' | cut -c1-12)"
-    agents+=" $(_agent_emoji "$typ")${short}·$(_elapsed "$age")"
+    [ "$age" -gt 7200 ] && continue
     n_agents=$((n_agents+1))
   done
 fi
 
-# ── agent token / cost spend today (from agent-events.jsonl) ─────────────────
-spend=""
+# ── today's aggregates (across ALL sessions) ─────────────────────────────────
+# Tokens + cost from agent-events.jsonl; sessions from distinct parent_id of
+# today's agent_spawn events.
+today_tok=0; today_cost=0; today_sess=0
 if [ -f "$EVENTS" ]; then
   today="$(date -u +%Y-%m-%d)"
-  read -r tot_tok tot_cost < <(awk -v d="$today" '
+  # Single awk pass: count tokens, cost, distinct parent_id.
+  read -r today_tok today_cost today_sess < <(awk -v d="$today" '
     index($0,d)>0 {
-      t=0; c=0
-      if (match($0,/total_tokens[^0-9]*[0-9]+/)) { s=substr($0,RSTART,RLENGTH); gsub(/[^0-9]/,"",s); t=s }
-      if (match($0,/"cost_usd"[: ]*[0-9.]+/)) { s=substr($0,RSTART,RLENGTH); gsub(/[^0-9.]/,"",s); c=s }
-      T+=t; C+=c
-    } END { printf "%d %.4f", T+0, C+0 }' "$EVENTS" 2>/dev/null)
-  # agent COST only (💰) — session tokens are shown separately as 🪙 above,
-  # so we don't repeat a token count here. Cost is non-null only when the
-  # sub-agent payload carried a model.
-  if [ "${tot_cost:-0}" != "0.0000" ] && [ -n "${tot_cost:-}" ]; then
-    spend=" 💰\$$(printf '%.2f' "$tot_cost" 2>/dev/null)"
-  fi
+      if (match($0,/total_tokens[^0-9]*[0-9]+/)) { s=substr($0,RSTART,RLENGTH); gsub(/[^0-9]/,"",s); T+=s }
+      if (match($0,/"cost_usd"[: ]*[0-9.]+/))   { s=substr($0,RSTART,RLENGTH); gsub(/[^0-9.]/,"",s); C+=s }
+      if (match($0,/"parent_id"[: ]*"[^"]+"/))  { s=substr($0,RSTART,RLENGTH); gsub(/.*"parent_id"[: ]*"|".*/,"",s); seen[s]=1 }
+    } END {
+      n=0; for (k in seen) n++
+      printf "%d %.4f %d", T+0, C+0, n
+    }' "$EVENTS" 2>/dev/null)
 fi
+
+# Format tokens compactly: 1234567 → 1.2M / 5400 → 5k / 999 → 999
+_short_tok() {
+  local n=${1:-0}
+  if   [ "$n" -ge 1000000 ]; then awk -v n="$n" 'BEGIN{printf "%.1fM", n/1000000}'
+  elif [ "$n" -ge 1000 ];    then awk -v n="$n" 'BEGIN{printf "%dk",   n/1000}'
+  else                            printf '%d' "$n"
+  fi
+}
+
+global=""
+[ "${today_sess:-0}" -gt 0 ] 2>/dev/null && global+="💬${today_sess} "
+[ "${today_tok:-0}"  -gt 0 ] 2>/dev/null && global+="🌍$(_short_tok "$today_tok") "
+[ "${n_agents:-0}"   -gt 0 ] 2>/dev/null && global+="🤖${n_agents} "
+spend=""
+if [ "${today_cost:-0}" != "0.0000" ] && [ -n "${today_cost:-}" ]; then
+  spend="💰\$$(printf '%.2f' "$today_cost" 2>/dev/null)"
+fi
+[ -n "$spend" ] && global+="${spend} "
+global="${global% }"
 
 # ── THIS session: tokens + context% (from statusLine stdin) ─────────────────
 sess=""
@@ -150,9 +170,9 @@ EWIN="${HOME}/.claude/memory/error-window.txt"
 proj="${PWD##*/}"; [ -z "$proj" ] && proj="~"
 
 out=""
-[ -n "$sess" ] && out+="${sess}  "
-[ -n "${agents// }" ] && out+="${agents# }${spend}  "
-[ -n "$plan" ] && out+="${plan} "
+[ -n "$sess" ]   && out+="${sess}  "
+[ -n "$global" ] && out+="${dim}${global}${reset}  "
+[ -n "$plan" ]   && out+="${plan} "
 out+="${color}${face}${reset}"
 [ -n "$message" ] && out+=" ${dim}${message}${reset}"
 out+="${stats}"
