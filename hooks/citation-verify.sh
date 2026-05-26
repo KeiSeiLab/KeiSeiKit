@@ -77,11 +77,6 @@ TO PROCEED (any one):
   2) Mark as [UNVERIFIED] and do NOT use as proof
   3) If this is a retraction/audit, include literal: FABRICATED / RETRACTED / MISATTRIBUTED / unverifiable / NOT FOUND
 
-TO PROCEED (any one):
-  1) WebFetch/WebSearch the citation → paste DOI/URL as [VERIFIED: <url>] inline
-  2) Mark as [UNVERIFIED] and do NOT use as proof
-  3) If this is a retraction/audit, include literal: FABRICATED / RETRACTED / MISATTRIBUTED / unverifiable / NOT FOUND
-
 Bypass (emergency only): prepend content with "[HOOK-BYPASS: citation-verify <reason>]".
 EOF
 
