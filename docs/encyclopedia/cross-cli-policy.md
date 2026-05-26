@@ -100,10 +100,14 @@ on stdin with `.tool_name` + `.tool_input`, return exit 0 = pass / 2 = block).
 
 ### kei-mcp built-in tools
 
-`kei-mcp` (Rust MCP server at `_primitives/_rust/kei-mcp/`) exposes four
-built-in tools that bypass atom discovery:
+`kei-mcp` (Rust MCP server at `_primitives/_rust/kei-mcp/`) exposes 4
+built-in tools across two source files (both bypass the atom-discovery
+loop in `handlers/tools.rs`):
 
+In `handlers/tools.rs`:
 - `spawn_agent(name, task, on?)` — invokes a KeiSeiKit agent on any backend
+
+In `handlers/safe_tools.rs` (Phase C, v0.40+):
 - `kei_bash(command, cwd?)` — runs `[bash]` chain → executes
 - `kei_edit(file_path, old_string, new_string)` — runs `[edit]` chain → edits
 - `kei_write(file_path, content)` — runs `[write]` chain → writes
@@ -111,6 +115,23 @@ built-in tools that bypass atom discovery:
 The chain runs against the same hook scripts Claude uses; identical input
 shape, identical decisions. On block, the hook's stderr surfaces as the MCP
 error message so the calling agent sees exactly why.
+
+**v0.41 hardening** (post-audit fixes):
+
+- **Fail-CLOSED on missing config** — if `policy-chain.toml` is absent the
+  chain refuses to run (was: silent pass-through). Tests / dev can opt in
+  via `KEI_POLICY_CHAIN_OPTIONAL=1` env.
+- **Fail-CLOSED on missing hook script** — if a hook declared in the chain
+  is not on disk the call fails (was: warn-and-skip).
+- **Path-traversal guard** on `kei_edit` / `kei_write` — rejects `..`
+  segments, `/etc/`, `/usr/`, `/System/`, `/var/`, `/root/`, plus
+  `$HOME/{.ssh,.aws,.gnupg,.config/gcloud}/` recursively. Override via
+  `KEI_ALLOWED_ROOTS=':'-separated-absolute-paths`.
+- **Async file I/O** — `kei_edit` / `kei_write` now use `tokio::fs` so a
+  pathological file (`/dev/random` etc.) cannot block a tokio worker.
+- **Process-group kill on timeout** — `kei_bash` puts its child shell in
+  its own process group; on timeout the entire group is `killpg(SIGKILL)`'d
+  so grandchildren don't orphan (Unix-only; no-op on Windows).
 
 ### Double-enforcement guard
 
