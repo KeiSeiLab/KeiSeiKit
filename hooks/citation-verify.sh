@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "citation-verify" || exit 0; fi
 # PreToolUse(Edit|Write) — block unverified academic citations
 #
 # Rule 0.5 NO HALLUCINATION enforcer.
@@ -68,6 +71,11 @@ RULE 0.5 NO HALLUCINATION. Prior fabrications (session 68f86858, 2026-04-18):
   • "Jaffe-Jäkel 2014 CMP 325" → real is 3-author Jaffe-Jäkel-Martinez CMP 329
   • "Letac 2023 Lecture Notes" → not in DBLP/arXiv/HAL
   • "Archibald-Kratz-Meerschaert-Sabatelli 2001" → no trace
+
+TO PROCEED (any one):
+  1) WebFetch/WebSearch the citation → paste DOI/URL as [VERIFIED: <url>] inline
+  2) Mark as [UNVERIFIED] and do NOT use as proof
+  3) If this is a retraction/audit, include literal: FABRICATED / RETRACTED / MISATTRIBUTED / unverifiable / NOT FOUND
 
 TO PROCEED (any one):
   1) WebFetch/WebSearch the citation → paste DOI/URL as [VERIFIED: <url>] inline
