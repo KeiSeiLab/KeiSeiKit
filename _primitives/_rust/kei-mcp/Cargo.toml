@@ -21,6 +21,9 @@ serde_json = { workspace = true }
 # v0.39: io-std added for tokio::io::stdin/stdout used by the MCP stdio
 # transport in main.rs (workspace tokio doesn't enable io-std by default).
 tokio = { workspace = true, features = ["io-std"] }
+# v0.40 (Phase C): toml needed for safe_tools::policy_chain — reads
+# ~/.claude/hooks/_lib/policy-chain.toml to know which hooks to chain.
+toml = "0.8"
 anyhow = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 kei-skills = { path = "../kei-skills" }
