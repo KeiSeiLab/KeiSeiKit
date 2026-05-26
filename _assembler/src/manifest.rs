@@ -9,6 +9,13 @@ pub struct Manifest {
     pub description: String,
     pub tools: Vec<String>,
     pub model: String,
+    /// v0.39 (multi-CLI): optional LLM provider this agent prefers when invoked
+    /// via `kei agent <name>`. Values: claude / grok / agy / copilot / kimi /
+    /// codex. Empty / missing → DNA resolver falls back to ~/.claude/config/
+    /// primary.toml, then to claude. Affects `kei run-via` / `kei agent`
+    /// dispatch; does NOT change Claude Code's in-session model.
+    #[serde(default)]
+    pub provider: Option<String>,
     pub role: String,
     pub blocks: Vec<String>,
     /// v0.16 (phase 5): agent substrate role. When present, assembler loads
