@@ -72,7 +72,7 @@ curl -fsSL https://install.keisei.app | bash -s -- --profile=dev --yes  # CI
 /plugin install keisei@keisei-marketplace
 
 # Any MCP-compatible client (Cursor / Continue / Zed / Aider / etc)
-git clone https://keigit.com/keisei/KeiSeiKit-1.0.git
+git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0.git
 cd KeiSeiKit-1.0
 ./bootstrap.sh                    # interactive profile picker
 # or: ./install.sh --profile=minimal   # direct

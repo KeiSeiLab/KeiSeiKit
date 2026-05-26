@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "no-downgrade" || exit 0; fi
 # RULE -1 NO DOWNGRADE / CONSTRUCTIVE ONLY (2026-04-15 LOCK) enforcement.
 #
 # Detects downgrade-style phrases in Write/Edit content without accompanying

@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "citation-verify" || exit 0; fi
 # PreToolUse(Edit|Write) — block unverified academic citations
 #
 # Rule 0.5 NO HALLUCINATION enforcer.

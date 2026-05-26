@@ -19,11 +19,16 @@
 set -e
 
 # --- subcommand dispatch (before splash) ---------------------------------
-# `kei message ...` → the mailbox CLI; everything else falls through to launch.
+# `kei message ...` → mailbox CLI; `kei configure` → hook/stack re-picker;
+# everything else falls through to launch.
 case "${1:-}" in
   message|msg|m)
     shift
     exec "$HOME/.claude/scripts/kei-message.sh" "$@"
+    ;;
+  configure|config|reconfigure)
+    shift
+    exec "$HOME/.claude/scripts/kei-configure.sh" "$@"
     ;;
 esac
 

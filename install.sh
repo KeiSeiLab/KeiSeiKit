@@ -37,6 +37,8 @@ source "$LIB_DIR/lib-log.sh"
 source "$LIB_DIR/lib-backup.sh"
 # shellcheck source=install/lib-profile.sh
 source "$LIB_DIR/lib-profile.sh"
+# shellcheck source=install/lib-packs.sh
+source "$LIB_DIR/lib-packs.sh"
 # shellcheck source=install/lib-args.sh
 source "$LIB_DIR/lib-args.sh"
 # shellcheck source=install/lib-menu.sh
@@ -150,6 +152,8 @@ say "profile: $PROFILE"
 # Stamp the chosen profile so `kei` splash + tools can show it (bin/kei reads this).
 mkdir -p "$HOME_DIR/.claude" 2>/dev/null || true
 printf '%s\n' "$PROFILE" > "$HOME_DIR/.claude/.kei-profile" 2>/dev/null || true
+# Stamp the kit checkout dir so `kei configure` can re-source the libs later.
+printf '%s\n' "$KIT_DIR" > "$HOME_DIR/.claude/.kei-kit-dir" 2>/dev/null || true
 
 # --- resolve profile -> primitive list (UNCONDITIONAL, SSoT) -------------
 # Must run BEFORE any reader of PROFILE_PRIMS: the --no-execute plan block

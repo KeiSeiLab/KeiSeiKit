@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "alignment-check" || exit 0; fi
 # ALIGNMENT CHECK HOOK
 # Fires on UserPromptSubmit when comparison/experiment keywords detected.
 # THREE-TIME REPEAT BUG: exp6, exp24-28, basecaller — all forgot alignment.

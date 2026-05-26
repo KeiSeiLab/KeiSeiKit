@@ -29,6 +29,53 @@ _onb_read_choice() {
   done
 }
 
+# Step 6 — pick a stack profile (selects which discipline hooks + agents
+# install) then optionally toggle discipline packs the stack does not pull.
+# Sets ONBOARDING_STACK + ONBOARDING_PACKS. Reuses _onb_read_choice + stack_packs
+# (lib-packs.sh). Default = minimal (safety hooks + core agents only).
+onboarding_pick_stack() {
+  echo "" >&2
+  printf '%s\n' "${STR_PICK_STACK:-Pick your stack profile (selects hooks + agents):}" >&2
+  local opts="minimal web ml systems mobile" i=1 o d ans
+  for o in $opts; do
+    case "$o" in
+      minimal) d="${STR_STACK_MINIMAL:-safety hooks + core agents only}" ;;
+      web)     d="${STR_STACK_WEB:-TS/frontend agents + evidence, observability}" ;;
+      ml)      d="${STR_STACK_ML:-ML/data agents + evidence, observability, epistemic}" ;;
+      systems) d="${STR_STACK_SYSTEMS:-Rust/Go agents + Rust-first + evidence, observability}" ;;
+      mobile)  d="${STR_STACK_MOBILE:-Swift/Flutter agents + evidence, observability}" ;;
+    esac
+    printf '  %d) %-8s — %s\n' "$i" "$o" "$d" >&2
+    i=$((i+1))
+  done
+  ans="$(_onb_read_choice 5 "${STR_PICK_STACK_PROMPT:-[1-5, default 1=minimal]: }")"
+  ONBOARDING_STACK="$(echo "$opts" | cut -d' ' -f"$ans")"
+  [ -n "$ONBOARDING_STACK" ] || ONBOARDING_STACK="minimal"
+
+  # Offer discipline packs the chosen stack does not already enable.
+  local stackpacks p pd reply
+  stackpacks=" $(command -v stack_packs >/dev/null 2>&1 && stack_packs "$ONBOARDING_STACK") "
+  ONBOARDING_PACKS=""
+  printf '%s\n' "${STR_PACK_INTRO:-Optional discipline packs (safety is always on):}" >&2
+  for p in evidence observability epistemic orchestration git-guard; do
+    case "$stackpacks" in *" $p "*) continue ;; esac
+    case "$p" in
+      evidence)      pd="${STR_PACK_EVIDENCE:-force evidence markers on numeric/cost claims}" ;;
+      observability) pd="${STR_PACK_OBS:-task timing, session dumps, agent telemetry}" ;;
+      epistemic)     pd="${STR_PACK_EPI:-no-downgrade + alignment + recurrence reminders}" ;;
+      orchestration) pd="${STR_PACK_ORCH:-multi-agent fork logging + orchestrator git checks}" ;;
+      git-guard)     pd="${STR_PACK_GIT:-block git push to github (for private-remote teams)}" ;;
+    esac
+    printf '  + %-13s — %s\n' "$p" "$pd" >&2
+    read -r -p "    ${STR_PACK_ENABLE:-enable? [y/N]: }" reply
+    case "$reply" in y|Y|yes|YES) ONBOARDING_PACKS="$ONBOARDING_PACKS $p" ;; esac
+  done
+  ONBOARDING_PACKS="$(echo "$ONBOARDING_PACKS" | sed 's/^ *//;s/ *$//')"
+  if command -v say >/dev/null 2>&1; then
+    say "stack: $ONBOARDING_STACK  packs: ${ONBOARDING_PACKS:-(stack defaults only)}"
+  fi
+}
+
 onboarding_pick_language() {
   local langs
   langs="$(i18n_available_languages 2>/dev/null)"

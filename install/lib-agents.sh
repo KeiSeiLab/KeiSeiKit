@@ -14,9 +14,18 @@
 # when present.
 install_manifests() {
   say "copying generic manifests -> $AGENTS_DIR/_manifests/ (skip if exists)"
-  local copied=0 skipped=0 f name t has_templates=0
+  # Stack filter: when a stack profile is chosen, install only its agent set.
+  # Empty allowlist (no stack / non-interactive) => install ALL (back-compat).
+  local allow=""
+  if command -v resolve_selected_agent_manifests >/dev/null 2>&1; then
+    allow="$(resolve_selected_agent_manifests)"
+  fi
+  local copied=0 skipped=0 filtered=0 f name t has_templates=0
   for f in "$KIT_DIR/_manifests/"*.toml; do
     name="$(basename "$f")"
+    if [ -n "$allow" ] && ! printf '%s\n' "$allow" | grep -qx "${name%.toml}"; then
+      filtered=$((filtered+1)); continue
+    fi
     if [[ -f "$AGENTS_DIR/_manifests/$name" ]]; then
       skipped=$((skipped+1))
     else
@@ -24,7 +33,11 @@ install_manifests() {
       copied=$((copied+1))
     fi
   done
-  say "  copied $copied, skipped $skipped (already present)"
+  if [ -n "$allow" ]; then
+    say "  copied $copied, skipped $skipped, stack-filtered $filtered"
+  else
+    say "  copied $copied, skipped $skipped (already present)"
+  fi
 
   for t in "$KIT_DIR/_templates/"*.template; do
     [ -f "$t" ] && { has_templates=1; break; }

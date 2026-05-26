@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "numeric-claims-guard" || exit 0; fi
 # RULE 0.18 — Numeric claim enforcement — block Edit/Write of numeric claims
 # without evidence marker. Bypass: RULE_017_BYPASS=1 prefix (kept for compat).
 #
@@ -24,9 +27,10 @@ fi
 # Patterns that indicate a numeric claim
 # - "~N min/hour/day/week"
 # - "N MB/GB/LOC/tests/crates/atomars"
-# - "~$N", "$N/mo"
+# - "~$N", "$N/mo", "$N.NN", "$NN" (money needs decimal / unit / tilde / 2+ digits
+#   so shell positionals $1..$9 are NOT flagged)
 # - "Nm Ns", "займёт N", "should take N"
-NUMERIC_PATTERN='(~\s*[0-9]+(\.[0-9]+)?\s*(min|minute|hour|hr|day|week|month|sec|second|MB|GB|KB|LOC|line|test|crate|atomar|%|µs|ms|ns|TPS|req/s)|[0-9]+m\s*[0-9]+s|\$[0-9]+(\.[0-9]+)?(/(mo|hr|day|run))?|~\s*\$[0-9]+|should take|will take|takes about|займёт|за ~|estimated at|ETA[: ]|approximately\s+[0-9])'
+NUMERIC_PATTERN='(~\s*[0-9]+(\.[0-9]+)?\s*(min|minute|hour|hr|day|week|month|sec|second|MB|GB|KB|LOC|line|test|crate|atomar|%|µs|ms|ns|TPS|req/s)|[0-9]+m\s*[0-9]+s|\$[0-9]+\.[0-9]+|\$[0-9]+/(mo|hr|day|run)|\$[0-9]{2,}|~\s*\$[0-9]+|should take|will take|takes about|займёт|за ~|estimated at|ETA[: ]|approximately\s+[0-9])'
 
 # Markers that satisfy the rule
 EVIDENCE_PATTERN='\[(REAL|FROM-JOURNAL|ESTIMATE-HTC)[: ]'
@@ -45,9 +49,9 @@ fi
 MATCHED="$(echo "$NEW_CONTENT" | grep -iEo "$NUMERIC_PATTERN" | head -3 | tr '\n' '; ')"
 
 cat >&2 <<EOF
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
   RULE 0.18 — Numeric claim without evidence marker.
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
 
 Found in Edit/Write content:
   $MATCHED
@@ -67,7 +71,7 @@ Bypass (visible, per-call):
   RULE_017_BYPASS=1 <command>
 
 See: ~/.claude/rules/numeric-claims-evidence.md
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
 EOF
 
 exit 2
