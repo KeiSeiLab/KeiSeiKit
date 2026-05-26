@@ -19,13 +19,16 @@ have_python_toml() {
   return 1
 }
 
-# Echo space-separated primitive names for a given profile.
-# Usage: profile_members <profile-name>
-profile_members() {
-  local profile="$1"
-  [ -f "$MANIFEST" ] || { err "MANIFEST.toml not found at $MANIFEST"; return 1; }
+# Generic one-line-array TOML reader. Echoes space-separated values of
+#   [<table>]
+#   <key> = ["a", "b", ...]
+# python-tomllib preferred; awk fallback handles one-line arrays only.
+# Usage: _toml_array <file> <table> <key>
+_toml_array() {
+  local file="$1" table="$2" key="$3"
+  [ -f "$file" ] || return 1
   if have_python_toml; then
-    python3 - "$MANIFEST" "$profile" <<'PY' 2>/dev/null || return 1
+    python3 - "$file" "$table" "$key" <<'PY' 2>/dev/null || return 1
 import sys
 try:
     import tomllib
@@ -33,20 +36,19 @@ try:
 except ImportError:
     import toml as tomllib
     mode = "r"
-path, prof = sys.argv[1], sys.argv[2]
+path, table, key = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(path, mode) as f:
-    data = tomllib.load(f) if mode == "rb" else tomllib.load(f)
-members = data.get("profile", {}).get(prof)
-if members is None:
+    data = tomllib.load(f)
+vals = data.get(table, {}).get(key)
+if vals is None:
     sys.exit(2)
-print(" ".join(members))
+print(" ".join(vals))
 PY
   else
-    # awk fallback — only handles `profile.<name> = [...]` on one line
-    awk -v prof="$profile" '
-      /^\[profile\]/ { in_profile=1; next }
-      /^\[/ && !/^\[profile\]/ { in_profile=0 }
-      in_profile && $0 ~ "^[[:space:]]*" prof "[[:space:]]*=" {
+    awk -v table="$table" -v key="$key" '
+      $0 ~ "^\\[" table "\\]" { in_t=1; next }
+      /^\[/ { in_t=0 }
+      in_t && $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
         line = $0
         sub(/^[^\[]*\[/, "", line)
         sub(/\].*$/, "", line)
@@ -55,8 +57,16 @@ PY
         print line
         exit
       }
-    ' "$MANIFEST"
+    ' "$file"
   fi
+}
+
+# Echo space-separated primitive names for a given profile.
+# Usage: profile_members <profile-name>
+profile_members() {
+  local profile="$1"
+  [ -f "$MANIFEST" ] || { err "MANIFEST.toml not found at $MANIFEST"; return 1; }
+  _toml_array "$MANIFEST" "profile" "$profile"
 }
 
 # Echo a field of a primitive. Usage: primitive_field <name> <field>

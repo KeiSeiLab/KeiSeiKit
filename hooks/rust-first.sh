@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "rust-first" || exit 0; fi
 # RULE 0.2 — RUST FIRST reminder hook.
 #
 # Fires on UserPromptSubmit. Detects keywords indicating language choice

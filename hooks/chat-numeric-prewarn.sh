@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "chat-numeric-prewarn" || exit 0; fi
 # chat-numeric-prewarn.sh — UserPromptSubmit remind (RULE 0.18 chat-output)
 #
 # Detects time/cost/effort keywords in the user's prompt and injects an

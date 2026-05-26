@@ -4,8 +4,8 @@
   "displayName": "KeiSei",
   "description": "Constructor Pattern agent substrate — 59 agents, 67 skills, 39 hooks, 86 blocks. Rust primitives via classic ./install.sh.",
   "version": "0.38.0",
-  "homepage": "https://keigit.com/keisei/KeiSeiKit-1.0",
-  "repository": "https://keigit.com/keisei/KeiSeiKit-1.0.git",
+  "homepage": "https://keisei.app",
+  "repository": "https://github.com/KeiSeiLab/KeiSeiKit-1.0.git",
   "author": {
     "name": "Denis Parfionovich",
     "email": "info@greendragon.info"

@@ -39,6 +39,8 @@ language = "$ONBOARDING_LANG"
 transport = "$ONBOARDING_TRANSPORT"
 provider = "$ONBOARDING_PROVIDER"
 default_model = "$ONBOARDING_MODEL"
+stack_profile = "$ONBOARDING_STACK"
+enabled_packs = "$ONBOARDING_PACKS"
 EOF
 
   # Override для kei-model-router (HIGH аудит-1).

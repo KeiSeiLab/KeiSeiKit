@@ -102,20 +102,64 @@ _jq_merge_hooks() {
   fi
 }
 
+# Write a filtered copy of the snippet keeping only hook entries whose command
+# basename is in the newline allowlist (plus the cosmetic pet hooks, always
+# kept). Drops emptied matcher groups. Echoes the temp path. Arg: $1 = allowlist.
+filter_snippet_by_packs() {
+  local allow="$1" snippet="$KIT_DIR/settings-snippet.json" tmp
+  tmp="$(mktemp -t kei-snippet.XXXXXX)"
+  jq --arg allow "$allow" '
+    def b: sub("^.*/"; "") | sub("\\.sh$"; "");
+    def keep($ok; $c): (($c | b) as $x | ($ok | index($x)) != null)
+                       or ($c | test("keisei-pet")) or ($c | test("^CMD="));
+    ($allow | split("\n") | map(select(length > 0))) as $ok
+    | .hooks |= with_entries(
+        .value |= ( map(.hooks |= map(select(keep($ok; .command))))
+                    | map(select((.hooks | length) > 0)) )
+      )
+  ' "$snippet" > "$tmp" || { err "snippet filter failed"; rm -f "$tmp"; return 1; }
+  printf '%s' "$tmp"
+}
+
+# Remove every kit-owned hook entry from an existing settings.json (ownership =
+# basename in the full pack universe, plus pet hooks). Foreign hooks survive.
+# Lets reconfigure REMOVE deselected hooks (the merge alone is additive-only).
+# Args: $1 = target settings.json, $2 = newline list of all kit hook basenames.
+prune_kit_hooks() {
+  local target="$1" universe="$2" tmp
+  tmp="$(mktemp "$target.XXXXXX")"
+  jq --arg universe "$universe" '
+    def b: sub("^.*/"; "") | sub("\\.sh$"; "");
+    def owned($kit; $c): (($c | b) as $x | ($kit | index($x)) != null)
+                         or ($c | test("keisei-pet")) or ($c | test("^CMD="));
+    ($universe | split("\n") | map(select(length > 0))) as $kit
+    | .hooks |= with_entries(
+        .value |= ( map(.hooks |= map(select(owned($kit; .command) | not)))
+                    | map(select((.hooks | length) > 0)) )
+      )
+  ' "$target" > "$tmp" && mv "$tmp" "$target" || { err "prune failed"; rm -f "$tmp"; return 1; }
+}
+
 activate_hooks() {
   local snippet="$KIT_DIR/settings-snippet.json"
   local target="$HOME_DIR/.claude/settings.json"
   [ -f "$snippet" ] || { warn "no snippet at $snippet"; return 0; }
+  local allow filtered
+  allow="$(resolve_selected_hook_basenames)"
+  filtered="$(filter_snippet_by_packs "$allow")" || return 1
   if [ ! -f "$target" ]; then
     local tmp
     tmp="$(mktemp "$target.XXXXXX")"
-    jq 'del(._comment)' "$snippet" > "$tmp"
+    jq 'del(._comment)' "$filtered" > "$tmp"
     mv "$tmp" "$target"
-    say "created $target from snippet (no prior settings.json)"
+    rm -f "$filtered"
+    say "created $target from filtered snippet"
     return 0
   fi
   backup_file "$target"
-  _jq_merge_hooks "$snippet" "$target"
+  prune_kit_hooks "$target" "$(all_pack_basenames)"
+  _jq_merge_hooks "$filtered" "$target"
+  rm -f "$filtered"
 }
 
 # Flag-or-prompt dispatcher, mirroring the v0.15 behavior:
