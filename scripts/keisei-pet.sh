@@ -127,6 +127,37 @@ fi
 [ -n "$spend" ] && global+="${spend} "
 global="${global% }"
 
+# v0.43: CLI subscription limits (best-effort).
+# Pet does NOT poll — reads cache only. Cache populated by `kei limits`.
+# Reality: 4 of 5 CLIs have no programmatic limit API (see research). Pet
+# shows only what's actually available + how stale the cache is.
+limits_cache="${HOME}/.claude/pet/limits-cache.json"
+limits=""
+if [ -f "$limits_cache" ]; then
+  # Cache age in seconds.
+  cache_ts=$(jq -r '.ts // empty' "$limits_cache" 2>/dev/null)
+  if [ -n "$cache_ts" ]; then
+    # Convert ISO8601 to epoch (macOS + Linux compatible).
+    cache_epoch=$(
+      date -j -u -f "%Y-%m-%dT%H:%M:%SZ" "$cache_ts" "+%s" 2>/dev/null \
+      || date -u -d "$cache_ts" "+%s" 2>/dev/null \
+      || echo 0
+    )
+    cache_age=$(( now - cache_epoch ))
+    # Kimi balance (only CLI with live API). Show $X.XX if available.
+    kimi_avail=$(jq -r '.kimi | select(.status=="live") | .available_balance_usd' "$limits_cache" 2>/dev/null)
+    if [ -n "$kimi_avail" ] && [ "$kimi_avail" != "null" ]; then
+      limits+="K:\$$(printf '%.2f' "$kimi_avail" 2>/dev/null) "
+    fi
+    # Stale marker if older than 1h.
+    if [ "$cache_age" -gt 3600 ] 2>/dev/null && [ -n "$limits" ]; then
+      stale_min=$((cache_age / 60))
+      limits="${limits% }${dim}(${stale_min}m old)${reset} "
+    fi
+  fi
+fi
+limits="${limits% }"
+
 # ── THIS session: tokens + context% (from statusLine stdin) ─────────────────
 sess=""
 if [ -n "$SLINE" ]; then
@@ -172,6 +203,7 @@ proj="${PWD##*/}"; [ -z "$proj" ] && proj="~"
 out=""
 [ -n "$sess" ]   && out+="${sess}  "
 [ -n "$global" ] && out+="${dim}${global}${reset}  "
+[ -n "$limits" ] && out+="${dim}${limits}${reset}  "
 [ -n "$plan" ]   && out+="${plan} "
 out+="${color}${face}${reset}"
 [ -n "$message" ] && out+=" ${dim}${message}${reset}"
