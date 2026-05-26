@@ -20,6 +20,8 @@ ONBOARDING_LANG=""
 ONBOARDING_TRANSPORT=""
 ONBOARDING_PROVIDER=""
 ONBOARDING_MODEL=""
+ONBOARDING_STACK=""
+ONBOARDING_PACKS=""
 declare -a ONBOARDING_AUTH_ENV_KEYS=()
 declare -a ONBOARDING_AUTH_ENV_VALUES=()
 
@@ -49,20 +51,21 @@ onboarding_should_run() {
   return 0
 }
 
-# Оркестратор: 5 шагов + preflight + запись.
+# Оркестратор: 6 шагов + preflight + запись.
 onboarding_run() {
   onboarding_should_run || return 0
 
   if command -v say >/dev/null 2>&1; then
-    say "${STR_ONBOARDING_INTRO:-Onboarding wizard (5 steps)}"
+    say "${STR_ONBOARDING_INTRO:-Onboarding wizard (6 steps)}"
   else
-    echo "── KeiSei: ${STR_ONBOARDING_INTRO:-onboarding (5 steps)} ──" >&2
+    echo "── KeiSei: ${STR_ONBOARDING_INTRO:-onboarding (6 steps)} ──" >&2
   fi
 
   onboarding_pick_language
   onboarding_pick_transport
   onboarding_pick_provider
   onboarding_pick_model
+  onboarding_pick_stack
 
   # Preflight — провайдер-специфичная проверка CLI/daemon до сбора ключей.
   if command -v preflight_run >/dev/null 2>&1; then
