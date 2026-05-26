@@ -6,6 +6,45 @@
 
 ---
 
+## 2026-05-25 — Opt-in hook packs + stack profiles (public-prep posture)
+
+### Context
+
+The kit force-activated every hook via `settings-snippet.json`, including the
+author's personal research discipline (numeric-claims evidence markers,
+no-downgrade, citation-verify, rust-first / no-python). For a public,
+general-audience kit that is presumptuous — users bring their own stack and do
+not need a Rust-only policy or evidence-marker enforcement by default.
+
+### Decision
+
+- Posture: **safety hooks on by default; all discipline packs opt-in.** Packs:
+  `safety` (always), `evidence`, `observability`, `epistemic`, `orchestration`,
+  `git-guard`, `stack-rust`. SSoT = `_primitives/hook-packs.toml`.
+- **Stack profiles** (minimal / web / ml / systems / mobile) pull a set of
+  discipline packs AND an agent set. `rust-first` / `no-python` live only in
+  `stack-rust`, which only the `systems` stack enables. `git-guard`
+  (no-github-push) is opt-in only and pulled by NO stack — a general kit must
+  not block a user's normal `git push` to github.
+- Mechanism: install-time **filter** of the snippet by selected packs
+  (`filter_snippet_by_packs`) + **prune** of kit-owned hooks on reconfigure
+  (`prune_kit_hooks`, foreign hooks preserved). Selection persists to
+  `~/.claude/config/onboarding.toml`; re-runnable via `kei configure`.
+- Non-interactive / `--yes` / CI default = minimal (safety + cosmetic only),
+  all agents (back-compat for power users).
+
+### Consequences
+
+- Gate wiring (`_lib/gate.sh`) added to the 8 highest-friction discipline hooks
+  for runtime toggling via the `hooks-control` skill; remaining cosmetic/event
+  hooks deferred (install-time filtering already gives "off by default", so the
+  runtime gate is a convenience, not a correctness requirement).
+- Agent-set changes via `kei configure` apply on the next `./install.sh`
+  (reconfigure re-applies hooks fully but does not remove already-installed
+  agent manifests — they are harmless extra `.md` files).
+- `_toml_array` extracted from `lib-profile.sh:profile_members` as the shared
+  one-line-array TOML reader (no new dependency).
+
 ## 2026-04-28 — Three scheduling abstractions in workspace
 
 ### Context
