@@ -28,6 +28,17 @@ All hooks live under `hooks/` directory. Format: `| Hook Name | Event | Severity
 - **remind (exit 0 + stderr on trigger)** — passive reminder
 - **advisory** — informational, never blocks
 
+### Hook packs (opt-in posture)
+
+A fresh install activates **only the `safety` pack** (plus cosmetic/infra hooks).
+Discipline packs are opt-in, chosen during onboarding (step 6) or later via
+`kei configure`. SSoT for pack membership + stack profiles is
+`_primitives/hook-packs.toml`. Packs: `safety` (always on), `evidence`,
+`observability`, `epistemic`, `orchestration`, `git-guard` (opt-in only),
+`stack-rust` (only under the `systems` stack profile). Discipline hooks also
+respect runtime toggling via `KEI_DISABLED_HOOKS` / `KEI_HOOK_PROFILE` (see the
+`hooks-control` skill).
+
 ### Core Safety Hooks
 
 | Hook | Event | Severity | Purpose | Bypass Env |
