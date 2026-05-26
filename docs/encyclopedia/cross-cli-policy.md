@@ -116,22 +116,34 @@ The chain runs against the same hook scripts Claude uses; identical input
 shape, identical decisions. On block, the hook's stderr surfaces as the MCP
 error message so the calling agent sees exactly why.
 
-**v0.41 hardening** (post-audit fixes):
+**v0.42 hardening** (post 4-CLI re-audit, supersedes v0.41):
 
-- **Fail-CLOSED on missing config** — if `policy-chain.toml` is absent the
-  chain refuses to run (was: silent pass-through). Tests / dev can opt in
-  via `KEI_POLICY_CHAIN_OPTIONAL=1` env.
-- **Fail-CLOSED on missing hook script** — if a hook declared in the chain
-  is not on disk the call fails (was: warn-and-skip).
-- **Path-traversal guard** on `kei_edit` / `kei_write` — rejects `..`
-  segments, `/etc/`, `/usr/`, `/System/`, `/var/`, `/root/`, plus
-  `$HOME/{.ssh,.aws,.gnupg,.config/gcloud}/` recursively. Override via
-  `KEI_ALLOWED_ROOTS=':'-separated-absolute-paths`.
-- **Async file I/O** — `kei_edit` / `kei_write` now use `tokio::fs` so a
-  pathological file (`/dev/random` etc.) cannot block a tokio worker.
-- **Process-group kill on timeout** — `kei_bash` puts its child shell in
-  its own process group; on timeout the entire group is `killpg(SIGKILL)`'d
-  so grandchildren don't orphan (Unix-only; no-op on Windows).
+- **Fail-CLOSED everywhere** — missing config, missing hook, OR empty
+  section (`[bash]/[edit]/[write]` with no entries) all refuse to run.
+  Tests / dev can opt in via `KEI_POLICY_CHAIN_OPTIONAL=1`.
+- **Symlink-safe path guard** — `kei_edit` / `kei_write` canonicalize the
+  FULL path (resolving any leaf symlink to its real target) and reject
+  if the leaf itself is a symlink for a not-yet-existent file. Fixes the
+  v0.41 CRITICAL bypass where `ln -s ~/.ssh/keys ./x; kei_write x` would
+  follow the link.
+- **$PWD-only default root** — `allowed_roots` defaults to current working
+  directory only. Was: `$PWD` + entire `$HOME` — too permissive, agent
+  could overwrite `~/.claude/hooks/*` (self-neuter) or `~/.zshrc` (RCE on
+  next shell). Operators who need broader access set `KEI_ALLOWED_ROOTS`.
+- **Denylist extended** — system dirs (`/etc/`, `/usr/`, `/System/`,
+  `/var/`, `/root/`, `/bin/`, `/sbin/`); credential stores (`~/.ssh/`,
+  `~/.aws/`, `~/.gnupg/`, `~/.config/gcloud/`, `~/.cargo/credentials`,
+  `~/.docker/config.json`, `~/.kube/`); substrate dirs (`~/.claude/`,
+  `~/.grok/`, `~/.gemini/`, `~/.copilot/`, `~/.kimi/`); exact shell-init
+  files (`.zshrc`, `.bashrc`, `.profile`, `.zshenv`, `.gitconfig`, ...).
+- **Async file I/O in load_chain** — `policy-chain.toml` now read via
+  `tokio::fs` (was: blocking `std::fs` froze worker on slow mounts).
+- **Process-group kill on hooks too** — hook subprocesses get
+  `process_group(0)` and `killpg(SIGKILL)` on timeout. Was: only the bash
+  action got this; hook grandchildren orphaned.
+- **CLAUDECODE/GROKCODE design note** — documented as perf/UX
+  optimization, NOT a security boundary (env-controllable parent → confused
+  deputy is already-game-over scenario).
 
 ### Double-enforcement guard
 
