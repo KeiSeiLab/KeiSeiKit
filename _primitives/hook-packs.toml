@@ -1,0 +1,55 @@
+# KeiSeiKit hook-pack + stack-profile map — single source of truth for the
+# opt-in install posture. Parsed by install/lib-packs.sh, which reuses the
+# generic TOML array reader `_toml_array` extracted from lib-profile.sh
+# (python-tomllib preferred, awk fallback). No new dependency.
+#
+# Values are HOOK BASENAMES WITHOUT `.sh`, matched against the command
+# basenames in settings-snippet.json. Every hook wired in the snippet MUST
+# appear in exactly one [pack] entry or in [pack-always]; anything missing
+# would be silently filtered out of a fresh install.
+#
+# Posture: only `safety` + `pack-always` are active on a fresh/non-interactive
+# install. All other packs are opt-in (via onboarding or `kei configure`).
+# `git-guard` (no-github-push) is opt-in ONLY and is pulled by NO stack — a
+# general kit must never block a user's normal `git push` to github by default.
+
+[pack]
+safety        = ["block-dangerous", "safety-guard", "destructive-guard", "disk-headroom-check", "secrets-pre-guard", "no-hand-edit-agents", "assemble-validate", "assemble-agents"]
+evidence      = ["numeric-claims-guard", "citation-verify", "chat-numeric-prewarn", "chat-numeric-postflag"]
+observability = ["task-timer", "session-end-dump", "extract-task-durations", "error-spike-detector", "agent-event-spawn", "agent-event-done", "agent-heartbeat-tick", "stop-verify"]
+epistemic     = ["alignment-check", "no-downgrade", "recurrence-suggest"]
+orchestration = ["agent-fork-logger", "agent-fork-done", "orchestrator-dirty-check", "orchestrator-branch-check", "agent-capability-check", "agent-stub-scan", "milestone-commit-hook", "post-commit-audit", "post-write-check"]
+git-guard     = ["no-github-push"]
+stack-rust    = ["rust-first", "no-python-without-approval"]
+
+# Always wired, never filtered (cosmetic / infra). The keisei-pet*.sh status
+# updater + the inline pet hook are kept by the filter directly (name match),
+# so they are NOT listed here.
+[pack-always]
+base = ["first-run-onboard", "mailbox-inject", "tomd-preread", "site-wysiwyd-check"]
+
+# Stack profile -> discipline packs auto-enabled (safety is always implicit).
+# git-guard intentionally absent from every stack (opt-in only).
+[stack-packs]
+minimal = []
+web     = ["evidence", "observability"]
+ml      = ["evidence", "observability", "epistemic"]
+systems = ["evidence", "observability", "stack-rust"]
+mobile  = ["evidence", "observability"]
+
+# Stack profile -> agent groups installed (the `base` group is always added).
+[stack-agents]
+minimal = ["base"]
+web     = ["base", "web"]
+ml      = ["base", "ml"]
+systems = ["base", "systems"]
+mobile  = ["base", "mobile"]
+
+# Agent group -> manifest basenames (without `.toml`). When no stack is chosen
+# (power user / --profile=full / non-interactive), ALL manifests install.
+[agent-set]
+base    = ["architect", "critic", "validator", "researcher", "code-implementer", "security-auditor"]
+web     = ["code-implementer-typescript", "frontend-validator", "validator-api", "validator-doc", "researcher-web", "researcher-code"]
+ml      = ["ml-implementer", "ml-researcher", "modal-runner", "cost-guardian", "fal-ai-runner", "code-implementer-python", "validator-benchmark"]
+systems = ["code-implementer-rust", "code-implementer-go", "infra-implementer", "infra-implementer-cicd", "infra-implementer-container", "infra-implementer-iac", "infra-implementer-secrets", "validator-version"]
+mobile  = ["code-implementer-swift", "code-implementer-flutter", "frontend-validator"]
