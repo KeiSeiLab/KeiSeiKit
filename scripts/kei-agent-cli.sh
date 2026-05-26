@@ -115,9 +115,21 @@ backend_invoke() {
     exec "$bin" --agent "$agent_name" --print "${prompt##*TASK FOR THIS RUN:}"
   fi
 
+  # v0.41 fix: headless subprocess invocation of claude/grok without
+  # --dangerously-skip-permissions returns empty (the agent's system prompt
+  # asks for Read/Grep tools, but those need permission prompts which can't
+  # be answered in -p mode). Pass the flag so the agent actually executes.
+  # Override via KEI_AGENT_PERMISSIVE=0 to keep the strict default.
+  local permissive_claude="" permissive_grok=""
+  if [ "${KEI_AGENT_PERMISSIVE:-1}" = "1" ]; then
+    permissive_claude="--permission-mode=bypassPermissions"
+    permissive_grok="--always-approve"
+  fi
+
   case "$backend" in
-    claude)               exec "$bin" -p "$prompt" ;;
-    grok|agy|antigravity) exec "$bin" --print "$prompt" ;;
+    claude)               exec "$bin" $permissive_claude -p "$prompt" ;;
+    grok)                 exec "$bin" $permissive_grok --print "$prompt" ;;
+    agy|antigravity)      exec "$bin" --dangerously-skip-permissions --print "$prompt" ;;
     copilot)              exec "$bin" --prompt "$prompt" ;;
     kimi)
       # Kimi has NO one-shot print mode (smoke-tested 2026-05-26): bare `kimi`
