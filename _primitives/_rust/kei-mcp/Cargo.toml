@@ -24,6 +24,11 @@ tokio = { workspace = true, features = ["io-std"] }
 # v0.40 (Phase C): toml needed for safe_tools::policy_chain — reads
 # ~/.claude/hooks/_lib/policy-chain.toml to know which hooks to chain.
 toml = "0.8"
+# v0.41 (audit fix #5): killpg via libc on Unix — kill_on_drop only SIGKILLs
+# the immediate child shell, leaving grandchildren orphaned. We set the child
+# in its own process group and killpg() the group on timeout.
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 anyhow = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 kei-skills = { path = "../kei-skills" }
