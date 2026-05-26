@@ -17,6 +17,9 @@
 #                           # backends: claude grok agy copilot kimi codex
 #                           # `kei run-via list` shows install status + agents
 #   kei primary [<backend>] # get/set primary LLM provider (DNA fallback)
+#   kei mcp-wire [<cli>]    # wire kei-mcp into a CLI's MCP config + hook setup
+#                           # (Phase C cross-CLI policy enforcement)
+#   kei mcp-wire --list     # show enforcement tier per CLI
 #   kei --on=<backend>      # one-shot launch of <backend> (does not change primary)
 #   kei [args...]           # splash → exec primary CLI (default: claude)
 #
@@ -58,6 +61,10 @@ case "${1:-}" in
   pick)
     shift
     exec "$HOME/.claude/scripts/kei-pick.sh" "$@"
+    ;;
+  mcp-wire|wire)
+    shift
+    exec "$HOME/.claude/scripts/kei-mcp-wire.sh" "$@"
     ;;
 esac
 
@@ -217,7 +224,7 @@ ${C1}    ██╔═██╗ ██╔══╝  ██║╚════█�
 ${C1}    ██║  ██╗███████╗██║███████║███████╗██║${C0}
 ${C1}    ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚══════╝╚═╝${C0}
 
-${C2}    KeiSeiKit · substrate v0.39${C0}
+${C2}    KeiSeiKit · substrate v0.40${C0}
 ${C3}    ─────────────────────────────────────${C0}
       primary CLI    : ${CV}${PRIMARY}${C0}
       profile        : ${CV}${p}${C0}
