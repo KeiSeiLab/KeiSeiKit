@@ -1,7 +1,10 @@
 #!/bin/bash
+
+# Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
+_KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "no-python-without-approval" || exit 0; fi
 # Hard block on python/python3/python2 invocations in Bash tool.
 # RULE 0.2 (Rust First) — Python requires explicit architectural reason.
-# Claude кroнически нарушает RULE 0.2 inline-вызовами python3 для мелких расчётов.
+# Claude kрoнически нарушает RULE 0.2 inline-вызовами python3 для мелких расчётов.
 # Этот хук форсирует: каждый python-вызов = отдельный approval через интерфейс.
 #
 # How to approve: user may add a one-off permission via Claude Code's
@@ -27,9 +30,9 @@ fi
 # Also: uv run python, poetry run python, pipx run python
 if echo "$CMD" | grep -qE '(^|[[:space:]/"=(|&;`])(python|python2|python3)([0-9]?\.[0-9]+)?([[:space:]]|$)'; then
   cat >&2 <<'EOF'
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
   BLOCKED — Python invocation requires explicit approval (RULE 0.2).
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
 
 RULE 0.2 Rust First:
   Python не разрешается по умолчанию. Для "одноразовых расчётов"
@@ -51,7 +54,7 @@ that only exists in Python, one of the RULE 0.2 exceptions 1-7):
 
 This hook installed 2026-04-21 by user request after repeated
 repeated inline python3 use where Rust would suffice.
-═══════════════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════════════
 EOF
   exit 2
 fi
