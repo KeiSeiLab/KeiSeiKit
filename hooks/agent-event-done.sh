@@ -39,7 +39,6 @@ fi
 MODEL=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.model // .tool_input.model // ""' 2>/dev/null | tr '[:upper:]' '[:lower:]')
 IN_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.usage.input_tokens // 0' 2>/dev/null)
 OUT_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.usage.output_tokens // 0' 2>/dev/null)
-TOT_TOK=$(printf '%s' "$PAYLOAD" | jq -r '.tool_response.totalTokens // 0' 2>/dev/null)
 cost_usd=$(awk -v m="$MODEL" -v i="$IN_TOK" -v o="$OUT_TOK" 'BEGIN{
     if(index(m,"haiku")>0){p=0.000001;q=0.000005}
     else if(index(m,"sonnet")>0){p=0.000003;q=0.000015}
@@ -53,9 +52,8 @@ jq -cn \
     --argjson duration_ms "$(printf '%s' "$PAYLOAD" | jq '.duration_ms // .tool_response.totalDurationMs // null' 2>/dev/null)" \
     --argjson tool_use_count "$(printf '%s' "$PAYLOAD" | jq '.tool_response.totalToolUseCount // null' 2>/dev/null)" \
     --argjson cost_usd "$cost_usd" \
-    --argjson total_tokens "${TOT_TOK:-0}" \
     '{ts:$ts,event:"agent_done",id:$id,outcome:$outcome,
-      duration_ms:$duration_ms,tool_use_count:$tool_use_count,cost_usd:$cost_usd,total_tokens:$total_tokens}' \
+      duration_ms:$duration_ms,tool_use_count:$tool_use_count,cost_usd:$cost_usd}' \
     >> "$EVENTS_FILE" 2>/dev/null || true
 
 # Remove this spawn from active-children ledger (mirror of spawn hook).
@@ -65,6 +63,16 @@ ACTIVE_FILE="${KEI_ACTIVE_SPAWNS_FILE:-/tmp/kei-active-children.tsv}"
 if [ -n "$TOOL_USE_ID" ] && [ -f "$ACTIVE_FILE" ]; then
     grep -v "	$TOOL_USE_ID\$" "$ACTIVE_FILE" > "$ACTIVE_FILE.tmp" 2>/dev/null
     mv "$ACTIVE_FILE.tmp" "$ACTIVE_FILE" 2>/dev/null || true
+fi
+
+# v0.40 root-cause fix: remove the .task-${id}.start marker that task-timer.sh
+# wrote on agent_spawn. Without this, completed sub-agents leave stale markers
+# in ~/.claude/memory/time-metrics/ which inflate the pet's running-agent
+# counter (🤖N). Previously task-timer was the only writer + the 2h stale
+# filter in keisei-pet.sh was the only cleanup; that left up-to-2h dead
+# markers visible on every status refresh.
+if [ -n "$TOOL_USE_ID" ] && [ "$TOOL_USE_ID" != "unknown" ]; then
+    rm -f "$HOME/.claude/memory/time-metrics/.task-${TOOL_USE_ID}.start" 2>/dev/null || true
 fi
 
 exit 0
