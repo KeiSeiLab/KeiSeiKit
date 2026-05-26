@@ -14,7 +14,7 @@
 #
 # Env / args:
 #   KEISEI_ROOT     install dir          (default: $HOME/.local/share/keisei)
-#   KEISEI_REPO     git URL              (default: https://keigit.com/keisei/KeiSeiKit-1.0.git)
+#   KEISEI_REPO     git URL              (default: https://github.com/KeiSeiLab/KeiSeiKit-1.0.git)
 #   KEISEI_REF      branch/tag/sha       (default: main)
 #   --profile=NAME  passed through to ./bootstrap.sh
 #   --yes           passed through to ./bootstrap.sh
@@ -24,7 +24,7 @@
 set -euo pipefail
 
 KEISEI_ROOT="${KEISEI_ROOT:-$HOME/.local/share/keisei}"
-KEISEI_REPO="${KEISEI_REPO:-https://keigit.com/keisei/KeiSeiKit-1.0.git}"
+KEISEI_REPO="${KEISEI_REPO:-https://github.com/KeiSeiLab/KeiSeiKit-1.0.git}"
 KEISEI_REF="${KEISEI_REF:-main}"
 
 PASS_THROUGH=()
@@ -48,13 +48,13 @@ exec > >(tee -a "$LOG") 2>&1
 say() { printf "\033[1;36m[web-install]\033[0m %s\n" "$*"; }
 die() { printf "\033[1;31m[err]\033[0m %s\n" "$*" >&2; exit 1; }
 
-# ── splash ─────────────────────────────────────────────────────────────────
+# ── splash ──────────────────────────────────────────────────────────────────
 cat <<'EOF'
 
-  ╔═══════════════════════════════════════════════════════╗
+  ╔═════════════════════════════════════════════════════╗
   ║           KeiSeiKit · Exobrain installer              ║
   ║   Portable Rust agent substrate for AI coding tools   ║
-  ╚═══════════════════════════════════════════════════════╝
+  ╚═════════════════════════════════════════════════════╝
 
 EOF
 say "log: $LOG"
@@ -62,7 +62,7 @@ say "log: $LOG"
 # ── prereq: git (the only thing bootstrap.sh can't self-install) ───────────
 command -v git >/dev/null || die "missing: git  (brew install git / apt install git)"
 
-# ── auth probe for private repo ────────────────────────────────────────────
+# ── auth probe for private repo ─────────────────────────────────────────────────────────
 case "$KEISEI_REPO" in
   git@github.com:*)
     say "checking GitHub SSH auth"
@@ -73,7 +73,7 @@ case "$KEISEI_REPO" in
     ;;
 esac
 
-# ── clone or pull (idempotent) ─────────────────────────────────────────────
+# ── clone or pull (idempotent) ────────────────────────────────────────────────────────────
 mkdir -p "$(dirname "$KEISEI_ROOT")"
 if [ -d "$KEISEI_ROOT/.git" ]; then
   say "pulling $KEISEI_REF in $KEISEI_ROOT"
@@ -92,7 +92,7 @@ else
 fi
 git -C "$KEISEI_ROOT" submodule update --init --recursive 2>/dev/null || true
 
-# ── delegate to kit's own bootstrap.sh ─────────────────────────────────────
+# ── delegate to kit's own bootstrap.sh ────────────────────────────────────────────────
 [ -x "$KEISEI_ROOT/bootstrap.sh" ] || die "kit's bootstrap.sh not found in $KEISEI_ROOT"
 say "delegating to $KEISEI_ROOT/bootstrap.sh ${PASS_THROUGH[*]:-}"
 cd "$KEISEI_ROOT"
