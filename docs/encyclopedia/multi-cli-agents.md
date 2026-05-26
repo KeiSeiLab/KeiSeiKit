@@ -171,7 +171,14 @@ Wire kei-mcp into the orchestrator's MCP config (each CLI has its own):
 Point each at `<kit>/_primitives/_rust/target/release/kei-mcp` (built via
 `cargo build -p kei-mcp --release`).
 
-## Rule enforcement caveat (READ THIS)
+## Rule enforcement — see also: cross-CLI policy
+
+**Phase C delivered**: KeiSeiKit's safety hooks now have a 3-tier enforcement
+model across CLIs. See [cross-cli-policy.md](./cross-cli-policy.md) for the
+full matrix and `kei mcp-wire` setup. Short version: TIER 1 (full native)
+on claude+grok, TIER 2 (MCP-wrapped) on copilot, TIER 3 (advisory) on agy+kimi.
+
+## Rule enforcement caveat (READ THIS — pre-Phase-C view)
 
 KeiSeiKit hooks (`numeric-claims-guard`, `citation-verify`, `no-github-push`,
 `safety-guard`, `push-to-main`, etc.) are **Claude Code-side**:
