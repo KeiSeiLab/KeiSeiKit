@@ -1,0 +1,32 @@
+# policy-chain.toml — SSoT for which hooks gate which MCP tool.
+#
+# Consumed by `kei-mcp::handlers::safe_tools` to enforce KeiSeiKit's safety
+# rules on non-Claude CLIs (Grok / Agy / Copilot / Kimi) via the
+# `kei_bash` / `kei_edit` / `kei_write` MCP tools.
+#
+# Hooks live in ~/.claude/hooks/ (overridable via $KEI_HOOKS_DIR).
+# Exit codes: 0 = pass, 2 = block, other non-zero = treat as block + log.
+# The dispatcher iterates `chain` IN ORDER and aborts on first non-zero.
+#
+# Constructor Pattern: ONE chain for all CLIs. Per-CLI override deferred
+# until proven necessary. To extend, append a hook basename (no .sh) to
+# the relevant chain — the hook script must already exist in ~/.claude/hooks/.
+
+[bash]
+chain = [
+  "no-github-push.sh",
+  "safety-guard.sh",
+  "destructive-guard.sh",
+]
+
+[edit]
+chain = [
+  "citation-verify.sh",
+  "numeric-claims-guard.sh",
+]
+
+[write]
+chain = [
+  "citation-verify.sh",
+  "numeric-claims-guard.sh",
+]

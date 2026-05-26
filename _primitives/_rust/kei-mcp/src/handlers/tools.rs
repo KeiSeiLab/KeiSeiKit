@@ -37,6 +37,12 @@ pub fn list(req: JsonRpcRequest, ctx: &ServerContext) -> JsonRpcResponse {
     // CLI (grok / agy / copilot / kimi / claude) can spawn a KeiSeiKit agent
     // as a sub-agent. Bypasses atom discovery (it's an internal handler).
     tools.push(spawn_agent_descriptor());
+    // v0.40 (Phase C): policy-gated MCP tools — kei_bash / kei_edit /
+    // kei_write run the configured hook chain BEFORE executing the action.
+    // This restores Claude Code's PreToolUse safety on non-Claude CLIs
+    // (Grok / Agy / Copilot / Kimi) — any MCP-capable orchestrator that
+    // disables its native shell + uses kei_bash gets full enforcement.
+    tools.extend(super::safe_tools::descriptors());
     tools.sort_by(|a, b| {
         a.get("name").and_then(Value::as_str).unwrap_or("")
             .cmp(b.get("name").and_then(Value::as_str).unwrap_or(""))
@@ -64,6 +70,11 @@ pub async fn call(req: JsonRpcRequest, ctx: &ServerContext) -> JsonRpcResponse {
             })),
             Err(e) => err(req.id, INTERNAL_ERROR, e),
         };
+    }
+
+    // v0.40 (Phase C): kei_bash / kei_edit / kei_write — policy-gated tools.
+    if matches!(name.as_str(), "kei_bash" | "kei_edit" | "kei_write") {
+        return super::safe_tools::dispatch_safe(req, &name, &args).await;
     }
 
     match invoke_atom(&ctx.atoms_root, &name, &args).await {
