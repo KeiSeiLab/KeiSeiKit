@@ -50,6 +50,8 @@ fn check_bearer(expected: &str, req: &Request) -> Result<(), OpenAiError> {
 /// matching `subtle::ConstantTimeEq` semantics for our use-case
 /// without pulling in the dependency.
 fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
+    // Length is a public, fixed-length design parameter (operator-set
+    // `KEI_API_KEY`), not a secret — early return on length mismatch is benign.
     if a.len() != b.len() {
         return false;
     }

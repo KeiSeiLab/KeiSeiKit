@@ -84,20 +84,29 @@ pub fn validate_hex(token: &str) -> Result<(), AuthError> {
 
 /// Constant-time-ish comparison (length + byte-level xor fold).
 ///
-/// MISS-6: `validate_hex` accepts mixed-case hex, so we must accept either
-/// case here too. Both inputs are lowercased (ASCII-only — safe per
-/// `validate_hex` invariants) before the xor-fold so a user pasting an
-/// UPPERCASE token through a UI matches the lowercase generated form.
-/// Lowercasing ASCII does not change the byte length, so the branchless
-/// fold over equal-length buffers is preserved.
+/// Case-insensitivity is a **hex-only** invariant: `validate_hex` accepts
+/// mixed case, so a UI paste of an UPPERCASE token must match the
+/// lowercase generated form. We gate that lowercasing on `expected`
+/// passing `validate_hex` — for non-hex callers (e.g. an operator
+/// supplying a base64 `KEI_TOKEN_OVERRIDE`) lowercasing would halve the
+/// effective keyspace per character (62→36 for base64), so we fall
+/// through to strict byte-level equality instead. Both branches keep the
+/// branchless xor-fold over equal-length buffers.
 pub fn tokens_match(expected: &str, got: &str) -> bool {
     if expected.len() != got.len() {
         return false;
     }
-    let exp_lower = expected.to_ascii_lowercase();
-    let got_lower = got.to_ascii_lowercase();
+    if validate_hex(expected).is_ok() {
+        let exp_lower = expected.to_ascii_lowercase();
+        let got_lower = got.to_ascii_lowercase();
+        let mut diff: u8 = 0;
+        for (a, b) in exp_lower.bytes().zip(got_lower.bytes()) {
+            diff |= a ^ b;
+        }
+        return diff == 0;
+    }
     let mut diff: u8 = 0;
-    for (a, b) in exp_lower.bytes().zip(got_lower.bytes()) {
+    for (a, b) in expected.bytes().zip(got.bytes()) {
         diff |= a ^ b;
     }
     diff == 0
