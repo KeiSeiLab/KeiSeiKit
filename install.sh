@@ -52,6 +52,27 @@ MANIFEST="$KIT_DIR/_primitives/MANIFEST.toml"
 INSTALLED_FILE="$AGENTS_DIR/_primitives/.installed"
 LIB_DIR="$KIT_DIR/install"
 
+# --- v0.49: interactive-prompt cube (Constructor Pattern SSoT) -----------
+# ALL interactive logic — `kei_is_interactive`, `kei_prompt`, `kei_prompt_yn`,
+# `kei_prompt_secret` — lives in scripts/kei-prompt.sh. NEVER inline
+# `[ -t 0 ]` or `read -r` in installer code. Source it BEFORE other libs
+# so they can use the helpers.
+if [ -r "$KIT_DIR/scripts/kei-prompt.sh" ]; then
+    # shellcheck source=scripts/kei-prompt.sh
+    source "$KIT_DIR/scripts/kei-prompt.sh"
+elif [ -r "$HOME/.claude/scripts/kei-prompt.sh" ]; then
+    # shellcheck disable=SC1091
+    source "$HOME/.claude/scripts/kei-prompt.sh"
+else
+    # Self-contained fallback — same contract as the cube's kei_is_interactive.
+    kei_is_interactive() {
+        [ "${KEI_NONINTERACTIVE:-0}" = "1" ] && return 1
+        if [ -r /dev/tty ] && [ -w /dev/tty ]; then return 0; fi
+        [ -t 0 ] && return 0
+        return 1
+    }
+fi
+
 # --- source cubes (order matters: logs -> backup -> profile -> rest) ------
 # shellcheck source=install/lib-log.sh
 source "$LIB_DIR/lib-log.sh"
@@ -267,7 +288,7 @@ if [ "$NO_PATHWAY" != "1" ]; then
   # logfile, so -t 1 is false even interactively. Requiring it skipped PATH
   # wiring (~/.claude/bin), so the `kei` entry-point was not found after a
   # curl|bash install. (Same tee/-t1 trap as the onboarding gates.)
-  if [ "$WITH_PATHWAY" = "1" ] || [ -t 0 ]; then
+  if [ "$WITH_PATHWAY" = "1" ] || kei_is_interactive; then
     pathway_install
   fi
 fi

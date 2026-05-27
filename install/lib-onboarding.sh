@@ -43,11 +43,10 @@ REGISTRY_MODELS="$KIT_DIR/_blocks/registries/models.toml"
 onboarding_should_run() {
   [ -f "$ONBOARDED_FLAG" ]    && return 1
   [ "${KEISEI_SKIP_ONBOARD:-}" = "1" ] && return 1
-  # Interactive iff stdin is a terminal. We deliberately do NOT require -t 1:
-  # the curl|bash bootstrapper (web-install.sh) tees stdout to a logfile, so
-  # -t 1 is false even in an interactive session. Prompts go to stderr, input
-  # reads from stdin — an interactive stdin is the only real requirement.
-  [ ! -t 0 ] && return 1
+  # v0.49: delegate to the kei-prompt cube — covers both plain bash AND
+  # curl|bash (where stdin is the pipe from curl, so [ -t 0 ] is false
+  # even with the user at a real terminal — only /dev/tty is reliable).
+  kei_is_interactive || return 1
   return 0
 }
 
@@ -72,8 +71,8 @@ onboarding_run() {
     if ! preflight_run "$ONBOARDING_PROVIDER"; then
       echo "" >&2
       echo "  ⚠ ${STR_PREFLIGHT_FAILED:-Preflight failed — provider may not work.}" >&2
-      if [ -t 0 ]; then  # stdin-only: stdout may be tee'd in curl|bash
-        read -r -p "  ${STR_PREFLIGHT_CONTINUE:-Continue anyway? [y/N]} " _ans
+      if kei_is_interactive; then  # /dev/tty-aware: covers curl|bash
+        _ans=$(kei_prompt "  ${STR_PREFLIGHT_CONTINUE:-Continue anyway? [y/N]} " "N")
         case "$_ans" in
           y|Y|yes|да|Да)
             echo "  → продолжаю; ключи запишутся но runtime может упасть." >&2

@@ -17,7 +17,7 @@ menu_should_skip() {
   [ -n "$ADD_LIST" ]     && return 0
   [ -n "$REMOVE_NAME" ]  && return 0
   [ "$LIST_MODE" = "1" ] && return 0
-  [ ! -t 0 ]             && return 0   # interactive stdin only; not -t 1 (curl|bash tees stdout)
+  kei_is_interactive || return 0       # /dev/tty-aware: covers curl|bash + plain bash
   return 1
 }
 

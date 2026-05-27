@@ -137,7 +137,7 @@ show_confirm_screen() {
   local profile_label="$1"
   print_plan_body "$profile_label"
   [ "$ASSUME_YES" = "1" ] && { echo "(--yes: auto-confirming)"; return 0; }
-  [ ! -t 0 ] && { echo "(non-TTY: auto-confirming)"; return 0; }
+  kei_is_interactive || { echo "(non-TTY: auto-confirming)"; return 0; }
   if command -v whiptail >/dev/null 2>&1; then
     whiptail --yesno "Install ${CONFIRM_TOTAL:-0} primitive(s) for profile '$profile_label'?\n\nTime: ~${CONFIRM_SECS}s, disk: ~${CONFIRM_MB} MB" 14 70
     return $?

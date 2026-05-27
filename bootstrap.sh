@@ -55,7 +55,7 @@ prompt_profile() {
     # no 105-crate compile, can't half-fail. Matches install.sh's own default
     # (was "cortex" here → divergent install vs direct install.sh). Opt up with
     # --profile=cortex/full-hub.
-    if [ ! -t 0 ]; then PROFILE="minimal"; return 0; fi
+    if ! kei_is_interactive; then PROFILE="minimal"; return 0; fi
     cat <<'WIZARD'
 
 ╔═══════════════════════════════════════════════════════════════════╗
@@ -114,6 +114,30 @@ esac
 log()  { echo "[bootstrap] $*"; }
 err()  { echo "[bootstrap] ERROR: $*" >&2; }
 have() { command -v "$1" >/dev/null 2>&1; }
+
+# v0.49: source the interactive-prompt cube (Constructor Pattern: ONE place
+# where all interactivity logic lives). Tries kit-local path first (when
+# running from a clone / curl|bash via cloned checkout), then installed
+# path (when bootstrap re-runs from $HOME/.claude). Last-resort inline
+# fallback if neither found — keeps the script self-bootable.
+_KIT_DIR_PRE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -r "$_KIT_DIR_PRE/scripts/kei-prompt.sh" ]; then
+    # shellcheck source=scripts/kei-prompt.sh
+    . "$_KIT_DIR_PRE/scripts/kei-prompt.sh"
+elif [ -r "$HOME/.claude/scripts/kei-prompt.sh" ]; then
+    # shellcheck disable=SC1091
+    . "$HOME/.claude/scripts/kei-prompt.sh"
+else
+    # Self-contained fallback so bootstrap never breaks when run from a
+    # weird directory. Mirrors kei_is_interactive's contract only.
+    kei_is_interactive() {
+        [ "${KEI_NONINTERACTIVE:-0}" = "1" ] && return 1
+        if [ -r /dev/tty ] && [ -w /dev/tty ]; then return 0; fi
+        [ -t 0 ] && return 0
+        return 1
+    }
+fi
+unset _KIT_DIR_PRE
 
 OS="$(uname -s)"
 
@@ -271,7 +295,7 @@ log "===========================================================================
 # inside this scope correctly reports interactive vs headless. Wizard
 # itself re-checks and exits cleanly if non-interactive.
 ONBOARD_SH="$HOME/.claude/scripts/kei-onboard.sh"
-if [ -x "$ONBOARD_SH" ] && [ -t 0 ] && [ "${KEI_NO_ONBOARD:-0}" != "1" ]; then
+if [ -x "$ONBOARD_SH" ] && kei_is_interactive && [ "${KEI_NO_ONBOARD:-0}" != "1" ]; then
   log ""
   log "Starting post-install onboarding (pick primary CLI + wire MCP)..."
   log "Skip with KEI_NO_ONBOARD=1; re-run anytime with 'kei onboard'."
@@ -297,7 +321,7 @@ log "  - For sleep layer: run /sleep-setup inside Claude Code."
 # stdin was reattached to /dev/tty above (when present), so [ -t 0 ] is
 # now true under curl|bash too. Simple gate works correctly.
 KEI_BIN_PATH="$HOME/.claude/bin/kei"
-if [ -x "$KEI_BIN_PATH" ] && [ -t 0 ] && [ "${KEI_NO_AUTORUN:-0}" != "1" ]; then
+if [ -x "$KEI_BIN_PATH" ] && kei_is_interactive && [ "${KEI_NO_AUTORUN:-0}" != "1" ]; then
     log ""
     printf '  → Запустить kei сейчас? [Y/n] '
     _reply=""

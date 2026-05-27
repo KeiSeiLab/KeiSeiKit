@@ -179,17 +179,17 @@ maybe_activate_hooks() {
   elif [ ! -f "$settings_file" ]; then
     say "no existing settings.json; installing snippet"
     activate_hooks && DID_ACTIVATE=1
-  elif [ -t 0 ]; then  # stdin-only: stdout may be tee'd in curl|bash
+  elif kei_is_interactive; then  # /dev/tty-aware: covers curl|bash
+    local _hooks_q
     if [ "$COLOR" = "1" ]; then
-      printf '\033[1;36m[install]\033[0m activate hooks now? [y/N] '
+      _hooks_q=$'\033[1;36m[install]\033[0m activate hooks now?'
     else
-      printf '[install] activate hooks now? [y/N] '
+      _hooks_q='[install] activate hooks now?'
     fi
-    local reply
-    read -r reply
-    case "$reply" in
-      y|Y|yes|YES) activate_hooks && DID_ACTIVATE=1 ;;
-      *) say "skipping hook activation" ;;
-    esac
+    if kei_prompt_yn "$_hooks_q" "N"; then
+      activate_hooks && DID_ACTIVATE=1
+    else
+      say "skipping hook activation"
+    fi
   fi
 }

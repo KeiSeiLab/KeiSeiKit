@@ -46,7 +46,7 @@ sleep consolidates 30-session windows into morning markdown reports.
   updates, agent regeneration, DNA index refresh, keimd graph
   reindex. Auto-self-indexing via kei-registry SQLite.
 
-## By the numbers (v0.47)
+## By the numbers (v0.49)
 
 110 Rust crates · 69 skills · 54 hooks · 38 agent manifests ·
 86 substrate blocks · 18 capability atoms · 7 substrate roles ·

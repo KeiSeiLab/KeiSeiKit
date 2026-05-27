@@ -10,7 +10,7 @@
 
 run_sleep_wizard() {
   local sleep_helper="$AGENTS_DIR/_primitives/kei-sleep-setup.sh"
-  if [[ -x "$sleep_helper" ]] && [ -t 0 ]; then  # stdin only; not -t 1 (curl|bash tees stdout)
+  if [[ -x "$sleep_helper" ]] && kei_is_interactive; then  # /dev/tty-aware: covers curl|bash
     say "running sleep-sync setup helper"
     "$sleep_helper" || warn "sleep-sync setup did not complete — re-run via /sleep-setup"
   else

@@ -25,9 +25,9 @@ preflight_offer_install() {
   echo "  ⚠ $cli не найден." >&2
   echo "  Установить: $install_cmd" >&2
   echo "" >&2
-  if [ -t 0 ]; then  # stdin-only: stdout may be tee'd in curl|bash
+  if kei_is_interactive; then  # /dev/tty-aware: covers curl|bash
     echo "  ⓘ команда: $install_cmd" >&2
-    read -r -p "  Поставить сейчас? [y/N/skip] " ans
+    ans=$(kei_prompt "  Поставить сейчас? [y/N/skip] " "N")
     case "$ans" in
       y|Y|yes)
         # bash -c вместо eval — explicit subshell, не word-splitting'тся
