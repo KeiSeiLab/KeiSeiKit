@@ -41,11 +41,27 @@ REGISTRY_MODELS="$KIT_DIR/_blocks/registries/models.toml"
 
 # Skip-логика.
 onboarding_should_run() {
-  [ -f "$ONBOARDED_FLAG" ]    && return 1
+  # v0.49: force-rerun override — wipes the flag and runs the wizard again.
+  # User-facing path: `KEISEI_FORCE_ONBOARD=1 curl ... | bash` OR
+  # `KEISEI_FORCE_ONBOARD=1 ./bootstrap.sh`. Useful after `rm -rf ~/.claude`
+  # restored from backup, or to switch language post-install.
+  if [ "${KEISEI_FORCE_ONBOARD:-0}" = "1" ]; then
+    rm -f "$ONBOARDED_FLAG" 2>/dev/null
+    say "KEISEI_FORCE_ONBOARD=1 — wiped ~/.claude/.onboarded, re-running wizard"
+    kei_is_interactive || return 1
+    return 0
+  fi
+  if [ -f "$ONBOARDED_FLAG" ]; then
+    # Visible signal so the user knows WHY language picker is silent.
+    say "onboarding already completed (~/.claude/.onboarded exists)"
+    say "  to re-run:  KEISEI_FORCE_ONBOARD=1 <install command>"
+    say "  or:         rm ~/.claude/.onboarded  then re-install"
+    return 1
+  fi
   [ "${KEISEI_SKIP_ONBOARD:-}" = "1" ] && return 1
-  # v0.49: delegate to the kei-prompt cube — covers both plain bash AND
-  # curl|bash (where stdin is the pipe from curl, so [ -t 0 ] is false
-  # even with the user at a real terminal — only /dev/tty is reliable).
+  # Covers both plain bash AND curl|bash (where stdin is the pipe from
+  # curl, so [ -t 0 ] is false even with the user at a real terminal —
+  # only /dev/tty is reliable).
   kei_is_interactive || return 1
   return 0
 }
