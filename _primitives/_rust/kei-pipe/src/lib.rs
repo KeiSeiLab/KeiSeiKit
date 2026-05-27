@@ -24,6 +24,7 @@ pub mod hot_reload;
 pub mod report;
 pub mod resolve;
 pub mod scheduler_bridge;
+pub mod scheduler_denylist;
 pub mod topo;
 
 use std::path::{Path, PathBuf};

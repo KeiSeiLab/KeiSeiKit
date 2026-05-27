@@ -26,6 +26,8 @@ kei-cache = { path = "../kei-cache" }
 kei-watch = { path = "../kei-watch" }
 kei-scheduler = { path = "../kei-scheduler" }
 rusqlite = { workspace = true }
+tokio = { workspace = true }
+shell-words = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

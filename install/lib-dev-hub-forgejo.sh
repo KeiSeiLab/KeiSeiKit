@@ -134,21 +134,38 @@ _dhf_bootstrap_admin_user() {
     err "$output"
     return 1
   fi
-  # Keychain (macOS only — `security` not on Linux). Soft-fail elsewhere.
+  # v0.51 audit H2: never print secrets to stderr/scrollback/tmux/CI-logs.
+  # Storage hierarchy by host capability:
+  #   1. macOS  → Keychain (`security add-generic-password`)
+  #   2. Linux  → libsecret via `secret-tool` if installed
+  #   3. fallback → ~/.claude/secrets/.env (chmod 600) — silent, no echo
+  _env_file="$HOME_DIR/.claude/secrets/.env"
+  _stashed_in=""
   if command -v security >/dev/null 2>&1; then
-    security add-generic-password -U -s "$kc_token_svc" \
-      -a "$username" -w "$token" 2>/dev/null && \
-      say "  → token stashed: security find-generic-password -s $kc_token_svc -w"
-    security add-generic-password -U -s "$kc_pass_svc" \
-      -a "$username" -w "$password" 2>/dev/null && \
-      say "  → password stashed: security find-generic-password -s $kc_pass_svc -w"
-  else
-    warn "  → 'security' (macOS Keychain) not found — credentials only on screen below:"
-    warn "      USER:  $username"
-    warn "      PASS:  $password"
-    warn "      TOKEN: $token"
-    warn "    Save manually before this output scrolls off."
+    security add-generic-password -U -s "$kc_token_svc" -a "$username" -w "$token" 2>/dev/null && \
+      security add-generic-password -U -s "$kc_pass_svc" -a "$username" -w "$password" 2>/dev/null && \
+      _stashed_in="macOS Keychain ($kc_pass_svc / $kc_token_svc)"
+  elif command -v secret-tool >/dev/null 2>&1; then
+    printf '%s' "$token"    | secret-tool store --label="kei forgejo token" service "$kc_token_svc" account "$username" 2>/dev/null && \
+    printf '%s' "$password" | secret-tool store --label="kei forgejo pass"  service "$kc_pass_svc"  account "$username" 2>/dev/null && \
+      _stashed_in="libsecret (secret-tool lookup service $kc_pass_svc account $username)"
   fi
+  if [ -z "$_stashed_in" ]; then
+    # Fallback — write to env file with chmod 600. NEVER stderr.
+    [ -d "$(dirname "$_env_file")" ] || mkdir -p "$(dirname "$_env_file")"
+    [ -f "$_env_file" ] || { touch "$_env_file"; chmod 600 "$_env_file"; }
+    # Replace any previous KEI_FORGEJO_PASSWORD / KEI_FORGEJO_TOKEN lines.
+    {
+      grep -vE '^(KEI_FORGEJO_PASSWORD|KEI_FORGEJO_TOKEN)=' "$_env_file" 2>/dev/null || true
+      printf 'KEI_FORGEJO_PASSWORD=%s\n' "$password"
+      printf 'KEI_FORGEJO_TOKEN=%s\n'    "$token"
+    } > "$_env_file.tmp" && mv "$_env_file.tmp" "$_env_file"
+    chmod 600 "$_env_file"
+    _stashed_in="$_env_file (chmod 600)"
+  fi
+  say "  → forgejo admin credentials stored in: $_stashed_in"
+  say "    user: $username  (password + token NOT printed)"
+  unset _env_file _stashed_in
   # Stamp .env with KEI_FORGEJO_USER + URL (live, not example — wizard reads .env).
   env_file="$HOME_DIR/.claude/secrets/.env"
   [ -d "$(dirname "$env_file")" ] || mkdir -p "$(dirname "$env_file")"

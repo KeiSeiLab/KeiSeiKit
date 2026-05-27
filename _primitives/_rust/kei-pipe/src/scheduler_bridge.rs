@@ -1,24 +1,43 @@
 //! `scheduler_bridge` — kei-scheduler → kei-pipe executor glue.
 //!
 //! Pumps `kei_scheduler::list_due` → `sh -c <command>` →
-//! `kei_scheduler::mark_run`, once per call. Caller owns the tick cadence
-//! (typical: 1 Hz loop inside a daemon, or a one-shot drain from cron).
+//! `kei_scheduler::mark_run`, once per call. Caller owns the tick cadence.
 //!
-//! # Security / trust boundary
+//! # Security / trust boundary — CALLER RESTRICTION
 //!
-//! The scheduler stores `command` as a shell string (not an argv). This
-//! bridge therefore execs via `sh -c <command>` — the caller is
-//! responsible for ensuring `tasks.command` is trusted. There is NO
-//! sandbox, NO wall-time cap, NO stdout capture. A runaway task blocks
-//! the current thread until `sh` exits.
+//! `tasks.command` is a shell string exec'd via `sh -c`. Privileged surface.
+//! Two defenses live here:
+//!   1. Argv0 allow-list + substring denylist ([`scheduler_denylist`]) —
+//!      mirrors `kei-cortex::tool::bash` layered defense. Rejection
+//!      returns [`Error::Denied`]; task is NOT marked-run.
+//!   2. Per-task wall-time cap ([`SAFE_TOOL_TIMEOUT_SECS`], mirrors
+//!      `kei-mcp::safe_tools`). Tasks over 60s are killed; `exit_code = -1`.
 //!
-//! Out of scope for v0.1: timeouts, CPU/memory limits, argv-form tasks,
-//! stdout/stderr capture. Add higher up in the call stack if needed.
+//! Out of scope: full sandbox (namespace / cgroup / seccomp), CPU/memory
+//! caps, stdout capture.
+//!
+//! ## TODO — `RootExecutor` newtype
+//!
+//! Today any in-graph caller can invoke `run_due_tasks(&Connection)`. Too
+//! loose: scheduler execution is root-level by trust model and MUST NOT
+//! be wired up from MCP/HTTP/agent handlers. Wrap the entry point in a
+//! `RootExecutor(())` newtype constructible only from the `kei-pipe`
+//! daemon binary, so any caller outside the daemon fails to compile.
+//! Callers outside the `kei-pipe` daemon binary MUST NOT have access to
+//! `schedule()` either — `schedule()` writes the command that gets
+//! exec'd, so exposing it via HTTP/MCP is RCE.
 
+use crate::scheduler_denylist::{deny_dangerous, Denied};
 use kei_scheduler::{list_due, mark_run, Error as SchedError};
 use rusqlite::Connection;
-use std::process::Command;
-use std::time::Instant;
+use std::process::Stdio;
+use std::time::{Duration, Instant};
+use tokio::process::Command;
+use tokio::runtime::Builder;
+use tokio::time::timeout;
+
+/// Per-task wall-time cap. Mirrors `kei-mcp::safe_tools::SAFE_TOOL_TIMEOUT_SECS`.
+pub const SAFE_TOOL_TIMEOUT_SECS: u64 = 60;
 
 /// Per-task execution outcome.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -33,6 +52,8 @@ pub struct RunResult {
 pub enum Error {
     Scheduler(SchedError),
     Spawn(std::io::Error),
+    Denied(Denied),
+    Runtime(std::io::Error),
 }
 
 impl std::fmt::Display for Error {
@@ -40,6 +61,8 @@ impl std::fmt::Display for Error {
         match self {
             Error::Scheduler(e) => write!(f, "scheduler: {e}"),
             Error::Spawn(e) => write!(f, "spawn sh: {e}"),
+            Error::Denied(e) => write!(f, "{e}"),
+            Error::Runtime(e) => write!(f, "tokio runtime: {e}"),
         }
     }
 }
@@ -49,6 +72,8 @@ impl std::error::Error for Error {
         match self {
             Error::Scheduler(e) => Some(e),
             Error::Spawn(e) => Some(e),
+            Error::Denied(e) => Some(e),
+            Error::Runtime(e) => Some(e),
         }
     }
 }
@@ -59,17 +84,21 @@ impl From<SchedError> for Error {
     }
 }
 
-/// Fetch every due task at `now`, exec each via `sh -c`, `mark_run` it,
-/// and return one [`RunResult`] per task in scheduler order.
-///
-/// Errors short-circuit: a DB failure at any point aborts the batch. A
-/// failed `sh` spawn (rare — missing /bin/sh) likewise aborts. An exec
-/// that returns a non-zero exit code is NOT an error — it's captured in
-/// `RunResult.exit_code` and passed through to `mark_run`.
+impl From<Denied> for Error {
+    fn from(e: Denied) -> Self {
+        Error::Denied(e)
+    }
+}
+
+/// Fetch every due task at `now`, exec each via `sh -c`, `mark_run` it.
+/// DB failure / spawn failure / denylist rejection short-circuits the
+/// batch; a denied task stays due (NOT marked-run) so it surfaces in
+/// audit. Non-zero exit is NOT an error. Timeout → killed, `-1`.
 pub fn run_due_tasks(conn: &Connection, now: i64) -> Result<Vec<RunResult>, Error> {
     let due = list_due(conn, now)?;
     let mut out = Vec::with_capacity(due.len());
     for task in due {
+        deny_dangerous(&task.command)?;
         let (exit_code, duration_ms) = exec_shell(&task.command)?;
         mark_run(conn, task.id, exit_code as i64, now)?;
         out.push(RunResult {
@@ -81,17 +110,35 @@ pub fn run_due_tasks(conn: &Connection, now: i64) -> Result<Vec<RunResult>, Erro
     Ok(out)
 }
 
-/// Spawn `sh -c <cmd>`, block for completion, return `(exit_code, wall_ms)`.
-/// On platforms where the process was killed by a signal (exit code
-/// unavailable), we report `-1`.
+/// Spawn `sh -c <cmd>` under a single-thread tokio runtime, enforce
+/// [`SAFE_TOOL_TIMEOUT_SECS`] via `tokio::time::timeout`. Timeout or
+/// signal-kill → `exit_code = -1`.
 fn exec_shell(cmd: &str) -> Result<(i32, u64), Error> {
     let start = Instant::now();
-    let status = Command::new("sh")
-        .args(["-c", cmd])
-        .status()
-        .map_err(Error::Spawn)?;
+    let rt = Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .map_err(Error::Runtime)?;
+    let code = rt.block_on(async {
+        let mut child = Command::new("sh")
+            .args(["-c", cmd])
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .map_err(Error::Spawn)?;
+        let wait = child.wait();
+        match timeout(Duration::from_secs(SAFE_TOOL_TIMEOUT_SECS), wait).await {
+            Ok(Ok(status)) => Ok::<i32, Error>(status.code().unwrap_or(-1)),
+            Ok(Err(e)) => Err(Error::Spawn(e)),
+            Err(_) => {
+                let _ = child.kill().await;
+                let _ = child.wait().await;
+                Ok::<i32, Error>(-1)
+            }
+        }
+    })?;
     let dur = start.elapsed().as_millis() as u64;
-    let code = status.code().unwrap_or(-1);
     Ok((code, dur))
 }
 
@@ -116,14 +163,10 @@ mod tests {
     fn runs_due_interval_task() {
         let s = setup_store();
         schedule(s.conn(), "ok_task", INTERVAL, "60", "true").unwrap();
-        // Query far enough in the future that the interval trigger is
-        // eligible (interval sets next_run_at ≈ now+60).
         let query_ts = chrono_now() + 3600;
         let out = run_due_tasks(s.conn(), query_ts).expect("run");
         assert_eq!(out.len(), 1, "exactly one due task");
         assert_eq!(out[0].exit_code, 0, "`true` exits 0");
-        // After the run, next_run_at is advanced to query_ts + 60, so
-        // re-polling at the same `query_ts` finds nothing.
         let again = run_due_tasks(s.conn(), query_ts).expect("run again");
         assert!(again.is_empty(), "interval advanced; expected empty");
     }
@@ -138,8 +181,15 @@ mod tests {
         assert_ne!(out[0].exit_code, 0, "`false` exits non-zero");
     }
 
-    /// Tests don't import chrono directly — read wall clock via std so
-    /// the bridge crate's dep surface stays minimal.
+    #[test]
+    fn rejects_denylisted_command() {
+        let s = setup_store();
+        schedule(s.conn(), "bad", INTERVAL, "60", "sudo rm -rf /").unwrap();
+        let query_ts = chrono_now() + 3600;
+        let err = run_due_tasks(s.conn(), query_ts).expect_err("must deny");
+        assert!(matches!(err, Error::Denied(_)));
+    }
+
     fn chrono_now() -> i64 {
         use std::time::{SystemTime, UNIX_EPOCH};
         SystemTime::now()

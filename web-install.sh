@@ -78,12 +78,19 @@ mkdir -p "$(dirname "$KEISEI_ROOT")"
 if [ -d "$KEISEI_ROOT/.git" ]; then
   say "pulling $KEISEI_REF in $KEISEI_ROOT"
   git -C "$KEISEI_ROOT" fetch --depth=1 origin "$KEISEI_REF"
-  # reset --hard discards ANY local edits in this managed clone. It's a managed
-  # dir (don't hand-edit it — change the repo + push instead), but warn loudly
-  # so a manual tweak isn't lost silently.
+  # v0.51 audit M4: stash local edits BEFORE reset --hard, so user can
+  # recover via `git stash pop` if they hand-edited this managed dir
+  # (don't hand-edit — change repo + push instead, but accidents happen).
   if ! git -C "$KEISEI_ROOT" diff --quiet 2>/dev/null \
      || ! git -C "$KEISEI_ROOT" diff --cached --quiet 2>/dev/null; then
-    say "  ⚠ local changes in $KEISEI_ROOT will be DISCARDED by reset --hard"
+    _stash_msg="web-install backup $(date -u +%FT%TZ)"
+    if git -C "$KEISEI_ROOT" stash push -u -m "$_stash_msg" >/dev/null 2>&1; then
+      say "  ⚠ local changes stashed as: $_stash_msg"
+      say "    recover with: (cd $KEISEI_ROOT && git stash pop)"
+    else
+      say "  ⚠ local changes in $KEISEI_ROOT will be DISCARDED (stash failed)"
+    fi
+    unset _stash_msg
   fi
   git -C "$KEISEI_ROOT" reset --hard "origin/$KEISEI_REF"
 else
