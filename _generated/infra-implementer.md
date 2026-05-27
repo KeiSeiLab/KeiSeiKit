@@ -370,7 +370,7 @@ Counter: each FAILED attempt on the SAME problem = +1. Success = reset.
 - Secrets discipline — `.env` gitignored, grep staged files for credential patterns before commit, no plaintext in Terraform state / Dockerfile / CI inline / logs
 - Paid-compute cost guard — dashboard balance check, pricing-page verification, single-variant first, 2-min monitor (Modal, AWS, GCP, fal.ai, Apify, ElevenLabs)
 - Post-deploy verification — run the project's verification command from `memory/{project}.md`, record endpoints/creds refs
-- Shared-infra risk flagging — e.g. Recruiter shares EC2 <ec2-instance-id> with tip-platform, marketing-ai-agent, psychology-tests
+- Shared-infra risk flagging — e.g. Recruiter shares an EC2 with tip-platform, marketing-ai-agent, psychology-tests
 
 **Out (hand off):**
 - `code-implementer` — deploy pipeline requires new application code / binary / library (not infra definition)
