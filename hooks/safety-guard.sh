@@ -37,10 +37,18 @@ for pattern in "${BLOCKED_PATTERNS[@]}"; do
   fi
 done
 
-# Check for hardcoded secrets in echo/printf
-if echo "$COMMAND" | grep -qE '(echo|printf).*\b(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|AKIA[A-Z0-9]{16})\b'; then
-  echo "BLOCKED by safety-guard: potential secret leak in echo/printf" >&2
-  exit 2
+# Check for hardcoded secrets in any command (echo/printf/curl/etc).
+# Uses SSoT regex from hooks/_lib/secret-patterns.sh (RULE 0.8).
+_SP_LIB="$(dirname "$0")/_lib/secret-patterns.sh"
+if [ -f "$_SP_LIB" ]; then
+  # shellcheck source=hooks/_lib/secret-patterns.sh
+  . "$_SP_LIB"
+  _SECRET_RE=$(kei_secret_patterns_regex)
+  if printf '%s' "$COMMAND" | grep -qE "$_SECRET_RE"; then
+    echo "BLOCKED by safety-guard: potential secret leak (hardcoded token shape detected)" >&2
+    echo "Move the value to ~/.claude/secrets/.env and reference by env var name." >&2
+    exit 2
+  fi
 fi
 
 exit 0

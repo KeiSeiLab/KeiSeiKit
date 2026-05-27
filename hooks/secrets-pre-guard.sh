@@ -51,54 +51,37 @@ CONTENT=$(printf '%s' "$INPUT" | jq -r \
 
 ALLOWLIST_RE='YOUR_TOKEN_HERE|<redacted>|\[VERIFY:|placeholder|xxx+|_TOKEN_NAME_HERE|_KEY_HERE|_SECRET_HERE|example[_-]?(key|token|secret)|dummy[_-]?(key|token|secret)'
 
-DETECTED=""
+# Source SSoT (RULE 0.8): single canonical list of secret regexes + labels.
+_SP_LIB="$(dirname "$0")/_lib/secret-patterns.sh"
+if [ ! -f "$_SP_LIB" ]; then
+  echo "[secrets-pre-guard] FATAL: missing $_SP_LIB" >&2
+  exit 0
+fi
+# shellcheck source=hooks/_lib/secret-patterns.sh
+. "$_SP_LIB"
 
-# Helper: scan content line-by-line for a given regex; for each match,
-# allow only if the SAME LINE matches ALLOWLIST_RE. Sets DETECTED to label
-# on first non-allowlisted hit.
-scan_pattern() {
-  pattern="$1"
-  label="$2"
-  [ -n "$DETECTED" ] && return 0
-  hit=$(printf '%s' "$CONTENT" | awk -v pat="$pattern" -v allow="$ALLOWLIST_RE" '
-    {
-      if (match($0, pat)) {
-        if (match($0, allow)) {
-          next
+# Scan: for each canonical (regex, label) pair from SSoT, run awk to find a
+# non-allowlisted hit. Use command substitution to capture label, avoiding
+# POSIX subshell variable-loss from `pipe | while`.
+DETECTED=$(
+  _TAB=$(printf '\t')
+  kei_secret_patterns | while IFS="$_TAB" read -r _pat _label; do
+    [ -z "$_pat" ] && continue
+    _hit=$(printf '%s' "$CONTENT" | awk -v pat="$_pat" -v allow="$ALLOWLIST_RE" '
+      {
+        if (match($0, pat)) {
+          if (match($0, allow)) { next }
+          print "HIT"
+          exit
         }
-        print "HIT"
-        exit
       }
-    }
-  ')
-  if [ "$hit" = "HIT" ]; then
-    DETECTED="$label"
-  fi
-}
-
-# Anthropic/OpenAI legacy key
-scan_pattern 'sk-[A-Za-z0-9]{20,}' "Anthropic/OpenAI legacy key (sk-...)"
-
-# Anthropic current key
-scan_pattern 'sk-ant-[A-Za-z0-9_-]{40,}' "Anthropic current key (sk-ant-...)"
-
-# GitHub classic PAT
-scan_pattern 'ghp_[A-Za-z0-9]{36}' "GitHub classic PAT (ghp_...)"
-
-# GitHub fine-grained PAT
-scan_pattern 'github_pat_[A-Za-z0-9_]{82}' "GitHub fine-grained PAT (github_pat_...)"
-
-# Slack bot token
-scan_pattern 'xoxb-[0-9]+-[0-9]+-[A-Za-z0-9]+' "Slack bot token (xoxb-...)"
-
-# Telegram bot token
-scan_pattern '[0-9]{8,10}:[A-Za-z0-9_-]{35}' "Telegram bot token (NNNNNNNNN:...)"
-
-# AWS access key
-scan_pattern 'AKIA[A-Z0-9]{16}' "AWS access key (AKIA...)"
-
-# PEM private key block
-scan_pattern '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' "PEM private key (-----BEGIN ... PRIVATE KEY-----)"
+    ')
+    if [ "$_hit" = "HIT" ]; then
+      printf '%s' "$_label"
+      break
+    fi
+  done
+)
 
 [ -z "$DETECTED" ] && exit 0
 

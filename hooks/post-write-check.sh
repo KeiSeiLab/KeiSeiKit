@@ -11,15 +11,29 @@ fi
 
 WARNINGS=""
 
-# Check file size (lines)
-LINE_COUNT=$(wc -l < "$FILE_PATH" 2>/dev/null | tr -d ' ')
-if [ "$LINE_COUNT" -gt 300 ]; then
-  WARNINGS="${WARNINGS}WARNING: ${FILE_PATH} has ${LINE_COUNT} lines (>300). Consider decomposing.\n"
+# Check file size (lines) — Constructor Pattern threshold is >200 (CLAUDE.md).
+# v0.51 audit M6: hook was warning at 300, breaking rule/enforcement alignment.
+# Escape hatch: drop a path-prefix into .keisei/post-write-check-exemptions.txt
+# to silence the warning for known-legacy files; new code should still decompose.
+EXEMPT=".keisei/post-write-check-exemptions.txt"
+if [ -f "$EXEMPT" ] && grep -qF "$FILE_PATH" "$EXEMPT" 2>/dev/null; then
+  : # exempted
+else
+  LINE_COUNT=$(wc -l < "$FILE_PATH" 2>/dev/null | tr -d ' ')
+  if [ "$LINE_COUNT" -gt 200 ]; then
+    WARNINGS="${WARNINGS}WARNING: ${FILE_PATH} has ${LINE_COUNT} lines (>200). Consider decomposing per Constructor Pattern.\n"
+  fi
 fi
 
-# Check for hardcoded API keys
-if grep -qE '(sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|AKIA[A-Z0-9]{16}|xox[bpsa]-[a-zA-Z0-9-]+)' "$FILE_PATH" 2>/dev/null; then
-  WARNINGS="${WARNINGS}WARNING: Potential hardcoded API key detected in ${FILE_PATH}. Use env vars instead.\n"
+# Check for hardcoded API keys using SSoT regex (RULE 0.8).
+_SP_LIB="$(dirname "$0")/_lib/secret-patterns.sh"
+if [ -f "$_SP_LIB" ]; then
+  # shellcheck source=hooks/_lib/secret-patterns.sh
+  . "$_SP_LIB"
+  _SECRET_RE=$(kei_secret_patterns_regex)
+  if grep -qE "$_SECRET_RE" "$FILE_PATH" 2>/dev/null; then
+    WARNINGS="${WARNINGS}WARNING: Potential hardcoded API key detected in ${FILE_PATH}. Use env vars instead.\n"
+  fi
 fi
 
 if [ -n "$WARNINGS" ]; then
