@@ -48,6 +48,36 @@ impl Drop for KillPgGuard {
     }
 }
 
+/// Names an operator MUST NOT forward into a subprocess even via the
+/// `KEI_SAFE_ENV_EXTRA` override. These vars hijack the dynamic loader
+/// or interpreter startup and let an attacker inject code into every
+/// child the safe-tools spawn — Stack-Overflow-copy-paste-style. Every
+/// hit here is logged AND skipped.
+///
+/// Sources: ld.so(8), dyld(1), node --help, ruby(1), python(1).
+const BANNED_FORWARD: &[&str] = &[
+    // GNU/Linux dynamic linker
+    "LD_PRELOAD",
+    "LD_LIBRARY_PATH",
+    "LD_AUDIT",
+    // macOS dynamic linker
+    "DYLD_INSERT_LIBRARIES",
+    "DYLD_LIBRARY_PATH",
+    "DYLD_FRAMEWORK_PATH",
+    // Node, Python, Ruby interpreter-side equivalents
+    "NODE_OPTIONS",
+    "PYTHONSTARTUP",
+    "PYTHONPATH",
+    "RUBYOPT",
+];
+
+/// True iff `name` matches a banned forward (case-sensitive — POSIX env
+/// names are case-sensitive on every supported platform). Exposed for
+/// unit tests.
+pub fn is_banned_forward(name: &str) -> bool {
+    BANNED_FORWARD.iter().any(|b| *b == name)
+}
+
 /// v0.44 fix #4 (Gemini HIGH): strip parent env on subprocess spawn so secrets
 /// like AWS_*, GITHUB_TOKEN, MOONSHOT_API_KEY etc. don't leak to user-controlled
 /// bash commands or hook scripts. Whitelist forwards only PATH/HOME/USER/LANG/
@@ -56,6 +86,9 @@ impl Drop for KillPgGuard {
 ///
 /// Override: `KEI_SAFE_ENV_EXTRA=":-separated list"` adds named vars to the
 /// whitelist for callers that legitimately need (e.g. NIX_PATH, JAVA_HOME).
+/// The override is filtered by [`BANNED_FORWARD`] — loader-injection vars
+/// (LD_PRELOAD, DYLD_INSERT_LIBRARIES, NODE_OPTIONS, ...) are refused even
+/// when the operator names them explicitly. Attempts are logged.
 pub fn apply_safe_env(cmd: &mut Command) {
     cmd.env_clear();
     let default_keep = [
@@ -71,9 +104,54 @@ pub fn apply_safe_env(cmd: &mut Command) {
         for k in extras.split(':') {
             let k = k.trim();
             if k.is_empty() { continue; }
+            if is_banned_forward(k) {
+                eprintln!(
+                    "kei-mcp safe_tools: refusing to forward `{k}` via \
+                     KEI_SAFE_ENV_EXTRA (loader-injection class)"
+                );
+                continue;
+            }
             if let Ok(v) = std::env::var(k) {
                 cmd.env(k, v);
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn banned_list_covers_loader_vars() {
+        for v in [
+            "LD_PRELOAD",
+            "LD_LIBRARY_PATH",
+            "LD_AUDIT",
+            "DYLD_INSERT_LIBRARIES",
+            "DYLD_LIBRARY_PATH",
+            "DYLD_FRAMEWORK_PATH",
+            "NODE_OPTIONS",
+            "PYTHONSTARTUP",
+            "PYTHONPATH",
+            "RUBYOPT",
+        ] {
+            assert!(is_banned_forward(v), "{v} must be banned");
+        }
+    }
+
+    #[test]
+    fn banned_check_is_case_sensitive() {
+        // POSIX env names are case-sensitive; "ld_preload" is a different
+        // variable from "LD_PRELOAD" and not handled by ld.so. We mirror that.
+        assert!(!is_banned_forward("ld_preload"));
+        assert!(!is_banned_forward("Ld_Preload"));
+    }
+
+    #[test]
+    fn benign_names_not_banned() {
+        for v in ["PATH", "HOME", "JAVA_HOME", "NIX_PATH", "GOPATH"] {
+            assert!(!is_banned_forward(v));
         }
     }
 }
