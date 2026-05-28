@@ -19,7 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KeiSeiLab/KeiSeiKit-1.0.git",
+    "url": "git+https://github.com/KeiSeiLab/KeiSeiKit.git",
     "directory": "_ts_packages/packages/mcp-server"
   },
   "publishConfig": {

@@ -13,7 +13,7 @@
       "name": "keisei",
       "source": {
         "source": "github",
-        "repo": "KeiSeiLab/KeiSeiKit-1.0"
+        "repo": "KeiSeiLab/KeiSeiKit"
       },
       "description": "Full KeiSeiKit — agent manifests, skills, hooks, Rust workspace primitives via MANIFEST.toml profiles (classic ./install.sh), sleep-sync cloud consolidation, MCP server layer"
     }

@@ -27,6 +27,7 @@
 
 use super::types::ToolError;
 use super::webfetch_policy::is_allowed;
+use tracing::{debug, warn};
 use lru::LruCache;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -110,13 +111,13 @@ async fn resolve_and_check(parsed: &Url) -> Result<Resolved, ToolError> {
     let full_bypass = std::env::var("KEI_WEBFETCH_ALLOW_PRIVATE").as_deref() == Ok("1");
     if full_bypass {
         FULL_BYPASS_WARNING.call_once(|| {
-            eprintln!(
+            warn!(
                 "kei-cortex webfetch: WARNING KEI_WEBFETCH_ALLOW_PRIVATE=1 disables \
                  ALL SSRF guards (including IMDS 169.254.169.254). Restrict via \
                  KEI_WEBFETCH_ALLOW_TAILSCALE=1 or KEI_WEBFETCH_ALLOW_RANGES instead."
             );
         });
-        eprintln!("kei-cortex webfetch: bypass call host={host} port={port}");
+        debug!("kei-cortex webfetch: bypass call host={host} port={port}");
     }
 
     // If host is an IP literal, validate without DNS.

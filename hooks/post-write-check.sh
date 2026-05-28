@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Post-Write Check — PostToolUse hook for Write|Edit
 # Warns about large files and hardcoded secrets (async, non-blocking)
 

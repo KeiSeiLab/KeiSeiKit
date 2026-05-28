@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Runtime gate (hooks-control skill / KEI_DISABLED_HOOKS / KEI_HOOK_PROFILE).
 _KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "no-python-without-approval" || exit 0; fi

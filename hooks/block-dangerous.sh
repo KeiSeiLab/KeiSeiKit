@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Block dangerous commands that could cause irreversible damage
 
 command -v jq >/dev/null 2>&1 || exit 0

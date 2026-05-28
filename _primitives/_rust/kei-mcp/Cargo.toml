@@ -18,6 +18,7 @@ path = "src/lib.rs"
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
+tracing = { workspace = true }
 # v0.39: io-std added for tokio::io::stdin/stdout used by the MCP stdio
 # transport in main.rs (workspace tokio doesn't enable io-std by default).
 tokio = { workspace = true, features = ["io-std"] }
@@ -27,11 +28,13 @@ toml = "0.8"
 # v0.41 (audit fix #5): killpg via libc on Unix — kill_on_drop only SIGKILLs
 # the immediate child shell, leaving grandchildren orphaned. We set the child
 # in its own process group and killpg() the group on timeout.
-[target.'cfg(unix)'.dependencies]
-libc = "0.2"
 anyhow = { workspace = true }
+thiserror = { workspace = true }
 kei-atom-discovery = { path = "../kei-atom-discovery" }
 kei-skills = { path = "../kei-skills" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [dev-dependencies]
 tempfile = { workspace = true }

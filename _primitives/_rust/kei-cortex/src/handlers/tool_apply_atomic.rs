@@ -29,6 +29,7 @@
 //! after the wave44a `atomic_write` extraction lands.
 
 use crate::error::AppError;
+use tracing::debug;
 use nix::fcntl::{openat, renameat, OFlag};
 use nix::sys::stat::Mode;
 use nix::unistd::{fsync, unlinkat, UnlinkatFlags};
@@ -130,7 +131,7 @@ fn verify_or_unlink(
     };
     if !canon.starts_with(project_root_canon) {
         unlink_silent(dirfd, basename);
-        eprintln!(
+        debug!(
             "tool_apply: symlink escape detected dest={} canon={} root={}",
             dest.display(), canon.display(), project_root_canon.display()
         );

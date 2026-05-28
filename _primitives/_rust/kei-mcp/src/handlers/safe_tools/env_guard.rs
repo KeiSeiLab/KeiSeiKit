@@ -3,6 +3,7 @@
 //! v0.46: extracted from monolithic safe_tools.rs.
 
 use tokio::process::Command;
+use tracing::debug;
 
 /// v0.41 fix #5: process-group helper (Unix-only; no-op on other platforms).
 /// tokio::process::Command::process_group is available on Unix without
@@ -105,7 +106,7 @@ pub fn apply_safe_env(cmd: &mut Command) {
             let k = k.trim();
             if k.is_empty() { continue; }
             if is_banned_forward(k) {
-                eprintln!(
+                debug!(
                     "kei-mcp safe_tools: refusing to forward `{k}` via \
                      KEI_SAFE_ENV_EXTRA (loader-injection class)"
                 );

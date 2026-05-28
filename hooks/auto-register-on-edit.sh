@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # auto-register-on-edit.sh — PostToolUse:Edit|Write — auto-register substrate blocks.
 # Severity: warn (exit 0; advisory only)
 #

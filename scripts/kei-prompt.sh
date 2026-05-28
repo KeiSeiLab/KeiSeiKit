@@ -61,13 +61,25 @@ kei_is_interactive() {
 _kei_read_from_tty() {
     local _varname="$1"
     local _line=""
+    # v0.54 audit: validate _varname is a bare identifier before `eval` —
+    # caller-supplied name otherwise allows `_varname="x; rm -rf /; y"` to
+    # inject arbitrary shell. All current callers pass literal names
+    # (`ans`, `reply`), but the contract is now enforced.
+    case "$_varname" in
+        [A-Za-z_]*) ;;
+        *) printf 'kei-prompt: bad var name: %s\n' "$_varname" >&2; return 1 ;;
+    esac
+    case "$_varname" in
+        *[!A-Za-z0-9_]*) printf 'kei-prompt: bad var name: %s\n' "$_varname" >&2; return 1 ;;
+    esac
+
     if { exec 3</dev/tty; } 2>/dev/null; then
         IFS= read -r _line <&3 || _line=""
         exec 3<&-
     else
         IFS= read -r _line || _line=""
     fi
-    # POSIX-safe assignment to caller's variable.
+    # POSIX-safe assignment to caller's variable (name now identifier-validated).
     eval "$_varname=\$_line"
 }
 

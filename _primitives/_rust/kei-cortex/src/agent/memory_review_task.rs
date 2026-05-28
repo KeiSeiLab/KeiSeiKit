@@ -29,6 +29,7 @@
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use tracing::debug;
 
 use kei_pet::memory::MemoryTag;
 
@@ -164,14 +165,14 @@ async fn persist_if_configured(target: &Option<PersistTarget>, reply: &str) -> u
     let out = match tokio::task::spawn_blocking(move || req.run()).await {
         Ok(o) => o,
         Err(e) => {
-            eprintln!("memory_review persist join error: {e}");
+            debug!("memory_review persist join error: {e}");
             return 0;
         }
     };
     match out {
         PersistOutcome::Wrote(_) => 1,
         PersistOutcome::Failed(e) => {
-            eprintln!("memory_review persist failed: {e}");
+            debug!("memory_review persist failed: {e}");
             0
         }
         _ => 0,

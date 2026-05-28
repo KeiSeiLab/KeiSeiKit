@@ -14,6 +14,7 @@ use crate::agent::memory_review_task::Invoker;
 use crate::state::InvokerFactory;
 use kei_token_tracker::Store as TokenTracker;
 use std::sync::Arc;
+use tracing::debug;
 
 /// Default Anthropic-backed invoker factory. Each call rebuilds the
 /// invoker so the API key is re-read fresh — same discipline as
@@ -44,7 +45,7 @@ pub(crate) fn open_token_tracker(
 ) -> Option<Arc<std::sync::Mutex<TokenTracker>>> {
     if let Some(parent) = path.parent() {
         if !parent.exists() {
-            eprintln!(
+            debug!(
                 "kei-cortex: token-tracker parent dir {:?} missing — skipping store open",
                 parent
             );
@@ -54,7 +55,7 @@ pub(crate) fn open_token_tracker(
     match TokenTracker::open(path) {
         Ok(s) => Some(Arc::new(std::sync::Mutex::new(s))),
         Err(e) => {
-            eprintln!(
+            debug!(
                 "kei-cortex: token-tracker open {} failed: {e} — telemetry disabled",
                 path.display()
             );

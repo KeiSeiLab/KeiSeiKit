@@ -6,8 +6,8 @@
     "name": "Denis Parfionovich",
     "url": "https://github.com/KeiSeiLab"
   },
-  "homepage": "https://github.com/KeiSeiLab/KeiSeiKit-1.0",
-  "repository": "https://github.com/KeiSeiLab/KeiSeiKit-1.0",
+  "homepage": "https://github.com/KeiSeiLab/KeiSeiKit",
+  "repository": "https://github.com/KeiSeiLab/KeiSeiKit",
   "license": "Apache-2.0",
   "keywords": [
     "constructor-pattern",

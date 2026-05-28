@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # disk-headroom-check.sh — PreToolUse:Bash advisory + block (RULE 0.17).
 #
 # Tier ladder on free space at /System/Volumes/Data:

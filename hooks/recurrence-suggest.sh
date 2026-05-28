@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # recurrence-suggest — remind Claude to invoke /escalate-recurrence
 # Event: UserPromptSubmit
 # Severity: remind (exit 0 + stderr advisory only)

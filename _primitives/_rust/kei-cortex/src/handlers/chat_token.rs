@@ -16,6 +16,7 @@
 use crate::tool::loop_driver::TokenUsage;
 use kei_token_tracker::{Store as TokenTracker, TokenEvent};
 use std::sync::Arc;
+use tracing::debug;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Bundle for one [`TokenEvent`] write. Held by the post-Done callback
@@ -47,7 +48,7 @@ pub fn record_token_event(
         Err(e) => e.into_inner(),
     };
     if let Err(e) = guard.record_event(&event) {
-        eprintln!(
+        debug!(
             "kei-cortex token-tracker: record_event({}) failed: {e}",
             write.agent_id
         );

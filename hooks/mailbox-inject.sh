@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # mailbox-inject — pull-inbox for kei-message. On every UserPromptSubmit, inject
 # any messages addressed to THIS session (by cwd-basename or the broadcast
 # channel "all") that arrived since last turn, into the session context, so

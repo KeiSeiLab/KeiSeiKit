@@ -13,6 +13,7 @@
 //! calls; everything else here is implementation detail.
 
 use super::ip_filter::is_blocked_ip;
+use tracing::debug;
 use once_cell::sync::Lazy;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
@@ -26,7 +27,7 @@ static ALLOW_RANGES: Lazy<Vec<Cidr>> = Lazy::new(|| {
         .filter_map(|s| match Cidr::parse(s) {
             Some(c) => Some(c),
             None => {
-                eprintln!("kei-cortex webfetch: ignoring invalid CIDR `{s}`");
+                debug!("kei-cortex webfetch: ignoring invalid CIDR `{s}`");
                 None
             }
         })
@@ -45,7 +46,7 @@ pub(crate) fn is_allowed(ip: IpAddr, full_bypass: bool) -> bool {
     // ALLOW_RANGES — explicit per-CIDR opt-in. Logged.
     for cidr in ALLOW_RANGES.iter() {
         if cidr.contains(ip) {
-            eprintln!("kei-cortex webfetch: allow-range hit ip={ip} cidr={cidr}");
+            debug!("kei-cortex webfetch: allow-range hit ip={ip} cidr={cidr}");
             return true;
         }
     }

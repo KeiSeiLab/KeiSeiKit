@@ -15,6 +15,7 @@ use super::translation::{build_assistant_message, filter_supported_tools, flatte
 use super::types::{ChatCompletionRequest, ChatCompletionResponse, ChatMessage};
 use crate::state::AppState;
 use crate::tool;
+use tracing::debug;
 use axum::extract::State;
 use axum::http::HeaderMap;
 use axum::response::{IntoResponse, Response};
@@ -38,7 +39,7 @@ pub async fn chat_completions(
         Some(tools) => {
             let (kept, dropped) = filter_supported_tools(tools);
             if !dropped.is_empty() {
-                eprintln!("openai: dropped unsupported tools: {dropped:?}");
+                debug!("openai: dropped unsupported tools: {dropped:?}");
             }
             kept
         }

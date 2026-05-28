@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # affect-live-scan.sh — UserPromptSubmit live frustration-matrix update.
 # Severity: remind (exit 0)
 #

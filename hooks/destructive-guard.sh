@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # Guard against destructive actions that could damage running experiments.
 # Returns JSON with block decision if destructive command detected.
 

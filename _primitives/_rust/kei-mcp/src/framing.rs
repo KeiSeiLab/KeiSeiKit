@@ -12,7 +12,7 @@
 //! `fill_buf`/`consume` interface to peek-and-drain without copying into
 //! a growing `Vec<u8>` after the cap is hit.
 
-use anyhow::Context;
+use crate::error::Error;
 use tokio::io::AsyncBufReadExt;
 
 /// Hard cap on a single JSON-RPC line (10 MB). Anything larger is rejected
@@ -43,11 +43,14 @@ pub enum ReadOutcome {
 ///   the next `\n` is consumed but NOT stored. Memory stays bounded.
 pub async fn read_capped_line<R: AsyncBufReadExt + Unpin>(
     reader: &mut R,
-) -> anyhow::Result<ReadOutcome> {
+) -> Result<ReadOutcome, Error> {
     let mut buf: Vec<u8> = Vec::new();
     let mut over_cap = false;
     loop {
-        let chunk = reader.fill_buf().await.context("reading stdin")?;
+        let chunk = reader
+            .fill_buf()
+            .await
+            .map_err(|e| Error::Stdin(format!("reading stdin: {e}")))?;
         if chunk.is_empty() {
             // EOF before any newline.
             break;
@@ -75,7 +78,7 @@ pub async fn read_capped_line<R: AsyncBufReadExt + Unpin>(
     }
     let line = match String::from_utf8(buf) {
         Ok(s) => s,
-        Err(e) => return Err(anyhow::anyhow!("stdin line was not valid UTF-8: {e}")),
+        Err(e) => return Err(Error::InvalidUtf8(e.to_string())),
     };
     if line.trim().is_empty() {
         return Ok(ReadOutcome::Empty);

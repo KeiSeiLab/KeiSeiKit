@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Safety Guard — PreToolUse hook for Bash
 # Blocks dangerous commands before execution
 

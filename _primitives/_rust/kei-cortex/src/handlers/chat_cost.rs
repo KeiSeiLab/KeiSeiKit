@@ -24,6 +24,7 @@
 
 use crate::tool::loop_driver::{ModelInvoker, TokenUsage};
 use std::path::PathBuf;
+use tracing::debug;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -122,7 +123,7 @@ pub fn record_chat_cost(write: CostWrite) {
     let conn = match kei_ledger::open(&write.ledger_path) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!(
+            debug!(
                 "kei-cortex chat_cost: open ledger {} failed: {e}",
                 write.ledger_path.display()
             );
@@ -130,7 +131,7 @@ pub fn record_chat_cost(write: CostWrite) {
         }
     };
     if let Err(e) = ensure_row(&conn, &write.agent_id) {
-        eprintln!("kei-cortex chat_cost: ensure_row({}): {e}", write.agent_id);
+        debug!("kei-cortex chat_cost: ensure_row({}): {e}", write.agent_id);
         return;
     }
     if let Err(e) = kei_ledger::record_cost_micro(
@@ -141,7 +142,7 @@ pub fn record_chat_cost(write: CostWrite) {
         &write.provider,
         &write.model,
     ) {
-        eprintln!("kei-cortex chat_cost: record_cost({}): {e}", write.agent_id);
+        debug!("kei-cortex chat_cost: record_cost({}): {e}", write.agent_id);
     }
 }
 
