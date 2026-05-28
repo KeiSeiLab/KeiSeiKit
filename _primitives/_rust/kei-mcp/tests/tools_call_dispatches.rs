@@ -51,7 +51,13 @@ Search atoms.
     fs::write(atoms.join(format!("{verb}.md")), md).unwrap();
 }
 
+// serial_test (2026-05-28): KEI_RUNTIME_BIN_DIR is a process-global env var.
+// Workspace-parallel `cargo test` on Linux CI saw race-induced flakes when
+// other tests in the same binary touched dispatch + env. Serialising the
+// two tests in this file is the cheapest fix; no other crate touches this
+// env var in the same process (each crate's tests run in their own binary).
 #[tokio::test]
+#[serial_test::serial(kei_runtime_bin_dir)]
 async fn tools_call_resolves_binary_and_returns_stdout_json() {
     let tmp = tempfile::tempdir().unwrap();
     let atoms_root = tmp.path().join("atoms-root");
@@ -78,7 +84,17 @@ async fn tools_call_resolves_binary_and_returns_stdout_json() {
     let resp = dispatch(req, &ctx).await;
     std::env::remove_var("KEI_RUNTIME_BIN_DIR");
 
-    let result = resp.result.expect("expected success result");
+    // CI debug (2026-05-28): when this assert fired on Ubuntu CI the panic
+    // only said "expected success result" — useless. Surface the actual
+    // JSON-RPC error message so the next failure points at the root cause
+    // (binary not found / non-zero exit / non-JSON stdout / atom timeout).
+    let result = match resp.result {
+        Some(r) => r,
+        None => panic!(
+            "expected success result, got error: {:?}",
+            resp.error.map(|e| format!("code={} msg={}", e.code, e.message))
+        ),
+    };
     assert_eq!(result["isError"], false);
     let content = result["content"].as_array().expect("content array");
     let payload_str = content[0]["text"].as_str().expect("text payload");
@@ -88,6 +104,7 @@ async fn tools_call_resolves_binary_and_returns_stdout_json() {
 }
 
 #[tokio::test]
+#[serial_test::serial(kei_runtime_bin_dir)]
 async fn tools_call_unknown_tool_yields_error() {
     let tmp = tempfile::tempdir().unwrap();
     let atoms_root = tmp.path().join("atoms-root");

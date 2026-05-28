@@ -40,6 +40,10 @@ libc = "0.2"
 tempfile = { workspace = true }
 # test-util: needed by tests/tools_call_timeout.rs for tokio::time::advance + Builder::start_paused
 tokio = { workspace = true, features = ["test-util"] }
+# CI race fix (2026-05-28): tools_call_dispatches.rs mutates KEI_RUNTIME_BIN_DIR
+# globally. Linux runners + workspace-parallel-test sometimes saw resolve_binary()
+# read a torn value. serial_test serializes only that pair, no perf cost.
+serial_test = "3"
 
 [package.metadata.keisei]
 backend = "none"
