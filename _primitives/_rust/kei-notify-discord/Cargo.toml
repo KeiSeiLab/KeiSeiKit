@@ -28,4 +28,4 @@ tokio = { workspace = true }
 backend = "discord"
 trait = "NotifyChannel"
 description = "Discord webhook NotifyChannel"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -28,5 +28,5 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "external-cli"
 description = "Shells out to `vultr-cli` (Vultr) / `linode-cli` (Linode) / `doctl` (DigitalOcean). Parses JSON output. Honors VULTR_API_KEY / LINODE_TOKEN / DIGITALOCEAN_TOKEN env refs per RULE 0.8."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]
 supersedes = ["provision-vultr.sh"]

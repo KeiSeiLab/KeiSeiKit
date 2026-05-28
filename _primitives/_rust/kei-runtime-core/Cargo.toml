@@ -28,4 +28,4 @@ tokio = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Hosted Sleep runtime traits + DNA registry; impls in sibling crates"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

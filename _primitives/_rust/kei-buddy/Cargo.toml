@@ -72,4 +72,4 @@ telegram = []
 [package.metadata.keisei]
 maturity = "concept"
 description = "KeiBuddy personal-assistant: onboarding FSM + bot driver scaffold"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -27,4 +27,4 @@ anyhow = { workspace = true }
 backend = "mlx-bridge"
 trait = "LlmBackend"
 description = "Bridges kei-llm-mlx (Wave 59 Apple Silicon shell-out) to LlmBackend trait"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

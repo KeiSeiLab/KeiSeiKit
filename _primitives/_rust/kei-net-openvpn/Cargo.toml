@@ -26,4 +26,4 @@ tokio = { workspace = true }
 backend = "openvpn"
 trait = "NetworkMode"
 description = "OpenVPN NetworkMode (systemctl-managed openvpn-server@ unit + management UNIX socket peers)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

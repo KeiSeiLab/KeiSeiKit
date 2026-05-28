@@ -31,4 +31,4 @@ tokio = { workspace = true }
 backend = "google"
 trait = "AuthProvider"
 description = "Google OAuth 2.0 + OIDC AuthProvider"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

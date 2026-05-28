@@ -31,4 +31,4 @@ live = []
 backend = "redis"
 trait = "MemoryBackend"
 description = "Redis 7+ MemoryBackend (async, aio+tokio-comp). Hosted Sleep Wave 6."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

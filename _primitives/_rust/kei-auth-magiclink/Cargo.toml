@@ -30,4 +30,4 @@ tokio = { workspace = true }
 backend = "magiclink"
 trait = "AuthProvider"
 description = "Email magic-link AuthProvider (HMAC-SHA256 stateless tokens, passwordless)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

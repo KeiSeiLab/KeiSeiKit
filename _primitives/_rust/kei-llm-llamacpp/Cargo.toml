@@ -29,4 +29,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Local-LLM adapter — shells out to llama-cli/llama-server, parses stdout. Probe/models/generate/server/version subcommands. Runner trait for testability. Default --host 127.0.0.1 for security."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

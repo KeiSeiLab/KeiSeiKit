@@ -37,4 +37,4 @@ tokio = { workspace = true }
 maturity = "alpha"
 trait = "TtsBackend"
 description = "TTS abstraction with 4 backends (ElevenLabs/OpenAI/Google/Piper). Default = piper."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -3,7 +3,7 @@ name = "kei-model-router"
 version = "0.1.0"
 edition = "2021"
 description = "Model selection for Claude Code Agent spawns. Reads providers/models/agent-profiles TOML registries. Empirical-posterior decision rule keyed on task-class DNA + Beta posterior + cost minimization."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]
 license = "Apache-2.0"
 
 [workspace]
@@ -20,6 +20,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.31", features = ["bundled"] }
 toml = "0.8"
+tracing = "0.1"
 
 [dev-dependencies]
 tempfile = "3"

@@ -28,4 +28,4 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 maturity = "alpha"
 backend = "apple"
 description = "iCloud CardDAV thin client (Basic Auth, Vec<AppleContact>-out)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

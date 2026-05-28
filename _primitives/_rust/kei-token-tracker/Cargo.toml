@@ -29,4 +29,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 trait = "TokenTracker"
 description = "Per-LLM-call token usage + cost SQLite store. Schema migrates on open(). Phase D sleep-report markdown emitter."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

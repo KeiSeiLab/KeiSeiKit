@@ -22,4 +22,4 @@ kei-runtime-core = { path = "../kei-runtime-core" }
 [package.metadata.keisei]
 backend = "wireguard"
 description = "WireGuard NetworkMode (wg-quick up/down, wg show dump) — private mesh adapter"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

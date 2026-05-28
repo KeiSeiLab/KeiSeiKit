@@ -38,4 +38,4 @@ httpmock = "0.7"
 [package.metadata.keisei]
 backend = "none"
 description = "Wraps kei-agent-runtime prepare + kei-ledger fork + kei-agent-runtime verify into a single CLI. Step 3 (Agent tool call) stays with the orchestrator."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

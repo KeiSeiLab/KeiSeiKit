@@ -23,4 +23,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Shared atom discovery + frontmatter parsing + safe path join"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -36,4 +36,4 @@ tempfile = { workspace = true }
 backend = "linode-api-v4"
 trait = "ComputeProvider"
 description = "Linode (Akamai Cloud) v4 REST API. Bearer LINODE_TOKEN. Tier slugs: g6-nanode-1 / g6-standard-{1,2,4} / g6-dedicated-{2,4}."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -28,4 +28,4 @@ wiremock = { workspace = true }
 backend = "telegram"
 trait = "NotifyChannel"
 description = "Telegram Bot API NotifyChannel (sendMessage, HTML body, severity emoji prefix)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

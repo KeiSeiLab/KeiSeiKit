@@ -33,4 +33,4 @@ wiremock = { workspace = true }
 backend = "vultr-cloud-v2"
 trait = "ComputeProvider"
 description = "Vultr Cloud Compute v2 API impl of ComputeProvider — instance create/destroy/halt/start/resize, base64 cloud-init, vc2/vhf tier validation"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

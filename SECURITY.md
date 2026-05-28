@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Email `info@greendragon.info` with a description and reproduction steps. PGP key available on request.
+Email `security@keilab.io` with a description and reproduction steps. PGP key available on request.
 
 ## Threat model
 

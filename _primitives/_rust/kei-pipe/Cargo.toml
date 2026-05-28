@@ -36,4 +36,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Atom DAG pipe runtime — topo-sorts steps, pipes JSON between atoms."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

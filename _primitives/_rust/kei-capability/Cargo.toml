@@ -29,4 +29,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Hook-protocol CLI — `kei-capability check <name>` / `kei-capability verify <name>`"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

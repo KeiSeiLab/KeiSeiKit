@@ -30,4 +30,4 @@ toml = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Reconstruct agent spawn from DNA — replay / verify / diff"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

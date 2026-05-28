@@ -29,4 +29,4 @@ wiremock = { workspace = true }
 backend = "gitea"
 trait = "GitBackend"
 description = "Gitea HTTP API client + GitBackend impl (mirror, ensure_repo, clone, push)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

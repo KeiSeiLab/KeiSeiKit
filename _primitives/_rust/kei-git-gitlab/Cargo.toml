@@ -29,4 +29,4 @@ wiremock = { workspace = true }
 backend = "gitlab"
 trait = "GitBackend"
 description = "GitLab.com SaaS GitBackend (REST v4, PRIVATE-TOKEN, url-encoded path-with-namespace)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

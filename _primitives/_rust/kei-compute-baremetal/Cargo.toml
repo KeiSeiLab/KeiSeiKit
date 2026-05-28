@@ -32,4 +32,4 @@ tokio = { workspace = true }
 backend = "ssh-baremetal"
 trait = "ComputeProvider"
 description = "Register-only ComputeProvider for user-owned hardware: SSH ping + remote shell exec + cloud-init dispatch; no provision/destroy of hardware"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

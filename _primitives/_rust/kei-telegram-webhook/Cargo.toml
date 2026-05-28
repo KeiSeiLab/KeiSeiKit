@@ -29,4 +29,4 @@ tower = { workspace = true }
 maturity = "alpha"
 backend = "telegram"
 description = "Inbound Telegram webhook handler (secret-token verified, typed WebhookEvent)"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

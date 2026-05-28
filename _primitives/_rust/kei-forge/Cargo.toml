@@ -10,7 +10,7 @@ license.workspace = true
 [package.metadata.keisei]
 backend = "none"
 description = "Local web wizard for scaffolding new atoms"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]
 
 [[bin]]
 name = "kei-forge"

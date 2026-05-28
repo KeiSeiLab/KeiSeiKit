@@ -27,4 +27,4 @@ tempfile = { workspace = true }
 backend = "sqlite"
 trait = "MemoryBackend"
 description = "SQLite (rusqlite bundled) MemoryBackend; offline-first, embedded"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

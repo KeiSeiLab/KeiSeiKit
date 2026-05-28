@@ -25,6 +25,7 @@ anyhow = { workspace = true }
 walkdir = { workspace = true }
 rusqlite = { workspace = true }
 kei-registry = { path = "../kei-registry" }
+tracing = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }
@@ -33,4 +34,4 @@ rusqlite = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Detects MD format (research / wave-audit / sleep / architecture / new-project), parses via registered FormatParser, normalizes to unified Action struct, emits kei-spawn task.toml, and dispatches via kei-spawn (with optional kei-ledger pre-fork). Closes Wave 50 META: kit had 6+ ad-hoc MD formats but only research had a path to action."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

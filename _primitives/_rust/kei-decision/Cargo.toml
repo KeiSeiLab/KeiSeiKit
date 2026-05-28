@@ -30,4 +30,4 @@ tempfile = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "Parses /research MASTER-REPORT.md actionable plans, classifies + ranks actions, emits kei-spawn-compatible task.toml, optionally drives kei-spawn + kei-ledger pre-fork. Bootstraps day-research → action pipeline so /research output flows into kei-spawn without manual orchestrator intervention."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

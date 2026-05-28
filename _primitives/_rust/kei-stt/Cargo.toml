@@ -36,4 +36,4 @@ tokio = { workspace = true }
 maturity = "alpha"
 trait = "SttBackend"
 description = "STT abstraction with 3 backends (whisper-local/Deepgram/OpenAI). Default = whisper-local."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

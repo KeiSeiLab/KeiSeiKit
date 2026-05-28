@@ -27,4 +27,4 @@ async-trait = { workspace = true }
 [package.metadata.keisei]
 trait = "PingStore"
 description = "Atomar — cross-window agent heartbeat. Two engines (SQLite default, Redis auto if running)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -48,4 +48,4 @@ serial_test = "3"
 [package.metadata.keisei]
 backend = "none"
 description = "MCP server exposing atoms as tools, skills as resources, over stdio JSON-RPC"
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]

@@ -34,4 +34,4 @@ pretty_assertions = { workspace = true }
 [package.metadata.keisei]
 backend = "none"
 description = "External skill-format importer for KeiSeiKit canonical shapes (atoms / recipes / proposed primitives)."
-authors = ["Denis Parfionovich <info@greendragon.info>"]
+authors = ["KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>"]
