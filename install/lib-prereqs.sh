@@ -49,7 +49,24 @@ check_hard_prereqs() {
     err "otherwise abort Claude Code's Edit/Write/Bash tool calls. Install it:"
     err "  brew install jq   (macOS)"
     err "  apt install jq    (Debian/Ubuntu)"
+    err "  dnf install jq    (Fedora/RHEL)"
     exit 1
+  fi
+  # v0.55 audit (Linux DGX cargo-build failure 2026-05-28):
+  # libc / thiserror / zerocopy build scripts need a C toolchain.
+  # rustup on a fresh Linux box does NOT install gcc; cargo build silently
+  # fails with "error: could not compile `libc` (build script)" once it
+  # falls through to the first crate with a build.rs that links C code.
+  if _profile_needs_cargo && [ "${KEI_OS:-}" = "linux" ] && ! command -v cc >/dev/null 2>&1; then
+    err "C compiler (cc/gcc) not found — Rust build scripts need it."
+    err "Install before re-running:"
+    err "  Debian/Ubuntu:   sudo apt install -y build-essential pkg-config"
+    err "  Fedora/RHEL:     sudo dnf install -y gcc gcc-c++ make pkg-config"
+    err "  Arch:            sudo pacman -S base-devel pkgconf"
+    err "  Alpine:          sudo apk add build-base pkgconfig"
+    err ""
+    err "Skip the toolchain check with KEI_SKIP_CC_CHECK=1 (will fail later)."
+    [ "${KEI_SKIP_CC_CHECK:-0}" = "1" ] || exit 1
   fi
 }
 
