@@ -1,17 +1,17 @@
 # shellcheck shell=bash
-# lib-i18n.sh — лоадер локализаций.
+# lib-i18n.sh — localization loader.
 #
-# Контракт:
-#   1. На старте всегда source install/i18n/en.sh — экран приветствия
-#      показывается ДО выбора языка пользователем.
-#   2. После onboarding_pick_language вызывается i18n_load_lang "$lang" —
-#      перегружает строки выбранного словаря.
-#   3. Любая строка отсутствующая в словаре — fallback на en.sh уже в
-#      памяти (мы не unset'им переменные, ru перезаписывает поверх).
+# Contract:
+#   1. On startup, always source install/i18n/en.sh — the welcome screen
+#      shows BEFORE the user picks a language.
+#   2. After onboarding_pick_language, i18n_load_lang "$lang" reloads
+#      strings from the picked dictionary.
+#   3. Any STR_* missing from a non-EN dict falls back to en.sh already
+#      in memory (we don't unset; the chosen lang overwrites on top).
 #
-# Используется install.sh и install/lib-onboarding.sh.
+# Used by install.sh and install/lib-onboarding.sh.
 
-# Корень i18n относительно LIB_DIR.
+# i18n root relative to LIB_DIR.
 I18N_DIR="${LIB_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/i18n"
 
 i18n_load_default() {
@@ -21,18 +21,18 @@ i18n_load_default() {
 
 i18n_load_lang() {
   local lang="$1"
-  # Сначала всегда грузим английский — это база fallback.
+  # Always load English first — fallback baseline.
   i18n_load_default
-  # Если выбран не-английский — поверх кладём словарь языка.
-  # Любой STR_*, отсутствующий в файле, остаётся с английским значением.
+  # If non-English picked — overlay the chosen dictionary on top.
+  # Any STR_* absent from the file keeps the English value.
   if [ "$lang" != "en" ] && [ -f "$I18N_DIR/${lang}.sh" ]; then
     # shellcheck disable=SC1090
     source "$I18N_DIR/${lang}.sh"
   fi
 }
 
-# Список доступных языков — для onboarding_pick_language.
-# Формат: <code>\t<display_name>
+# Available languages list — for onboarding_pick_language.
+# Format: <code>\t<display_name>
 i18n_available_languages() {
   cat <<'EOF'
 en	English
@@ -54,7 +54,7 @@ vi	Tiếng Việt
 EOF
 }
 
-# Welcome banner. Всегда EN. Запускается из install.sh до мастера.
+# Welcome banner. Always EN. Called from install.sh before the wizard.
 i18n_print_welcome() {
   echo ""
   echo "  ╔═══════════════════════════════════════════════════════╗"

@@ -1,15 +1,15 @@
-# Реестр блоков KeiSeiKit
+# KeiSeiKit blocks registry
 
-> SSoT для assembler. Все блоки доступные для `blocks = [...]` в `_manifests/<agent>.toml`.
-> Авто-генерируется из `_blocks/*.md` через `bash build-index.sh`.
-> Каждый файл = атомарный кубик (Constructor Pattern).
+> SSoT for the assembler. All blocks available for `blocks = [...]` in `_manifests/<agent>.toml`.
+> Auto-generated from `_blocks/*.md` via `bash build-index.sh`.
+> Each file = one atomic cube (Constructor Pattern).
 
-Пример:
+Example:
 ```toml
 blocks = ["baseline", "rule-pre-dev-gate", "api-anthropic"]
 ```
 
-## По категориям
+## By category
 
 ### API
 
@@ -136,7 +136,7 @@ blocks = ["baseline", "rule-pre-dev-gate", "api-anthropic"]
 - `test-load` — TEST — Load / performance testing (baseline → profile → fix)
 - `test-property` — TEST — Property-based testing (invariants + shrinking)
 
-### Прочие (без категорийного префикса)
+### Misc (no category prefix)
 
 - `baseline` — BASELINE — inherit from Main Claude (never violate)
 - `evidence-grading` — EVIDENCE GRADING
@@ -145,5 +145,5 @@ blocks = ["baseline", "rule-pre-dev-gate", "api-anthropic"]
 
 ---
 
-Всего блоков: 84.
-Перегенерация: `bash _blocks/build-index.sh`.
+Total blocks: 84.
+Regenerate via: `bash _blocks/build-index.sh`.

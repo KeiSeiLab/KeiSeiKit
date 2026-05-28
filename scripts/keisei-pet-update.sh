@@ -112,7 +112,7 @@ case "$event" in
   # hooks/agent-event-done.sh → agent-events.jsonl). keisei-pet.sh READS those
   # (SSoT). This updater only owns mood / language / plan / counters.
   plan)
-    plan="📋"; mood="proud"; message="план готов"
+    plan="📋"; mood="proud"; message="plan ready"
     ;;
   lang)
     fp="$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)"

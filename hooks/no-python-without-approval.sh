@@ -4,8 +4,8 @@
 _KEI_LIB="$(dirname "$0")/_lib/gate.sh"; if [ -r "$_KEI_LIB" ]; then . "$_KEI_LIB"; kei_hook_gate "no-python-without-approval" || exit 0; fi
 # Hard block on python/python3/python2 invocations in Bash tool.
 # RULE 0.2 (Rust First) — Python requires explicit architectural reason.
-# Claude kрoнически нарушает RULE 0.2 inline-вызовами python3 для мелких расчётов.
-# Этот хук форсирует: каждый python-вызов = отдельный approval через интерфейс.
+# Claude chronically violates RULE 0.2 with inline python3 calls for small calcs.
+# This hook forces: each python invocation = separate approval via the UI.
 #
 # How to approve: user may add a one-off permission via Claude Code's
 # "allow this command" prompt, OR prefix with RULE02_BYPASS=1.
@@ -35,9 +35,9 @@ if echo "$CMD" | grep -qE '(^|[[:space:]/"=(|&;`])(python|python2|python3)([0-9]
 ════════════════════════════════════════════════════════════════
 
 RULE 0.2 Rust First:
-  Python не разрешается по умолчанию. Для "одноразовых расчётов"
-  Claude должен предпочитать: Rust (cargo script), awk/bc/dc, jq,
-  node, или существующий Rust-код в проекте.
+  Python is not allowed by default. For "one-off calculations"
+  Claude must prefer: Rust (cargo script), awk/bc/dc, jq, node,
+  or existing Rust code in the project.
 
 Approved alternatives BEFORE retrying:
   • Rust one-shot:  write my-project/examples/foo.rs, cargo run

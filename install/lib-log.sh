@@ -14,10 +14,10 @@ else
   COLOR=0
 fi
 
-# Brand palette: тёмно-жёлтый (gold) for [install], голубой (sky-blue) for KeiSei.
+# Brand palette: dark gold for [install], sky-blue for KeiSei.
 if [ "$COLOR" = "1" ]; then
-  KEI_GOLD=$'\033[38;5;178m'    # тёмно-жёлтый — install prefix
-  KEI_BLUE=$'\033[38;5;39m'     # голубой — logo / primitives
+  KEI_GOLD=$'\033[38;5;178m'    # dark gold — install prefix
+  KEI_BLUE=$'\033[38;5;39m'     # sky-blue — logo / primitives
   KEI_DIM=$'\033[2m'
   KEI_RST=$'\033[0m'
   say()  { printf '%s[install]%s %s\n' "$KEI_GOLD" "$KEI_RST" "$*"; }
@@ -30,7 +30,7 @@ else
   err()  { printf '[error] %s\n' "$*" >&2; }
 fi
 
-# KeiSei ASCII banner — голубой logo, shown once at install start.
+# KeiSei ASCII banner — sky-blue logo, shown once at install start.
 kei_banner() {
   printf '\n'
   printf '%s    ██╗  ██╗███████╗██╗███████╗███████╗██╗%s\n' "$KEI_BLUE" "$KEI_RST"

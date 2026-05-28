@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# preflight/ollama-local.sh — Ollama daemon на 127.0.0.1:11434.
+# preflight/ollama-local.sh — Ollama daemon at 127.0.0.1:11434.
 
 preflight_check_ollama_local() {
   if ! command -v ollama >/dev/null 2>&1; then
@@ -7,28 +7,28 @@ preflight_check_ollama_local() {
     case "$(uname -s)" in
       Darwin) cmd="brew install ollama" ;;
       Linux)
-        # WARNING: curl|sh без verification — supply-chain риск.
-        # Если есть apt/dnf — лучше через них, но ollama не в репах
-        # большинства дистров. Предупреждаем юзера явно.
-        echo "  ⚠ Linux установка ollama тянет скрипт с https://ollama.com и" >&2
-        echo "    выполняет его как shell — без проверки хэша/подписи." >&2
-        echo "    Альтернатива: скачать вручную с https://ollama.com/download/linux" >&2
-        echo "    и проверить SHA256 перед запуском." >&2
+        # WARNING: curl|sh without verification — supply-chain risk.
+        # Prefer apt/dnf when available, but ollama is not in the repos of
+        # most distros. Warn the user explicitly.
+        echo "  ⚠ On Linux, ollama install fetches a script from https://ollama.com and" >&2
+        echo "    runs it as shell — no hash/signature check." >&2
+        echo "    Alternative: download manually from https://ollama.com/download/linux" >&2
+        echo "    and verify SHA256 before running." >&2
         cmd="curl -fsSL https://ollama.com/install.sh | sh"
         ;;
-      *)      cmd="см. https://ollama.com/download" ;;
+      *)      cmd="see https://ollama.com/download" ;;
     esac
     preflight_offer_install "ollama" "$cmd" || return 1
   fi
-  # Проверяем что daemon запущен.
+  # Verify the daemon is running.
   if ! curl -fsS --max-time 3 http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
     echo "" >&2
-    echo "  ⚠ ollama daemon не запущен." >&2
-    echo "  Запустите: ollama serve  (или brew services start ollama на macOS)" >&2
+    echo "  ⚠ ollama daemon not running." >&2
+    echo "  Run: ollama serve  (or brew services start ollama on macOS)" >&2
     echo "" >&2
     return 1
   fi
   echo "  ✓ ollama: $(ollama --version 2>&1 | head -1)" >&2
-  echo "  ✓ daemon: 127.0.0.1:11434 отвечает" >&2
+  echo "  ✓ daemon: 127.0.0.1:11434 responding" >&2
   return 0
 }

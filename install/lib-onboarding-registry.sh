@@ -1,21 +1,21 @@
 # shellcheck shell=bash
-# lib-onboarding-registry.sh — парсеры реестров providers.toml + models.toml.
+# lib-onboarding-registry.sh — registry parsers for providers.toml + models.toml.
 #
-# Constructor Pattern: 1 файл = парсинг реестров. UI и state — в соседних кубах.
+# Constructor Pattern: 1 file = registry parsing. UI and state live in sibling cubes.
 #
-# Источник: $KIT_DIR/_blocks/registries/{providers,models}.toml (submodule
-# kei-registries). Если файла нет — fallback на захардкоженный набор
-# покрывающий все 7 транспортов.
+# Source: $KIT_DIR/_blocks/registries/{providers,models}.toml (submodule
+# kei-registries). If the file is missing — fallback to a hardcoded set
+# covering all 7 transports.
 #
-# Глобалы (общие с lib-onboarding-*):
-#   REGISTRY_PROVIDERS — путь к providers.toml
-#   REGISTRY_MODELS    — путь к models.toml
+# Globals (shared with lib-onboarding-*):
+#   REGISTRY_PROVIDERS — path to providers.toml
+#   REGISTRY_MODELS    — path to models.toml
 
 REGISTRY_PROVIDERS="${REGISTRY_PROVIDERS:-$KIT_DIR/_blocks/registries/providers.toml}"
 REGISTRY_MODELS="${REGISTRY_MODELS:-$KIT_DIR/_blocks/registries/models.toml}"
 
-# Парсер providers.toml. Простой awk-граббер по [[provider]] секциям.
-# Печатает: <id>\t<transport>\t<display_name>\t<auth_env>
+# providers.toml parser. Simple awk grabber over [[provider]] sections.
+# Prints: <id>\t<transport>\t<display_name>\t<auth_env>
 onboarding_list_providers() {
   [ -f "$REGISTRY_PROVIDERS" ] || { onboarding_fallback_providers; return; }
   awk '
@@ -28,9 +28,9 @@ onboarding_list_providers() {
   ' "$REGISTRY_PROVIDERS"
 }
 
-# Fallback если submodule не подтянут.
-# Покрывает 7 транспортов минимальными представителями. Синхронизировать
-# вручную если в реестре появится новый транспорт-тип.
+# Fallback when the submodule is not present.
+# Covers 7 transports with minimal representatives. Sync
+# manually when a new transport type appears in the registry.
 onboarding_fallback_providers() {
   printf "anthropic\tdirect-api\tAnthropic (Direct API)\tANTHROPIC_API_KEY\n"
   printf "anthropic-bedrock\taws-bedrock\tAnthropic (AWS Bedrock)\tAWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION\n"
@@ -49,9 +49,9 @@ onboarding_fallback_providers() {
   printf "codex\tsubscription\tOpenAI Codex (ChatGPT OAuth)\t_\n"
 }
 
-# Уникальные транспорты — для первого экрана выбора.
-# Claude-Code-native kit → выводим subscription + direct-api ПЕРВЫМИ, чтобы
-# рекомендованный путь (Claude Code, опция 1) был дефолтом. Остальные следом.
+# Unique transports — for the first selection screen.
+# Claude-Code-native kit → list subscription + direct-api FIRST so
+# the recommended path (Claude Code, option 1) is the default. Others follow.
 onboarding_list_transports() {
   local all; all="$(onboarding_list_providers | awk -F'\t' '{print $2}' | sort -u)"
   local t
@@ -61,13 +61,13 @@ onboarding_list_transports() {
   printf '%s\n' "$all" | grep -vxE 'subscription|direct-api' || true
 }
 
-# Провайдеры внутри транспорта.
+# Providers within a transport.
 onboarding_providers_in_transport() {
   local tr="$1"
   onboarding_list_providers | awk -F'\t' -v t="$tr" '$2==t {print $1 "\t" $3 "\t" $4}'
 }
 
-# Модели по provider_ref.
+# Models by provider_ref.
 onboarding_models_for_provider() {
   local pr="$1"
   [ -f "$REGISTRY_MODELS" ] || { printf "claude-sonnet-4-6\tClaude Sonnet 4.6\n"; return; }
@@ -80,7 +80,7 @@ onboarding_models_for_provider() {
   ' "$REGISTRY_MODELS"
 }
 
-# auth_env для одного провайдера (для onboarding_collect_auth).
+# auth_env for a single provider (for onboarding_collect_auth).
 onboarding_auth_env_for_provider() {
   local p="$1"
   onboarding_list_providers | awk -F'\t' -v p="$p" '$1==p {print $4}'

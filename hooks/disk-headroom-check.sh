@@ -40,12 +40,12 @@ fi
 # Tier evaluation (lowest threshold first, blocking takes precedence)
 if [ "$free_gb" -lt 2 ]; then
   echo "═══════════════════════════════════════════════════════════════════" >&2
-  echo "  HARD BLOCK — диск критически забит (свободно ${free_gb} GB)." >&2
-  echo "  RULE 0.17: <2 GB → блок ЛЮБОЙ Bash команды." >&2
+  echo "  HARD BLOCK — disk critically full (free=${free_gb} GB)." >&2
+  echo "  RULE 0.17: <2 GB → block ANY Bash command." >&2
   echo "" >&2
-  echo "  Освободи место:" >&2
-  echo "    ~/.claude/hooks/disk-reclaim.sh   # ручной запуск Phase C reclaim" >&2
-  echo "    cargo clean (в активных проектах)" >&2
+  echo "  Free up space:" >&2
+  echo "    ~/.claude/hooks/disk-reclaim.sh   # manual Phase C reclaim" >&2
+  echo "    cargo clean (in active projects)" >&2
   echo "" >&2
   echo "  Bypass: prefix DISK_GUARD_BYPASS=1 <command> (per-call, visible)." >&2
   echo "═══════════════════════════════════════════════════════════════════" >&2
@@ -55,20 +55,20 @@ fi
 if [ "$free_gb" -lt 5 ] && [ "$is_heavy" = "1" ]; then
   echo "═══════════════════════════════════════════════════════════════════" >&2
   echo "  BLOCK — heavy command rejected, free=${free_gb} GB (<5 GB threshold)." >&2
-  echo "  RULE 0.17: cargo/npm/tar/cp -r/dd/docker блокируются при <5 GB." >&2
+  echo "  RULE 0.17: cargo/npm/tar/cp -r/dd/docker blocked at <5 GB free." >&2
   echo "" >&2
-  echo "  Освободи 5+ GB или используй DISK_GUARD_BYPASS=1." >&2
+  echo "  Free 5+ GB or use DISK_GUARD_BYPASS=1." >&2
   echo "═══════════════════════════════════════════════════════════════════" >&2
   exit 2
 fi
 
 if [ "$free_gb" -lt 10 ]; then
-  echo "[disk-headroom] WARN: свободно ${free_gb} GB. Запусти ~/.claude/hooks/disk-reclaim.sh при первой возможности (RULE 0.17)." >&2
+  echo "[disk-headroom] WARN: free=${free_gb} GB. Run ~/.claude/hooks/disk-reclaim.sh at the first opportunity (RULE 0.17)." >&2
   exit 0
 fi
 
 if [ "$free_gb" -lt 20 ]; then
-  echo "[disk-headroom] advisory: свободно ${free_gb} GB (порог комфорта 20 GB)." >&2
+  echo "[disk-headroom] advisory: free=${free_gb} GB (comfort threshold 20 GB)." >&2
   exit 0
 fi
 

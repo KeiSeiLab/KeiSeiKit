@@ -151,8 +151,16 @@ cd ~/keisei && ./bootstrap.sh --profile=full
 
 ### 4. Manual (any MCP-compatible client — Cursor / Continue / Zed / Aider)
 
+Repo is **private** — `git clone` will fail without HTTPS credentials. Two options:
+
 ```bash
+# Option A — authenticate git via gh CLI (one-time)
+gh auth login && gh auth setup-git
 git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0.git
+cd KeiSeiKit-1.0 && ./bootstrap.sh
+
+# Option B — SSH (one-time: add your ssh key to your github account)
+git clone git@github.com:KeiSeiLab/KeiSeiKit-1.0.git
 cd KeiSeiKit-1.0 && ./bootstrap.sh
 ```
 

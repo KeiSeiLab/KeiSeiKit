@@ -89,7 +89,7 @@ source "$LIB_DIR/lib-args.sh"
 source "$LIB_DIR/lib-menu.sh"
 # shellcheck source=install/lib-i18n.sh
 source "$LIB_DIR/lib-i18n.sh"
-# Загружаем английский словарь по умолчанию — welcome banner идёт до выбора языка.
+# Load English dictionary by default — welcome banner shows before language pick.
 i18n_load_default
 # shellcheck source=install/lib-preflight.sh
 source "$LIB_DIR/lib-preflight.sh"
@@ -220,8 +220,8 @@ if [ -z "${KEI_SKIP_RUST:-}" ] && ! _profile_needs_cargo; then
 fi
 
 # --- welcome banner + onboarding wizard ----------------------------------
-# Banner всегда EN — пользователь ещё не выбрал язык.
-# Wizard: TTY + нет ~/.claude/.onboarded + не задан KEISEI_SKIP_ONBOARD.
+# Banner always EN — user has not picked a language yet.
+# Wizard: TTY + no ~/.claude/.onboarded + KEISEI_SKIP_ONBOARD unset.
 # Skip: KEISEI_SKIP_ONBOARD=1 ./install.sh
 #
 # v0.50 UX: spare the user from 3 sequential prompts (profile already chosen,
@@ -251,8 +251,8 @@ if onboarding_should_run; then
 fi
 onboarding_run
 
-# --- early exit: --no-execute или --skip-prereqs ДО prereqs --------------
-# Это позволяет смотреть план без установленных зависимостей.
+# --- early exit: --no-execute or --skip-prereqs BEFORE prereqs ------------
+# Lets you preview the plan without dependencies installed.
 if [ "$NO_EXECUTE" = "1" ]; then
   CONFIRM_LABEL="$PROFILE"
   [ "$PROFILE" = "custom" ] && CONFIRM_LABEL="custom ($CUSTOM_PRIMS)"

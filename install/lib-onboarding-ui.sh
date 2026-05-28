@@ -1,16 +1,16 @@
 # shellcheck shell=bash
-# lib-onboarding-ui.sh — pick_* функции мастера (whiptail / bash select).
+# lib-onboarding-ui.sh — wizard pick_* functions (whiptail / bash select).
 #
-# Constructor Pattern: 1 файл = UI слой. Парсеры реестров — в registry.sh,
-# state-запись — в state.sh.
+# Constructor Pattern: 1 file = UI layer. Registry parsers live in registry.sh,
+# state-write lives in state.sh.
 #
-# Заполняет глобалы:
+# Populates globals:
 #   ONBOARDING_LANG, ONBOARDING_TRANSPORT, ONBOARDING_PROVIDER, ONBOARDING_MODEL
 #   ONBOARDING_AUTH_ENV_KEYS[] + ONBOARDING_AUTH_ENV_VALUES[]
 #
-# Использует:
-#   - lib-i18n.sh: STR_* словарь + i18n_available_languages + i18n_load_lang
-#   - lib-onboarding-registry.sh: списки провайдеров/моделей
+# Uses:
+#   - lib-i18n.sh: STR_* dictionary + i18n_available_languages + i18n_load_lang
+#   - lib-onboarding-registry.sh: provider/model lists
 
 # Read a validated 1-based menu choice. Non-numeric or out-of-range input is
 # rejected with a re-prompt instead of crashing: bash arithmetic $((ans-1))
@@ -156,7 +156,7 @@ onboarding_pick_provider() {
   local rows; rows=$(onboarding_providers_in_transport "$ONBOARDING_TRANSPORT")
   local count; count=$(echo "$rows" | wc -l | tr -d ' ')
 
-  # Если провайдер один на транспорт — авто-выбор.
+  # If a single provider exists per transport — auto-pick.
   if [ "$count" = "1" ]; then
     ONBOARDING_PROVIDER=$(echo "$rows" | awk -F'\t' '{print $1}')
     return
@@ -188,7 +188,7 @@ onboarding_pick_provider() {
 }
 
 onboarding_pick_model() {
-  # Для AWS/Azure/Vertex модели идут под parent-провайдером — мапим.
+  # For AWS/Azure/Vertex models live under the parent provider — map them.
   local lookup="$ONBOARDING_PROVIDER"
   case "$ONBOARDING_PROVIDER" in
     anthropic-bedrock) lookup="anthropic" ;;
@@ -232,7 +232,7 @@ onboarding_collect_auth() {
   ONBOARDING_AUTH_ENV_KEYS=()
   ONBOARDING_AUTH_ENV_VALUES=()
   local ae; ae=$(onboarding_auth_env_for_provider "$ONBOARDING_PROVIDER")
-  [ -z "$ae" ] || [ "$ae" = "_" ] && return  # local / subscription — нет ключей
+  [ -z "$ae" ] || [ "$ae" = "_" ] && return  # local / subscription — no keys
 
   echo "" >&2
   echo "${STR_AUTH_INTRO:-Auth for} $ONBOARDING_PROVIDER ($ae):" >&2

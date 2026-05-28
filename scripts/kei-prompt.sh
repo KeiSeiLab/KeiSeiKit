@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kei-prompt — единственный cube для интерактивного ввода (Constructor Pattern).
+# kei-prompt — the single cube for interactive input (Constructor Pattern).
 #
 # Source it, then use the functions. NEVER inline `[ -t 0 ]` + `read` in
 # installer / bootstrap shell files — call these helpers instead.

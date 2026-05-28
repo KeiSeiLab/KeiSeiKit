@@ -57,9 +57,9 @@ backup_file() {
   local target="$1"
   [ -f "$target" ] || return 0
   local backup="${target}.bak-$(date +%s)"
-  # cp -a, НЕ mv — _jq_merge_hooks ниже читает оригинал target'а после
-  # backup_file. С mv оригинал исчезает → jq не может open file →
-  # «invalid output» → rollback (gx10 fail 2026-05-18).
+  # cp -a, NOT mv — _jq_merge_hooks below reads the target's original
+  # after backup_file. With mv the original vanishes → jq cannot open
+  # the file → "invalid output" → rollback (gx10 failure 2026-05-18).
   cp -a "$target" "$backup"
   BACKUP_PAIRS+=("$target|$backup")
   say "backed up existing $target to $backup"

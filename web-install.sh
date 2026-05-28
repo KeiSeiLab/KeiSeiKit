@@ -39,7 +39,7 @@ done
 
 LOG="$HOME/.keisei-install.log"
 mkdir -p "$(dirname "$LOG")"
-# chmod 600 чтобы Forgejo admin creds в логе не были world-readable
+# chmod 600 so Forgejo admin creds in the log are not world-readable
 # (security MEDIUM audit 2026-05-18).
 ( umask 077 && : > "$LOG" )
 chmod 600 "$LOG" 2>/dev/null || true
@@ -104,18 +104,21 @@ git -C "$KEISEI_ROOT" submodule update --init --recursive 2>/dev/null || true
 say "delegating to $KEISEI_ROOT/bootstrap.sh ${PASS_THROUGH[*]:-}"
 cd "$KEISEI_ROOT"
 
-# curl|bash сценарий: stdin = pipe от curl, поэтому wizard'у read нечего читать.
-# Если /dev/tty реально ОТКРЫВАЕТСЯ (сессия интерактивная), запускаем bootstrap
-# со stdin = терминал — иначе onboarding/whiptail падают на первом prompt.
-# ВАЖНО #1: `[ -r /dev/tty ]` недостаточно — путь может stat'иться readable, но
-# `exec < /dev/tty` падает с "No such device or address" когда нет управляющего
-# терминала (ssh non-interactive, CI, cron). Поэтому пробуем реально открыть его
-# через `{ : < /dev/tty; }` и реаттачим ТОЛЬКО при успехе.
-# ВАЖНО #2: bash читает ЭТОТ скрипт из трубы curl ПОБАЙТНО. Отдельный
-# `exec < /dev/tty` заставил бы bash читать СЛЕДУЮЩУЮ строку (сам запуск
-# bootstrap) уже с клавиатуры → вечный висяк после "delegating". Поэтому редирект
-# и exec ОБЯЗАНЫ быть ОДНОЙ командой: подменили stdin и сразу заменили процесс —
-# bash больше не читает ни байта скрипта из (уже не той) трубы.
+# curl|bash scenario: stdin = pipe from curl, so the wizard's read has
+# nothing to consume. If /dev/tty truly OPENS (interactive session), we
+# launch bootstrap with stdin = terminal — otherwise onboarding/whiptail
+# fail on the first prompt.
+# IMPORTANT #1: `[ -r /dev/tty ]` is not enough — the path may stat as
+# readable, but `exec < /dev/tty` errors with "No such device or address"
+# when there is no controlling terminal (ssh non-interactive, CI, cron).
+# So we actually try to open it via `{ : < /dev/tty; }` and reattach
+# ONLY on success.
+# IMPORTANT #2: bash reads THIS script BYTE-BY-BYTE from the curl pipe.
+# A separate `exec < /dev/tty` would make bash read the NEXT line (the
+# bootstrap invocation itself) from the keyboard → forever hang after
+# "delegating". So the redirect and exec MUST be ONE command: we
+# replace stdin and immediately replace the process — bash never reads
+# another byte from the (now-stale) pipe.
 # audit 2026-05-18 bug #4; non-TTY e2e fix 2026-05-21; curl|bash hang fix 2026-05-22.
 if [ ! -t 0 ] && { : < /dev/tty; } 2>/dev/null; then
   exec ./bootstrap.sh "${PASS_THROUGH[@]}" < /dev/tty

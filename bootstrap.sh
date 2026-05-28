@@ -342,7 +342,7 @@ log "  - For sleep layer: run /sleep-setup inside Claude Code."
 KEI_BIN_PATH="$HOME/.claude/bin/kei"
 if [ -x "$KEI_BIN_PATH" ] && kei_is_interactive && [ "${KEI_NO_AUTORUN:-0}" != "1" ]; then
     log ""
-    printf '  → Запустить kei сейчас? [Y/n] '
+    printf '  → Run kei now? [Y/n] '
     _reply=""
     read -r _reply || _reply=""
     case "${_reply:-Y}" in

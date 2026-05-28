@@ -17,49 +17,49 @@
 PREFLIGHT_DIR="${LIB_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/preflight"
 
 # Печатает инструкцию по установке, спрашивает действие.
-# Аргументы: $1 — имя CLI, $2 — команда установки.
+# Args: $1 — CLI name, $2 — install command.
 preflight_offer_install() {
   local cli="$1"
   local install_cmd="$2"
   echo "" >&2
-  echo "  ⚠ $cli не найден." >&2
-  echo "  Установить: $install_cmd" >&2
+  echo "  ⚠ $cli not found." >&2
+  echo "  Install: $install_cmd" >&2
   echo "" >&2
   if kei_is_interactive; then  # /dev/tty-aware: covers curl|bash
-    echo "  ⓘ команда: $install_cmd" >&2
-    ans=$(kei_prompt "  Поставить сейчас? [y/N/skip] " "N")
+    echo "  ⓘ command: $install_cmd" >&2
+    ans=$(kei_prompt "  Install now? [y/N/skip] " "N")
     case "$ans" in
       y|Y|yes)
-        # bash -c вместо eval — explicit subshell, не word-splitting'тся
-        # лишний раз в текущем процессе.
+        # bash -c instead of eval — explicit subshell, no extra word-splitting
+        # in the current process.
         bash -c "$install_cmd"
         return $?
         ;;
       skip|s|S)
-        echo "  пропускаю — поставите вручную позже." >&2
+        echo "  skipping — install manually later." >&2
         return 0
         ;;
       *)
-        echo "  пропуск (по умолчанию)." >&2
+        echo "  skipped (default)." >&2
         return 1
         ;;
     esac
   else
-    # non-TTY: только печатаем инструкцию.
+    # non-TTY: just print the instruction.
     return 1
   fi
 }
 
-# Универсальный helper для типового CLI-чека (command -v + offer-install + version).
-# Используется per-provider preflight файлами чтобы убрать boilerplate.
+# Generic helper for the typical CLI-check pattern (command -v + offer-install + version).
+# Used by per-provider preflight files to remove boilerplate.
 #
-# Аргументы:
-#   $1 — имя CLI (для сообщений), например "aws CLI"
-#   $2 — бинарь (для command -v), например "aws"
-#   $3 — install_cmd (для preflight_offer_install)
-#   $4 — version_cmd (для печати при success), например "aws --version"
+# Args:
+#   $1 — CLI label (for messages), e.g. "aws CLI"
+#   $2 — binary (for command -v), e.g. "aws"
+#   $3 — install_cmd (for preflight_offer_install)
+#   $4 — version_cmd (printed on success), e.g. "aws --version"
 #
-# Возврат: 0 если CLI есть, 1 если нет и юзер не поставил.
+# Returns: 0 if CLI is present, 1 if absent and user did not install.
 preflight_check_cli() {
   local label="$1"
   local bin="$2"
@@ -67,31 +67,31 @@ preflight_check_cli() {
   local version_cmd="$4"
   if ! command -v "$bin" >/dev/null 2>&1; then
     preflight_offer_install "$label" "$install_cmd" || return 1
-    # После install проверяем что бинарь появился в PATH.
+    # After install, verify the binary appeared on PATH.
     command -v "$bin" >/dev/null 2>&1 || return 1
   fi
-  # bash -c вместо eval: explicit subshell, не word-splitится в текущем
-  # процессе (security MEDIUM-3 audit 2026-05-18).
+  # bash -c instead of eval: explicit subshell, no word-splitting in the
+  # current process (security MEDIUM-3 audit 2026-05-18).
   echo "  ✓ $label: $(bash -c "$version_cmd" 2>&1 | head -1)" >&2
   return 0
 }
 
-# Главный диспетчер. Вызывается из onboarding между pick_model и collect_auth.
+# Main dispatcher. Called from onboarding between pick_model and collect_auth.
 preflight_run() {
   local provider="$1"
   [ -z "$provider" ] && return 0
-  # Whitelist символов в provider-id: только [a-z0-9_-], длина 1..64.
-  # Защищает от path-traversal (../) и shell-инъекций через имя файла.
+  # Whitelist provider-id chars: only [a-z0-9_-], length 1..64.
+  # Guards against path-traversal (../) and shell-injection via filename.
   if ! [[ "$provider" =~ ^[a-z0-9][a-z0-9_-]{0,63}$ ]]; then
-    echo "  ⚠ preflight: provider id '$provider' содержит недопустимые символы — пропуск" >&2
+    echo "  ⚠ preflight: provider id '$provider' contains invalid characters — skipping" >&2
     return 0
   fi
   local script="$PREFLIGHT_DIR/${provider}.sh"
-  # Проверяем что resolved путь не вышел за PREFLIGHT_DIR (на случай symlink'ов).
+  # Verify the resolved path does not escape PREFLIGHT_DIR (in case of symlinks).
   local resolved
   resolved="$(cd "$PREFLIGHT_DIR" 2>/dev/null && pwd -P)/${provider}.sh"
   if [ ! -f "$script" ] || [ ! -f "$resolved" ]; then
-    return 0   # CLI не нужен — direct-api, ключ собирается ниже
+    return 0   # No CLI needed — direct-api, key collected below.
   fi
   # shellcheck disable=SC1090
   source "$script"
