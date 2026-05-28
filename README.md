@@ -46,7 +46,7 @@ sleep consolidates 30-session windows into morning markdown reports.
   updates, agent regeneration, DNA index refresh, keimd graph
   reindex. Auto-self-indexing via kei-registry SQLite.
 
-## By the numbers (v0.49)
+## By the numbers (v0.51.1)
 
 110 Rust crates · 69 skills · 54 hooks · 38 agent manifests ·
 86 substrate blocks · 18 capability atoms · 7 substrate roles ·
@@ -120,26 +120,45 @@ fork it.
 
 ## Quick start
 
+**Pick ONE** of the four entry points below — they all do the same thing.
+
+### 1. Web installer (anonymous-friendly, ONE line)
+
 ```bash
-# Web installer (recommended — one line, no prior clone)
 curl -fsSL https://install.keisei.app | bash
-curl -fsSL https://install.keisei.app | bash -s -- --profile=dev --yes  # CI
-
-# Claude Code (primary target — full hook + agent integration)
-/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
-/plugin install keisei@keisei-marketplace
-
-# Any MCP-compatible client (Cursor / Continue / Zed / Aider / etc)
-git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0.git
-cd KeiSeiKit-1.0
-./bootstrap.sh                    # interactive profile picker
-# or: ./install.sh --profile=minimal   # direct
 ```
 
-The web installer (`web-install.sh` in this repo, served at
-`install.keisei.app`) is a thin curl-pipeable wrapper that clones the
-repo and delegates to `bootstrap.sh` — single source of truth, no
-duplicated install logic.
+CI / non-interactive variant:
+
+```bash
+curl -fsSL https://install.keisei.app | bash -s -- --profile=full --yes
+```
+
+### 2. Claude Code plugin
+
+```
+/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
+/plugin install keisei@keisei-marketplace
+```
+
+### 3. GitHub clone (private repo — needs `gh auth login` first)
+
+```bash
+gh auth login
+gh repo clone KeiSeiLab/KeiSeiKit-1.0 ~/keisei
+cd ~/keisei && ./bootstrap.sh --profile=full
+```
+
+### 4. Manual (any MCP-compatible client — Cursor / Continue / Zed / Aider)
+
+```bash
+git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0.git
+cd KeiSeiKit-1.0 && ./bootstrap.sh
+```
+
+`web-install.sh` (served at `install.keisei.app`) is a thin curl-pipeable
+wrapper that clones the repo and delegates to `bootstrap.sh` — single
+source of truth, no duplicated install logic.
 
 38 agents + 69 skills + 54 hooks + nightly consolidation wired in
 ~60 seconds. Twelve install profiles (`outcome-only`, `minimal`,
@@ -151,7 +170,7 @@ duplicated install logic.
 into client-native config — those are bridge targets, not separate
 profiles.
 
-## Post-install — the `kei` CLI (v0.45+)
+## Post-install — the `kei` CLI
 
 After install, `kei` is the substrate entrypoint. On first interactive
 run an onboarding wizard walks you through picking a primary LLM
