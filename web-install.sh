@@ -76,6 +76,15 @@ esac
 # ── clone or pull (idempotent) ────────────────────────────────────────────────────────────
 mkdir -p "$(dirname "$KEISEI_ROOT")"
 if [ -d "$KEISEI_ROOT/.git" ]; then
+  # v0.58: if existing clone has a DIFFERENT origin URL (e.g. stale keigit
+  # mirror from before public-github migration), reset it. Otherwise we'd
+  # silently fetch from the old remote forever and ignore $KEISEI_REPO.
+  _existing_origin=$(git -C "$KEISEI_ROOT" remote get-url origin 2>/dev/null || echo)
+  if [ "$_existing_origin" != "$KEISEI_REPO" ] && [ -n "$_existing_origin" ]; then
+    say "origin mismatch: was '$_existing_origin', expected '$KEISEI_REPO' — updating"
+    git -C "$KEISEI_ROOT" remote set-url origin "$KEISEI_REPO"
+  fi
+  unset _existing_origin
   say "pulling $KEISEI_REF in $KEISEI_ROOT"
   git -C "$KEISEI_ROOT" fetch --depth=1 origin "$KEISEI_REF"
   # v0.51 audit M4: stash local edits BEFORE reset --hard, so user can
