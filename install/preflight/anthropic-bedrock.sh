@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/anthropic-bedrock.sh — AWS CLI + Bedrock regional access.
 

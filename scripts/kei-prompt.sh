@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # kei-prompt — the single cube for interactive input (Constructor Pattern).
 #
 # Source it, then use the functions. NEVER inline `[ -t 0 ]` + `read` in

@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-substrate.sh — substrate-binary mirror (Wave 39).
 #

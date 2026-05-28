@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-dev-hub-daytona.sh — stamp DAYTONA_API_KEY into ~/.claude/secrets/.env.example
 # (HERMES-MIGRATION P1.2.d). Companion to kei-backend-daytona crate.

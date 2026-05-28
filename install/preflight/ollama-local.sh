@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/ollama-local.sh — Ollama daemon at 127.0.0.1:11434.
 

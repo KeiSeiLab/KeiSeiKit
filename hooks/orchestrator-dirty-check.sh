@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # orchestrator-dirty-check.sh — PreToolUse:Agent advisory hook (RULE 0.13).
 # Severity: warn — per RULE 0.10, upgrade to enforce only after 2nd recurrence.
 #

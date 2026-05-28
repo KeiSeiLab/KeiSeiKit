@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-onboarding.sh — first-run wizard (thin orchestrator).
 #

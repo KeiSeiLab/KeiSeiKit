@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-bin.sh — install entry-point scripts from kit's `bin/` into
 # `~/.claude/bin/`. Today this is just `keisei` (TUI splash → claude),

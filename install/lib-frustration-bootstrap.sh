@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-frustration-bootstrap.sh — opt-in install hook for the v0.40
 # kei-frustration-loop per-user learning loop.

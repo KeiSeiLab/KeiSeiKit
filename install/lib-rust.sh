@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-rust.sh — scoped Rust workspace manifest + build orchestrator.
 #

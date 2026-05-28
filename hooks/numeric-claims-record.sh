@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # numeric-claims-record.sh — Stop event hook (RULE 0.18).
 #
 # Scans the last assistant message for evidence markers

@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/lmstudio-local.sh — LM Studio desktop GUI at 127.0.0.1:1234.
 

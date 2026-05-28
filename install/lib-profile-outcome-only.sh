@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-profile-outcome-only.sh — the "outcome-only" minimal install profile.
 #

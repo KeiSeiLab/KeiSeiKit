@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-menu.sh — interactive menu (option C hybrid).
 #

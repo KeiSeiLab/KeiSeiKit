@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-agents.sh — manifest copy + assembler build + .md agent generation.
 #

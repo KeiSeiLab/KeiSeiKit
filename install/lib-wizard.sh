@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-wizard.sh — v0.11 sleep-layer setup helper invocation.
 #

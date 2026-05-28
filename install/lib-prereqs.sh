@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-prereqs.sh — hard + soft prerequisite checks.
 #

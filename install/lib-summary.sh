@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-summary.sh — final success banner with next-step hints.
 #

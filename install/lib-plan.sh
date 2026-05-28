@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-plan.sh — install-plan estimation, soft-dep status, confirm screen.
 #

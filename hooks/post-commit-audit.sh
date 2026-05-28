@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # PostToolUse hook: after git commit, remind about double audit
 CMD=$(cat | jq -r '.tool_input.command // empty' 2>/dev/null)
 

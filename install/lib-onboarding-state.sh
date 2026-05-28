@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-onboarding-state.sh — write wizard result to disk.
 #

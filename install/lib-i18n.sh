@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-i18n.sh — localization loader.
 #

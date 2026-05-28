@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/codex.sh — OpenAI Codex CLI via ChatGPT OAuth.
 

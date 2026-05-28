@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-profile.sh — MANIFEST.toml parser + profile resolver.
 #

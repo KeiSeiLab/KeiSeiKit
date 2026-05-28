@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # decompose-rules-on-edit.sh — PostToolUse:Edit|Write — auto-decompose rules.
 # Severity: warn (exit 0; advisory only)
 #

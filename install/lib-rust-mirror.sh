@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-rust-mirror.sh — dev-mode mirror cube for fresh Rust binaries.
 #

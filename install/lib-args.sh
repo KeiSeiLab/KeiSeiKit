@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-args.sh — flag parsing + --help text.
 #

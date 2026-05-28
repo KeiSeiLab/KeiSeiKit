@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-dev-hub-forgejo-runner.sh — install Forgejo Actions CI runner (act_runner).
 #

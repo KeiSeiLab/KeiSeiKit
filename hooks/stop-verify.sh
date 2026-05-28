@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Stop Verify — Stop hook
 # Checks for uncommitted changes and running compute before session ends
 

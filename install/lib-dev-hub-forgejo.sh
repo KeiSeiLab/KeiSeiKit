@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-dev-hub-forgejo.sh — install/uninstall/verify the local Forgejo git server
 # (Wave 45 dev-hub bundle, local-mirror profile and supersets).

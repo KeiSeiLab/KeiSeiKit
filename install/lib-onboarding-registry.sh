@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-onboarding-registry.sh — registry parsers for providers.toml + models.toml.
 #

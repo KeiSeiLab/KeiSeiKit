@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # DELETED — 2026-05-02
 # Reasons:
 #   1. Hardcoded absolute path leak (machine-specific, author-local)

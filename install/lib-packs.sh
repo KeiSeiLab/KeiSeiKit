@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-packs.sh — hook-pack + stack-profile resolver. Reads _primitives/hook-packs.toml
 # via the generic _toml_array reader (from lib-profile.sh). Decides which hooks get

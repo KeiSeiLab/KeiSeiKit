@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-rust-prebuild.sh — fresh-install Rust binary acquisition (v0.18+).
 #

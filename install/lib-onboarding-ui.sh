@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-onboarding-ui.sh — wizard pick_* functions (whiptail / bash select).
 #

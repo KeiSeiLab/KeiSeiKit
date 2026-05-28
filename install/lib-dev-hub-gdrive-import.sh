@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-dev-hub-gdrive-import.sh — install the kei-drive-import wizard
 # (Wave 46 dev-hub bundle). Companion to dev-hub-forgejo (Wave 45).

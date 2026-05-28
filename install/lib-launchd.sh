@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-launchd.sh — render launchd plist templates + load/unload lifecycle.
 #

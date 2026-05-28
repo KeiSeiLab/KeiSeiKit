@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-scaffold.sh — directory scaffolding + MEMORY.md + primitives-meta copy
 # + always-on sleep scripts + clean-slate primitive reset + profile install.

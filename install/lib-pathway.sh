@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-pathway.sh — PATH wiring for KeiSeiKit substrate.
 #

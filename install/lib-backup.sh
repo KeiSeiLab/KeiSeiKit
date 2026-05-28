@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-backup.sh — rollback trap + backup_dir / backup_file helpers.
 #

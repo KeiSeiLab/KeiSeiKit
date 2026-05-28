@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-log.sh — say / warn / err with optional ANSI color + KeiSei banner.
 # Honors NO_COLOR (no-color.org). Color is ON when stdout is a TTY OR a

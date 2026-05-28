@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/google-vertex.sh — gcloud CLI + service-account JSON.
 

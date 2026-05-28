@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # preflight/mlx-local.sh — MLX inference server (Apple silicon).
 

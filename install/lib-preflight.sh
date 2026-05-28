@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-preflight.sh — диспетчер preflight-проверок CLI.
 #

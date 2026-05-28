@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # auto-encyclopedia-refresh.sh — PostToolUse:Edit|Write — refresh DNA-INDEX.md.
 # Severity: warn (exit 0; advisory only)
 #

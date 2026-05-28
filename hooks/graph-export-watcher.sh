@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # graph-export-watcher.sh — polls kei-graph-export and writes data-runtime.js atomically.
 # Bypass: GRAPH_EXPORT_BYPASS=1
 

@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-hooks.sh — hook file copy + settings.json jq-merge.
 #

@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-bridges.sh — copy bridge templates + optional --with-bridges render into $PWD.
 #

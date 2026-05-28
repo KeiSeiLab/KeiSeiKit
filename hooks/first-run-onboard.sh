@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # first-run-onboard — on the FIRST Claude Code session after a KeiSeiKit install,
 # inject a one-time POST-INSTALL ONBOARDING checklist so Claude walks the user
 # through ALL setup in order (agents → sleep → cortex), instead of leaving each

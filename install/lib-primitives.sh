@@ -1,3 +1,4 @@
+set -e
 # shellcheck shell=bash
 # lib-primitives.sh — shell-primitive copy + Rust workspace scoped build +
 # .installed state helpers + --list printer.
