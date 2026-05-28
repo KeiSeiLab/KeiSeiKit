@@ -11,7 +11,7 @@
 #   Path A — download from latest github release (fast, no Rust required):
 #     1. Detect platform via uname → Rust target triple.
 #     2. Fetch keisei-${TARGET}.tar.gz from
-#        https://github.com/KeiSeiLab/KeiSeiKit-1.0/releases/latest/download/
+#        https://github.com/KeiSeiLab/KeiSeiKit/releases/latest/download/
 #     3. Verify sha256.
 #     4. Extract into target/release/.
 #
@@ -62,7 +62,7 @@ download_release_tarball() {
   local target="$1"
   [ -n "$target" ] || return 1
   local tarball="keisei-${target}.tar.gz"
-  local url="https://github.com/KeiSeiLab/KeiSeiKit-1.0/releases/latest/download/${tarball}"
+  local url="https://github.com/KeiSeiLab/KeiSeiKit/releases/latest/download/${tarball}"
   local tmp
   tmp="$(mktemp -d -t keisei-prebuild-XXXX 2>/dev/null)" || return 1
   command -v curl >/dev/null 2>&1 || { rm -rf "$tmp"; return 1; }

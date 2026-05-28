@@ -12,7 +12,7 @@ mkdir -p "$BRAIN"/{bin,memory,artifacts,manifests}
 ## 2. Download MCP server binaries
 
 ```bash
-BASE=https://github.com/KeiSeiLab/KeiSeiKit-1.0/releases/download/v0.21.0
+BASE=https://github.com/KeiSeiLab/KeiSeiKit/releases/download/v0.21.0
 cd "$BRAIN/bin"
 for n in darwin-arm64 darwin-x64 linux-x64 windows-x64.exe; do
   curl -fL -O "$BASE/kei-mcp-server-$n"

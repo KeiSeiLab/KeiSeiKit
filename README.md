@@ -137,7 +137,7 @@ curl -fsSL https://install.keisei.app | bash -s -- --profile=full --yes
 ### 2. Claude Code plugin
 
 ```
-/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0
+/plugin marketplace add KeiSeiLab/KeiSeiKit
 /plugin install keisei@keisei-marketplace
 ```
 
@@ -145,7 +145,7 @@ curl -fsSL https://install.keisei.app | bash -s -- --profile=full --yes
 
 ```bash
 gh auth login
-gh repo clone KeiSeiLab/KeiSeiKit-1.0 ~/keisei
+gh repo clone KeiSeiLab/KeiSeiKit ~/keisei
 cd ~/keisei && ./bootstrap.sh --profile=full
 ```
 
@@ -156,12 +156,12 @@ Repo is **private** — `git clone` will fail without HTTPS credentials. Two opt
 ```bash
 # Option A — authenticate git via gh CLI (one-time)
 gh auth login && gh auth setup-git
-git clone https://github.com/KeiSeiLab/KeiSeiKit-1.0.git
-cd KeiSeiKit-1.0 && ./bootstrap.sh
+git clone https://github.com/KeiSeiLab/KeiSeiKit.git
+cd KeiSeiKit && ./bootstrap.sh
 
 # Option B — SSH (one-time: add your ssh key to your github account)
-git clone git@github.com:KeiSeiLab/KeiSeiKit-1.0.git
-cd KeiSeiKit-1.0 && ./bootstrap.sh
+git clone git@github.com:KeiSeiLab/KeiSeiKit.git
+cd KeiSeiKit && ./bootstrap.sh
 ```
 
 `web-install.sh` (served at `install.keisei.app`) is a thin curl-pipeable

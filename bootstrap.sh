@@ -8,8 +8,8 @@
 #
 # Usage from a fresh machine (private repo, gh CLI required for clone):
 #     gh auth login
-#     gh repo clone KeiSeiLab/KeiSeiKit-1.0
-#     cd KeiSeiKit-1.0 && ./bootstrap.sh
+#     gh repo clone KeiSeiLab/KeiSeiKit
+#     cd KeiSeiKit && ./bootstrap.sh
 #
 # What it does (idempotent — re-running is safe):
 #     1. Detects OS (macOS / Linux)
@@ -182,7 +182,7 @@ case "$OS" in
         err "A native PowerShell port is demand-driven — not built yet because"
         err "WSL2 covers 100% with zero code duplication. If enough Windows users"
         err "ask, we will ship one. Open / 👍 an issue at:"
-        err "  https://github.com/KeiSeiLab/KeiSeiKit-1.0/issues"
+        err "  https://github.com/KeiSeiLab/KeiSeiKit/issues"
         err ""
         err "Path forward (one-time setup, ~5 min + reboot):"
         err ""
@@ -190,7 +190,7 @@ case "$OS" in
         err "  2. Run:        wsl --install -d Ubuntu"
         err "  3. Reboot when prompted; Ubuntu auto-starts on next login."
         err "  4. Inside Ubuntu, re-run this same bootstrap:"
-        err "       curl -fsSL https://raw.githubusercontent.com/KeiSeiLab/KeiSeiKit-1.0/main/bootstrap.sh | bash"
+        err "       curl -fsSL https://raw.githubusercontent.com/KeiSeiLab/KeiSeiKit/main/bootstrap.sh | bash"
         err ""
         err "Alternative — MCP-only (no substrate, no skills, no hooks):"
         err "  Grab kei-mcp-server-windows-x64.exe from a release and wire it"
@@ -257,7 +257,7 @@ fi
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ ! -f "$KIT_DIR/install.sh" ]; then
     err "install.sh not found in $KIT_DIR — am I inside a KeiSeiKit checkout?"
-    err "if not: gh repo clone KeiSeiLab/KeiSeiKit-1.0 && cd KeiSeiKit-1.0 && ./bootstrap.sh"
+    err "if not: gh repo clone KeiSeiLab/KeiSeiKit && cd KeiSeiKit && ./bootstrap.sh"
     exit 1
 fi
 log "checkout: $KIT_DIR"

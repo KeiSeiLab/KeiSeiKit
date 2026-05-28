@@ -383,5 +383,5 @@ Per RULE 0.13 (orchestrator branch first), each phase = orchestrator-created bra
 ## Sources
 
 - `/tmp/hermes-research/hermes-agent/` (NousResearch/hermes-agent @ HEAD, 2026-04-28)
-- `~/Projects/KeiSeiKit/` (local, public mirror github.com/KeiSeiLab/KeiSeiKit-1.0)
+- `~/Projects/KeiSeiKit/` (local, public mirror github.com/KeiSeiLab/KeiSeiKit)
 - 7 parallel Explore agents, 2026-04-28 session.

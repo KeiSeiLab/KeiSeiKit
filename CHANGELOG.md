@@ -14,7 +14,7 @@ All notable changes are tagged via `git tag v*`. This file tracks unreleased wor
 ## Released
 
 Release notes per tag are kept in the GitHub Releases UI:
-https://github.com/KeiSeiLab/KeiSeiKit-1.0/releases
+https://github.com/KeiSeiLab/KeiSeiKit/releases
 
 Highlights below; full notes in each tag's GitHub Release page.
 

@@ -63,7 +63,7 @@ cd _primitives/_rust && cargo test --workspace 2>&1 | tail -5
 
 ## GitHub Releases status
 
-6 tags pushed. Release workflow in `release.yml` triggers on tag push. Expected: 6 releases × (3 Rust tarballs + 5 MCP binaries + sha256 each) = ~48 assets. Check `github.com/KeiSeiLab/KeiSeiKit-1.0/releases` on wake — all tags should have attached assets within 10 min of push per prior v0.22.3 smoke. CI was re-triggered after Pro upgrade; confirm status there.
+6 tags pushed. Release workflow in `release.yml` triggers on tag push. Expected: 6 releases × (3 Rust tarballs + 5 MCP binaries + sha256 each) = ~48 assets. Check `github.com/KeiSeiLab/KeiSeiKit/releases` on wake — all tags should have attached assets within 10 min of push per prior v0.22.3 smoke. CI was re-triggered after Pro upgrade; confirm status there.
 
 ## What substrate looks like now
 

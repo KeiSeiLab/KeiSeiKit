@@ -8,7 +8,7 @@ Complete install guide. Quick-start lives in the main [README](../README.md#inst
 
 | Path | Command | Best for |
 |---|---|---|
-| **Plugin** (v0.16+, recommended on Claude Code 2.1+) | `/plugin marketplace add KeiSeiLab/KeiSeiKit-1.0` then `/plugin install keisei@keisei-marketplace` | Agents + skills + hooks + MCP. Zero cargo build. See [PLUGIN.md](../PLUGIN.md). |
+| **Plugin** (v0.16+, recommended on Claude Code 2.1+) | `/plugin marketplace add KeiSeiLab/KeiSeiKit` then `/plugin install keisei@keisei-marketplace` | Agents + skills + hooks + MCP. Zero cargo build. See [PLUGIN.md](../PLUGIN.md). |
 | **Classic** `./install.sh` | Below | Full kit incl. 47 Rust primitives + 13 shell primitives. Required for `ops` / `dev` / `full` profiles. |
 
 ## Prerequisites

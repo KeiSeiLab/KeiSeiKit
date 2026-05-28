@@ -198,8 +198,8 @@ edition = "2021"
 rust-version = "1.77"
 authors = ["Denis Parfionovich <info@greendragon.info>"]
 license = "Apache-2.0"
-repository = "https://github.com/KeiSeiLab/KeiSeiKit-1.0"
-homepage = "https://github.com/KeiSeiLab/KeiSeiKit-1.0"
+repository = "https://github.com/KeiSeiLab/KeiSeiKit"
+homepage = "https://github.com/KeiSeiLab/KeiSeiKit"
 
 # v0.53: clippy workspace lints (audit fix #2 — was "no enforcement on
 # .unwrap()/.expect() density, 3,694 .unwrap() in tree as of 2026-05-28").
