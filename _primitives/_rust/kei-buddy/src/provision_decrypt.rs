@@ -262,7 +262,11 @@ mod tests {
         let pub_b64 = genkeys(&key_path).unwrap();
         let pem = std::fs::read_to_string(&key_path).unwrap();
 
-        let secret = "1234567890:ABC-DEF1234ghIkl-zyx57W2v1u123ew11";
+        // Fixture intentionally generic: the round-trip test verifies bytes
+        // travel unchanged through seal/decrypt; the content is irrelevant.
+        // Previously this LOOKED like a Telegram bot token and tripped
+        // GitHub Secret Scanning (Copilot scanner false-positive 2026-05-29).
+        let secret = "kei-buddy-roundtrip-fixture-not-a-secret";
         let blob = seal(secret.as_bytes(), &pub_b64);
 
         let pt = decrypt_blob(&pem, &blob).unwrap();
@@ -278,7 +282,7 @@ mod tests {
         std::fs::write(&env_path, "LLM_API_BASE=https://api.keisei.app\n").unwrap();
 
         let pub_b64 = genkeys(&key_path).unwrap();
-        let secret = "9999999999:XYZ-abc";
+        let secret = "kei-buddy-export-fixture-not-a-secret";
         let blob = seal(secret.as_bytes(), &pub_b64);
         let blob_json = format!(
             r#"{{"ciphertext":"{}","nonce":"{}","ephPub":"{}"}}"#,
