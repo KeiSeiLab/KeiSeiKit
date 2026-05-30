@@ -34,7 +34,6 @@ menu_whiptail_profile() {
     "${STR_MENU_PROFILE_PROMPT:-Choose install profile (SPACE to select, ENTER to confirm):}" 28 86 12 \
     "minimal"      "substrate only — 0 primitives (~5s)"                       ON  \
     "core"         "+ 2 primitives (tomd, kei-doctor) (~5s)"                   OFF \
-    "frontend"     "+ 8 site tools — mock-render, visual-diff, figma-tokens"   OFF \
     "ops"          "+ 9 infra tools — provision, ssh-check, firewall-diff"     OFF \
     "dev"          "+ 17 dev tools — kei-migrate, kei-memory, deep-sleep"      OFF \
     "mcp"          "+ 10 MCP tools — kei-router, kei-sage, kei-auth, kei-pet"  OFF \
@@ -83,36 +82,34 @@ menu_plain_profile() {
   echo "  Standard:"                                                                    >&2
   echo "    1) minimal      — substrate only, 0 primitives (~5s)"                      >&2
   echo "    2) core         — + 2 prims (tomd, kei-doctor) (~5s)"                      >&2
-  echo "    3) frontend     — + 8 site tools (~60s, 80 MB)"                            >&2
-  echo "    4) ops          — + 9 infra tools (~90s, 50 MB)"                           >&2
-  echo "    5) dev          — + 17 dev tools (~120s, 80 MB)"                           >&2
-  echo "    6) mcp          — + 10 MCP/LBM tools (~90s, 50 MB)"                        >&2
-  echo "    7) cortex       — + 11 cortex stack (~90s, 60 MB)"                         >&2
-  echo "    8) full         — + all 62 primitives (~5 min, 380 MB)"                    >&2
+  echo "    3) ops          — + 9 infra tools (~90s, 50 MB)"                           >&2
+  echo "    4) dev          — + 17 dev tools (~120s, 80 MB)"                           >&2
+  echo "    5) mcp          — + 10 MCP/LBM tools (~90s, 50 MB)"                        >&2
+  echo "    6) cortex       — + 11 cortex stack (~90s, 60 MB)"                         >&2
+  echo "    7) full         — + all primitives (~5 min, 380 MB)"                       >&2
   echo                                                                                  >&2
   echo "  Dev hub (local-first development environment, macOS arm64):"                  >&2
-  echo "   10) local-mirror — cortex + Forgejo + CI runner (+ 13 prims)"                >&2
-  echo "   11) dashboard    — local-mirror + projects-index + Datasette (+ 16)"         >&2
-  echo "   12) full-hub     — dashboard + zoekt + mdbook + restic + gdrive (+ 20)"      >&2
+  echo "    9) local-mirror — cortex + Forgejo + CI runner (+ 13 prims)"                >&2
+  echo "   10) dashboard    — local-mirror + projects-index + Datasette (+ 16)"         >&2
+  echo "   11) full-hub     — dashboard + zoekt + mdbook + restic + gdrive (+ 20)"      >&2
   echo                                                                                  >&2
-  echo "    9) custom       — pick individual primitives (64 available)"                >&2
+  echo "    8) custom       — pick individual primitives"                               >&2
   echo                                                                                  >&2
   local reply
-  printf 'Enter choice [1-12] (default 1): ' >&2
+  printf 'Enter choice [1-11] (default 1): ' >&2
   read -r reply || return 1
   case "${reply:-1}" in
     1)  echo minimal      ;;
     2)  echo core         ;;
-    3)  echo frontend     ;;
-    4)  echo ops          ;;
-    5)  echo dev          ;;
-    6)  echo mcp          ;;
-    7)  echo cortex       ;;
-    8)  echo full         ;;
-    9)  echo custom       ;;
-    10) echo local-mirror ;;
-    11) echo dashboard    ;;
-    12) echo full-hub     ;;
+    3)  echo ops          ;;
+    4)  echo dev          ;;
+    5)  echo mcp          ;;
+    6)  echo cortex       ;;
+    7)  echo full         ;;
+    8)  echo custom       ;;
+    9)  echo local-mirror ;;
+    10) echo dashboard    ;;
+    11) echo full-hub     ;;
     *) err "invalid choice: $reply"; return 1 ;;
   esac
 }
@@ -173,7 +170,7 @@ run_menu_if_needed() {
   if echo "$menu_out" | grep -q ','; then
     CUSTOM_PRIMS="$menu_out"
     PROFILE="custom"
-  elif echo "$menu_out" | grep -qE '^(minimal|core|frontend|ops|dev|mcp|cortex|full|local-mirror|dashboard|full-hub)$'; then
+  elif echo "$menu_out" | grep -qE '^(minimal|core|ops|dev|mcp|cortex|full|local-mirror|dashboard|full-hub)$'; then
     PROFILE="$menu_out"
   else
     # Single name from custom-with-one-item — treat as CUSTOM_PRIMS

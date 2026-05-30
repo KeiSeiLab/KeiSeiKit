@@ -32,35 +32,9 @@ Full feature development pipeline:
 ### marketing-launch
 Product launch content pipeline:
 1. `/competitor-analysis` — understand the landscape
-2. `/landing-page` — create product landing page
-3. `/content-pipeline` — write launch blog post
-4. `/social-post platform=all` — create social media posts
-5. `/email-sequence type=launch` — create launch email sequence
-6. `/seo-audit` — audit the landing page
-
-### design-to-code
-Design implementation pipeline:
-1. `/figma-to-code` — convert Figma design to code
-2. `/design-system` — extract/create tokens if needed
-3. `/ui-component` — build reusable components
-4. `/responsive-audit` — verify responsiveness
-
-### web-creation
-Elite website pipeline (7-level constructor):
-1. Brief & goal definition (manual — product, audience, goal, tone)
-2. `/competitor-analysis` — market positioning, 3-5 competitors
-3. `/design-inspiration` — reference board from awwwards/godly/dribbble/21st.dev
-4. `/site-teardown` — deconstruct best reference into recipe + tokens
-5. `/frontend-design` — design direction from tokens + archetype
-6. `/design-system` — create design system from tokens
-7. `/landing-page recipe=<type>` — implement page with recipe
-8. Animation skills as needed (`/scroll-animation`, `/motion-design`, `/web-effects`)
-9. `/web-assets pipeline` — optimize all images, fonts, video
-10. `/a11y-audit scan` — WCAG 2.2 AA compliance
-11. `/seo-audit` — meta, schema, OG tags
-12. `/responsive-audit` — 6 breakpoints
-13. `/perf-audit` — Lighthouse >90
-14. `/web-deploy` — deploy to Cloudflare Pages
+2. `/content-pipeline` — write launch blog post
+3. `/social-post platform=all` — create social media posts
+4. `/email-sequence type=launch` — create launch email sequence
 
 ### rag-setup
 RAG knowledge base setup pipeline:
@@ -73,10 +47,7 @@ RAG knowledge base setup pipeline:
 ### full-audit
 Comprehensive project audit:
 1. `/perf-audit target=full` — performance check
-2. `/seo-audit` — SEO check (if web project)
-3. `/responsive-audit` — responsive check (if web project)
-4. `/a11y-audit scan` — accessibility check (if web project)
-5. `auditor` agent — Constructor Pattern audit
+2. `auditor` agent — Constructor Pattern audit
 
 ## Execution
 - Present the workflow steps to user BEFORE starting

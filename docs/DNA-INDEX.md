@@ -1,9 +1,5 @@
 # KeiSeiKit DNA Encyclopedia
 
-> **Note (2026-05-30):** the site-building cluster (frontend-design, landing-page, site-builder, site-create, site-teardown, figma-to-code, design-system, web-deploy, web-assets, web-effects, share-page, responsive-audit, a11y-audit, seo-audit, ui-component, form-builder, visual-loop) plus the supporting primitives (mock-render, visual-diff, tokens-sync, design-scrape, live-preview, figma-tokens, frontend-inspect, screenshot-decode) and the frontend-validator agent have been extracted to the private repo `KeiSeiLab/frontend-studio`. References below may still mention them historically. The generic image / video / 3D / animation skills (nano-banana, video-gen, animate, motion-design, scroll-animation, 3d-scene, visual-explainer, design-inspiration, playwright-cli) remain shipped here.
-
----
-
 
 > Auto-generated from kei-registry. Last regenerated: 2026-05-14T04:37:36Z.
 > Total blocks: 679. Per-type breakdown:
@@ -171,10 +167,7 @@ Sorted alphabetically by name.
 | keidna-sign | primitive::cli,fs,ha… | _primitives/_rust/keidna-sign/Cargo.toml | b6d5f10993eaa4db |
 | keidocs | primitive::cli,fs,ha… | _primitives/_rust/keidocs/Cargo.toml | 63c3efd1c43d824f |
 | keisei | primitive::cli,md,re… | _primitives/_rust/keisei/Cargo.toml | 57874ba402c21fd3 |
-| mock-render | primitive::hash,md::… | _primitives/_rust/mock-render/Cargo.toml | a89ee70a71170bbe |
 | ssh-check | primitive::cli,md::8… | _primitives/_rust/ssh-check/Cargo.toml | efaf88561df1143f |
-| tokens-sync | primitive::md::32f10… | _primitives/_rust/tokens-sync/Cargo.toml | 18793d64c6cd18dc |
-| visual-diff | primitive::_::d495df… | _primitives/_rust/visual-diff/Cargo.toml | a5129a58469c8040 |
 
 ## Skill (84)
 
@@ -195,11 +188,8 @@ Sorted alphabetically by name.
 | /dev-start — Parallel Feature Kickoff | md | skill::md::1f6d5b4ce… | skills/dev-start/SKILL.md |
 | /drive-import — Google Drive → Forgejo project import | md | skill::md::5ed3f8c44… | skills/drive-import/SKILL.md |
 | /drive-import — Google Drive → Forgejo project import | md | skill::md::431425875… | skills/drive-import/SKILL.md |
-| /site-builder — WYSIWYD website builder | md | skill::md::7b080bfff… | skills/site-builder/SKILL.md |
-| /site-create — 7-Phase Website Pipeline (index) | md | skill::md::8b8b3ad57… | skills/site-create/SKILL.md |
 | /spawn-agent — Click-only Agent-tool composer (index) | md | skill::md::81c46bb3c… | skills/spawn-agent/SKILL.md |
 | /test-matrix — Testing beyond unit tests (index) | md | skill::md::a6272bbff… | skills/test-matrix/SKILL.md |
-| /visual-loop — Visual / A11y / Responsive Regression Loop | md | skill::md::ea70d3a94… | skills/visual-loop/SKILL.md |
 | /vm-provision — 6-Phase VPS Pipeline (index) | md | skill::md::ffc6787be… | skills/vm-provision/SKILL.md |
 | /wave-audit — 3-Wave Parallel Audit | md | skill::md::11ba3da8a… | skills/wave-audit/SKILL.md |
 | /wave-audit — 3-Wave Parallel Audit | md | skill::md::3c0b33a5c… | skills/wave-audit/SKILL.md |
@@ -208,7 +198,6 @@ Sorted alphabetically by name.
 | AI Animation Pipeline | md | skill::md::5102577d3… | skills/ai-animation/SKILL.md |
 | AI Animation Pipeline | md | skill::md::71529ec40… | skills/ai-animation/skill.md |
 | API-Design — Style, Contract & Lifecycle Pipeline (index) | md | skill::md::85d94768d… | skills/api-design/SKILL.md |
-| Accessibility Audit — WCAG 2.2 AA | md | skill::md::be686747b… | skills/a11y-audit/SKILL.md |
 | Architecture Rules Engine | md | skill::md::8d2151f68… | skills/architecture-rules/SKILL.md |
 | Architecture Rules Engine | md | skill::md::d76cc647d… | skills/architecture-rules/SKILL.md |
 | Auth-Setup — Identity, Session & Authorization Pipeline (index) | md | skill::md::451d5fbae… | skills/auth-setup/SKILL.md |
@@ -219,22 +208,16 @@ Sorted alphabetically by name.
 | Content Pipeline Workflow | md | skill::md::c7812224a… | skills/content-pipeline/SKILL.md |
 | Deep Debug — Holographic Error Analysis | md | skill::md::a2219dc6a… | skills/debug-deep/SKILL.md |
 | Deep Research Skill | md | skill::md::6f8da4583… | skills/research/SKILL.md |
-| Design System Workflow | md | skill::md::e9c7bef9b… | skills/design-system/SKILL.md |
 | Docs-Scaffold — Project Documentation Pipeline (index) | md | skill::md::97e897fd3… | skills/docs-scaffold/SKILL.md |
 | Email Sequence Workflow | md | skill::md::bc16d8ab1… | skills/email-sequence/SKILL.md |
 | Engine Rebuild + Re-run | md | skill::md::852a4a244… | skills/engine-rebuild-and-rerun/SKILL.md |
 | Escalate Recurrence — Interactive Codifier | md | skill::md::b42f87a42… | skills/escalate-recurrence/SKILL.md |
 | Escalate Recurrence — Interactive Codifier | md | skill::md::d4d128ae1… | skills/escalate-recurrence/SKILL.md |
-| Figma to Code Workflow | md | skill::md::4d3cbbf32… | skills/figma-to-code/SKILL.md |
 | Fix Issue Workflow | md | skill::md::44576f8b4… | skills/fix-issue/SKILL.md |
-| Form Construction & Submission | md | skill::md::4c0c81b05… | skills/form-builder/SKILL.md |
-| Frontend Design — Think Before You Code | md | skill::md::a01ff586a… | skills/frontend-design/SKILL.md |
 | Holographic Architecture Analysis | md | skill::md::7084fc9c6… | skills/architecture/SKILL.md |
 | Holographic Architecture Analysis | md | skill::md::f6e0d034b… | skills/architecture/SKILL.md |
 | Holographic Architecture Analysis | md | skill::md::484e4c1cd… | skills/architecture/SKILL.md |
 | Hooks Control — Runtime Hook Enable/Disable | md | skill::md::17b262659… | skills/hooks-control/SKILL.md |
-| Image & Asset Optimization Pipeline | md | skill::md::e2b3a4a9b… | skills/web-assets/SKILL.md |
-| Landing Page Orchestrator | md | skill::md::570422d1a… | skills/landing-page/SKILL.md |
 | Motion Design Skill | md | skill::md::3f7a247d8… | skills/motion-design/SKILL.md |
 | New Agent — Project-Specialist Wizard | md | skill::md::e6634723d… | skills/new-agent/SKILL.md |
 | New-Project — 4-Phase Pipeline (index) | md | skill::md::cca3793e2… | skills/new-project/SKILL.md |
@@ -247,24 +230,16 @@ Sorted alphabetically by name.
 | RAG Pipeline Skill | md | skill::md::d1ef17764… | skills/rag-pipeline/SKILL.md |
 | RAG Pipeline Skill | md | skill::md::b62e8900b… | skills/rag-pipeline/skill.md |
 | Refactor Workflow | md | skill::md::7669f25fd… | skills/refactor/SKILL.md |
-| Responsive Audit Workflow | md | skill::md::ff87607a8… | skills/responsive-audit/SKILL.md |
-| SEO Audit Workflow | md | skill::md::a3be7db51… | skills/seo-audit/SKILL.md |
 | Schema-Design — Relational Schema & Migration Pipeline (index) | md | skill::md::956807024… | skills/schema-design/SKILL.md |
 | Scroll Animation Skill | md | skill::md::ee729a8f1… | skills/scroll-animation/SKILL.md |
 | Self-Audit — Session Retrospective Triage (index) | md | skill::md::c4f7b6f40… | skills/self-audit/SKILL.md |
 | Session Budget Tracker | md | skill::md::4e984ca7a… | skills/session-budget/SKILL.md |
-| Share Page | md | skill::md::1a37814af… | skills/share-page/SKILL.md |
-| Share Page | md | skill::md::fffd8cdf5… | skills/share-page/SKILL.md |
-| Site Teardown — Deconstruct Any Website into a Reusable Recipe | md | skill::md::2a6aba4d8… | skills/site-teardown/SKILL.md |
 | Sleep On It — Incubation Wizard (index) | md | skill::md::af6869682… | skills/sleep-on-it/SKILL.md |
 | Sleep Setup — Cloud REM Sync Wizard (index) | md | skill::md::136a4886f… | skills/sleep-setup/SKILL.md |
 | Social Post Workflow | md | skill::md::fb2402cbe… | skills/social-post/SKILL.md |
 | Test Generation Workflow | md | skill::md::19f693295… | skills/test-gen/SKILL.md |
-| UI Component Workflow | md | skill::md::6c0e347e5… | skills/ui-component/SKILL.md |
 | Video-Gen Skill — Frame Sequence Pipeline | md | skill::md::b770fd701… | skills/video-gen/SKILL.md |
 | Visual Explainer | md | skill::md::930703c51… | skills/visual-explainer/SKILL.md |
-| Web Deployment & Performance | md | skill::md::c352a83a9… | skills/web-deploy/SKILL.md |
-| Web Effects Skill | md | skill::md::78ada116b… | skills/web-effects/SKILL.md |
 | nano-banana | md | skill::md::840e10fbb… | skills/nano-banana/SKILL.md |
 
 ## Rule (183)
@@ -988,7 +963,6 @@ Sorted alphabetically by name.
 | secrets-pre-guard | shell | hook::shell::bbdd013… | hooks/secrets-pre-guard.sh |
 | secrets-pre-guard | shell | hook::shell::31fb751… | hooks/secrets-pre-guard.sh |
 | session-end-dump | shell | hook::shell::7c3e2d9… | hooks/session-end-dump.sh |
-| site-wysiwyd-check | shell | hook::shell::0683fa8… | hooks/site-wysiwyd-check.sh |
 | skill-record | shell | hook::shell::954ccee… | hooks/skill-record.sh |
 | sleep-report-tg | shell | hook::shell::2e5b134… | hooks/sleep-report-tg.sh |
 | stop-verify | shell | hook::shell::adedcfe… | hooks/stop-verify.sh |
@@ -1065,7 +1039,6 @@ Sorted alphabetically by name.
 | SECURITY — Patching (unattended-upgrades + needrestart + reboot window) | atom::_::22e056fe0e1… | _blocks/security-patching.md | 6736cb45c1423716 |
 | SECURITY — SSH Hardening (sshd_config.d/99-kei.conf) | atom::_::221ea663a5a… | _blocks/security-ssh-hardening.md | f64872fa2c456424 |
 | SECURITY — TLS via Caddy (automatic ACME, HTTP-01 / DNS-01) | atom::_::d990d943fc2… | _blocks/security-tls-caddy.md | 2c5e8fde1fe5ce2f |
-| STACK — Astro 6 (Content + Marketing + Islands) | atom::_::f4a34753cb4… | _blocks/stack-astro.md | 245630f058e7f5c8 |
 | STACK — Embedded Rust STM32 (embassy / cortex-m) | atom::_::ebf68a2173e… | _blocks/stack-embedded-stm32.md | 6fc3b55a1c85a4bf |
 | STACK — FastAPI + async SQLAlchemy 2.0 + PostgreSQL | atom::_::8d6a0bc1198… | _blocks/stack-fastapi-postgres.md | 100bdd1f7e9104e0 |
 | STACK — Flutter + Riverpod + Clean Architecture | atom::_::44208b34744… | _blocks/stack-flutter.md | b66a5b3a10478b8b |
@@ -1174,7 +1147,6 @@ Sorted alphabetically by name.
 | critic-perf | manifest::_::b50a6be… | _manifests/critic-perf.toml | 0fb071fa7eaab564 |
 | critic-tech-debt | manifest::_::b3d6e89… | _manifests/critic-tech-debt.toml | af98047e524fb2bf |
 | fal-ai-runner | manifest::_::7a7c8e2… | _manifests/fal-ai-runner.toml | c03c6ce7ed52b6d4 |
-| frontend-validator | manifest::_::1c3447f… | _manifests/frontend-validator.toml | 2a27cb166cad8eb0 |
 | infra-implementer | manifest::_::94c8642… | _manifests/infra-implementer.toml | 37ce7a2d1f858a78 |
 | infra-implementer-cicd | manifest::_::6465024… | _manifests/infra-implementer-cicd.toml | 5ba585df9fc0695a |
 | infra-implementer-container | manifest::_::38f9d49… | _manifests/infra-implementer-container.toml | b069db59d93de252 |
@@ -1209,11 +1181,8 @@ Sorted alphabetically by name.
 - `/dev-ship — Pre-Merge Quality Gate` — 14 versions: d698e957 → 405cd8c5 → f621cf3c → c124440b → ace99b99 → ace99b998f80356e → db9c3a9b8673297e → 2dab0f7a4a5e7f50 → 5598b03b64b33216 → dc01a07af0396f34 → bb38374000e17d3e → 3549c5b8143f824a → 32b6775d8d7dd48f → b0c96e9b2e8e0cb6
 - `/dev-start — Parallel Feature Kickoff` — 23 versions: c9ab5b12 → d7fd4796 → d7fd47968b9d35e2 → edf77e9445083439 → 208ed528d18eee07 → 683f18600ccaca98 → ffa53aaaa265d39d → 3d9dc486283656ea → 89f6b9bd68735864 → 8e2ac93e67533b08 → df56417834175bb8 → bfb4093ef1f70667 → b4a72909a5840e67 → ee2b7fe8398857e0 → 72d660a861197d32 → c66c962e8ed908b6 → b5226f98a28acf26 → 13ac76730db622b0 → 69d2c7ce52cdafed → 70565bed9e25b6de → e5e5ab3f05346963 → b22ff95b86168c1e → 6eca5a21c3567ac5
 - `/drive-import — Google Drive → Forgejo project import` — 4 versions: 32b0a64e → 2d68d9c8 → 2d68d9c81c8ddac5 → cfc808e1a1f9763e
-- `/site-builder — WYSIWYD website builder` — 3 versions: b5f7c090 → 2508e02d → 2508e02dbd40ab39
-- `/site-create — 7-Phase Website Pipeline (index)` — 3 versions: 1223899c → bd31968f → bd31968f2f3b99dc
 - `/spawn-agent — Click-only Agent-tool composer (index)` — 3 versions: 86daa3a8 → a6c00648 → a6c0064857fe992c
 - `/test-matrix — Testing beyond unit tests (index)` — 3 versions: 8e6e1f56 → c4653cc6 → c4653cc6dff02685
-- `/visual-loop — Visual / A11y / Responsive Regression Loop` — 2 versions: de50b51c → de50b51c38dcba29
 - `/vm-provision — 6-Phase VPS Pipeline (index)` — 3 versions: c3cdf6f2 → 04a5eb35 → 04a5eb35731ad538
 - `/wave-audit — 3-Wave Parallel Audit` — 59 versions: b754cd05 → 01329795 → 01329795ba38a5ac → e116e138cfd55f93 → 7c1de001814a0376 → e25ae7688e7919c4 → 7b59e0c07d7ac394 → 090a78c36e43332a → f0a99365d19e3466 → 40ab6805f2c896bc → 4351790b948a3fbd → 199363cb616e51c5 → 0d2ef02b30098a65 → d13433cc75b3fd95 → 11f4ce5905bb2b08 → 5a7e01aaf9d49ceb → 55d88592f1f6d7da → e5625030dc7a18c6 → e995eb849341e001 → f7110fb0fb39d075 → c8d6aab5d7a55cdc → 5be3ca67d7708668 → 12933bb2852bd7d4 → c33338f03eca80bb → 2317084ca9929d7a → 67c686ebae79aece → 3789d7dedd1e2a9a → 8b72264b418ba989 → 32e16959f50a5688 → 22b2c8216dc6e6ad → 7a9ee89e2682f809 → 9c8345ae3276b783 → 8d8ea38ef0d7676a → 0bf0bae20c44fef0 → b62735250b9d9848 → 52b2a882fbc55430 → c48eadcfab7bf0a5 → 0e820ee2d3c70feb → f5c142793c66def0 → fd904c6ba5f3f9b8 → 138997cb014305ec → 23a8b6fc03d35529 → 616ae6ea95422445 → 5ee3de4d82a91d2f → 23f4603922e5cf95 → c37544ac08e7fc57 → 112af96feca608d6 → 6ffce790dbadf446 → 18b99e8cc22ac6a6 → 6db8e96db777fdc4 → 6e901dc26054e973 → c252f2d53f44f820 → b0e2767a721d7c74 → 82954089d94488a5 → cc882ffb7fa6fb1c → 3f241a501aa6d477 → cc6630c7f24b0dab → d71f4baf36f0378d → 90e52d2532482010
 - `3D Scene Skill` — 4 versions: e31a87ca → ca06fcac → e31a87ca → e31a87caffc57858
@@ -1586,7 +1555,6 @@ Sorted alphabetically by name.
 - `keisei::keisei` — 2 versions: 32025580 → 32025580
 - `merger` — 3 versions: af2bf880 → a9f3f180 → a9f3f18090737ae1
 - `milestone-commit-hook` — 2 versions: a6cf8dc6 → a6cf8dc62002af8f
-- `mock-render` — 4 versions: 99b0927a → f5f4d966 → a89ee70a → a89ee70a71170bbe
 - `nano-banana` — 3 versions: af1cdb93 → beb1649e → beb1649ee3cb9f86
 - `no-downgrade` — 6 versions: ff6a5fe0 → e9aa1cf2 → 13087e5b → 13087e5ba4dd20af → fcbabe521b91885f → f96e6fe35655cecc
 - `no-github-push` — 3 versions: dc2f99ae → dc2f99ae → dc2f99aea68bfbe1
@@ -1623,13 +1591,11 @@ Sorted alphabetically by name.
 - `shipped-vs-functional::1-agent-self-tag-status-truth-marker` — 2 versions: b5ec90aa → 94f83554
 - `shipped-vs-functional::2-hook-scan-claude-hooks-agent-stub-scan-sh` — 2 versions: 19866fb4 → 6c2a93d5
 - `shipped-vs-functional::3-orchestrator-pre-commit-gate` — 2 versions: 1719fc7e → 06326b0a
-- `site-wysiwyd-check` — 3 versions: a0d38a22 → 416c0648 → 416c06485a627202
 - `skill-record` — 4 versions: cdf67741 → e2444805 → 44e464fe → 44e464fe9e3d5881
 - `sleep-report-tg` — 4 versions: acc3ebfb → ef101ab6 → 9529ec50 → 9529ec503aab1f2c
 - `ssh-check` — 4 versions: f419e2b0 → ebd97541 → efaf8856 → efaf88561df1143f
 - `stop-verify` — 5 versions: ea57eb38 → 81f1dd9e → 10673c57 → 10673c572a6d504f → ea57eb3823f79ee6
 - `task-timer` — 6 versions: 202823f9 → 16e4f0a3 → a48f5401 → 4482de6f → d1289992 → d12899927f89056f
-- `tokens-sync` — 4 versions: 54c149ab → 69857925 → 18793d64 → 18793d64c6cd18dc
 - `tomd-preread` — 2 versions: e2cec1bb → e2cec1bb46cb50bd
 - `tool-use-event` — 3 versions: 8903ffd4 → a7a0cfd9 → a7a0cfd93a7777cb
 - `tools::bash-allowlist` — 2 versions: f18330d4 → f18330d483f5a694
@@ -1640,7 +1606,6 @@ Sorted alphabetically by name.
 - `user-memory` — 9 versions: b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f → b8f9e85f72437c2a
 - `user-rules` — 9 versions: bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acf → bc8e0acfc14a3161
 - `verify::fork-audit` — 2 versions: 3fb8694d → 3fb8694dc95d99fc
-- `visual-diff` — 4 versions: 557bdc21 → 4516e372 → a5129a58 → a5129a58469c8040
 
 ---
 

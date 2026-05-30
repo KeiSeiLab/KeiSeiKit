@@ -1,6 +1,6 @@
 # STACK — Tailwind CSS 4 (compositional add-on)
 
-This is a **compositional** block — it does NOT stand alone. Layer on top of `stack-nextjs`, `stack-react-vite`, `stack-astro`, or `stack-sveltekit`. Any of those + this = the canonical 2026 "Tailwind project" shape.
+This is a **compositional** block — it does NOT stand alone. Layer on top of `stack-nextjs`, `stack-react-vite`, or `stack-sveltekit`. Any of those + this = the canonical 2026 "Tailwind project" shape.
 
 **Version:** Tailwind 4.x — ships as a Vite / PostCSS / CLI plugin, NOT as a dependency you import into your framework code. Config lives in CSS via `@theme` (not `tailwind.config.ts` — that is v3).
 

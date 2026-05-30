@@ -121,7 +121,6 @@ KeiSeiKit is a **multi-tier agent composition substrate** built on four mutually
 | **cost-guardian** | specialization | sonnet | Modal/AWS/GCP/fal.ai/Apify cost pre-launch gate | modal-runner | stable |
 | **fal-ai-runner** | specialization | sonnet | Image/video/3D generation; model catalog & pricing | code-impl | stable |
 | **modal-runner** | specialization | sonnet | Modal jobs: cost est, GPU compat, observability | code-impl | stable |
-| **frontend-validator** | specialization | sonnet | tsc --noEmit, eslint, kei-db-contract, visual snapshots | code-impl | stable |
 
 **Notes:**
 - Model: `opus` (Opus 4 for complex reasoning), `sonnet` (Haiku 4.5 for routine implementation)

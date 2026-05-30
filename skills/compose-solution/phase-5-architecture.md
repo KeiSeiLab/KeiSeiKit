@@ -33,7 +33,6 @@ via Phase 3 grep, but surface it explicitly so the user sees the option:
 - REST / GraphQL / gRPC API contract → `/api-design`
 - Doc site + changelog automation → `/docs-scaffold` + `kei-changelog`
 - Test matrix (unit / integration / e2e / visual) → `/test-matrix`
-- Frontend site / UI WYSIWYD loop → `/site-create` + `mock-render` + `visual-diff` + `tokens-sync`
 - Multi-agent project bootstrap → `/new-project` + `kei-ledger` (RULE 0.12 fork tracking)
 - Typed artifact handoff between agents → `kei-artifact` (v0.15: schema-validated spec→plan→patch→review chain instead of prose hints). If your architecture spans multiple agents and the output of one is the input of another, declare `produces_artifact` / `expects_artifact` in the manifest and emit via `kei-artifact emit`.
 

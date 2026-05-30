@@ -778,8 +778,6 @@ EOF
 | `video-gen` | Process video → frame sequence | Step 3A |
 | `scroll-animation` | GSAP ScrollTrigger playback | Step 4 (scroll) |
 | `motion-design` | Page transitions + micro-interactions | Step 4 (ambient) |
-| `web-assets` | Optimize final video/frames | Step 3 (all routes) |
-| `landing-page` | Full page orchestration | When recipe needs video |
 | `3d-scene` | Three.js alternative to AI video | When real 3D needed |
 
 ---

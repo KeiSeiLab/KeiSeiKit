@@ -106,7 +106,6 @@ respect runtime toggling via `KEI_DISABLED_HOOKS` / `KEI_HOOK_PROFILE` (see the
 | milestone-commit-hook.sh | PostToolUse:Bash (git commit) | block | On feat:/refactor:/merge → run `kei-memory analyze` + append to audit-backlog.md | none |
 | alignment-check.sh | (internal) | block | Track 3-time recurrence: exp6, exp24-28, basecaller forgot alignment | none |
 | graph-export-watcher.sh | PreToolUse:Edit | warn | When keimd graph file edited → watch for drift | GRAPH_EXPORT_BYPASS |
-| site-wysiwyd-check.sh | PostToolUse:Edit | advisory | After frontend edit → WYSIWYG drift check against dev-server | none |
 
 ### Sleep Layer & Cloud Agent Triggers (RULE 0.15)
 
@@ -318,7 +317,6 @@ All blocks live under `_blocks/` directory. Format: `| Block Name | Category | P
 
 | Block | Purpose |
 |-------|---------|
-| stack-astro.md | Astro.build SSR framework (components, islands, integrations) |
 | stack-embedded-stm32.md | STM32 microcontroller (HAL, firmware, JTAG debug) |
 | stack-fastapi-postgres.md | FastAPI + PostgreSQL (asyncio, SQLAlchemy async, dependency injection) |
 | stack-flutter.md | Flutter mobile + web (Riverpod state, Clean Architecture, testing) |

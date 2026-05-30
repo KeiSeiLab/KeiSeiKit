@@ -1,8 +1,8 @@
 ---
-description: React + Tailwind component rules for the design-system package.
+description: React + Tailwind component rules for the motion-design package.
 globs:
-  - "packages/design-system/**/*.tsx"
-  - "packages/design-system/**/*.ts"
+  - "packages/motion-design/**/*.tsx"
+  - "packages/motion-design/**/*.ts"
 alwaysApply: false
 ---
 

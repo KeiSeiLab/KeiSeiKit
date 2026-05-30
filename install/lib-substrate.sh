@@ -31,7 +31,7 @@ substrate_core_binaries() {
     kei-chat-store kei-provision kei-changelog kei-migrate \
     kei-db-contract \
     frustration-matrix \
-    ssh-check firewall-diff mock-render visual-diff tokens-sync
+    ssh-check firewall-diff
 }
 
 # Echo cortex-profile-only binaries.

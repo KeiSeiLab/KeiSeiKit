@@ -64,12 +64,6 @@ Compose 3-6 one-line bullets conditional on the scan + applied outcome:
     skills (DB workflow detected in <project>)
   ```
 
-- If frontend detected but no frontend primitives installed:
-  ```
-  • Run install.sh --profile=frontend for live-preview, design-scrape,
-    screenshot-decode, frontend-inspect
-  ```
-
 - If banned-public deploy detected (ML weights / offensive tools):
   ```
   • Review security-restricted-projects.md — confirm this project's

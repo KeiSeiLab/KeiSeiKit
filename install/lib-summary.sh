@@ -81,7 +81,7 @@ EOF
 ==========================================================================
 
   KeiSeiKit ships 9 hooks (assemble-agents, assemble-validate, no-hand-edit,
-  tomd-preread, agent-fork-logger, site-wysiwyd-check, session-end-dump,
+  tomd-preread, agent-fork-logger, session-end-dump,
   milestone-commit-hook, error-spike-detector).
   To activate them, merge entries from:
       $KIT_DIR/settings-snippet.json

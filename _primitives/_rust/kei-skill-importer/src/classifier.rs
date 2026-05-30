@@ -22,7 +22,7 @@ const KNOWN_PRIMITIVES: &[&str] = &[
     "kei-scheduler", "kei-diff", "kei-dna-index", "kei-shared",
     "kei-forge", "kei-runtime", "kei-atom-discovery",
     "kei-skill-importer", "tomd", "ssh-check", "firewall-diff",
-    "mock-render", "visual-diff", "tokens-sync",
+    "motion-design", "motion-design", "motion-design",
 ];
 
 fn bash_fence_re() -> &'static Regex {

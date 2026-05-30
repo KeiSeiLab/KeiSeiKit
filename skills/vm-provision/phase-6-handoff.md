@@ -1,8 +1,7 @@
 # Phase 6 — Handoff + Final Report
 
 > Goal: emit a single, complete report and (optionally) hand off to
-> `/web-deploy` or `/auth-setup`. No further mutation to the VM from this
-> skill.
+> `/auth-setup`. No further mutation to the VM from this skill.
 > **Verify criterion:** final report emitted; all Phase-1..5 artefacts
 > listed with absolute paths; next-skill dispatch (if any) announced.
 
@@ -58,12 +57,6 @@ No prose after the ledger. The report is the contract.
 ---
 
 ## 6.c — Handoff (no AskUserQuestion; next-skill dispatch inferred)
-
-If `TLS_HOST` was set AND the caller's intent mentions deploying an app
-— dispatch to `/web-deploy` with the VM IP and admin credentials
-(by env-var reference only, RULE 0.8). Surface:
-
-> `Handoff → /web-deploy <VM_IP> --admin <ADMIN_USER> --tls <TLS_HOST>`
 
 If the intent mentions auth / identity — surface:
 

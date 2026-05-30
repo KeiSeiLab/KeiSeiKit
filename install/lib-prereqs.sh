@@ -89,7 +89,6 @@ _soft_dep_flags() {
   for p in $PROFILE_PRIMS; do
     case "$p" in
       tomd)                                   needs_pandoc=1 ;;
-      design-scrape|live-preview|mock-render) needs_playwright=1 ;;
       kei-ledger|kei-migrate)                 needs_sqlite=1 ;;
       provision-hetzner)                      needs_hcloud=1 ;;
       provision-vultr)                        needs_vultr=1 ;;
@@ -108,9 +107,6 @@ check_soft_prereqs() {
   read -r n_pandoc n_playwright n_sqlite n_hcloud n_vultr n_yq n_python n_ffmpeg n_node n_pnpm <<< "$(_soft_dep_flags)"
   if [ "$n_pandoc" = "1" ] && ! command -v pandoc >/dev/null 2>&1; then
     warn "pandoc not found — tomd primitive will fail on .docx/.pptx. Install: brew install pandoc"
-  fi
-  if [ "$n_playwright" = "1" ] && ! command -v playwright >/dev/null 2>&1 && ! command -v npx >/dev/null 2>&1; then
-    warn "playwright/npx not found — frontend primitives need them. Install: npm i -g playwright && playwright install chromium"
   fi
   if [ "$n_sqlite" = "1" ] && ! command -v sqlite3 >/dev/null 2>&1; then
     warn "sqlite3 CLI not found — kei-ledger/kei-migrate work without it (rusqlite embedded). Install for manual DB inspection: brew install sqlite"

@@ -25,9 +25,6 @@ export const RUST_PRIMITIVE_TOOLS: ReadonlyArray<{ binary: string; desc: string 
   { binary: "kei-changelog", desc: "Generate changelog from commit/tag history." },
   { binary: "ssh-check", desc: "Validate SSH config + known_hosts consistency." },
   { binary: "firewall-diff", desc: "Diff two firewall rule dumps." },
-  { binary: "tokens-sync", desc: "Sync design tokens from Figma export to code." },
-  { binary: "visual-diff", desc: "Compare rendered screenshots pixel-wise." },
-  { binary: "mock-render", desc: "Render HTML mock templates for preview." },
   { binary: "kei-gdrive-import", desc: "Classify a Google Drive folder as PROJECT/AMBIGUOUS/NOT-A-PROJECT/ALREADY-REPO via 8-marker scoring (Cargo.toml, package.json, pyproject.toml, go.mod, pom.xml, build.gradle, Gemfile, composer.json). Subcommands: classify <path> [--remote], scan-tree <root> [--remote]. Remote mode shells to rclone lsf — no download." },
 ];
 

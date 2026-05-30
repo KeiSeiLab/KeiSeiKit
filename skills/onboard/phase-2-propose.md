@@ -23,7 +23,6 @@ Compose a dry-run `/new-agent` input based on the scan:
   - `package.json` + Next.js dep → `stack-nextjs`
   - `package.json` + React + Vite → `stack-react-vite`
   - `package.json` + SvelteKit → `stack-sveltekit`
-  - `package.json` + Astro → `stack-astro`
   - `Cargo.toml` + `[[bin]]` + axum → `stack-rust-axum`
   - `Cargo.toml` + `[[bin]]` no axum → `stack-rust-cli`
   - `pyproject.toml` + FastAPI → `stack-fastapi-postgres`
@@ -96,9 +95,6 @@ Read `_primitives/MANIFEST.toml` (already on disk). Map scan → primitives:
 - CI detected → `kei-ci-lint` (high confidence)
 - Doc heavy (`docs/`, many `.md`) → `kei-docs-scaffold` (medium)
 - DB migrations (schema files, `migrations/` dir) → `kei-migrate` (high)
-- Frontend + live preview needed → `live-preview`, `design-scrape`,
-  `frontend-inspect`, `screenshot-decode` (bundle as `frontend` profile
-  suggestion)
 - Ops / VPS → `provision-hetzner`, `provision-vultr`, `harden-base` (ops
   profile suggestion)
 - Non-native docs (.docx/.xlsx/.pptx) in repo → `tomd` (high)

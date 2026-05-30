@@ -102,12 +102,12 @@ fn shared_produces_no_confident_trait_match() {
 
 #[test]
 fn mock_render_produces_no_confident_trait_match() {
-    let src = load("mock-render");
+    let src = load("motion-design");
     let matches = match_module(&src);
     for m in &matches {
         assert!(
             m.confidence < 0.5,
-            "mock-render unexpectedly matched {:?} with confidence {:.2}",
+            "motion-design unexpectedly matched {:?} with confidence {:.2}",
             m.kind, m.confidence
         );
     }

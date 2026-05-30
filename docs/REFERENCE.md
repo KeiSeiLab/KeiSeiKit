@@ -1,8 +1,5 @@
 # Reference
 
-> **Note (2026-05-30):** the site-building cluster (frontend-design, landing-page, site-builder, site-create, site-teardown, figma-to-code, design-system, web-deploy, web-assets, web-effects, share-page, responsive-audit, a11y-audit, seo-audit, ui-component, form-builder, visual-loop) plus the supporting primitives (mock-render, visual-diff, tokens-sync, design-scrape, live-preview, figma-tokens, frontend-inspect, screenshot-decode) and the frontend-validator agent have been extracted to the private repo `KeiSeiLab/frontend-studio`. References below may still mention them historically. The generic image / video / 3D / animation skills (nano-banana, video-gen, animate, motion-design, scroll-animation, 3d-scene, visual-explainer, design-inspiration, playwright-cli) remain shipped here.
-
----
 
 
 Every shipped component, its real behaviour, and where to look in source. Each subsection documents the actual CLI surface as extracted from `_primitives/_rust/*/src/main.rs`, `_primitives/*.sh`, `hooks/*.sh`, and `skills/*/SKILL.md`. If a flag or subcommand is not listed here, it does not exist in the current build.
@@ -85,39 +82,6 @@ firewall-diff --intent <yaml> (--status-file <path> | --stdin) [--json]
 ```
 
 Exit 2 on any diff. Use via `ufw status numbered | firewall-diff --intent fw.yaml --stdin`.
-
-### `mock-render` — WYSIWYD screenshot-and-lock
-
-Playwright-backed. Enforces the "What You See Is What's Deployed" invariant: every site section's source file is hashed, the hash is locked against a screenshot, and `verify` fails if the source drifts after lock.
-
-```
-mock-render screenshot <url> --out <png> [--viewport WxH]
-mock-render lock    --project <dir> --section <src> [--screenshot <png>]
-mock-render verify  --project <dir> --section <src>
-mock-render status  --project <dir>
-```
-
-Exit 2 on invariant violation (source hash changed since lock).
-
-### `visual-diff` — pixel PNG comparator
-
-Used by `site-wysiwyd-check` hook to detect visual drift. Produces a red-overlay diff PNG when images differ beyond threshold.
-
-```
-visual-diff <a.png> <b.png> [--out <file=diff.png>] [--threshold <pct=1.0>]
-```
-
-Exit 2 if mismatch exceeds threshold. Prints percentage + diff-px count.
-
-### `tokens-sync` — design tokens → Tailwind + CSS vars
-
-Single JSON file → Tailwind `theme.extend` config and CSS `:root` custom properties. Either or both output targets; at least one required.
-
-```
-tokens-sync <tokens.json> [--out-tailwind <path>] [--out-css <path>]
-```
-
-JSON minimum shape: `{ colors, fonts, spacing, radius }`.
 
 ### `kei-memory` — session retrospective + pattern detector (RULE 0.14)
 
@@ -367,54 +331,6 @@ All 13 live under `_primitives/*.sh`. Installed with `chmod +x` at `~/.claude/ag
 
 Converts PDF / DOCX / DOC / HTML / PPTX / XLSX / CSV / images / source code to markdown. Used by the `tomd-preread` hook to auto-convert binary formats before Claude reads them. Deps: `pandoc`, `python3`, `jq`. Optional: `pymupdf4llm` (better PDF), `openpyxl` (XLSX tables), `tesseract` (OCR).
 
-### `design-scrape.sh` — Playwright site scrape
-
-Scrapes a live URL into tokens + section map + desktop/mobile screenshots.
-
-```
-design-scrape <url> [--out <dir>]
-```
-
-Output: `<out>/desktop.png`, `<out>/mobile.png`, `<out>/tokens.json`, `<out>/structure.json`. Requires `npx` + Playwright chromium.
-
-### `live-preview.sh` — dev-server wrapper
-
-Detects framework from `package.json`, runs `npm run dev`, writes PID to `.keisei/dev-server.pid` for the `site-wysiwyd-check` hook to discover.
-
-```
-live-preview start <dir>
-live-preview stop  [pid]       — default: reads .keisei/dev-server.pid
-live-preview status
-```
-
-### `figma-tokens.sh` — Figma → tokens.json
-
-Fetches Figma Variables + Styles via REST API, emits a `tokens.json` consumable by `tokens-sync`.
-
-```
-FIGMA_TOKEN=figd_xxx figma-tokens <file-key> [--out <path=tokens.json>]
-```
-
-Token MUST come from env (RULE 0.8). File-key is the segment after `/design/` or `/file/` in the Figma URL.
-
-### `frontend-inspect.sh` — project fingerprint
-
-Reports framework (Astro / Next / SvelteKit / Vite-React / static / unknown), styling (tailwind4 / tailwind3 / css-modules / plain), package manager, component count, whether tests exist.
-
-```
-frontend-inspect [<dir>] [--json]
-```
-
-### `screenshot-decode.sh` — vision-API screenshot → structured description
-
-Posts a PNG + prompt to the Anthropic Messages API (claude-sonnet-4) and prints the text response.
-
-```
-ANTHROPIC_API_KEY=sk-ant-xxx screenshot-decode <png> [--prompt <text>]
-```
-
-Default prompt asks for token + layout + sections as JSON. API key MUST come from env (RULE 0.8).
-
 ### `metrics-scrape.sh` — Prometheus /metrics scraper
 
 Scrape + format / filter / alert-check. POSIX sh.
@@ -519,7 +435,6 @@ All 12 kit-shipped hooks live under `hooks/*.sh`, get copied to `~/.claude/hooks
 | `tomd-preread` | `PreToolUse:Read` | redirect — exit 2 with stderr pointing to cached `.md` | — |
 | `agent-fork-logger` | `PreToolUse:Agent` | advisory (logs to `kei-ledger`; silent if absent) | — |
 | `orchestrator-dirty-check` | `PreToolUse:Agent` | warn (stderr only) | `ORCHESTRATOR_META=1` or `ORCHESTRATOR_DIRTY_OK=1` |
-| `site-wysiwyd-check` | `PostToolUse:Edit\|Write` | warn (stderr drift report) | — |
 | `session-end-dump` | `Stop` | advisory (archives trace + calls `kei-memory ingest`) | — |
 | `milestone-commit-hook` | `PostToolUse:Bash` | advisory (appends to audit-backlog on `feat:`/`refactor:`/merge) | — |
 | `error-spike-detector` | `PostToolUse:*` | warn (stderr when ≥3 errors in 20-call window) | — |
@@ -532,7 +447,6 @@ Details beyond the table:
 - **`tomd-preread`** — whitelist: `.docx`, `.doc`, `.xlsx`, `.pptx`, `.csv`. Cache key: basename + mtime + short path-hash (prevents collision between two same-basename files). Cache dir: `$KEISEI_TOMD_CACHE` or `/tmp/keisei-tomd-cache`.
 - **`agent-fork-logger`** — extracts `subagent_type` + `prompt` + `isolation`; branch = `agent/<slug>-<ts>` when `isolation=worktree`, else `inline-<slug>-<ts>`. Spec-SHA = first 16 hex chars of SHA-256(prompt).
 - **`orchestrator-dirty-check`** — runs `git status --porcelain` on repo root, stderr-warns with modified + untracked counts.
-- **`site-wysiwyd-check`** — triggers on `.tsx` / `.vue` / `.svelte` / `.astro` / `.css` / `.html` / `.jsx` / `.ts`. Walks up to find `.keisei/dev-server.pid`; bails if no live server or no `.keisei/target.png`.
 - **`session-end-dump`** — copies transcript JSONL to `~/.claude/memory/traces/<session_id>.jsonl`, calls `kei-memory ingest`, then best-effort calls `kei-sleep-sync.sh` (RULE 0.15, silent if sleep-sync not opted in).
 - **`milestone-commit-hook`** — case-sensitive prefix match on `feat:`, `refactor:`, `merge` (avoids false-firing on `feature-docs.md`).
 - **`error-spike-detector`** — rolling window in `~/.claude/memory/error-window.txt`; error-classifier = `is_error=true` OR message matches `/error:|failed|panic|denied/i`.
@@ -558,24 +472,9 @@ Details beyond the table:
 
 | Skill | One-liner |
 |---|---|
-| `/site-create` | End-to-end site pipeline — intake → design → sections → WYSIWYD mock-render loop → audits → preview → deploy. The verify gate HARD-BLOCKS deploy of unlocked sections. |
-| `/site-builder` | Build a site from block recipes. WYSIWYD invariant via `mock-render`. |
-| `/site-teardown` | Deconstruct any live site into a reusable recipe — HTML, CSS, JS, tokens, animations. |
-| `/landing-page` | Orchestrates design + copy + assets + animations + SEO for a landing page. Supports recipes (apple-product, saas, portfolio, ecommerce). |
-| `/design-system` | Build a design system — tokens, base components, Tailwind config, dark mode, docs. |
-| `/ui-component` | Build a UI component — API design, variants, a11y, animations, tests. |
-| `/form-builder` | Multi-step forms — Zod validation, Turnstile anti-spam, serverless backends, upload, progressive enhancement. |
 | `/scroll-animation` | Scroll-driven animation — GSAP ScrollTrigger, CSS scroll-timeline, parallax, pin/scrub. |
 | `/motion-design` | Motion design — page transitions, element animations, View Transitions API, Rive/Lottie, a11y. |
-| `/web-effects` | Visual web effects — WebGL shaders, particles, noise/grain, displacement maps, CSS-only. |
-| `/web-assets` | Image / font / video optimization — AVIF, responsive srcset, font subsetting, Sharp.js. |
-| `/figma-to-code` | Figma design → code — screenshot, context, tokens, responsive implementation. |
-| `/frontend-design` | Anti-AI-slop aesthetic philosophy — typography pairing, color theory, spatial composition, motion guidelines, design archetypes. |
-| `/responsive-audit` | 6-breakpoint audit — layout, touch targets, overflow, images. |
-| `/a11y-audit` | WCAG 2.2 AA compliance — contrast, keyboard nav, screen reader, prefers-reduced-motion. |
 | `/perf-audit` | Perf baseline → profile → top-3 bottlenecks → fix → remeasure. |
-| `/seo-audit` | Technical + content SEO via WebFetch + code inspection. |
-| `/web-deploy` | Cloudflare Pages / Vercel / edge functions / caching / Core Web Vitals / CI/CD / DNS. |
 
 </details>
 
@@ -688,7 +587,6 @@ Hub-and-spoke skills that combine primitives into end-to-end flows. Each one is 
 | `/compose-solution` | Meta-composer: decompose any task, grep prior art, propose math-first architecture, assemble the right artefact (agent / skill / hook / block) |
 | `/new-project` | Bootstrap a project specialist agent + repo skeleton + bridges + ledger row |
 | `/new-agent` | Interactive 6-question wizard that builds a project-specialist manifest and its `.md` |
-| `/site-create` | Frontend stack pick → design tokens → scaffold → WYSIWYD loop (mock-render, visual-diff, tokens-sync) |
 | `/schema-design` | DB schema design → migrations → `kei-migrate` apply (PG/SQLite/MySQL autodetect) |
 | `/observability-setup` | Pick metrics + logs stack → scrape + ship config (`metrics-scrape`, `log-ship`) |
 | `/auth-setup` | Pick auth model (session / JWT / OAuth2) → emit routes + middleware + token rotation |

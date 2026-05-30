@@ -49,12 +49,11 @@ Usage: ./install.sh [flags]
                             Standard:
                               minimal      — 0 primitives (~5s)
                               core         — 2 prims (tomd, kei-doctor)
-                              frontend     — 8 site tools (mock-render, visual-diff, …)
                               ops          — 9 infra tools (provision, ssh-check, …)
                               dev          — 17 dev tools (kei-migrate, kei-memory, …)
                               mcp          — 10 MCP/LBM tools (kei-router, kei-sage, …)
                               cortex       — 11 cortex stack (kei-cortex daemon + cortex-ui)
-                              full         — all 62 primitives (MANIFEST source of truth)
+                              full         — all primitives (MANIFEST source of truth)
                             Dev hub (local-first dev environment, macOS arm64):
                               local-mirror — cortex + Forgejo + CI runner (13 prims)
                               dashboard    — local-mirror + projects-index + Datasette (16)

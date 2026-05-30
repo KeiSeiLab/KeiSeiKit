@@ -355,20 +355,16 @@ The `kei-import` umbrella runs the same pipeline (decompose → match
 → extract-skills → plan → execute) on any Rust / TS / Python / Go
 repo. Hermes was the validation case; the runtime works on others.
 
-## Frontend / site-building cluster — extracted
+## Generic visual primitives
 
-The site-building pipeline (17 skills + 8 primitives + the frontend-validator
-agent) was extracted to a separate private repo on 2026-05-30 for SaaS
-productisation. KeiSeiKit public retains only the generic visual primitives:
+KeiSeiKit ships the generic image / video / animation / 3D toolkit:
 `nano-banana` (AI image gen), `video-gen`, `animate`, `motion-design`,
 `scroll-animation`, `3d-scene`, `visual-explainer`, `design-inspiration`,
 `playwright-cli`.
 
-The extracted cluster includes the WYSIWYD mock-render → deploy invariant,
-`/site-create` end-to-end pipeline, anti-AI-slop design philosophy, design
-tokens, Figma import, and the audit triad (a11y / SEO / responsive). It
-lives at `KeiSeiLab/frontend-studio` (private) and may surface later as a
-hosted SaaS.
+End-to-end site-building (design system, Figma import, audits, deploy
+pipeline) is **not part of the public substrate** — it lives in a separate
+private repo for productisation.
 
 ## Architecture
 

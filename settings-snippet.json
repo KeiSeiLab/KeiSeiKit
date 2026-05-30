@@ -16,11 +16,6 @@
           },
           {
             "type": "command",
-            "command": "~/.claude/hooks/site-wysiwyd-check.sh",
-            "statusMessage": "site-wysiwyd drift check..."
-          },
-          {
-            "type": "command",
             "command": "~/.claude/hooks/post-write-check.sh",
             "statusMessage": "post-write checks..."
           },

@@ -25,7 +25,7 @@ fn globs_become_glob_tags() {
     let glob_tags: Vec<&String> =
         skill.tags.iter().filter(|t| t.starts_with("glob:")).collect();
     assert_eq!(glob_tags.len(), 2, "expect 2 glob tags, got {:?}", skill.tags);
-    assert!(glob_tags.iter().any(|t| t.contains("design-system/**/*.tsx")));
+    assert!(glob_tags.iter().any(|t| t.contains("motion-design/**/*.tsx")));
 }
 
 #[test]

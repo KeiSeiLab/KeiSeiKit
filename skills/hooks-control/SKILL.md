@@ -53,7 +53,7 @@ Active kit-shipped hooks:   <list of 9 minus disabled set>
 
 `AskUserQuestion` multi-select over the 10 kit-shipped hook names:
 `assemble-agents`, `assemble-validate`, `no-hand-edit-agents`, `tomd-preread`,
-`agent-fork-logger`, `orchestrator-dirty-check`, `site-wysiwyd-check`,
+`agent-fork-logger`, `orchestrator-dirty-check`,
 `error-spike-detector`, `milestone-commit-hook`, `session-end-dump`.
 
 Emit:

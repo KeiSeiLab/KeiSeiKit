@@ -9,10 +9,7 @@
 |-------|-----------------|-----------------|-------------|-----------|
 | **firewall-diff** | Compare intended ufw rules (YAML) against live firewall state (from `ufw status numbered` output) | `diff::DiffResult`, `intent::Rule`, `ufw::Parser` | Defensive security audit before deploying firewall rules; CI gate for ufw config drift detection | clap, serde_yaml, serde_json, tempfile |
 | **frustration-matrix** | Regex-based chatlog scanner to compute per-user frustration score (longitudinal matrix, no ML) | `firmware::Firmware`, `categories::Category`, `jsonl::Parser`, `firmware_corpus::Corpus` | User experience monitoring; feedback loop training for `kei-frustration-loop`; JSONL chatlog ingestion | regex, walkdir, serde, flate2, clap, anyhow |
-| **mock-render** | WYSIWYD (What You See Is What's Deployed) enforcer for block-builder site: screenshot → hash lock → source-mutation detect | `render::Render`, `hash::ContentHash`, `state::State` | Preventing "design in UI, deploy different code" bugs; screenshot verification before locking a site section | serde_json, sha2, tempfile |
 | **ssh-check** | Pre-deploy sshd_config linter — parses `/etc/ssh/sshd_config` + drop-ins, enforces hardened baseline rules | `rules::RuleSet`, `parse::Directive`, `check::Violation` | Hardened SSH baseline validation before server deploy; CI gate for sshd_config compliance; multi-config merge (last-wins) | clap, serde_json, tempfile |
-| **tokens-sync** | Single-source-of-truth emitter for Tailwind config + CSS custom properties from JSON design-tokens file | `parse::TokensSchema`, `emit::TailwindConfig`, `emit::CssVariables` | Eliminating color/spacing/font drift between CSS and Tailwind sides; one-way regeneration on token update | serde_json, image (for visual-diff companion) |
-| **visual-diff** | Pixel-level PNG comparator for WYSIWYD drift detection — outputs difference % and red-overlay diff image | `diff::PixelDiff`, `diff::ThresholdResult` | Screenshot regression testing in CI; WYSIWYD enforcement alongside mock-render; smoke-test for design system changes | image, tempfile |
 
 ---
 
@@ -319,7 +316,6 @@
 |-------|-------|
 | **One-line Purpose** | Structural JSON diff (RFC 6902 subset: add/remove/replace) — pure computation primitive for drift detection + cache invalidation |
 | **Key API Exports** | `JsonDiff`, `Patch`, `PatchOp` |
-| **When to Use** | Computing cache invalidation in kei-cache; structural change detection in kei-db-contract; WYSIWYD drift in mock-render companion |
 | **Depends On** | serde, serde_json |
 
 ---

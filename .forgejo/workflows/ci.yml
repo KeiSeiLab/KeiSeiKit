@@ -78,7 +78,7 @@ jobs:
           - name: 'llm-stack'
             crates: 'kei-machine-probe,kei-llm-ollama,kei-llm-llamacpp,kei-llm-mlx,kei-llm-router,kei-model'
           - name: 'misc'
-            crates: 'frustration-matrix,kei-frustration-loop,kei-skill-importer,kei-projects-index,kei-projects-watcher,kei-gdrive-import,kei-leak-matrix,kei-skills,kei-gateway,kei-cron-scheduler,kei-export-trajectories,kei-backend-daytona,kei-decision,kei-decompose,kei-registry,ssh-check,firewall-diff,mock-render,visual-diff,tokens-sync,kei-ping,kei-tlog'
+            crates: 'frustration-matrix,kei-frustration-loop,kei-skill-importer,kei-projects-index,kei-projects-watcher,kei-gdrive-import,kei-leak-matrix,kei-skills,kei-gateway,kei-cron-scheduler,kei-export-trajectories,kei-backend-daytona,kei-decision,kei-decompose,kei-registry,ssh-check,firewall-diff,kei-ping,kei-tlog'
     steps:
       - uses: actions/checkout@v4
       - name: cargo test (group ${{ matrix.group.name }})

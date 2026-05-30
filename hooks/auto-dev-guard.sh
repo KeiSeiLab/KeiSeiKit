@@ -1,7 +1,7 @@
 #!/bin/sh
 # auto-dev-guard.sh — PostToolUse:Edit|Write advisory hook.
 #
-# Triggers a frontend-validator pass after meaningful Edit/Write on
+# Triggers a continuous-validator pass after meaningful Edit/Write on
 # frontend files (.tsx, .ts, .svelte, .vue, .dart) OR DB-layer files
 # (migrations/*.sql, src/db/**, src/types/**, prisma/schema.prisma,
 # drizzle.config.*).

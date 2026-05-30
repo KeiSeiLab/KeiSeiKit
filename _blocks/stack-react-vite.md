@@ -1,6 +1,6 @@
 # STACK — Vite + React 19 + TypeScript (SPA)
 
-Use for single-page applications, internal dashboards, editors, design tools — surfaces where the page IS the app and SEO / zero-JS don't matter. For marketing use `stack-astro`. For full-stack React with Server Components use `stack-nextjs`.
+Use for single-page applications, internal dashboards, editors, design tools — surfaces where the page IS the app and SEO / zero-JS don't matter. For full-stack React with Server Components use `stack-nextjs`.
 
 **Scaffold:** `npm create vite@latest <app> -- --template react-ts`. Dev server via `vite`; production via `vite build` → `dist/` (static files).
 

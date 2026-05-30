@@ -6,7 +6,6 @@ members = [
     "kei-changelog",
     "ssh-check",
     "firewall-diff",
-    # mock-render, visual-diff, tokens-sync EXTRACTED 2026-05-30 → KeiSeiLab/frontend-studio.
     "kei-memory",
     "kei-conflict-scan",
     "kei-refactor-engine",

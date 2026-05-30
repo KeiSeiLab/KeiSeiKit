@@ -33,6 +33,4 @@ Next:   /research --angle=design-refs <arguments>
 ## References
 
 - `skills/research/SKILL.md` — full 8-phase flow
-- `skills/frontend-design/SKILL.md` — archetype philosophy
-- `skills/site-create/SKILL.md` — where inspiration feeds into
 - `docs/CONVERGENCE-PLAN.md` §Pre-unlock quick wins #5

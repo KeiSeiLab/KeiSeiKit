@@ -26,7 +26,7 @@ stack-rust    = ["rust-first", "no-python-without-approval"]
 # updater + the inline pet hook are kept by the filter directly (name match),
 # so they are NOT listed here.
 [pack-always]
-base = ["first-run-onboard", "mailbox-inject", "tomd-preread", "site-wysiwyd-check"]
+base = ["first-run-onboard", "mailbox-inject", "tomd-preread"]
 
 # Stack profile -> discipline packs auto-enabled (safety is always implicit).
 # git-guard intentionally absent from every stack (opt-in only).
@@ -49,7 +49,7 @@ mobile  = ["base", "mobile"]
 # (power user / --profile=full / non-interactive), ALL manifests install.
 [agent-set]
 base    = ["architect", "critic", "validator", "researcher", "code-implementer", "security-auditor"]
-web     = ["code-implementer-typescript", "frontend-validator", "validator-api", "validator-doc", "researcher-web", "researcher-code"]
+web     = ["code-implementer-typescript", "validator-api", "validator-doc", "researcher-web", "researcher-code"]
 ml      = ["ml-implementer", "ml-researcher", "modal-runner", "cost-guardian", "fal-ai-runner", "code-implementer-python", "validator-benchmark"]
 systems = ["code-implementer-rust", "code-implementer-go", "infra-implementer", "infra-implementer-cicd", "infra-implementer-container", "infra-implementer-iac", "infra-implementer-secrets", "validator-version"]
-mobile  = ["code-implementer-swift", "code-implementer-flutter", "frontend-validator"]
+mobile  = ["code-implementer-swift", "code-implementer-flutter"]

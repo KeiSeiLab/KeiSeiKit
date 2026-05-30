@@ -18,13 +18,6 @@
 [profile]
 minimal = []
 core    = ["tomd", "kei-doctor"]
-# `frontend` profile EXTRACTED 2026-05-30 to KeiSeiLab/frontend-studio (private).
-# The site-building cluster is no longer shipped from the public KSK. The
-# generic image / video / 3D / animation skills (nano-banana, video-gen,
-# animate, motion-design, scroll-animation, 3d-scene, visual-explainer,
-# design-inspiration, playwright-cli) remain available via the `core` /
-# `dev` profiles. Users wanting the full site pipeline should install
-# frontend-studio separately.
 ops     = ["kei-ledger", "ssh-check", "firewall-diff", "provision-hetzner", "provision-vultr", "harden-base", "metrics-scrape", "log-ship", "kei-provision"]
 dev     = ["kei-migrate", "kei-changelog", "kei-ci-lint", "kei-docs-scaffold", "kei-memory", "kei-conflict-scan", "kei-refactor-engine", "kei-graph-check", "kei-store", "kei-artifact", "kei-agent-runtime", "kei-capability", "kei-entity-store", "kei-pipe", "kei-cache", "kei-spawn", "kei-replay"]
 mcp     = ["kei-router", "kei-sage", "kei-task", "kei-chat-store", "kei-crossdomain", "kei-search-core", "kei-content-store", "kei-social-store", "kei-curator", "kei-auth"]
@@ -58,10 +51,6 @@ kind = "shell"
 file = "kei-doctor.sh"
 deps = []
 desc = "Substrate health check + PATH diagnostic; --fix attempts repair"
-
-# 5 frontend-tooling shell primitives EXTRACTED 2026-05-30 → KeiSeiLab/frontend-studio:
-#   design-scrape, live-preview, figma-tokens, frontend-inspect, screenshot-decode.
-# They belonged to the site-building cluster and are no longer shipped here.
 
 [primitive.harden-base]
 kind = "shell"
@@ -136,10 +125,6 @@ kind = "rust"
 crate = "firewall-diff"
 deps = ["ufw (target-side; binary parses `ufw status` output)"]
 desc = "ufw intended-vs-running diff — catches drift between declared and live rules"
-
-# 3 frontend-tooling rust primitives EXTRACTED 2026-05-30 → KeiSeiLab/frontend-studio:
-#   mock-render, visual-diff, tokens-sync. They were the WYSIWYD enforcement +
-#   design-token pipeline for /site-create and are no longer shipped here.
 
 [primitive.kei-memory]
 kind = "rust"

@@ -172,59 +172,6 @@ Output:
 - Data flow issues: [list or NONE]
 ```
 
-### Agent: `sh-frontend-final-gate` (опциональный 5-й)
-
-> Запускается если diff содержит `*.tsx | *.ts | *.svelte | *.vue | *.dart` ИЛИ
-> затронут DB-layer (`migrations/*.sql`, `src/db/**`, `src/types/**`).
-
-```
-Спавнить с subagent_type: "frontend-validator". Prompt:
-
-FINAL pre-merge frontend pass. Project: [path], stack: [stack].
-Branch diff vs main: [git diff main..HEAD --stat].
-
-This is the LAST line — do NOT skip any subsection. All must PASS or commit blocks.
-
-1. **Production build** — `npm run build` (or `flutter build web`).
-   PASS: zero errors, zero warnings about unused exports / unused imports.
-   FAIL: any compile error, any runtime crash on build.
-
-2. **Type-check strict** — `npx tsc --noEmit --strict` (force strict, even if tsconfig is lenient).
-   PASS: zero errors.
-
-3. **DB-contract drift** — `kei-db-contract <root> --strict`.
-   PASS: drift_count == 0.
-
-4. **Visual regression FULL** — `npm run visual-check` if script exists.
-   PASS: zero pixel diff above 0.01 ratio across all routes × all viewports.
-   No baseline yet → emit WARN, suggest `/visual-loop` first.
-
-5. **A11y FULL** — `npm run a11y-check` if script exists, else `npx axe-cli` against built site.
-   PASS: zero WCAG 2 AA violations.
-
-6. **Lighthouse score gate** — `npx @lhci/cli autorun` if installed, else inline lighthouse via Playwright.
-   Gates: perf >= 90, a11y >= 95, best-practice >= 90, seo >= 90 (production-build target).
-
-Output format:
-- BUILD: PASS / FAIL [details]
-- TYPECHECK: PASS / FAIL [count]
-- DB_CONTRACT: PASS / FAIL [drift_count]
-- VISUAL: PASS / WARN / FAIL [diff_count]
-- A11Y: PASS / FAIL [violations]
-- LIGHTHOUSE: perf=N a11y=N best=N seo=N (PASS / FAIL)
-- VERDICT: SHIP_OK / FIX_FIRST / REVIEW_NEEDED
-```
-
-Hard rules:
-- BUILD FAIL → block ship.
-- TYPECHECK FAIL → block ship.
-- DB_CONTRACT FAIL → block ship (schema/types must align before merge).
-- A11Y violations → block ship.
-- VISUAL diff → REVIEW_NEEDED (user approves new baseline OR fixes regression).
-- Lighthouse below threshold → WARN, ship with explicit user override.
-
----
-
 ## Phase 2 — Ship Decision (lead)
 
 ```

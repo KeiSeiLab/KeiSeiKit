@@ -17,9 +17,9 @@ primitive_time_secs() {
     shell) echo 1 ;;
     rust)
       case "$name" in
-        mock-render|kei-migrate|kei-ledger) echo 20 ;;
+        kei-migrate|kei-ledger)             echo 20 ;;
         kei-changelog|firewall-diff)        echo 15 ;;
-        visual-diff|tokens-sync|ssh-check)  echo 5  ;;
+        ssh-check)                          echo 5  ;;
         *) echo 10 ;;
       esac
       ;;
@@ -35,9 +35,9 @@ primitive_disk_kb() {
     shell) echo 5 ;;
     rust)
       case "$name" in
-        mock-render|kei-migrate|kei-ledger) echo 30000 ;;
+        kei-migrate|kei-ledger)             echo 30000 ;;
         kei-changelog|firewall-diff)        echo 10000 ;;
-        visual-diff|tokens-sync|ssh-check)  echo 5000  ;;
+        ssh-check)                          echo 5000  ;;
         *) echo 8000 ;;
       esac
       ;;

@@ -30,7 +30,7 @@ order. Never skip a phase. Never re-order phases.
 | 3 | [phase-3-provision.md](phase-3-provision.md) | Provision + SSH first contact | 1× |
 | 4 | [phase-4-harden.md](phase-4-harden.md) | Run `harden-base.sh` over SSH | 1× |
 | 5 | [phase-5-verify.md](phase-5-verify.md) | `ssh-check` + `firewall-diff` **HARD GATE** | 1× |
-| 6 | [phase-6-handoff.md](phase-6-handoff.md) | Artifact list + optional `/web-deploy` | — (final report) |
+| 6 | [phase-6-handoff.md](phase-6-handoff.md) | Artifact list + handoff (e.g. `/auth-setup`) | — (final report) |
 
 **Minimum AskUserQuestion count across a complete pipeline: 6+** — pure-
 click contract. Only the intent argument and per-port customisations are
@@ -73,7 +73,7 @@ for open CVEs or probes third-party endpoints.
 | `HARDENED` | Phase 4 | true when harden-base.sh exited 0 |
 | `SSH_CHECK_OK` | Phase 5 | exit 0 of `ssh-check` |
 | `FW_DIFF_OK`   | Phase 5 | exit 0 of `firewall-diff` |
-| `HANDOFF_TO`   | Phase 6 | next skill (e.g. `/web-deploy`) or `none` |
+| `HANDOFF_TO`   | Phase 6 | next skill (e.g. `/auth-setup`) or `none` |
 
 ---
 
@@ -133,4 +133,3 @@ Artifacts:     <terraform state path | cloud-init.yaml path>
 - `_primitives/provision-hetzner.sh` · `_primitives/provision-vultr.sh` — provisioners (Phase 3)
 - `_primitives/harden-base.sh` — hardening script (Phase 4)
 - `_primitives/_rust/ssh-check/` · `_primitives/_rust/firewall-diff/` — verify gate (Phase 5)
-- `skills/web-deploy/SKILL.md` — optional Phase 6 handoff

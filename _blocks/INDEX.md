@@ -114,7 +114,6 @@ blocks = ["baseline", "rule-pre-dev-gate", "api-anthropic"]
 
 ### STACK
 
-- `stack-astro` — STACK — Astro 6 (Content + Marketing + Islands)
 - `stack-embedded-stm32` — STACK — Embedded Rust STM32 (embassy / cortex-m)
 - `stack-fastapi-postgres` — STACK — FastAPI + async SQLAlchemy 2.0 + PostgreSQL
 - `stack-flutter` — STACK — Flutter + Riverpod + Clean Architecture

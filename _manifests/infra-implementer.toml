@@ -54,7 +54,7 @@ forbidden_domain = [
     "Skipping `memory/{project}.md` update with new endpoints / credentials refs / learnings",
     "Fixing immediately after Phase 1 of Double Audit without running Phase 2",
     "Third attempt with the same failed approach (escalate to Error Budget Level 2)",
-    "Treating an ML / guidance-law / offensive-cyber / kernel-level project as deployable to public surfaces (share-page, Vercel, GitHub Pages, Netlify, CF Pages public routes)",
+    "Treating an ML / guidance-law / offensive-cyber / kernel-level project as deployable to public surfaces (Vercel, GitHub Pages, Netlify, CF Pages public routes)",
 ]
 
 output_extra_fields = [

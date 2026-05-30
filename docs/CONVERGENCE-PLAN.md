@@ -29,7 +29,6 @@ Source: `docs/CONVERGENCE-AUDIT-ATOMS.md` (architect, E2).
 |---|---|---|---|---|
 | **SQLite-CRUD engine** | 6 crates (kei-chat/content/social/sage/task/crossdomain-store) | 1 `kei-entity-store` engine + 6 thin schema plugins | **parallel with Stream B** (not before) | 2-3 days |
 | **Provisioner unification** | 3 shells (provision-hetzner, provision-vultr, harden-base) | 1 `kei-provision <backend>` Rust (harden-base stays — different lifecycle) | **v0.24 now** | 0.5-1 day |
-| **Frontend meta-dispatcher** | 4 shells (design-scrape, live-preview, figma-tokens, frontend-inspect) | thin `kei-frontend fetch\|analyze` shim, keep 4 impls underneath | post-unlock, optional | 0.5 day |
 | **4 unmapped LBM-port crates** | unknown | audit after mapping | post-unlock (2026-06-03+) | TBD |
 
 **Evidence:** `Store::open` is byte-identical across 5 crates (`kei-chat-store/src/store.rs:13-21` et al). FTS re-index literal-same body. Deps 7-liner identical. ~500 LOC duplication removed.
@@ -58,10 +57,7 @@ Source: same audit.
 
 | Consolidation | From | To | When |
 |---|---|---|---|
-| **/audit `<target>`** | /seo-audit + /a11y-audit + /perf-audit + /responsive-audit + /pr-review + /security-review (6) | 1 skill + checklist registry `checklists/<target>.md` | post-unlock — **largest LOC win (~50%)** |
-| **Deprecate /site-builder** | /site-builder (subset of /site-create) | `[DEPRECATED: use /site-create]` header | pre-unlock |
 | **Deprecate research presets** | /competitor-analysis + /design-inspiration (both are /research Phase-5 specializations) | Document as `/research --angle=competitors` / `--angle=design-refs` | pre-unlock |
-| **/animate gateway** | motion-design + scroll-animation + web-effects + ai-animation | Add top-level `/animate` router (40 LOC). Keep 4 existing (domain-disjoint matrices) | pre-unlock |
 
 **Kept separate with rationale:**
 - Setup pipelines (ci-scaffold, auth-setup, observability-setup, docs-scaffold, schema-design) — block sets disjoint (`ci-*.md` vs `auth-*.md`). Unified `/scaffold <domain>` would just be a switch. Reject consolidation. Extract `_blocks/pipeline-5phase-template.md` instead.
@@ -80,7 +76,6 @@ These land during the current schema-lock window (before 2026-05-14 for agent su
 | 1 | Extract `_blocks/pipeline-5phase-template.md` — shared preamble for ci/auth/obs/docs/schema pipeline skills | 0.5 day | none |
 | 2 | Extract `_blocks/rule-pure-click-contract.md` — AskUserQuestion contract referenced by 5+ skills | 0.5 day | none |
 | 3 | Rename capabilities for clarity (`cargo-only-bash` → `bash-allowlist`, `read-only` → `deny-tools`). Keep old names as deprecated aliases | 0.25 day | none (additive) |
-| 4 | Deprecate `/site-builder` with `[DEPRECATED: use /site-create]` header | 0.1 day | none |
 | 5 | Deprecate `/competitor-analysis` + `/design-inspiration` as presets pointing to `/research` | 0.1 day | none |
 | 6 | Add `/animate` gateway skill (40 LOC router) | 0.25 day | none |
 | **7** ✓ | **Cluster 2: Provisioner unification `kei-provision <backend>`** | **1 day** | **atom substrate — but additive, not removing existing scripts** |
@@ -169,6 +164,5 @@ Gap is skills: user assumed 39 → ~18, reality 39 → ~28. Why? Because domain-
 **Distinguish:**
 - **Verb parameterization** — when content is homogeneous, extract verb + param (scope::path-filter, quality::cargo-green, /audit <target>). Works when LOC overlap >50%.
 - **Block extraction** — when structure is homogeneous but content heterogeneous, extract shared block and reference it (_blocks/pipeline-5phase-template.md). Works when preamble overlap >50% but body differs.
-- **Subset deprecation** — when one skill is a strict subset of another (/site-builder ⊆ /site-create). Rare but clean.
 
 All three techniques apply in this plan. Substrate doesn't always compress via the same primitive.
