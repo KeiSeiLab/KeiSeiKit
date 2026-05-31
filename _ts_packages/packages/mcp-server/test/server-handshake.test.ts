@@ -9,7 +9,9 @@ describe("server handshake + tool listing", () => {
     expect(names.has("kei")).toBe(true);
     expect(names.has("kei-ledger")).toBe(true);
     expect(names.has("kei-memory")).toBe(true);
-    expect(tools.length).toBeGreaterThanOrEqual(14);
+    // v0.61: 3 tool entries removed (mock-render, visual-diff, tokens-sync
+    // extracted to private frontend-studio). Floor lowered from 14 to 10.
+    expect(tools.length).toBeGreaterThanOrEqual(10);
   });
 
   it("every listed tool has a non-empty description", () => {
