@@ -29,7 +29,10 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "author": "KeiSei LLC <hello@keilab.io>", "Denis Parfionovich <parfionovich@keilab.io>",
+  "author": "KeiSei LLC <hello@keilab.io>",
+  "contributors": [
+    "Denis Parfionovich <parfionovich@keilab.io>"
+  ],
   "publishConfig": {
     "registry": "https://keigit.com/api/packages/keisei/npm/",
     "access": "public"
