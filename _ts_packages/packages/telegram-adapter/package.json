@@ -19,7 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "grammy": "^1.28.0",
+    "grammy": "^1.43.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
