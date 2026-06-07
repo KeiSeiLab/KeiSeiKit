@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "typescript": "^5.5.0",
-    "vitest": "^2.0.0",
+    "vitest": "^4.1.8",
     "tsx": "^4.16.0"
   },
   "author": "KeiSei LLC <hello@keilab.io>",
