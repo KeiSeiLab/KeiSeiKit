@@ -253,7 +253,7 @@ bytes = "1"
 async-trait = "0.1"
 wiremock = "0.6"
 # Wave 38a — daemon integration deps (PTY for /term WS endpoint, tungstenite for axum WS)
-portable-pty = "0.8"
+portable-pty = "0.9"
 tokio-tungstenite = "0.29"
 # Wave 44a — tool-sandbox hardening (shell tokenization, URL parsing, bounded LRU)
 shell-words = "1"
