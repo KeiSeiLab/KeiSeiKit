@@ -5,6 +5,8 @@ name = "code-implementer-typescript"
 description = "TypeScript implementation specialist. Next.js 16 / Node / browser. Type-safe API contracts."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "edit-local"
 
 role = """

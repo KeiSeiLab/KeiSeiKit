@@ -134,6 +134,7 @@ backend_bin_for() {
     copilot)              echo "copilot" ;;
     kimi)                 echo "kimi"    ;;
     codex)                echo "codex"   ;;
+    glm)                  echo "claude"  ;;  # GLM rides the claude binary (Z.ai Anthropic-compat)
     *) return 1 ;;
   esac
 }
@@ -295,6 +296,24 @@ fi
 if [ "$SPLASH" = "1" ] && [ -t 0 ] && [ -t 1 ]; then
   # Wait up to 0.6s; any keypress aborts immediately.
   read -t 0.6 -n 1 -s _ 2>/dev/null || true
+fi
+
+# GLM (Z.ai) primary: same claude binary, Anthropic-compatible endpoint.
+# Source key from secrets (RULE 0.8) and inject env scoped to this exec only.
+if [ "$PRIMARY" = "glm" ]; then
+  KEI_SECRETS_FILE="${KEI_SECRETS_FILE:-$HOME/.claude/secrets/.env}"
+  [ -f "$KEI_SECRETS_FILE" ] && { set -a; . "$KEI_SECRETS_FILE"; set +a; }
+  if [ -z "${ZAI_API_KEY:-}" ]; then
+    echo "error: primary 'glm' needs ZAI_API_KEY in $KEI_SECRETS_FILE" >&2
+    exit 3
+  fi
+  exec env \
+    ANTHROPIC_BASE_URL="${ZAI_BASE_URL:-https://api.z.ai/api/anthropic}" \
+    ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+    ANTHROPIC_DEFAULT_OPUS_MODEL="${ZAI_MODEL:-glm-5.2}" \
+    ANTHROPIC_DEFAULT_SONNET_MODEL="${ZAI_MODEL:-glm-5.2}" \
+    ANTHROPIC_DEFAULT_HAIKU_MODEL="${ZAI_SMALL_MODEL:-glm-5-turbo}" \
+    "$CLAUDE_BIN" "${PASSTHROUGH[@]}"
 fi
 
 exec "$CLAUDE_BIN" "${PASSTHROUGH[@]}"

@@ -5,6 +5,8 @@ name = "critic-bug"
 description = "Detects bug patterns: off-by-one, error-swallowing, unchecked Result/Option, race conditions in shared state. Read-only."
 tools = ["Glob", "Grep", "Read"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "read-only"
 
 role = """

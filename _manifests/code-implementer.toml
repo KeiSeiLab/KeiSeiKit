@@ -6,6 +6,8 @@ name = "code-implementer"
 description = "Generic implementation specialist for Rust/Swift/Python/Go/Flutter/TypeScript. Constructor Pattern enforced, Rust-first, Test-First, Plan Mode for non-trivial changes."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "NotebookEdit", "Agent"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "edit-local"
 produces_artifact = "patch"
 

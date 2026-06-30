@@ -43,3 +43,9 @@ bin         = "codex"
 prompt_flag = "-p"
 notes       = "OpenAI Codex CLI — register here, install separately"
 homepage    = "https://github.com/openai/codex"
+
+[backend.glm]
+bin         = "claude"
+prompt_flag = "-p"
+notes       = "Z.ai GLM Coding Plan via Anthropic-compatible endpoint. Wraps the `claude` binary with ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic + ANTHROPIC_AUTH_TOKEN=$ZAI_API_KEY (sourced from ~/.claude/secrets/.env). Default model glm-5.2; override via ZAI_MODEL / ZAI_SMALL_MODEL. Does NOT touch your real Anthropic claude backend."
+homepage    = "https://docs.z.ai/scenario-example/develop-tools/claude"

@@ -5,6 +5,8 @@ name = "researcher-code"
 description = "Codebase research specialist. Glob / Grep / Read only. E1-E6 grading."
 tools = ["Glob", "Grep", "Read"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "read-only"
 
 role = """

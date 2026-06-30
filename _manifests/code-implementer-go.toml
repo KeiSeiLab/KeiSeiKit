@@ -5,6 +5,8 @@ name = "code-implementer-go"
 description = "Go implementation specialist. Mesh networking, lightweight CLI, embedded servers. Constructor Pattern enforced."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "edit-local"
 
 role = """

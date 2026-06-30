@@ -35,6 +35,13 @@ KEI_AGENTS_DIR="${KEI_AGENTS_DIR:-$HOME/.claude/agents}"
 KEI_MANIFESTS_DIR="${KEI_MANIFESTS_DIR:-$HOME/.claude/_manifests}"
 KEI_PRIMARY_CFG="${KEI_PRIMARY_CFG:-$HOME/.claude/config/primary.toml}"
 KEI_NATIVE_AGENT="${KEI_NATIVE_AGENT:-0}"
+KEI_SECRETS_FILE="${KEI_SECRETS_FILE:-$HOME/.claude/secrets/.env}"
+
+# Source secrets (RULE 0.8) so backends that need keys (e.g. glm → ZAI_API_KEY)
+# can read them. Never echoed; subshell-scoped to this process.
+if [ -f "$KEI_SECRETS_FILE" ]; then
+  set -a; . "$KEI_SECRETS_FILE"; set +a
+fi
 
 usage() { sed -n '2,32p' "$0" | sed 's|^# \{0,1\}||'; }
 
@@ -47,6 +54,7 @@ backend_bin() {
     copilot)              echo "copilot" ;;
     kimi)                 echo "kimi"    ;;
     codex)                echo "codex"   ;;
+    glm)                  echo "claude"  ;;  # GLM rides the claude binary (Anthropic-compat endpoint)
     *) return 1 ;;
   esac
 }
@@ -60,11 +68,15 @@ backend_supports_native_agent() {
 manifest_provider() {
   local agent="$1" tomlf="$KEI_MANIFESTS_DIR/$1.toml"
   [ -f "$tomlf" ] || return 1
-  awk -F'=' '
+  # Comment-safe: split only on the first '=', strip inline '# ...' comment,
+  # then trim whitespace + quotes. Tolerates `provider = "glm"  # note`.
+  awk '
     /^provider[[:space:]]*=/ {
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2)
-      gsub(/^"|"$/, "", $2)
-      print $2; exit
+      sub(/^provider[[:space:]]*=[[:space:]]*/, "")
+      sub(/[[:space:]]*#.*$/, "")
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+      gsub(/^"|"$/, "")
+      print; exit
     }
   ' "$tomlf"
 }
@@ -75,11 +87,13 @@ config_primary() {
     printf '%s\n' "$KEI_PRIMARY"; return 0
   fi
   [ -f "$KEI_PRIMARY_CFG" ] || return 1
-  awk -F'=' '
+  awk '
     /^provider[[:space:]]*=/ {
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2)
-      gsub(/^"|"$/, "", $2)
-      print $2; exit
+      sub(/^provider[[:space:]]*=[[:space:]]*/, "")
+      sub(/[[:space:]]*#.*$/, "")
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+      gsub(/^"|"$/, "")
+      print; exit
     }
   ' "$KEI_PRIMARY_CFG"
 }
@@ -128,6 +142,23 @@ backend_invoke() {
 
   case "$backend" in
     claude)               exec "$bin" $permissive_claude -p "$prompt" ;;
+    glm)
+      # Z.ai GLM Coding Plan: same claude binary, Anthropic-compatible endpoint.
+      # Key sourced from ~/.claude/secrets/.env (RULE 0.8). Env is scoped to the
+      # exec'd subprocess only — your real `claude` backend is untouched.
+      if [ -z "${ZAI_API_KEY:-}" ]; then
+        printf '[kei-agent-cli] ZAI_API_KEY unset. Add it to %s\n' "$KEI_SECRETS_FILE" >&2
+        printf '  echo '\''ZAI_API_KEY=...'\'' >> %s && chmod 600 %s\n' "$KEI_SECRETS_FILE" "$KEI_SECRETS_FILE" >&2
+        return 3
+      fi
+      exec env \
+        ANTHROPIC_BASE_URL="${ZAI_BASE_URL:-https://api.z.ai/api/anthropic}" \
+        ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+        ANTHROPIC_DEFAULT_OPUS_MODEL="${ZAI_MODEL:-glm-5.2}" \
+        ANTHROPIC_DEFAULT_SONNET_MODEL="${ZAI_MODEL:-glm-5.2}" \
+        ANTHROPIC_DEFAULT_HAIKU_MODEL="${ZAI_SMALL_MODEL:-glm-5-turbo}" \
+        "$bin" --strict-mcp-config $permissive_claude -p "$prompt"
+      ;;
     grok)                 exec "$bin" $permissive_grok --print "$prompt" ;;
     agy|antigravity)      exec "$bin" --dangerously-skip-permissions --print "$prompt" ;;
     copilot)              exec "$bin" --prompt "$prompt" ;;
@@ -187,7 +218,7 @@ handle_primary() {
   fi
   backend_bin "$arg" >/dev/null || {
     printf '[kei-primary] unknown backend: %s\n' "$arg" >&2
-    printf 'valid: claude grok agy copilot kimi codex\n' >&2
+    printf 'valid: claude grok agy copilot kimi codex glm\n' >&2
     return 2
   }
   mkdir -p "$(dirname "$KEI_PRIMARY_CFG")"
@@ -201,7 +232,7 @@ case "${1:-}" in
   ""|-h|--help|help) usage; exit 0 ;;
   list|--list)
     printf 'Backends (✓ installed, ✗ missing):\n'
-    for b in claude grok agy copilot kimi codex; do
+    for b in claude grok agy copilot kimi codex glm; do
       bin=$(backend_bin "$b")
       if p=$(command -v "$bin" 2>/dev/null); then
         printf '  %-10s ✓ %s\n' "$b" "$p"

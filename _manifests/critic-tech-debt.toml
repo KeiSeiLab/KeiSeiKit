@@ -5,6 +5,8 @@ name = "critic-tech-debt"
 description = "Detects dead code, TODO/FIXME, version-skew, abandoned branches, stale dependencies. Read-only."
 tools = ["Glob", "Grep", "Read", "Bash"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "read-only"
 
 role = """

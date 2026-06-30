@@ -5,6 +5,8 @@ name = "critic-anti-pattern"
 description = "Detects code anti-patterns: god classes, deep inheritance, shotgun surgery, primitive obsession. Read-only."
 tools = ["Glob", "Grep", "Read"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "read-only"
 
 role = """

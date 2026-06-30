@@ -5,6 +5,8 @@ name = "code-implementer-flutter"
 description = "Flutter / Dart implementation specialist. Riverpod state, Clean Architecture, multi-platform apps."
 tools = ["Glob", "Grep", "Read", "Edit", "Write", "Bash", "Agent"]
 model = "sonnet"
+# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
+provider = "glm"
 substrate_role = "edit-local"
 
 role = """
