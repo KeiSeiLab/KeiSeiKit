@@ -5,6 +5,8 @@ name = "security-auditor-supply-chain"
 description = "Supply-chain audit on new dependencies: maintainers, CVE history, transitive deps, native code. Read-only."
 tools = ["Glob", "Grep", "Read", "Bash", "WebFetch", "WebSearch"]
 model = "sonnet"
+# Z.ai GLM-5.2 — mechanical vuln/pattern scan (breadth, cheap); deep risk-verdict stays on claude.
+provider = "glm"
 substrate_role = "auditor"
 
 role = """

@@ -6,8 +6,6 @@ name = "architect"
 description = "Senior software architect — analyzes structure, dependencies, patterns, data flow, coupling/cohesion. Read-only. Use for architecture review, system design, module-boundary analysis, pattern inventory, structural evidence-graded verdict."
 tools = ["Glob", "Grep", "Read", "WebFetch", "WebSearch"]
 model = "opus"
-# Z.ai GLM-5.2 default for this read-only/coding agent (override per call: kei agent --on=claude).
-provider = "glm"
 substrate_role = "read-only"
 produces_artifact = "spec"
 

@@ -5,6 +5,8 @@ name = "security-auditor-variant"
 description = "Variant analysis after a vulnerability is found. Greps codebase for the same pattern. Read-only."
 tools = ["Glob", "Grep", "Read"]
 model = "sonnet"
+# Z.ai GLM-5.2 — mechanical vuln/pattern scan (breadth, cheap); deep risk-verdict stays on claude.
+provider = "glm"
 substrate_role = "auditor"
 
 role = """

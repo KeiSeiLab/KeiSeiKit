@@ -57,6 +57,10 @@ case "${1:-}" in
     shift
     exec "$HOME/.claude/scripts/kei-agent-cli.sh" "$@"
     ;;
+  second-opinion|2nd|so)
+    shift
+    exec "$HOME/.claude/scripts/kei-second-opinion.sh" "$@"
+    ;;
   primary)
     shift
     exec "$HOME/.claude/scripts/kei-agent-cli.sh" primary "$@"

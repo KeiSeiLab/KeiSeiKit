@@ -65,14 +65,42 @@ launch (~60 s); the trade-off is that the GLM sub-session does not see
 `kei-mcp` / `spawn_agent` (the standard agent roster declares no MCP tools, so
 this is harmless in practice).
 
-**Default routing (DNA).** Read-only analysis agents (`critic*`, `architect`,
-`researcher-code`) and coding agents (`code-implementer*`) ship with
-`provider = "glm"` in their manifests, so they resolve to GLM without `--on=glm`.
-High-stakes judgement gates and write/deploy agents (`validator*`,
-`security-auditor*`, `cost-guardian`, `ml-*`, `modal-runner`, `infra-*`,
-`researcher`) deliberately stay on `claude` — reserve the top-tier Anthropic
-model for verdicts where being wrong is expensive. Override either way per call
-with `--on=`.
+**Default routing (DNA) — benchmark-grounded (2026-06).** Two tiers, not a
+matrix. GLM-5.2 is near-Opus on SWE-bench-class coding at ~1/6 the cost with a
+1M context, but weakest on the hardest long-horizon multi-step work and complex
+multi-tool orchestration. So:
+
+- **→ GLM** (bulk / coding / read-only scan, cheap): `code-implementer*`,
+  `critic*`, `researcher-code`, and the mechanical security scanners
+  `security-auditor-variant` / `security-auditor-supply-chain` (GLM beat Opus 4.8
+  on IDOR detection F1 39 vs 28 at ~1/6 cost — good for breadth scanning).
+- **→ claude** (judgement / deep reasoning / expensive failure): `architect`
+  (deep structural reasoning is Opus's edge), `validator*`, `security-auditor` +
+  `security-auditor-differential` (final risk verdict), `cost-guardian`, `ml-*`,
+  `modal-runner`, `infra-*`, `researcher` / `researcher-web` / `researcher-hybrid`.
+
+Override per call with `--on=`. Escalate `code-implementer*` to `--on=claude` for
+marathon / cross-cutting refactors (GLM's weak spot).
+
+**Cross-model verification — `kei second-opinion`.** Different models surface
+different issues (the v0.62 audit showed this empirically). For critical
+*read-only* checks, run the same agent on two backends in parallel and diff:
+
+```bash
+kei second-opinion security-auditor "audit src/auth.rs"   # glm vs claude
+kei second-opinion critic "review src/lock.rs" --on=glm --vs=grok
+```
+
+It refuses mutating agents (Edit/Write) — running a writer twice would
+double-apply edits. Cheap because GLM is cheap; strictly better than picking one
+model for high-stakes read-only passes.
+
+**Invocation path matters.** `provider` resolution fires only on the
+`kei agent <name>` CLI path and `spawn_agent` (MCP). Claude Code's native `Agent`
+tool runs sub-agents in-process on the *current* backend and ignores `provider`.
+To actually route bulk work to GLM, dispatch via `kei agent --on=glm …` from the
+shell, or set `kei primary glm` to move the whole session. The shipped default is
+`kei primary claude` (orchestrator on Claude, bulk dispatched to GLM).
 
 ## DNA — agent prefers a provider
 
