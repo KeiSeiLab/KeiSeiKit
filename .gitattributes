@@ -1,0 +1,26 @@
+# Normalize line endings: store text as LF in the repo AND check out as LF on
+# every platform (incl. Windows), so a Windows working copy no longer shows the
+# whole tree as modified via CRLF. Binary types are left byte-exact.
+* text=auto eol=lf
+
+# Shell scripts and hooks MUST be LF (CRLF breaks the shebang / execution).
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# Explicit binaries — never touch these.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.pdf  binary
+*.zip  binary
+*.gz   binary
+*.tar  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.mp4  binary
+*.wasm binary
