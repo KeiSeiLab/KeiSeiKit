@@ -77,6 +77,10 @@ case "${1:-}" in
     shift
     exec "$HOME/.claude/scripts/kei-limits.sh" "$@"
     ;;
+  glm-ledger|glm-report|glm)
+    shift
+    exec "$HOME/.claude/scripts/kei-glm-ledger.sh" "$@"
+    ;;
   onboard|setup|wizard)
     shift
     exec "$HOME/.claude/scripts/kei-onboard.sh" "$@"

@@ -151,6 +151,45 @@ backend_invoke() {
         printf '  echo '\''ZAI_API_KEY=...'\'' >> %s && chmod 600 %s\n' "$KEI_SECRETS_FILE" "$KEI_SECRETS_FILE" >&2
         return 3
       fi
+      # Ledger mode (default on; disable with KEI_GLM_LEDGER=0). Runs the call
+      # with --output-format=json to capture the REAL per-run token usage that
+      # the Z.ai endpoint reports, appends it to the GLM ledger, then re-emits
+      # the agent's text result on stdout so the caller's contract is unchanged.
+      # NOTE: the binary's total_cost_usd is NOT trusted for GLM (it prices the
+      # mapped Anthropic slot, not Z.ai) — we log raw token counts only.
+      if [ "${KEI_GLM_LEDGER:-1}" = "1" ] && command -v jq >/dev/null 2>&1; then
+        local _out _rc
+        set +e
+        _out=$(env \
+          ANTHROPIC_BASE_URL="${ZAI_BASE_URL:-https://api.z.ai/api/anthropic}" \
+          ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+          ANTHROPIC_DEFAULT_OPUS_MODEL="${ZAI_MODEL:-glm-5.2}" \
+          ANTHROPIC_DEFAULT_SONNET_MODEL="${ZAI_MODEL:-glm-5.2}" \
+          ANTHROPIC_DEFAULT_HAIKU_MODEL="${ZAI_SMALL_MODEL:-glm-5-turbo}" \
+          "$bin" --strict-mcp-config $permissive_claude --output-format=json -p "$prompt")
+        _rc=$?
+        set -e
+        if printf '%s' "$_out" | jq -e . >/dev/null 2>&1; then
+          local _ledger="${KEI_GLM_LEDGER_FILE:-$HOME/.claude/glm-ledger.jsonl}"
+          mkdir -p "$(dirname "$_ledger")" 2>/dev/null || true
+          printf '%s' "$_out" | jq -c \
+            --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg agent "${agent_name:-unknown}" \
+            --arg model "${ZAI_MODEL:-glm-5.2}" \
+            '{ts:$ts, agent:$agent, model:$model,
+              input:(.usage.input_tokens//0),
+              output:(.usage.output_tokens//0),
+              cache_read:(.usage.cache_read_input_tokens//0),
+              cache_creation:(.usage.cache_creation_input_tokens//0),
+              duration_ms:(.duration_ms//0),
+              is_error:(.is_error//false)}' >> "$_ledger" 2>/dev/null || true
+          printf '%s' "$_out" | jq -r '.result // empty'
+        else
+          # Unexpected non-JSON — emit raw so the caller still gets output.
+          printf '%s' "$_out"
+        fi
+        return $_rc
+      fi
       exec env \
         ANTHROPIC_BASE_URL="${ZAI_BASE_URL:-https://api.z.ai/api/anthropic}" \
         ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \

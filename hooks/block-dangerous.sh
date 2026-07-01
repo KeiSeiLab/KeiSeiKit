@@ -18,7 +18,10 @@ if echo "$COMMAND" | grep -qE 'dd\s+if=.*of=/dev/'; then
   exit 2
 fi
 
-if echo "$COMMAND" | grep -qE 'mkfs|format\s+'; then
+# Match real filesystem-format commands, not flags like `--output-format json`.
+# `format` must be a command word (start / after whitespace) AND target a
+# device or drive letter; `mkfs`/`mke2fs` are always dangerous.
+if echo "$COMMAND" | grep -qE 'mkfs|mke2fs|(^|[[:space:]])format[[:space:]]+(/dev/|[a-zA-Z]:)'; then
   echo "BLOCKED: filesystem format command" >&2
   exit 2
 fi
