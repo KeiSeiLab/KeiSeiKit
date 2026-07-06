@@ -4,6 +4,16 @@ All notable changes are tagged via `git tag v*`. Latest entries first.
 
 ## Unreleased
 
+(none — v0.64.0 just shipped)
+
+---
+
+## v0.64.0 — 2026-07-06
+
+Verify convention wired end-to-end through the RULE 0.14 self-audit loop:
+codified guardrails must now state how they are re-confirmed, and hooks are
+proven to fire before they are trusted.
+
 - **self-audit codify quality gate (RULE 0.14-Q)** — Phase-4 `codify` /
   `create hook` routes now must carry a when-NOT-to-apply clause + a
   verification criterion, and match rigidity to finding severity

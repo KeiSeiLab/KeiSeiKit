@@ -3,7 +3,7 @@
   "name": "keisei",
   "displayName": "KeiSei",
   "description": "Constructor Pattern multi-LLM agent substrate — 37 agents, 52 skills, 53 hooks, 83 blocks. Cross-CLI policy enforcement (Claude/Grok/Copilot/Agy/Kimi) via kei-mcp + kei_bash/kei_edit/kei_write. Rust primitives via classic ./install.sh.",
-  "version": "0.63.0",
+  "version": "0.64.0",
   "homepage": "https://keilab.io",
   "repository": "https://github.com/KeiSeiLab/KeiSeiKit.git",
   "author": {
