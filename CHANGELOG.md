@@ -11,6 +11,14 @@ All notable changes are tagged via `git tag v*`. Latest entries first.
   (new `skills/self-audit/codify-quality-gate.md`). Adds a "When NOT to
   use" section to the skill. Method adapted from Trail of Bits
   `skills-curated/skill-extractor` quality guide. (`ee40c43`)
+- **escalate-recurrence Verify criterion + hook smoke-test (RULE 0.14-Q)**
+  — the codifier that self-audit's codify route hands off to now emits a
+  `## Verify` section in every generated rule and smoke-tests the hook
+  against the reproducing input (correct exit code + clean on benign
+  input) *before* registration — a hook not seen fire is never registered.
+  Closes the loop with `codify-quality-gate.md`. Pure-click contract
+  preserved (Verify derived from Phase-0 evidence, no new question).
+  (`3020172`)
 
 ---
 
