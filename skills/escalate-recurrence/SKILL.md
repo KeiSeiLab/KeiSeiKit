@@ -1,6 +1,6 @@
 ---
 name: escalate-recurrence
-description: Triggered when Claude detects the same mistake ≥2× in one session, or the user says "опять / again / second time / already said". Interactively codifies the pattern into a rule + hook + wiki entry via option-picker questions. Pure-click flow — no free-text decisions. Writes rule file, generates hook scaffold at user-chosen severity, registers hook in settings.json via update-config. See ~/.claude/rules/recurrence-escalate.md.
+description: Triggered when Claude detects the same mistake ≥2× in one session, or the user says "опять / again / second time / already said". Interactively codifies the pattern into a rule + hook + wiki entry via option-picker questions. Pure-click flow — no free-text decisions. Writes rule file, generates hook scaffold at user-chosen severity, registers hook in settings.json via update-config. Each rule carries a `## Verify` criterion and every hook is smoke-tested against the reproducing input before registration (RULE 0.14-Q). See ~/.claude/rules/recurrence-escalate.md.
 ---
 
 # Escalate Recurrence — Interactive Codifier
@@ -117,6 +117,15 @@ Template:
 
 - Hook: `~/.claude/hooks/<slug>-guard.sh` (<event>, severity <S>)
 - Bypass: <bypass env var name, if applicable>
+
+## Verify
+
+<How to re-confirm the guardrail actually fires — the reproducing input + the
+observable pass signal. For a hook: the exact command/edit that must trip it and
+the exit code produced (e.g. `echo '<triggering-tool_input-json>' |
+~/.claude/hooks/<slug>-guard.sh; echo $?` → <exit-code>), plus one benign input
+that must stay `exit 0`. For a rule-only entry: the session-trace `event_class`
+that must read 0 in the next self-audit.>
 
 ## Why this and not "remember to check"
 
@@ -271,7 +280,7 @@ Then:
       "header": "Confirm",
       "multiSelect": false,
       "options": [
-        {"label": "Confirm — write all",   "description": "Phase 4 runs: files written, hook registered via update-config"},
+        {"label": "Confirm — write all",   "description": "Phase 4 runs: files written, hook smoke-tested on the reproducing input, then registered via update-config"},
         {"label": "Edit rule (1)",         "description": "Regenerate the rule file with changes you specify"},
         {"label": "Edit hook (2)",         "description": "Regenerate the hook scaffold with changes you specify"},
         {"label": "Edit wiki diffs (3-4)", "description": "Regenerate RULES.md / MEMORY.md entries"},
@@ -293,6 +302,7 @@ Execute in order (each via its right tool — do NOT shell out when a tool exist
 
 1. `Write` → `~/.claude/rules/<slug>.md`
 2. If hook: `Write` → `~/.claude/hooks/<slug>-guard.sh`, then `Bash` → `chmod +x ~/.claude/hooks/<slug>-guard.sh`
+2b. **Verify the hook before registering it** (RULE 0.14-Q — its own `## Verify`). Smoke-test against the Phase-0 evidence: pipe the triggering `tool_input` JSON to the hook and confirm the exit code matches the severity map (block→2, enforce→1, warn/remind→0); then pipe one benign input and confirm `exit 0` (no false-positive). If either fails, the hook does not satisfy its `## Verify` — fix the pattern and re-test. **Do NOT proceed to registration with a hook you have not seen fire.**
 3. `Edit` → `~/.claude/rules/RULES.md` (append the row)
 4. `Edit` → `~/.claude/memory/MEMORY.md` (append the line)
 5. `Edit` → `~/.claude/CLAUDE.md` (add Rules Index row) — only if `W == "Yes — full"`
@@ -309,6 +319,7 @@ Execute in order (each via its right tool — do NOT shell out when a tool exist
 ```
 ✓ Rule codified:      ~/.claude/rules/<slug>.md
 ✓ Hook registered:    ~/.claude/hooks/<slug>-guard.sh   (severity <S>, event <E>)
+✓ Verified:           hook fired on reproducing input (exit <code>), clean on benign input
 ✓ Wikified:           RULES.md, MEMORY.md<, CLAUDE.md if full>
 ✓ Log entry:          ~/.claude/memory/recurrence-log.md
 
@@ -327,3 +338,4 @@ To disable: remove the entry from settings.json (or set "enabled": false).
 - **Never write `{{placeholder}}` literals.** The assembler `validator.rs` rejects them; same hygiene applies here.
 - **No Patching.** A new rule codifies a pattern, it doesn't paper over an existing rule's gap. If the gap is in an existing rule → extend that rule (Phase 1 option "Extend existing").
 - **Escape hatch.** Every hook MUST document its bypass mechanism (env var like `<SLUG>_BYPASS=1` or marker string). Without escape, emergency work stalls.
+- **Verify before trust (RULE 0.14-Q).** Every codified rule carries a `## Verify` criterion (how to re-confirm the guardrail works), and every hook is smoke-tested against the reproducing input in Phase 4 *before* registration — a guardrail you have not seen fire is a guess. This satisfies the codify-quality-gate this skill is handed off from (`skills/self-audit/codify-quality-gate.md`).
