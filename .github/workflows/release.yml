@@ -39,7 +39,7 @@ jobs:
       # commit SHA; a floating tag like @v4 can be re-pointed by a
       # compromised maintainer (CVE-2025-30066 class). Version comment next
       # to each SHA is for human readability only — the SHA is load-bearing.
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
 
@@ -132,7 +132,7 @@ jobs:
           - { platform: darwin,  arch: arm64, bun_target: bun-darwin-arm64, ext: '' }
           - { platform: windows, arch: x64,   bun_target: bun-windows-x64,  ext: '.exe' }
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
 
       - name: Install bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
@@ -192,7 +192,7 @@ jobs:
     needs: [build-release, build-mcp-binary]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         with:
           fetch-depth: 0
 
@@ -336,7 +336,7 @@ jobs:
             echo "::notice::KEIGIT_NPM_TOKEN not set — skipping keigit publish gracefully"
           fi
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         if: steps.have_token.outputs.present == '1'
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
@@ -427,7 +427,7 @@ jobs:
             echo "::notice::NPM_TOKEN not set — skipping npmjs publish gracefully (keigit publish is primary)"
           fi
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
         if: steps.have_token.outputs.present == '1'
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
