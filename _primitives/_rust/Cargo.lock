@@ -3432,7 +3432,7 @@ dependencies = [
  "kei-shared",
  "kei-token-tracker",
  "lru",
- "nix 0.29.0",
+ "nix 0.31.3",
  "once_cell",
  "portable-pty",
  "rand 0.8.6",
@@ -4958,18 +4958,6 @@ dependencies = [
  "libc",
  "memoffset",
  "pin-utils",
-]
-
-[[package]]
-name = "nix"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
-dependencies = [
- "bitflags 2.11.1",
- "cfg-if",
- "cfg_aliases",
- "libc",
 ]
 
 [[package]]

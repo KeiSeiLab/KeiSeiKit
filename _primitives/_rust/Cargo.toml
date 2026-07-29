@@ -260,7 +260,7 @@ shell-words = "1"
 url = "2"
 lru = "0.12"
 # Wave 44b — atomic O_NOFOLLOW openat for symlink-safe writes (tool_apply.rs)
-nix = { version = "0.29", default-features = false, features = ["fs"] }
+nix = { version = "0.31", default-features = false, features = ["fs"] }
 # A2.1 — kei-import-project trait pattern matcher (syn AST parsing)
 syn = { version = "2", features = ["full"] }
 
