@@ -235,7 +235,7 @@ regex = "1.10"
 rusqlite = { version = "0.31", features = ["bundled"] }
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 anyhow = "1"
-thiserror = "1"
+thiserror = "2"
 tempfile = "3"
 toml = "0.8"
 flate2 = "1"
