@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
       - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule: this action uses named-branch convention (stable/nightly/beta/1.NN.0) — pinning a SHA locks to a specific Rust version (validator V-2026-04-22 confirmed 3c5f7ea was rust 1.94.1 branch tip, not generic "install stable"). dtolnay is a trusted maintainer (author of serde/anyhow/cxx). Supply-chain risk of @stable re-point is LOW and accepted here.
-      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6  # v2.9.2
         with:
           workspaces: _assembler
       - run: cd _assembler && cargo test --release
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
       - uses: dtolnay/rust-toolchain@stable  # exception to SHA-pin rule: this action uses named-branch convention (stable/nightly/beta/1.NN.0) — pinning a SHA locks to a specific Rust version (validator V-2026-04-22 confirmed 3c5f7ea was rust 1.94.1 branch tip, not generic "install stable"). dtolnay is a trusted maintainer (author of serde/anyhow/cxx). Supply-chain risk of @stable re-point is LOW and accepted here.
-      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4  # v2.9.1
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6  # v2.9.2
         with:
           workspaces: _primitives/_rust
       # v0.30+ CI fix (2026-04-29): 98-crate workspace OOMs the default
